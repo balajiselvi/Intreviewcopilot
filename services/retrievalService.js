@@ -232,13 +232,26 @@ function createRetrievalService({
         metadataFilters: normalizedRequest.metadataFilters
       });
 
+      const filteredCandidates = candidates.filter(chunk => {
+
+    const text = normalize(chunk.content);
+
+    return expandedQuery.queries.some(q =>
+        normalize(q)
+            .split(" ")
+            .filter(w => w.length > 2)
+            .some(word => text.includes(word))
+    );
+
+});
+
       const rankingStartedAt = now();
       const scoredCandidates = scoreCandidatesStage({
         question: normalizedRequest.question,
         analysis: normalizedRequest.analysis,
         expandedQuery,
         embeddings,
-        candidates,
+        candidates: filteredCandidates.length ? filteredCandidates : candidates,
         weights: config.weights
       });
       const chunks = rankCandidatesStage(scoredCandidates, normalizedRequest.topK);
