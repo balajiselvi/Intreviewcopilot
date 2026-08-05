@@ -6,7 +6,7 @@ const mammoth = require("mammoth");
 
 const { cleanText } = require("../utils/textCleaner");
 const { DocumentSchema } = require("../models/contracts");
-const { appConfig } = require("../config/appConfig");
+const appConfig = require("../config/appConfig");
 const { logger } = require("../lib/logger");
 
 async function extractPDF(filePath) {
@@ -39,9 +39,11 @@ async function readFile(filePath) {
             return await extractPDF(filePath);
 
         case ".docx":
+        case ".doc":
             return await extractDOCX(filePath);
 
         case ".txt":
+        case ".md":
             return await extractTXT(filePath);
 
         default:
@@ -117,11 +119,56 @@ async function scanFolderWithReport(folder, rootFolder = folder, report = {
 
             const stat = fs.statSync(fullPath);
 
+            // Skip non-knowledge folders (applies to both files and directories, so an
+            // excluded directory is pruned entirely rather than just its top-level file).
+            const relativePath = path.relative(rootFolder, fullPath);
+
+            const excludedFolders = [
+                "Master",
+                "Templates",
+                "Examples",
+                "Prompts",
+                "tools",
+                "data"
+            ];
+
+            if (excludedFolders.some(folder => relativePath.includes(folder + path.sep) || relativePath === folder)) {
+                report.warnings.push({
+                    stage: "document-skip",
+                    fileName: file,
+                    message: "Excluded knowledge folder"
+                });
+                continue;
+            }
+
+            // Directories must recurse before any file-extension filtering — a directory
+            // has no extension, so checking extensions first would (and previously did)
+            // skip every subfolder as an "unsupported file type" and silently stop the
+            // scan from ever descending into knowledge/<domain>/*.md at all.
             if (stat.isDirectory()) {
 
                 await scanFolderWithReport(fullPath, rootFolder, report);
 
             } else {
+
+                const supportedExtensions = new Set([
+                    ".pdf",
+                    ".doc",
+                    ".docx",
+                    ".txt",
+                    ".md"
+                ]);
+
+                const ext = path.extname(file).toLowerCase();
+
+                if (!supportedExtensions.has(ext)) {
+                    report.warnings.push({
+                        stage: "document-skip",
+                        fileName: file,
+                        message: `Unsupported file type: ${ext}`
+                    });
+                    continue;
+                }
 
                 const content = await readFile(fullPath);
 

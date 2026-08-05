@@ -63,12 +63,11 @@ import ScrollToBottom from 'react-scroll-to-bottom';
 
 // Local Imports
 import SettingsDialog from '../components/SettingsDialog';
+import AnswerQualityPanel from '../components/AnswerQualityPanel';
 import { setAIResponse } from '../redux/aiResponseSlice';
 import { addToHistory } from '../redux/historySlice';
 import { clearTranscription, setTranscription } from '../redux/transcriptionSlice';
 import { getConfig, setConfig as saveConfig } from '../utils/config';
-
-
 
 function debounce(func, timeout = 100) {
   let timer;
@@ -79,7 +78,6 @@ function debounce(func, timeout = 100) {
     }, timeout);
   };
 }
-
 
 export default function InterviewPage() {
   const dispatch = useDispatch();
@@ -118,6 +116,9 @@ export default function InterviewPage() {
   const systemAutoModeRef = useRef(systemAutoMode);
   const throttledDispatchSetAIResponseRef = useRef(null);
   const activeRequestRef = useRef(null);
+  const isProcessingRef = useRef(false);
+  const historyRef = useRef(history);
+  const pendingAnalysisRef = useRef(null);
 
   const showSnackbar = useCallback((message, severity = 'info') => {
     setSnackbarMessage(message);
@@ -133,6 +134,7 @@ export default function InterviewPage() {
 
   useEffect(() => { isManualModeRef.current = isManualMode; }, [isManualMode]);
   useEffect(() => { systemAutoModeRef.current = systemAutoMode; }, [systemAutoMode]);
+  useEffect(() => { historyRef.current = history; }, [history]);
 
   useEffect(() => {
     throttledDispatchSetAIResponseRef.current = throttle((payload) => {
@@ -202,7 +204,6 @@ export default function InterviewPage() {
     if (!cleanText) return;
 
     const existingText = finalTranscript.current[source].trim();
-    // Azure can repeat a final phrase after a reconnect; avoid submitting it twice.
     if (existingText.toLowerCase().endsWith(cleanText.toLowerCase())) return;
     finalTranscript.current[source] = `${existingText} ${cleanText}`.trim() + ' ';
 
@@ -218,7 +219,39 @@ export default function InterviewPage() {
     if ((source === 'system' && systemAutoModeRef.current) || (source === 'microphone' && !isManualModeRef.current)) {
       clearTimeout(silenceTimers.current[source]);
       silenceTimers.current[source] = setTimeout(() => {
-        askOpenAI(finalTranscript.current[source].trim(), source);
+        const transcript = finalTranscript.current[source].trim().toLowerCase();
+
+// Ignore common interviewer acknowledgements
+const ignoredPhrases = [
+  "hmm",
+  "hmmm",
+  "uh",
+  "uhh",
+  "okay",
+  "ok",
+  "yes",
+  "yeah",
+  "right",
+  "correct",
+  "go ahead",
+  "continue",
+  "carry on",
+  "please continue",
+  "next question",
+  "i see",
+  "alright",
+  "fine"
+];
+
+// Ignore very short acknowledgements
+if (
+    transcript.length < 12 ||
+    ignoredPhrases.includes(transcript)
+) {
+    return;
+}
+
+askOpenAI(finalTranscript.current[source].trim(), source);
       }, currentSilenceTimerDuration * 1000);
     }
   };
@@ -289,6 +322,10 @@ export default function InterviewPage() {
 
     const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(currentConfig.azureToken, currentConfig.azureRegion);
     speechConfig.speechRecognitionLanguage = currentConfig.azureLanguage;
+
+    // ⚡ STEP 1 LATENCY OPTIMIZATION
+    speechConfig.setProperty("Speech_SegmentationSilenceTimeoutMs", "500");
+    speechConfig.setProperty("SpeechServiceConnection_InitialSilenceTimeoutMs", "3000");
 
     const recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
 
@@ -436,7 +473,7 @@ export default function InterviewPage() {
       showSnackbar('No input text to process.', 'warning');
       return;
     }
-    if (isProcessing) {
+    if (isProcessingRef.current) {
       showSnackbar('Please wait for the current response to finish.', 'info');
       return;
     }
@@ -449,6 +486,7 @@ export default function InterviewPage() {
       return;
     }
 
+    isProcessingRef.current = true;
     setIsProcessing(true);
     if (source === 'system' || source === 'microphone') clearTimeout(silenceTimers.current[source]);
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -459,9 +497,9 @@ export default function InterviewPage() {
 
     let requestController;
     try {
-      const conversationHistoryForAPI = history
+      const conversationHistoryForAPI = historyRef.current
         .filter(event => event.text && (event.type === 'question' || event.type === 'response') && event.status !== 'pending')
-        .slice(-6)
+        .slice(-4)
         .map(event => ({ role: event.type === 'question' ? 'user' : 'assistant', content: event.text }));
       activeRequestRef.current?.abort();
       requestController = new AbortController();
@@ -475,11 +513,27 @@ export default function InterviewPage() {
           model: currentConfig.aiModel,
           question: text,
           history: conversationHistoryForAPI,
-          responseLength: currentConfig.responseLength,
+          responseLength: "interview",
           customInstructions: currentConfig.gptSystemPrompt,
+          candidateResume: currentConfig.candidateResume,
         }),
       });
-      if (!response.ok || !response.body) throw new Error((await response.json().catch(() => ({}))).error || 'Could not start AI response.');
+      if (!response.ok) {
+        let errorMessage = 'Failed to get AI response.';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          try {
+            const text = await response.text();
+            if (text) errorMessage = text;
+          } catch {
+            errorMessage = `HTTP ${response.status}: ${response.statusText || 'Unknown error'}`;
+          }
+        }
+        throw new Error(errorMessage);
+      }
+      if (!response.body) throw new Error('Response body is empty. Please try again.');
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
@@ -494,24 +548,37 @@ export default function InterviewPage() {
             const payload = event.split('\ndata: ')[1];
             throw new Error(JSON.parse(payload || '{}').error || 'AI request failed.');
           }
+          if (event.includes('event: analysis')) {
+            const payload = event.split('\ndata: ')[1];
+            try {
+              pendingAnalysisRef.current = JSON.parse(payload || '{}');
+            } catch (parseError) {
+              console.error('Error parsing SSE analysis event:', parseError);
+            }
+            continue;
+          }
           const payload = event.split('data: ')[1];
           if (!payload || payload === '[DONE]') continue;
-          const chunkText = JSON.parse(payload).text || '';
-          streamedResponse += chunkText;
-          throttledDispatchSetAIResponseRef.current?.(streamedResponse);
+          try {
+            const chunkText = JSON.parse(payload).text || '';
+            streamedResponse += chunkText;
+            throttledDispatchSetAIResponseRef.current?.(streamedResponse);
+          } catch (parseError) {
+            console.error('Error parsing SSE chunk:', parseError);
+          }
         }
       }
-          if (throttledDispatchSetAIResponseRef.current && typeof throttledDispatchSetAIResponseRef.current.cancel === 'function') {
+      if (throttledDispatchSetAIResponseRef.current && typeof throttledDispatchSetAIResponseRef.current.cancel === 'function') {
         throttledDispatchSetAIResponseRef.current.cancel();
       }
       dispatch(setAIResponse(streamedResponse));
 
       const finalTimestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      dispatch(addToHistory({ type: 'response', text: streamedResponse, timestamp: finalTimestamp, status: 'completed' }));
+      dispatch(addToHistory({ type: 'response', text: streamedResponse, timestamp: finalTimestamp, status: 'completed', analysis: pendingAnalysisRef.current }));
+      pendingAnalysisRef.current = null;
 
     } catch (error) {
       if (error?.name === 'AbortError' || requestController?.signal.aborted) {
-        // Aborting is expected when the page unmounts or a newer request replaces this one.
         return;
       }
       console.error("AI request error:", error);
@@ -520,21 +587,22 @@ export default function InterviewPage() {
       dispatch(setAIResponse(`Error: ${errorMessage}`));
       dispatch(addToHistory({ type: 'response', text: `Error: ${errorMessage}`, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), status: 'error' }));
     } finally {
-      // Do not clear a controller installed by a newer request.
-      if (activeRequestRef.current === requestController) {
+      const isCurrentRequest = activeRequestRef.current === requestController;
+      if (isCurrentRequest) {
         activeRequestRef.current = null;
-      }
-      if ((source === 'system' && systemAutoModeRef.current) || (source === 'microphone' && !isManualModeRef.current)) {
-        finalTranscript.current[source] = '';
-        if (source === 'system') {
-          systemInterimTranscription.current = '';
-          dispatch(setTranscription(''));
-        } else {
-          micInterimTranscription.current = '';
-          setMicTranscription('');
+        if ((source === 'system' && systemAutoModeRef.current) || (source === 'microphone' && !isManualModeRef.current)) {
+          finalTranscript.current[source] = '';
+          if (source === 'system') {
+            systemInterimTranscription.current = '';
+            dispatch(setTranscription(''));
+          } else {
+            micInterimTranscription.current = '';
+            setMicTranscription('');
+          }
         }
+        isProcessingRef.current = false;
+        setIsProcessing(false);
       }
-      setIsProcessing(false);
     }
   };
 
@@ -578,7 +646,7 @@ export default function InterviewPage() {
             );
           },
           p: ({ node, ...props }) => <Typography paragraph {...props} sx={{ mb: 1, fontSize: '0.95rem', wordBreak: 'break-word' }} />,
-          strong: ({ node, ...props }) => <Typography component="strong" fontWeight="bold" {...props} />,
+          strong: ({ node, ...props }) => <Typography component="strong" fontWeight="bold" color="primary.main" {...props} />,
           em: ({ node, ...props }) => <Typography component="em" fontStyle="italic" {...props} />,
           ul: ({ node, ...props }) => <Typography component="ul" sx={{ pl: 2.5, mb: 1, fontSize: '0.95rem', wordBreak: 'break-word' }} {...props} />,
           ol: ({ node, ...props }) => <Typography component="ol" sx={{ pl: 2.5, mb: 1, fontSize: '0.95rem', wordBreak: 'break-word' }} {...props} />,
@@ -607,6 +675,7 @@ export default function InterviewPage() {
             <Typography variant="caption" color="text.secondary">{item.timestamp}</Typography>
           </Box>
           {formatAndDisplayResponse(item.text)}
+          {item.analysis && <AnswerQualityPanel analysis={item.analysis} />}
         </Paper>
       </ListItem>
     );
@@ -678,7 +747,7 @@ export default function InterviewPage() {
       } else if (pipWindowRef.current && !pipWindowRef.current.closed) {
         pipWindowRef.current.close();
       }
-      return; // State update will be handled by pagehide/interval listeners
+      return;
     }
 
     const addResizeListener = (pipWindow) => {
@@ -697,7 +766,7 @@ export default function InterviewPage() {
       }, 50);
 
       pipWindow.addEventListener('resize', handlePipResize);
-      return () => pipWindow.removeEventListener('resize', handlePipResize); // Return a cleanup function
+      return () => pipWindow.removeEventListener('resize', handlePipResize);
     };
 
     if (window.documentPictureInPicture && typeof window.documentPictureInPicture.requestWindow === 'function') {

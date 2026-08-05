@@ -1,20 +1,18 @@
 const { buildKnowledgeIndex } = require("../services/knowledgeIndexService");
 
-const { logger } = require("../lib/logger");
+(async () => {
+    try {
+        console.log("Building knowledge index...");
 
-async function buildKnowledge() {
-  const result = await buildKnowledgeIndex();
+        const result = await buildKnowledgeIndex();
 
-  logger.info("knowledge.compiler.completed", {
-    totalDocuments: result.totalDocuments,
-    totalChunks: result.totalChunks,
-    outputPath: result.outputPath,
-    manifestPath: result.manifestPath,
-    reportPath: result.reportPath
-  });
-}
+        console.log(result);
 
-buildKnowledge().catch((error) => {
-  logger.error("knowledge.compiler.failed", { error });
-  process.exitCode = 1;
-});
+        console.log("Knowledge build completed.");
+
+    } catch (err) {
+
+        console.error(err);
+
+    }
+})();

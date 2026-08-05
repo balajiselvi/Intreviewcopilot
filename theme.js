@@ -5,13 +5,13 @@ import { red, grey } from '@mui/material/colors';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2', // A professional blue
+      main: '#1976d2',
       light: '#42a5f5',
       dark: '#1565c0',
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#dc004e', // A vibrant pink/red for accents
+      main: '#dc004e',
       light: '#ff4081',
       dark: '#9a0036',
       contrastText: '#ffffff',
@@ -20,19 +20,19 @@ const theme = createTheme({
       main: red.A400,
     },
     background: {
-      default: grey[100], // A very light grey for the app background
-      paper: '#ffffff',   // White for paper elements
+      default: grey[100],
+      paper: '#ffffff',
     },
     text: {
-      primary: grey[900], // Dark grey for primary text
-      secondary: grey[700], // Medium grey for secondary text
+      primary: grey[900],
+      secondary: grey[700],
     }
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
     h4: {
       fontWeight: 700,
-      color: '#333333', // Darker color for main headings
+      color: '#333333',
       marginBottom: '0.75em',
     },
     h5: {
@@ -42,11 +42,11 @@ const theme = createTheme({
     },
     h6: {
       fontWeight: 600,
-      color: '#555555', // Slightly lighter for subheadings
+      color: '#555555',
       marginBottom: '0.5em',
     },
     button: {
-      textTransform: 'none', // Keep button text case as is
+      textTransform: 'none',
       fontWeight: 500,
       letterSpacing: '0.5px',
     },
@@ -58,35 +58,33 @@ const theme = createTheme({
     }
   },
   shape: {
-    borderRadius: 8, // Default border radius for components
+    borderRadius: 8,
   },
   components: {
     MuiPaper: {
       styleOverrides: {
         root: {
-          // borderRadius: 12, // Slightly more rounded corners for paper
-          boxShadow: '0px 5px 15px rgba(0,0,0,0.08)', // Softer, more modern shadow
+          boxShadow: '0px 5px 15px rgba(0,0,0,0.08)',
         }
       }
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          // borderRadius: 8, // Consistent rounded corners for buttons
-          padding: '10px 20px', // More generous padding
-          boxShadow: 'none', // Remove default button shadow for a flatter look, can add on hover
+          padding: '10px 20px',
+          boxShadow: 'none',
           '&:hover': {
-            boxShadow: '0px 2px 8px rgba(0,0,0,0.1)', // Subtle shadow on hover
+            boxShadow: '0px 2px 8px rgba(0,0,0,0.1)',
           }
         },
         containedPrimary: {
           '&:hover': {
-            backgroundColor: '#1565c0', // Darken primary on hover
+            backgroundColor: '#1565c0',
           }
         },
         containedSecondary: {
           '&:hover': {
-            backgroundColor: '#9a0036', // Darken secondary on hover
+            backgroundColor: '#9a0036',
           }
         },
       }
@@ -95,19 +93,12 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            // borderRadius: 8, // Rounded corners for text fields
-            '& fieldset': {
-              // borderColor: 'rgba(0, 0, 0, 0.23)',
-            },
             '&:hover fieldset': {
-              borderColor: '#1976d2', // Primary color border on hover
+              borderColor: '#1976d2',
             },
-            // '&.Mui-focused fieldset': {
-            //   borderColor: '#1976d2', // Primary color border when focused
-            // },
           },
           '& .MuiInputLabel-root.Mui-focused': {
-            color: '#1976d2', // Primary color for label when focused
+            color: '#1976d2',
           }
         }
       }
@@ -116,7 +107,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '&:hover': {
-            backgroundColor: 'rgba(0, 0, 0, 0.06)' // Standard hover for icon buttons
+            backgroundColor: 'rgba(255, 255, 255, 0.08)'
           }
         }
       }
@@ -124,7 +115,6 @@ const theme = createTheme({
     MuiChip: {
       styleOverrides: {
         root: {
-          // borderRadius: 16, // More rounded chips
           fontWeight: 500,
         }
       }
@@ -132,7 +122,7 @@ const theme = createTheme({
     MuiAppBar: {
         styleOverrides: {
             root: {
-                boxShadow: '0px 2px 4px -1px rgba(0,0,0,0.06), 0px 4px 5px 0px rgba(0,0,0,0.04), 0px 1px 10px 0px rgba(0,0,0,0.03)', // Softer app bar shadow
+                boxShadow: '0px 2px 4px -1px rgba(0,0,0,0.06), 0px 4px 5px 0px rgba(0,0,0,0.04), 0px 1px 10px 0px rgba(0,0,0,0.03)',
             }
         }
     },
@@ -140,20 +130,44 @@ const theme = createTheme({
         styleOverrides: {
             root: {
                 '& .MuiListItem-root': {
-                    borderRadius: 8, // Rounded list items if they are interactive
+                    borderRadius: 8,
                 }
-            }
-        }
-    },
-    MuiCard: {
-        styleOverrides: {
-            root: {
-                // borderRadius: 12,
-                // boxShadow: '0px 5px 15px rgba(0,0,0,0.08)',
             }
         }
     }
   }
 });
 
-export default theme;
+export const darkTheme = createTheme(theme, {
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#42a5f5',
+      light: '#80d6ff',
+      dark: '#0077c2',
+      contrastText: '#0a0a0a',
+    },
+    secondary: {
+      main: '#ff4081',
+      light: '#ff79b0',
+      dark: '#c60055',
+      contrastText: '#0a0a0a',
+    },
+    background: {
+      default: '#121212',
+      paper: '#1e1e1e',
+    },
+    text: {
+      primary: grey[100],
+      secondary: grey[400],
+    },
+  },
+  typography: {
+    h4: { color: grey[100] },
+    h5: { color: grey[200] },
+    h6: { color: grey[300] },
+    caption: { color: grey[500] },
+  },
+});
+
+export default darkTheme;

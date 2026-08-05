@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import { ThemeProvider } from '@mui/material/styles';
+import { darkTheme } from '../theme';
 
 // This page will simply redirect to the landing page.
 // It can also be used for initial auth checks or loading states in the future.
@@ -15,16 +17,18 @@ export default function Index() {
 
   // Optional: Show a loading indicator while redirecting
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        backgroundColor: 'background.default'
-      }}
-    >
-      <CircularProgress />
-    </Box>
+    <ThemeProvider theme={darkTheme}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          backgroundColor: 'background.default'
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    </ThemeProvider>
   );
 }

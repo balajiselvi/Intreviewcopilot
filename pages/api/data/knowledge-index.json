@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-08-03T14:49:24.630Z",
+  "totalChunks": 6,
+  "chunks": [
+    {
+      "id": "sod-risk-analysis-1",
+      "domain": "SAP GRC",
+      "component": "ARA",
+      "title": "Access Risk Analysis (ARA) & SoD Remediation",
+      "content": "Access Risk Analysis (ARA) identifies Segregation of Duties (SoD) conflicts and Critical Action/Permission risks. Key T-Codes: NWBC -> Access Management -> Access Risk Analysis, GRAC_RULE_BUILD for rule set execution/generation, SU24 for maintaining check indicators, and PFCG for role remediations. Primary tables: AGR_USERS (user roles), GRACUSER (GRC user mapping), and GRACRISK (risk definitions). Remediation involves removing conflicting roles/permissions or assigning a Mitigating Control ID via GRAC_MIT_CONTROL."
+    },
+    {
+      "id": "msmp-workflow-1",
+      "domain": "SAP GRC",
+      "component": "ARM",
+      "title": "MSMP Workflow Configuration Steps",
+      "content": "MSMP (Multi-Step Model Process) Workflow (T-Code: GRFNMW_CONFIGURE or via NWBC) manages Access Request Management (ARM). The 7 configuration steps are: 1. Process ID (e.g., SAP_GRAC_ACCESS_REQUEST), 2. Rule Definition (BRFplus initiation/routing rules), 3. Maintain Agents (Approvers like Role Owner or Manager), 4. Maintain Variables and Templates (Email notifications), 5. Maintain Paths (Approval stages), 6. Maintain Route Mapping, 7. Generate Version. Re-generation of the MSMP version is mandatory after changes."
+    },
+    {
+      "id": "eam-firefighter-1",
+      "domain": "SAP GRC",
+      "component": "EAM",
+      "title": "Emergency Access Management (EAM / Firefighter)",
+      "content": "EAM provides elevated emergency access through ID-based (FF ID) or Role-based assignments. Key T-Codes: /N/GRAC/EAM (Firefighter Launchpad), GRAC_EAM (Centralized Firefighter execution), and /N/GRAC/FFLOG for log generation. Key configuration steps in NWBC: Define Firefighter IDs, assign Firefighter Owners, assign Firefighter Controllers, and configure Reason Codes. Logs captured include Transaction Logs, Change Logs, System Logs, and OS Logs sent via email/workflow to Controllers."
+    },
+    {
+      "id": "brm-role-management-1",
+      "domain": "SAP GRC",
+      "component": "BRM",
+      "title": "Business Role Management (BRM) & Role Methodology",
+      "content": "BRM standardizes role creation using a multi-step methodology: 1. Define Role, 2. Maintain Actions/Permissions, 3. Analyze Risk (SoD check), 4. Approve Role, 5. Generate Role (PFCG in target system), 6. Test Role. T-Code for single/derived/composite role creation is PFCG or via NWBC BRM interface. Derivation uses Organizational Values to clone master roles into child roles."
+    },
+    {
+      "id": "brfplus-rules-1",
+      "domain": "SAP GRC",
+      "component": "BRFplus",
+      "title": "BRFplus Integration in SAP GRC",
+      "content": "BRFplus (Business Rule Framework plus, T-Code: BRFPLUS or BRF+) is used for decision-table routing in MSMP workflows and dynamic risk evaluation. Common BRFplus rule types in GRC ARM: Initiator Rule (determines workflow path based on request type/system), Routing Rule, Agent Rule, and Notification Rule. After creating decision tables in BRFplus, save, activate, and map the Function ID into MSMP Step 2."
+    },
+    {
+      "id": "security-troubleshooting-1",
+      "domain": "SAP Security",
+      "component": "SU53_STAT",
+      "title": "Authorization Troubleshooting & Trace",
+      "content": "When a user faces authorization failures: 1. Execute T-Code SU53 immediately after failure to identify missing Authorization Object, Field, and Value. 2. For deep authorization trace, use ST01 or STAUTHTRACE for user-level trace across application servers. 3. Adjust permissions via PFCG and update authorization check settings in SU24."
+    }
+  ]
+}

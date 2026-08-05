@@ -11,7 +11,7 @@ const {
   IndexReportSchema,
   KnowledgeIndexSchema
 } = require("../models/contracts");
-const { appConfig } = require("../config/appConfig");
+const appConfig = require("../config/appConfig");
 const { logger } = require("../lib/logger");
 
 async function readJsonIfPresent(filePath, eventName) {
@@ -32,8 +32,13 @@ function priorChunksByDocument(previousIndex, previousManifest) {
     !previousManifest ||
     previousManifest.schemaVersion !== appConfig.knowledge.schemaVersion ||
     previousManifest.parserVersion !== appConfig.knowledge.parserVersion ||
-    previousManifest.chunkVersion !== appConfig.knowledge.chunkVersion
+    previousManifest.chunkVersion !== appConfig.knowledge.chunkVersion ||
+    previousManifest.embeddingVersion !== appConfig.knowledge.embeddingModel
   ) {
+    // A mismatch on ANY of these wholesale-invalidates every prior chunk. embeddingVersion
+    // matters as much as chunkVersion: reusing chunks whose embeddings came from a
+    // different model would silently mix incompatible vector spaces into the same
+    // cosine-similarity comparison, corrupting every retrieval score with no visible error.
     return new Map();
   }
 
@@ -57,7 +62,8 @@ function isUnchangedDocument(document, priorChunks) {
     priorChunks.every(
       (chunk) =>
         chunk.metadata?.documentChecksum === document.documentChecksum &&
-        chunk.metadata?.chunkVersion === appConfig.knowledge.chunkVersion
+        chunk.metadata?.chunkVersion === appConfig.knowledge.chunkVersion &&
+        chunk.metadata?.embeddingVersion === appConfig.knowledge.embeddingModel
     )
   );
 }

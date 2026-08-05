@@ -1,7 +1,8 @@
 import React from 'react';
 import Head from 'next/head';
 import { Box, Button, Container, Grid, Paper, Typography, Avatar } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, ThemeProvider } from '@mui/material/styles';
+import { darkTheme } from '../theme';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import MicIcon from '@mui/icons-material/Mic';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
@@ -90,13 +91,14 @@ const features = [
 
 export default function LandingPage() {
   return (
-    <>
+    <ThemeProvider theme={darkTheme}>
       <Head>
         <title>Interview Copilot - Your AI-Powered Interview Assistant</title>
         <meta name="description" content="Elevate your technical interviews with real-time transcription, AI insights, and seamless assistance. Perfect for interviewers and candidates." />
         <link rel="icon" href="/favicon.ico" /> {/* Remember to add a favicon */}
       </Head>
 
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
       <HeroSection>
         <Container maxWidth="md">
           <Typography variant="h2" component="h1" gutterBottom sx={{ fontWeight: 700, letterSpacing: '-1px' }}>
@@ -150,7 +152,7 @@ export default function LandingPage() {
         </Container>
       </Section>
 
-      <Section id="about" sx={{ backgroundColor: 'rgba(0,0,0,0.02)'}}>
+      <Section id="about" sx={{ backgroundColor: 'action.hover' }}>
         <Container maxWidth="md">
           <Typography variant="h4" component="h2" align="center" gutterBottom sx={{ mb: 4 }}>
             About the Tool
@@ -172,6 +174,7 @@ export default function LandingPage() {
           Powered by AI for smarter interviews.
         </Typography>
       </Footer>
-    </>
+      </Box>
+    </ThemeProvider>
   );
 }

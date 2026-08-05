@@ -1,18 +1,18 @@
+import { ThemeProvider, CssBaseline } from '@mui/material';
 import { Provider } from 'react-redux';
-import "@/styles/globals.css"; // Ensure this is imported before theme for overrides to work correctly
-import store from '../store';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import theme from '../theme'; // Import the custom theme
+import store from '../store'; // 👈 Adjust this path if your store file is located elsewhere (e.g., ../redux/store or ../src/store)
+import darkTheme from '../theme';
+import '../styles/globals.css';
 
-export default function App({ Component, pageProps }) {
+function MyApp({ Component, pageProps }) {
   return (
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+      <ThemeProvider theme={darkTheme}>
         <CssBaseline />
         <Component {...pageProps} />
       </ThemeProvider>
     </Provider>
   );
 }
+
+export default MyApp;

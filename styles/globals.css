@@ -7,6 +7,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100%; /* Ensure html and body take full height */
+  background-color: #121212; /* Dark background */
+  color: #ffffff; /* Light text */
 }
 
 #__next { /* Next.js wrapper div */
@@ -49,4 +51,3 @@ a {
 }
 */
 /* The above would now be handled by ReactMarkdown component's styling or hljs theme */
-

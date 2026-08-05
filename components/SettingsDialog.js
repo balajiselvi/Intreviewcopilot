@@ -180,6 +180,12 @@ export default function SettingsDialog({ open, onClose, onSave }) {
                 <MenuItem value="lengthy">Lengthy (Detailed explanations)</MenuItem>
             </Select>
         </FormControl>
+        <TextField
+          fullWidth margin="dense" name="candidateResume" label="Your Real Background" multiline rows={4}
+          value={settings.candidateResume || ''} onChange={handleChange}
+          helperText="Only what you enter here can be phrased as personal experience ('I implemented...'). Leave blank to keep every answer in knowledge-framing."
+          sx={{mt:2}}
+        />
 
         <Divider sx={{ my: 3 }} />
         <Typography variant="h6" gutterBottom>Manage Custom AI Models</Typography>

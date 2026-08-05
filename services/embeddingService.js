@@ -29,15 +29,22 @@ async function generateEmbedding(text) {
 }
 
 async function generateEmbeddings(chunks) {
+
     const results = [];
 
+    let i = 0;
+
     for (const chunk of chunks) {
+
+        console.log(`Embedding ${++i}/${chunks.length}`);
+
         const embedding = await generateEmbedding(chunk.content);
 
         results.push({
             ...chunk,
             embedding
         });
+
     }
 
     return results;

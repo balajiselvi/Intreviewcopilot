@@ -38,6 +38,7 @@ const defaultConfig = {
   customModels: [], // Array for user-added models { value: 'model-id', label: 'Display Name', type: 'openai' | 'gemini' }
   systemAutoMode: true,
   isManualMode: false,
+  candidateResume: '', // Only content entered here may be phrased as personal experience in answers.
 };
 
 export function getConfig() {
