@@ -1,0 +1,142 @@
+[
+  {
+    "question": "What's the difference between ABAP modifications and extensions?",
+    "category": "GRC",
+    "latency": 3996,
+    "textPreview": "ABAP modifications directly alter the standard SAP code, which can lead to challenges during upgrades and maintenance. This matters because while modifications may provide immediate functionality, they create long-term technical debt and complicate future updates. Extensions, on the other hand, leve",
+    "textLength": 768,
+    "signals": {
+      "businessContext": true,
+      "sapComponents": true,
+      "tradeOffs": true,
+      "conversational": true,
+      "confidence": false
+    }
+  },
+  {
+    "question": "Explain Access Risk Analysis (ARA) and how it works.",
+    "category": "GRC",
+    "latency": 5354,
+    "textPreview": "Access Risk Analysis (ARA) is crucial for identifying and mitigating access risks within SAP environments. It evaluates user roles and authorizations against defined risk rules to detect potential Segregation of Duties (SoD) conflicts. This matters because unchecked access can lead to compliance vio",
+    "textLength": 1004,
+    "signals": {
+      "businessContext": true,
+      "sapComponents": true,
+      "tradeOffs": true,
+      "conversational": true,
+      "confidence": false
+    }
+  },
+  {
+    "question": "What's your philosophy on segregation of duties in SAP?",
+    "category": "GRC",
+    "latency": 4679,
+    "textPreview": "Segregation of duties (SoD) is critical in SAP to mitigate risks of fraud and errors. This matters because without proper controls, a single user could have excessive access, leading to potential misuse. The key tension here is balancing operational efficiency with compliance requirements. \\n\\nIn pr",
+    "textLength": 832,
+    "signals": {
+      "businessContext": true,
+      "sapComponents": true,
+      "tradeOffs": true,
+      "conversational": true,
+      "confidence": true
+    }
+  },
+  {
+    "question": "Tell me about your leadership style and how you develop junior staff.",
+    "category": "Behavioral",
+    "latency": 4286,
+    "textPreview": "My leadership style focuses on empowerment and mentorship. This matters because fostering a culture of learning accelerates team growth and enhances project outcomes. I prioritize hands-on experience, encouraging junior staff to take ownership of tasks while providing guidance through regular check-",
+    "textLength": 870,
+    "signals": {
+      "businessContext": true,
+      "sapComponents": true,
+      "tradeOffs": true,
+      "conversational": true,
+      "confidence": false
+    }
+  },
+  {
+    "question": "Describe a conflict you resolved between security requirements and business needs.",
+    "category": "Behavioral",
+    "latency": 8954,
+    "textPreview": "A common conflict arises when stringent security requirements clash with the need for operational efficiency. For instance, I encountered a situation where a client needed to implement strict access controls to sensitive financial data while also ensuring that their finance team could perform their ",
+    "textLength": 1352,
+    "signals": {
+      "businessContext": true,
+      "sapComponents": true,
+      "tradeOffs": true,
+      "conversational": true,
+      "confidence": false
+    }
+  },
+  {
+    "question": "How would you design a GRC security strategy for a new S/4HANA implementation?",
+    "category": "Architecture",
+    "latency": 3854,
+    "textPreview": "Designing a GRC security strategy for S/4HANA requires a focus on continuous access governance and automated segregation of duties (SoD) management. This matters because the complexity of S/4HANA can introduce significant risks if not properly managed. The key tension here is balancing security hard",
+    "textLength": 1033,
+    "signals": {
+      "businessContext": true,
+      "sapComponents": true,
+      "tradeOffs": true,
+      "conversational": true,
+      "confidence": false
+    }
+  },
+  {
+    "question": "Compare on-premise GRC vs cloud-native GRC. What changes?",
+    "category": "Architecture",
+    "latency": 3543,
+    "textPreview": "On-premise GRC relies heavily on traditional ABAP-based components like PFCG for role management and SU24 for authorization checks. In contrast, cloud-native GRC, particularly within SAP BTP, shifts to a more modern architecture using role collections and cloud identity services. This matters becaus",
+    "textLength": 1099,
+    "signals": {
+      "businessContext": true,
+      "sapComponents": true,
+      "tradeOffs": true,
+      "conversational": true,
+      "confidence": false
+    }
+  },
+  {
+    "question": "Walk me through implementing segregation of duties in a complex multi-entity environment.",
+    "category": "Implementation",
+    "latency": 8010,
+    "textPreview": "Implementing segregation of duties (SoD) in a multi-entity environment requires a strategic approach to balance compliance and operational efficiency. This matters because the risk of fraud and errors increases with complexity. The key tension is ensuring that roles are appropriately defined while m",
+    "textLength": 1179,
+    "signals": {
+      "businessContext": true,
+      "sapComponents": true,
+      "tradeOffs": true,
+      "conversational": true,
+      "confidence": false
+    }
+  },
+  {
+    "question": "What's your approach to a critical access violation found during an audit?",
+    "category": "Implementation",
+    "latency": 2787,
+    "textPreview": "Addressing a critical access violation requires immediate action and a structured approach. First, I would initiate a thorough investigation to understand the scope and impact of the violation. This involves analyzing the specific authorization objects involved, using T-codes like SU53 to identify t",
+    "textLength": 1382,
+    "signals": {
+      "businessContext": true,
+      "sapComponents": true,
+      "tradeOffs": true,
+      "conversational": true,
+      "confidence": false
+    }
+  },
+  {
+    "question": "What makes an excellent SAP security architect?",
+    "category": "Philosophy",
+    "latency": 3043,
+    "textPreview": "An excellent SAP security architect combines deep technical knowledge with a strong understanding of business objectives. This matters because security isn't just about compliance; it's about enabling the business to operate securely and efficiently. The key tension here is balancing robust security",
+    "textLength": 1252,
+    "signals": {
+      "businessContext": true,
+      "sapComponents": true,
+      "tradeOffs": true,
+      "conversational": true,
+      "confidence": false
+    }
+  }
+]
