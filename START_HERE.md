@@ -19,12 +19,18 @@ You are here for one of three reasons:
    - Engineering principles
 
 2. [docs/PROJECT_STATE.md](docs/PROJECT_STATE.md) — 3 min read
-   - What's been completed (28/110 files, 25%)
-   - What's in progress (BTP domain, 2/6 files)
+   - What's been completed: ALL 110 knowledge files across 20 domains ✓
+   - Current phase: Workstream A (Knowledge) complete → Workstreams B/C/D (Quality/Performance/Architecture) active
    - Frozen architectural components (don't redesign these)
-   - Next immediate tasks
+   - Next immediate tasks: Execute Workstream B quality improvements
 
-3. **Then proceed to Step 3 below** (Development Tasks)
+3. [OPERATING_MODEL.md](OPERATING_MODEL.md) — 2 min read
+   - Product Maturity Engineering framework
+   - Workstream orchestration (B, C, D parallel execution)
+   - Autonomous execution authorization
+   - Universal engineering decision filter
+
+4. **Then proceed to Step 3 below** (Development Tasks)
 
 ---
 
@@ -46,37 +52,64 @@ You are here for one of three reasons:
 
 ### 3. Development Tasks
 
-If you've read the bootstrap and project state, you're ready. Here's what to do:
+**⚠️ Workstream A Complete** — All 110 knowledge files populated ✓
 
-**Development follows the Standard Domain Workflow.** See [docs/RESUME_GUIDE.md](docs/RESUME_GUIDE.md) for step-by-step instructions:
+**You are now operating under Operating Model V2 (Product Maturity Engineering).**
 
-1. **Populate** empty markdown files in the current domain (4 files remaining in BTP)
-2. **Validate** markdown quality (grammar, accuracy, completeness)
-3. **Rebuild** the knowledge index: `node scripts/buildKnowledge.js`
-4. **Validate retrieval** (no API key needed; test that correct knowledge is retrieved)
-5. **Validate interview quality** (inspect what context would be injected into prompts)
-6. **Improve knowledge** if retrieval is weak (iterate until quality is high)
-7. **Freeze** the domain (mark complete; no further edits)
-8. **Report** progress, then continue to the next domain
+**Current Workstreams:**
 
-See [docs/RESUME_GUIDE.md](docs/RESUME_GUIDE.md) for the complete detailed workflow.
+- **Workstream A (Knowledge Platform):** COMPLETE ✓
+  - All 110 files across 20 domains populated
+  - Status: Frozen, no further population
+  - See [CURRENT_STATUS.md](CURRENT_STATUS.md) for completion details
+
+- **Workstream B (Quality Engineering):** IN PROGRESS
+  - Objective: Improve answer quality from 7.5/10 baseline to ≥8.5/10
+  - Method: Representative question benchmarking, 6-dimension evaluation
+  - High-impact improvements identified (within frozen architecture)
+  - See [OPERATING_MODEL.md](OPERATING_MODEL.md) for framework
+
+- **Workstream C (Performance & Reliability):** IN PROGRESS
+  - Monitor latency, response quality, system stability
+  - Target: <5s avg latency (current: 4.8s)
+
+- **Workstream D (Architectural Completeness):** IN PROGRESS  
+  - Evaluate cross-domain reasoning, feature completeness
+  - Identify expansion opportunities (within 20-domain framework)
+
+**Your task:** Continue according to [OPERATING_MODEL.md](OPERATING_MODEL.md)
+- Execute Workstream B improvements
+- Run parallel Workstreams C/D continuous monitoring
+- Do NOT suspend Workstream A unless production-blocking defect exists
+- Act as Principal Software Architect (you have autonomous execution authority)
 
 ---
 
 ## Documentation Map
 
+**Governing Documents (Read First):**
+
 | Document | Purpose | Read Time |
 |----------|---------|-----------|
+| [OPERATING_MODEL.md](OPERATING_MODEL.md) | Product Maturity Engineering framework, Workstreams B/C/D | 10 min |
+| [ARCHITECTURAL_PHILOSOPHY.md](ARCHITECTURAL_PHILOSOPHY.md) | Core mission: candidate credibility over documentation | 5 min |
+| [CURRENT_STATUS.md](CURRENT_STATUS.md) | Workstream A completion summary, current metrics | 5 min |
 | [docs/AI_SESSION_BOOTSTRAP.md](docs/AI_SESSION_BOOTSTRAP.md) | Entry point for every session | 5 min |
 | [docs/PROJECT_STATE.md](docs/PROJECT_STATE.md) | Current progress, frozen components, next tasks | 5 min |
+
+**Reference Documents:**
+
+| Document | Purpose | Read Time |
+|----------|---------|-----------|
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture, component design, data flow | 15 min |
 | [docs/CHANGELOG.md](docs/CHANGELOG.md) | Release history, bugs fixed, decisions made | 10 min |
 | [docs/DEVELOPMENT_ROADMAP.md](docs/DEVELOPMENT_ROADMAP.md) | Future phases (vector DB, analytics, enterprise features) | 10 min |
-| [docs/RESUME_GUIDE.md](docs/RESUME_GUIDE.md) | Step-by-step workflow for populating domains | 20 min |
 | [docs/PRODUCTION_READINESS.md](docs/PRODUCTION_READINESS.md) | Deployment, configuration, security | 5 min |
 | [docs/RETRIEVAL.md](docs/RETRIEVAL.md) | Detailed retrieval pipeline mechanics | 10 min |
 | [docs/INDEXING.md](docs/INDEXING.md) | Knowledge indexing and rebuild process | 5 min |
 | [docs/INTERVIEW_ENGINE_SPEC.md](docs/INTERVIEW_ENGINE_SPEC.md) | Prompt construction and generation | 10 min |
+| [docs/QUALITY_GATE.md](docs/QUALITY_GATE.md) | Knowledge quality standards and acceptance criteria | 10 min |
+| [docs/ANSWER_QUALITY_BENCHMARK.md](docs/ANSWER_QUALITY_BENCHMARK.md) | Quality evaluation framework and benchmarks | 10 min |
 
 **Suggested reading order for new developers:**
 1. AI_SESSION_BOOTSTRAP.md (this session's context)
