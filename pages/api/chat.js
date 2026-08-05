@@ -16,6 +16,53 @@ const MAX_HISTORY_ITEMS = 6;
 const DEFAULT_TIMEOUT_MS = 25000;
 const RESPONSE_WRITE_TIMEOUT = 100;
 
+// Startup diagnostics - log once per process
+let STARTUP_LOGGED = false;
+function logStartupDiagnostics() {
+  if (STARTUP_LOGGED) return;
+  STARTUP_LOGGED = true;
+
+  const llmConfig = APP_CONFIG?.llm || {};
+  const executionMode = llmConfig.validationMode || 'full';
+  const provider = llmConfig.provider || 'openai';
+  const model = llmConfig.defaultModel || 'gpt-4o-mini';
+  const hasOpenAIKey = !!llmConfig.apiKeys?.openai;
+  const hasGeminiKey = !!llmConfig.apiKeys?.gemini;
+
+  logger?.info?.({
+    event: 'app.startup_diagnostics',
+    executionMode,
+    provider,
+    defaultModel: model,
+    hasOpenAIKey,
+    hasGeminiKey,
+    nodeEnv: process.env.NODE_ENV,
+    timestamp: new Date().toISOString()
+  });
+
+  if (executionMode === 'retrieval-only') {
+    logger?.info?.({
+      event: 'app.mode_diagnostic',
+      message: 'Running in retrieval-only mode (diagnostic). No LLM calls will be made.',
+      mode: 'retrieval-only'
+    });
+  } else if (executionMode === 'disabled') {
+    logger?.warn?.({
+      event: 'app.mode_disabled',
+      message: 'Application is disabled. Interview Copilot will not be available.',
+      mode: 'disabled'
+    });
+  } else if (executionMode === 'full') {
+    logger?.info?.({
+      event: 'app.mode_production',
+      message: 'Running in production mode with LLM generation enabled.',
+      mode: 'full',
+      provider,
+      model
+    });
+  }
+}
+
 const TOP_K_BY_CATEGORY = Object.freeze({
   Architecture: 3,
   Implementation: 3,
@@ -358,6 +405,9 @@ function setSSEHeaders(res) {
 }
 
 export default async function handler(req, res) {
+  // Log startup diagnostics once per process
+  logStartupDiagnostics();
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -384,18 +434,57 @@ export default async function handler(req, res) {
     });
   }
 
-  const validationMode = APP_CONFIG?.llm?.validationMode || "retrieval-only";
-  const isRetrievalOnly = validationMode !== "full";
+  // Execution mode determines behavior: 'full' (production), 'retrieval-only' (diagnostic), 'disabled' (maintenance)
+  // Defaults to 'full' for production safety; must be explicitly configured for other modes
+  const validationMode = APP_CONFIG?.llm?.validationMode || 'full';
+  const isProduction = validationMode === 'full';
+  const isRetrievalOnly = validationMode === 'retrieval-only';
+  const isDisabled = validationMode === 'disabled';
+
+  // Log execution mode at request time
+  logger?.info?.({
+    event: 'interview.request',
+    executionMode: validationMode,
+    model,
+    isProduction,
+    isRetrievalOnly,
+    isDisabled
+  });
+
+  // Handle disabled mode
+  if (isDisabled) {
+    if (!setSSEHeaders(res)) {
+      return res.status(500).json({ error: "Failed to initialize streaming response." });
+    }
+    const disabledMessage = {
+      event: 'disabled',
+      message: 'Interview Copilot is currently disabled for maintenance. Please try again later.'
+    };
+    if (res?.writable) {
+      res.write(`event: disabled\ndata: ${JSON.stringify(disabledMessage)}\n\n`);
+      res.write("data: [DONE]\n\n");
+      res.end();
+    }
+    return;
+  }
 
   // Client-supplied key (Settings dialog) takes priority; env var is the fallback for
   // deployments running a shared server-side key. Neither is required in
   // retrieval-only mode, since no LLM call is made.
-  const envApiKey = isGeminiModel(model) ? APP_CONFIG?.api?.gemini?.apiKey : APP_CONFIG?.api?.openai?.apiKey;
+  const envApiKey = isGeminiModel(model)
+    ? APP_CONFIG?.llm?.apiKeys?.gemini
+    : APP_CONFIG?.llm?.apiKeys?.openai;
   const apiKey = clientApiKey || envApiKey || "";
 
-  if (!isRetrievalOnly && !apiKey) {
+  // Production mode requires an API key
+  if (isProduction && !apiKey) {
+    logger?.warn?.({
+      event: 'interview.missing_api_key',
+      model,
+      provider: isGeminiModel(model) ? 'gemini' : 'openai'
+    });
     return res.status(400).json({
-      error: "An API key is required for full generation mode — supply one in Settings or configure OPENAI_API_KEY/GEMINI_API_KEY."
+      error: "An API key is required for production mode — supply one in Settings or configure OPENAI_API_KEY/GEMINI_API_KEY."
     });
   }
 
@@ -467,31 +556,41 @@ export default async function handler(req, res) {
 
     streamStarted = true;
 
-    console.log("========== CHAT DEBUG ==========");
-console.log("isRetrievalOnly:", isRetrievalOnly);
-console.log("model:", model);
-console.log("apiKey exists:", !!apiKey);
-console.log("apiKey length:", apiKey ? apiKey.length : 0);
-console.log("================================");
-
     if (isRetrievalOnly) {
-      // No LLM call — validates the pipeline up through prompt construction without
-      // spending real API tokens. See config/appConfig.js's llm.validationMode.
+      // Retrieval-only diagnostic mode: validates the pipeline up through prompt construction
+      // without calling LLM or spending real API tokens. Useful for validating RAG quality.
+      logger?.info?.({
+        event: 'interview.retrieval_only_mode',
+        model,
+        knowledgeContextLength: knowledgeContext.length,
+        systemPromptLength: systemPrompt.length
+      });
+
       const diagnostic = {
         mode: "retrieval-only",
-        note: 'No real API call was made (LLM_VALIDATION_MODE is not "full"). This shows what would have been sent.',
+        note: 'Retrieval-only diagnostic mode: knowledge retrieved and prompt constructed, but no LLM call made.',
         model,
+        provider: isGeminiModel(model) ? 'gemini' : 'openai',
         maxTokens,
         category: analysis.category,
         sapComponents: technicalReasoning.recommendedComponents,
         knowledgeContextChars: knowledgeContext.length,
         knowledgeContextPreview: knowledgeContext.slice(0, 500),
-        systemPromptChars: systemPrompt.length
+        systemPromptChars: systemPrompt.length,
+        timestamp: new Date().toISOString()
       };
       if (res?.writable) {
         res.write(`event: retrieval_only\ndata: ${JSON.stringify(diagnostic)}\n\n`);
       }
     } else {
+      // Production mode: stream the LLM response
+      logger?.info?.({
+        event: 'interview.streaming_llm_response',
+        model,
+        provider: isGeminiModel(model) ? 'gemini' : 'openai',
+        hasApiKey: !!apiKey
+      });
+
       const fullAnswerText = isGeminiModel(model)
         ? await streamGeminiResponse(streamOptions)
         : await streamOpenAIResponse(streamOptions);

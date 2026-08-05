@@ -337,6 +337,58 @@
     validateSchemas: process.env.NODE_ENV === 'development',
     maxInputLength: 10000,
     maxOutputLength: 100000
+  },
+
+  llm: {
+    // Execution mode: 'full' (production, calls LLM), 'retrieval-only' (diagnostic, no LLM), or 'disabled' (maintenance mode)
+    // MUST be explicitly configured; defaults to 'full' for production safety
+    validationMode: process.env.LLM_VALIDATION_MODE || 'full',
+
+    // LLM provider configuration
+    provider: process.env.LLM_PROVIDER || 'openai',
+    defaultModel: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+
+    // API keys - client-supplied key takes priority (BYOK design)
+    // Server-side keys are optional fallbacks for shared deployments
+    apiKeys: {
+      openai: process.env.OPENAI_API_KEY || null,
+      gemini: process.env.GEMINI_API_KEY || null
+    },
+
+    // Timeout for LLM generation requests (milliseconds)
+    generationTimeoutMs: parseInt(process.env.LLM_GENERATION_TIMEOUT_MS) || 60000,
+
+    // Streaming configuration
+    streaming: {
+      enabled: true,
+      maxTokensPerChunk: parseInt(process.env.LLM_STREAMING_CHUNK_TOKENS) || 50,
+      flushIntervalMs: parseInt(process.env.LLM_STREAMING_FLUSH_MS) || 100
+    },
+
+    // Token limits for generation
+    maxCompletionTokens: parseInt(process.env.LLM_MAX_COMPLETION_TOKENS) || 2048,
+
+    // Validation mode diagnostic output
+    validationModeSettings: {
+      'full': {
+        description: 'Production mode: retrieves knowledge and calls LLM',
+        callsLLM: true,
+        returnsAnswer: true,
+        returnsRetrieval: false
+      },
+      'retrieval-only': {
+        description: 'Diagnostic mode: retrieves knowledge without calling LLM',
+        callsLLM: false,
+        returnsAnswer: false,
+        returnsRetrieval: true
+      },
+      'disabled': {
+        description: 'Maintenance mode: explicitly disabled',
+        callsLLM: false,
+        returnsAnswer: false,
+        returnsRetrieval: false
+      }
+    }
   }
 };
 
