@@ -120,9 +120,9 @@ bonuses; that was the root cause of a major retrieval-precision regression.
 - `rise/` — 9/9 files ✅ (COMPLETED SESSION 2026-08-05)
 
 ### In Progress
-- `project-management/` — 5/11 files complete
-  - Completed: blueprinting.md, change-management.md, requirement-gathering.md, fit-gap-analysis.md, project-governance.md
-  - Remaining: project-lifecycle, raid-log, release-management, resource-planning, risk-management, stakeholder-management
+- `project-management/` — 6/11 files complete
+  - Completed: blueprinting.md, change-management.md, requirement-gathering.md, fit-gap-analysis.md, project-governance.md, project-lifecycle.md
+  - Remaining: raid-log, release-management, resource-planning, risk-management, stakeholder-management
 
 ### Remaining Domains (not started)
 `project-management/` (11), `project-types/` (9), `interview-scenarios/` (5), 
