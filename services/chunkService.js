@@ -6,8 +6,8 @@ const {
 } = require("../models/contracts");
 const appConfig = require("../config/appConfig");
 
-const { maxChunkSize: MAX_CHUNK_SIZE, minChunkSize: MIN_CHUNK_SIZE } =
-  appConfig.chunking;
+const { maxChunkSizeTokens: MAX_CHUNK_SIZE, minChunkSizeTokens: MIN_CHUNK_SIZE } =
+  appConfig.knowledge.chunking;
 
 // Headings commonly found in SAP documentation/interview material — a fallback for
 // content that isn't authored as markdown (plain .txt/.pdf/.docx sources).

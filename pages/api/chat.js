@@ -467,6 +467,13 @@ export default async function handler(req, res) {
 
     streamStarted = true;
 
+    console.log("========== CHAT DEBUG ==========");
+console.log("isRetrievalOnly:", isRetrievalOnly);
+console.log("model:", model);
+console.log("apiKey exists:", !!apiKey);
+console.log("apiKey length:", apiKey ? apiKey.length : 0);
+console.log("================================");
+
     if (isRetrievalOnly) {
       // No LLM call — validates the pipeline up through prompt construction without
       // spending real API tokens. See config/appConfig.js's llm.validationMode.

@@ -5,15 +5,16 @@ All notable changes to Interview Copilot are documented here. This file records 
 ## [Unreleased] — Current Development Phase
 
 ### In Progress
-- Populating BTP domain knowledge (2 of 6 files complete)
-  - Remaining files: cloud-connector.md, cloud-identity.md, ias.md, ips.md
-- Planning: Populate remaining 16 domains (82 files total)
+- Populating project-management domain knowledge (0 of 11 files)
+- Planning: Populate remaining 15 domains (58 files total)
 
-### Tasks for This Session (2026-08-05)
-- Create missing documentation (ARCHITECTURE.md, CHANGELOG.md, DEVELOPMENT_ROADMAP.md, RESUME_GUIDE.md, START_HERE.md, AI_SESSION_BOOTSTRAP.md)
-- Populate remaining BTP files
-- Run domain workflow (validate markdown → rebuild index → validate retrieval)
-- Continue to RISE domain
+### Tasks Completed This Session (2026-08-05)
+- Created QUALITY_GATE.md — permanent quality standards for entire knowledge platform
+- Completed RISE domain: populated 4 remaining files (rise-project.md, rise-migration.md, rise-cutover.md, rise-security.md)
+- Fixed configuration bugs blocking knowledge index build:
+  - chunkService.js: corrected config path and property names (appConfig.knowledge.chunking, maxChunkSizeTokens/minChunkSizeTokens)
+  - appConfig.js: added missing sourceDirectory configuration
+- RISE domain now complete: 9/9 files (3,196 total lines), ready for index rebuild and retrieval validation
 
 ---
 

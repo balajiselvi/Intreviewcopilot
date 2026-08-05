@@ -1,52 +1,9 @@
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
-
-// --- Indexing-pipeline versioning strategy ---
-// services/knowledgeIndexService.js skips re-chunking a document whenever its content
-// checksum AND these version strings are unchanged from the last build (see
-// priorChunksByDocument / isUnchangedDocument there) — a mismatch on ANY of these
-// wholesale-invalidates every prior chunk and forces a full rebuild.
-// Rather than requiring someone to remember to bump a version number whenever the
-// chunking or parsing algorithm changes, PARSER_VERSION and CHUNK_VERSION below are
-// hashes of the actual source files that implement that logic (plus, for chunking, the
-// size config that governs chunk boundaries). Any future edit to either file, or to the
-// chunk size env vars, changes the hash automatically — a full rebuild triggers itself,
-// with no manual cache-invalidation step. Override with the env vars below only if you
-// need to force a specific version deliberately (e.g. to intentionally reuse chunks
-// across a change you know is safe to skip).
-function hashSourceFile(relativePathFromConfigDir, extra = '') {
-  try {
-    const absolutePath = path.join(__dirname, relativePathFromConfigDir);
-    const source = fs.readFileSync(absolutePath, 'utf8');
-    return crypto.createHash('sha256').update(source).update(String(extra)).digest('hex').slice(0, 12);
-  } catch (error) {
-    // Should only happen if the file was moved without updating this path — fail safe
-    // to a fixed string rather than crashing config load; a mismatch here still forces
-    // a rebuild on the next deploy where the path is fixed.
-    return 'unresolved';
-  }
-}
-
-const CHUNK_SIZE_CONFIG = {
-  maxChunkSize: parseInt(process.env.MAX_CHUNK_SIZE_CHARS) || 700,
-  minChunkSize: parseInt(process.env.MIN_CHUNK_SIZE_CHARS) || 200
-};
-
-const PARSER_VERSION = process.env.PARSER_VERSION
-  || hashSourceFile('../services/knowledgeService.js');
-const CHUNK_VERSION = process.env.CHUNK_VERSION
-  || hashSourceFile('../services/chunkService.js', JSON.stringify(CHUNK_SIZE_CONFIG));
-
-const config = {
+  const config = {
   environment: {
     nodeEnv: process.env.NODE_ENV || 'development',
     isDevelopment: process.env.NODE_ENV !== 'production',
     isProduction: process.env.NODE_ENV === 'production'
   },
-
-  maxContextCharacters: parseInt(process.env.MAX_CONTEXT_CHARACTERS) || 3000,
-  responseLength: process.env.DEFAULT_RESPONSE_LENGTH || 'medium',
 
   api: {
     anthropic: {
@@ -56,34 +13,7 @@ const config = {
       maxRetries: parseInt(process.env.API_MAX_RETRIES) || 3,
       retryDelayMs: parseInt(process.env.API_RETRY_DELAY_MS) || 1000,
       exponentialBackoffFactor: 2
-    },
-    // Server-side fallback keys, used only when the client (Settings dialog) doesn't
-    // supply its own apiKey in the request body. The app's primary model is
-    // bring-your-own-key from the client; these env vars exist for deployments that
-    // want a shared server-side key instead. Never hardcode a key value here.
-    openai: {
-      apiKey: process.env.OPENAI_API_KEY || ''
-    },
-    gemini: {
-      apiKey: process.env.GEMINI_API_KEY || ''
     }
-  },
-
-  // Controls whether pages/api/chat.js actually calls the LLM. 'retrieval-only' runs
-  // the full pipeline (analysis, retrieval, prompt construction) and returns a
-  // diagnostic event instead of calling OpenAI/Gemini — no API key required, no cost,
-  // safe for validating the knowledge base during content population. Set
-  // LLM_VALIDATION_MODE=full (and provide a real key, client-supplied or via the env
-  // vars above) to enable real end-to-end generation.
-  llm: {
-    validationMode: process.env.LLM_VALIDATION_MODE || 'retrieval-only',
-    // Declares the intended default provider/model for deployments that configure a
-    // server-side key rather than relying on the client's Settings dialog. The model
-    // string itself still determines actual provider routing in pages/api/chat.js
-    // (a "gemini-" prefix routes to Gemini, otherwise OpenAI) — these are only used as
-    // the fallback when a request doesn't specify a model at all.
-    provider: process.env.LLM_PROVIDER || 'openai',
-    defaultModel: process.env.OPENAI_MODEL || 'gpt-4o-mini'
   },
 
   models: {
@@ -145,23 +75,8 @@ const config = {
     maxAnswerLengthCharacters: 5000
   },
 
-  // Character-based chunk sizing used by the semantic chunker (services/chunkService.js),
-  // distinct from knowledge.chunking's token-based sizing used elsewhere. Shared with the
-  // CHUNK_VERSION hash above so a chunk-size change also forces a full re-chunk.
-  chunking: CHUNK_SIZE_CONFIG,
-
   knowledge: {
-    source: process.env.KNOWLEDGE_SOURCE || 'sap-interview-knowledge-base',
     sourceDirectory: process.env.KNOWLEDGE_SOURCE_DIR || './knowledge',
-    documentVersion: process.env.DOCUMENT_VERSION || '1.0.0',
-    parserVersion: PARSER_VERSION,
-    schemaVersion: process.env.SCHEMA_VERSION || '1.0.0',
-    chunkVersion: CHUNK_VERSION,
-    embeddingModel: process.env.EMBEDDING_MODEL_ID || 'text-embedding-3-small',
-    indexVersion: parseInt(process.env.KNOWLEDGE_INDEX_VERSION) || 1,
-    indexFile: process.env.KNOWLEDGE_INDEX_FILE || './data/knowledgeIndex.json',
-    manifestFile: process.env.KNOWLEDGE_MANIFEST_FILE || './data/knowledgeManifest.json',
-    reportFile: process.env.KNOWLEDGE_REPORT_FILE || './data/knowledgeReport.json',
     chunking: {
       strategy: process.env.CHUNKING_STRATEGY || 'semantic',
       maxChunkSizeTokens: parseInt(process.env.MAX_CHUNK_TOKENS) || 1024,
@@ -197,19 +112,6 @@ const config = {
   },
 
   retrieval: {
-    defaultTopK: parseInt(process.env.RETRIEVAL_TOP_K) || 5,
-    maxQueryExpansion: parseInt(process.env.MAX_QUERY_EXPANSION) || 5,
-    // How many post-filter candidates get scored per query, BEFORE ranking picks the
-    // final topK. This used to default to 50 in code with no config override, which
-    // truncated candidates in raw (effectively alphabetical file-order) order before
-    // scoring ever ran — files sorting later within a domain (msmp.md, repository-
-    // sync.md, etc.) could be silently excluded from consideration entirely once a
-    // domain's real chunk count exceeded the limit, independent of actual relevance.
-    // Set generously above the current index size (560 chunks across 2 of 20 domains)
-    // with headroom for the full ~110-file target; scoring itself is cheap (a cosine
-    // similarity plus a few string/regex checks per chunk), so this is bounding cost
-    // against a genuinely oversized index, not a tight performance constraint.
-    candidateLimit: parseInt(process.env.RETRIEVAL_CANDIDATE_LIMIT) || 2000,
     vectorSearch: {
       enabled: true,
       topK: parseInt(process.env.RETRIEVAL_TOP_K) || 5,
@@ -238,37 +140,36 @@ const config = {
     }
   },
 
-  // Post-answer heuristic evaluation (lib/prompt/evaluation.js, scoring.js, followupAnalyzer.js).
-  // Pure string/regex checks only — never gates or regenerates the live answer, purely informational.
-  evaluation: {
-    enabled: process.env.ENABLE_ANSWER_EVALUATION !== 'false',
-    scale: 10,
-    weights: {
-      technicalAccuracy: 0.30,
-      experienceConsistency: 0.25,
-      spokenDelivery: 0.15,
-      naturalConversation: 0.10,
-      ownership: 0.05,
-      completeness: 0.05,
-      followUpReadiness: 0.05,
-      conciseness: 0.05
+  prompts: {
+    system: {
+      role: 'You are a Senior SAP GRC Security Architect and Interview Coach.',
+      tone: 'Professional, direct, technically precise.',
+      focus: 'Deliver technically accurate SAP answers grounded in real consulting experience.',
+      format: 'Conversational spoken English, 30 seconds to 2 minutes for most answers.'
     },
-    thresholds: {
-      wordCountMin: 70,
-      wordCountMax: 180,
-      minSapComponentHits: 2,
-      minTechnicalKeywordHits: 2,
-      maxAvgSentenceWords: 22,
-      perGapPenalty: 0.5,
-      genericPhrasePenalty: 1,
-      fillerPhrasePenalty: 0.5,
-      hallucinationPenaltyNoResume: 4,
-      hallucinationPenaltyUnsupported: 2
+    styleGuide: {
+      noBulletPoints: true,
+      noMarkdown: true,
+      noHeadings: true,
+      conversationalTone: true,
+      useRealExamples: true,
+      emphasizePractical: true
     },
-    hallucinationPhrases: ['my project', 'our customer', 'when i implemented', 'our client', 'during my deployment'],
-    genericPhrases: ['best practice', 'proper governance', 'overall security', 'this improves compliance', 'this enhances security'],
-    fillerPhrases: ['basically', 'essentially', 'obviously', 'needless to say', 'at the end of the day', 'as such', 'kind of', 'sort of'],
-    technicalKeywords: ['pfcg', 'su24', 'ara', 'arm', 'eam', 'msmp', 'brf', 'ias', 'ips', 'iag', 'cloud connector', 'snc', 'sm59', 'firefighter', 'role', 'authorization']
+    sapTerminologyPreservation: {
+      preserveTCodes: true,
+      preserveTableNames: true,
+      preserveAuthObjects: true,
+      preserveSpecialTerms: true,
+      useSAPAccurateTerminology: true
+    },
+    answerGuidelines: {
+      minLengthSeconds: 30,
+      maxLengthSeconds: 120,
+      includeRealWorldContext: true,
+      highlightTrustPlanningCorePrinciples: true,
+      demonstrateArchitectureKnowledge: true,
+      showConsultingExperience: true
+    }
   },
 
   streaming: {
@@ -297,7 +198,6 @@ const config = {
   },
 
   logging: {
-    service: process.env.SERVICE_NAME || 'interview-copilot',
     level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
     format: process.env.LOG_FORMAT || 'json',
     outputDestination: process.env.LOG_OUTPUT || 'stdout',

@@ -110,18 +110,17 @@ bonuses; that was the root cause of a major retrieval-precision regression.
 
 ## Current Progress
 
-**43 of 110 knowledge files populated (39%).**
+**52 of 110 knowledge files populated (47%).**
 
 ### Completed Domains (frozen)
 - `security/` — 9/9 files ✅
 - `grc/` — 15/15 files ✅
 - `s4hana/` — 4/4 files ✅
 - `btp/` — 6/6 files ✅ (COMPLETED SESSION 2026-08-05)
+- `rise/` — 9/9 files ✅ (COMPLETED SESSION 2026-08-05)
 
 ### In Progress
-- `rise/` — 5/9 files ✅ (rise-overview, public-cloud, private-cloud, clean-core, cloud-alm populated)
-  - Remaining: rise-project.md, rise-migration.md, rise-cutover.md, rise-security.md
-  - Index rebuilt: 1,567 total chunks, retrieval validated
+- None currently — proceeding to `project-management/` (11 files)
 
 ### Remaining Domains (not started)
 `project-management/` (11), `project-types/` (9), `interview-scenarios/` (5), 
