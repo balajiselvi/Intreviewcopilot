@@ -110,20 +110,22 @@ bonuses; that was the root cause of a major retrieval-precision regression.
 
 ## Current Progress
 
-**34 of 110 knowledge files populated (31%).**
+**43 of 110 knowledge files populated (39%).**
 
 ### Completed Domains (frozen)
 - `security/` — 9/9 files ✅
 - `grc/` — 15/15 files ✅
 - `s4hana/` — 4/4 files ✅
-- `btp/` — 6/6 files ✅ (COMPLETED THIS SESSION: 2026-08-05)
+- `btp/` — 6/6 files ✅ (COMPLETED SESSION 2026-08-05)
 
 ### In Progress
-- None (previous BTP domain now complete)
+- `rise/` — 5/9 files ✅ (rise-overview, public-cloud, private-cloud, clean-core, cloud-alm populated)
+  - Remaining: rise-project.md, rise-migration.md, rise-cutover.md, rise-security.md
+  - Index rebuilt: 1,567 total chunks, retrieval validated
 
 ### Remaining Domains (not started)
-`rise/` (9), `project-management/` (11), `project-types/` (9), `interview-scenarios/`
-(5), `behavioral/` (4), `leadership/` (4), `cloud/` (4), `idm/` (4), `fiori/` (4),
+`project-management/` (11), `project-types/` (9), `interview-scenarios/` (5), 
+`behavioral/` (4), `leadership/` (4), `cloud/` (4), `idm/` (4), `fiori/` (4),
 `bw/` (3), `troubleshooting/` (4), `audit/` (3), `compliance/` (3), `transports/` (3),
 `cutover/` (3), `hypercare/` (3).
 
