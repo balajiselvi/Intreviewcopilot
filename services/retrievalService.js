@@ -290,6 +290,15 @@ return RankedChunkSchema.parse({
 });
 }
 
+function countSapComponents(content = "") {
+const text = String(content).toLowerCase();
+let count = 0;
+for (const keyword of SAP_KEYWORDS) {
+  if (text.includes(keyword)) count += 1;
+}
+return count;
+}
+
 function rankCandidatesStage(scoredCandidates, topK) {
 const defaultTopK = appConfig?.retrieval?.defaultTopK || 5;
 const targetTopK = typeof topK === "number" && topK > 0 ? topK : defaultTopK;
@@ -306,6 +315,13 @@ if (aImplementation !== bImplementation) {
 
 if (b.semanticScore !== a.semanticScore) {
   return b.semanticScore - a.semanticScore;
+}
+
+// Component saturation: tie-breaker to ensure component-rich chunks rank higher
+const aComponents = countSapComponents(a.content);
+const bComponents = countSapComponents(b.content);
+if (aComponents !== bComponents) {
+  return bComponents - aComponents;
 }
 
 return (b.content?.length || 0) - (a.content?.length || 0);
