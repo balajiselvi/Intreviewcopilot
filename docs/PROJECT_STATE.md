@@ -110,7 +110,7 @@ bonuses; that was the root cause of a major retrieval-precision regression.
 
 ## Current Progress
 
-**55 of 110 knowledge files populated (50%).**
+**66 of 110 knowledge files populated (60%).**
 
 ### Completed Domains (frozen)
 - `security/` — 9/9 files ✅
@@ -119,10 +119,13 @@ bonuses; that was the root cause of a major retrieval-precision regression.
 - `btp/` — 6/6 files ✅ (COMPLETED SESSION 2026-08-05)
 - `rise/` — 9/9 files ✅ (COMPLETED SESSION 2026-08-05)
 
-### In Progress
-- `project-management/` — 6/11 files complete
-  - Completed: blueprinting.md, change-management.md, requirement-gathering.md, fit-gap-analysis.md, project-governance.md, project-lifecycle.md
-  - Remaining: raid-log, release-management, resource-planning, risk-management, stakeholder-management
+### Completed Domains (frozen)
+- `security/` — 9/9 files ✅
+- `grc/` — 15/15 files ✅
+- `s4hana/` — 4/4 files ✅
+- `btp/` — 6/6 files ✅
+- `rise/` — 9/9 files ✅
+- `project-management/` — 11/11 files ✅ (COMPLETED SESSION 2026-08-05)
 
 ### Remaining Domains (not started)
 `project-management/` (11), `project-types/` (9), `interview-scenarios/` (5), 
