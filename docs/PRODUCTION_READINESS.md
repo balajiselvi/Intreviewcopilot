@@ -4,16 +4,46 @@
 
 The app already auto-detects this — `config/appConfig.js`'s `environment.isDevelopment`/`isProduction` derive from `NODE_ENV`, which Next.js sets automatically (`development` under `next dev`, `production` under `next build && next start`). No manual toggle needed; nothing in this document requires setting `NODE_ENV` yourself.
 
-## Retrieval-Only Mode vs. Full LLM Mode
+## Execution Modes
 
-Controlled by `LLM_VALIDATION_MODE`, read in `pages/api/chat.js`.
+Interview Copilot supports three explicit execution modes, controlled by the `LLM_VALIDATION_MODE` environment variable (read from `config/appConfig.js`, used in `pages/api/chat.js`):
 
-| Mode | Behavior | API key required | API cost |
-|---|---|---|---|
-| `retrieval-only` (default) | Runs the full pipeline — question analysis, knowledge retrieval, prompt construction — then returns a diagnostic `event: retrieval_only` SSE frame (model, token ceiling, category, retrieved-context preview) instead of calling the LLM. | No | None |
-| `full` | Makes a real streaming call to OpenAI or Gemini, same as before this work. | Yes (client-supplied or `OPENAI_API_KEY`/`GEMINI_API_KEY`) | Real |
+| Mode | Environment Variable | Behavior | API Key Required | Use Case | Default |
+|---|---|---|---|---|---|
+| **Production** | `LLM_VALIDATION_MODE=full` (or unset) | Runs full pipeline: question analysis → knowledge retrieval → prompt construction → **LLM streaming** → answer evaluation. Returns streamed interview answer. | Yes (client-supplied or `OPENAI_API_KEY`/`GEMINI_API_KEY`) | Live interviews, real generation | **YES** |
+| **Retrieval Validation** | `LLM_VALIDATION_MODE=retrieval-only` | Runs pipeline up through prompt construction, returns diagnostic SSE event showing what would have been sent to LLM (model, token ceiling, category, retrieved-context preview). No LLM call made. | No | Validating retrieval quality without API cost | No |
+| **Disabled** | `LLM_VALIDATION_MODE=disabled` | Application explicitly disabled. Returns message that system is unavailable. | No | Maintenance or emergency shutdown | No |
 
-This is what let the knowledge base and retrieval pipeline get built and validated end-to-end in this session without spending any real API tokens, and without a key configured at all. Flip to `full` only when you're ready for real generation.
+### Default Behavior (Production-Safe)
+
+When `LLM_VALIDATION_MODE` is **not set**, the application defaults to **production mode** (`full`). This is the safe default: if an API key is provided, the application will stream real LLM responses. If no API key is provided, production mode will return a clear error asking for one.
+
+### Configuring Modes
+
+Set via environment variable:
+```bash
+# Production mode (default if unset)
+export LLM_VALIDATION_MODE=full
+
+# Retrieval validation mode (diagnostic, no API cost)
+export LLM_VALIDATION_MODE=retrieval-only
+
+# Disabled mode (maintenance)
+export LLM_VALIDATION_MODE=disabled
+```
+
+Or via `.env.local` (git-ignored):
+```
+LLM_VALIDATION_MODE=retrieval-only
+```
+
+### Important Design Decisions
+
+1. **Production is the default.** Do not silently fall back to retrieval-only mode when configuration is missing. If the user didn't explicitly ask for diagnostic mode, they expect production mode with LLM generation.
+
+2. **Retrieval-only must be explicit.** Developers who want to validate retrieval without API costs must explicitly set `LLM_VALIDATION_MODE=retrieval-only`. This prevents accidental "it's working, but there's no answer" scenarios.
+
+3. **API key requirement depends on mode.** Production mode requires an API key and returns a clear error if missing. Retrieval-only mode does not require a key.
 
 ## Configuring the LLM provider
 

@@ -5,16 +5,35 @@ All notable changes to Interview Copilot are documented here. This file records 
 ## [Unreleased] — Current Development Phase
 
 ### In Progress
+- End-to-end validation of Knowledge Platform with LLM streaming now functional
 - Populating project-management domain knowledge (0 of 11 files)
 - Planning: Populate remaining 15 domains (58 files total)
 
 ### Tasks Completed This Session (2026-08-05)
+
+**Production Configuration Defect Fixed**
+- Root cause: validationMode always defaulted to 'retrieval-only' (diagnostic), never calling LLM
+- Result: Backend working correctly, but no interview answers streamed to frontend
+- Solution: Added complete llm configuration section to appConfig.js
+  - validationMode defaults to 'full' (production) instead of 'retrieval-only'
+  - Three explicit modes: 'full' (production), 'retrieval-only' (diagnostic), 'disabled' (maintenance)
+  - Only retrieval-only mode requires explicit env var; production is now the safe default
+  - Added comprehensive startup diagnostics and per-request logging
+- Impact: LLM streaming restored, end-to-end knowledge platform validation now possible
+
+**Knowledge Platform Quality Standards**
 - Created QUALITY_GATE.md — permanent quality standards for entire knowledge platform
-- Completed RISE domain: populated 4 remaining files (rise-project.md, rise-migration.md, rise-cutover.md, rise-security.md)
-- Fixed configuration bugs blocking knowledge index build:
-  - chunkService.js: corrected config path and property names (appConfig.knowledge.chunking, maxChunkSizeTokens/minChunkSizeTokens)
-  - appConfig.js: added missing sourceDirectory configuration
-- RISE domain now complete: 9/9 files (3,196 total lines), ready for index rebuild and retrieval validation
+- Defines mandatory 24-section template, minimum coverage requirements, quality acceptance criteria
+
+**Completed RISE Domain**
+- Populated 4 remaining files (rise-project.md, rise-migration.md, rise-cutover.md, rise-security.md)
+- RISE domain complete: 9/9 files (3,196 total lines)
+- Ready for index rebuild and retrieval validation
+
+**Infrastructure Fixes**
+- Fixed configuration bugs blocking knowledge index build
+- Fixed chunkService.js config path and property names
+- Added sourceDirectory configuration to appConfig.js
 
 ---
 
