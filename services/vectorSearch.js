@@ -55,16 +55,46 @@ function computeKeywordOverlap(queryNorm, contentNorm) {
   return matches / queryTokens.length;
 }
 
+// A real architect's reasoning connects adjacent domains (a GRC question naturally touches
+// role design and Fiori; an S/4HANA question naturally touches security and BTP). Retrieval
+// scoring previously only rewarded exact-domain keyword matches, so adjacent-domain context
+// never got a relevance boost even when genuinely relevant. This is a half-weight boost --
+// EXPERIMENTAL, see git log for the before/after measurement.
+const RELATED_DOMAINS = Object.freeze({
+  "SAP Security": ["SAP GRC", "SAP Fiori Security"],
+  "SAP GRC": ["SAP Security", "SAP Fiori Security", "SAP IDM"],
+  "SAP Cloud Identity": ["SAP BTP Security", "SAP IDM"],
+  "SAP BTP Security": ["SAP Cloud Identity", "SAP Fiori Security"],
+  "SAP Cloud Identity / BTP": ["SAP Security", "SAP GRC", "SAP IDM"],
+  "SAP Fiori Security": ["SAP Security", "SAP BTP Security"],
+  "SAP IDM": ["SAP GRC", "SAP Cloud Identity"],
+  "SAP Platform": ["SAP Security", "SAP GRC", "SAP Fiori Security"]
+});
+
 function computeDomainBoost(domain, contentNorm) {
-  if (!domain || !DOMAIN_BOOST_MAP[domain] || !contentNorm) return 0;
-  const keywords = DOMAIN_BOOST_MAP[domain];
-  let hits = 0;
-  for (let i = 0; i < keywords.length; i++) {
-    if (contentNorm.includes(keywords[i])) {
-      hits++;
+  if (!domain || !contentNorm) return 0;
+
+  const directKeywords = DOMAIN_BOOST_MAP[domain];
+  let directHits = 0;
+  if (directKeywords) {
+    for (let i = 0; i < directKeywords.length; i++) {
+      if (contentNorm.includes(directKeywords[i])) directHits++;
     }
   }
-  return Math.min(0.15, hits * 0.03);
+  const directBoost = Math.min(0.15, directHits * 0.03);
+
+  const relatedDomains = RELATED_DOMAINS[domain] || [];
+  let relatedHits = 0;
+  for (const relatedDomain of relatedDomains) {
+    const relatedKeywords = DOMAIN_BOOST_MAP[relatedDomain];
+    if (!relatedKeywords) continue;
+    for (let i = 0; i < relatedKeywords.length; i++) {
+      if (contentNorm.includes(relatedKeywords[i])) relatedHits++;
+    }
+  }
+  const relatedBoost = Math.min(0.06, relatedHits * 0.015);
+
+  return Math.min(0.18, directBoost + relatedBoost);
 }
 
 function computeArtifactBoost(content) {

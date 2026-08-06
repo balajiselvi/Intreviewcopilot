@@ -1,0 +1,41 @@
+[
+  {
+    "domain": "SAP GRC",
+    "scores": [
+      6.83,
+      6.83,
+      6.83
+    ],
+    "mean": 6.83,
+    "stdDev": 0,
+    "baselineMean": 6.86,
+    "baselineStdDev": 0.07,
+    "delta": -0.03
+  },
+  {
+    "domain": "SAP BTP Security",
+    "scores": [
+      6.5,
+      6.5,
+      6.5
+    ],
+    "mean": 6.5,
+    "stdDev": 0,
+    "baselineMean": 6.7,
+    "baselineStdDev": 0.4,
+    "delta": -0.2
+  },
+  {
+    "domain": "HANA",
+    "scores": [
+      6.83,
+      6.83,
+      6.83
+    ],
+    "mean": 6.83,
+    "stdDev": 0,
+    "baselineMean": 6.83,
+    "baselineStdDev": 0,
+    "delta": 0
+  }
+]
