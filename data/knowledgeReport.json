@@ -1,9 +1,9 @@
 {
-  "documentsProcessed": 110,
-  "documentsSkipped": 34,
-  "documentsUpdated": 76,
-  "chunksCreated": 246,
-  "elapsedSeconds": 55.611,
+  "documentsProcessed": 113,
+  "documentsSkipped": 0,
+  "documentsUpdated": 113,
+  "chunksCreated": 2595,
+  "elapsedSeconds": 58.224,
   "errors": [],
   "warnings": [
     {

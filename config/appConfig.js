@@ -77,6 +77,19 @@
 
   knowledge: {
     sourceDirectory: process.env.KNOWLEDGE_SOURCE_DIR || './knowledge',
+    source: process.env.KNOWLEDGE_SOURCE_ID || 'interview-copilot-knowledge-base',
+    documentVersion: process.env.KNOWLEDGE_DOCUMENT_VERSION || '1.0.0',
+    indexFile: process.env.KNOWLEDGE_INDEX_FILE || './data/knowledgeIndex.json',
+    manifestFile: process.env.KNOWLEDGE_MANIFEST_FILE || './data/knowledgeManifest.json',
+    reportFile: process.env.KNOWLEDGE_REPORT_FILE || './data/knowledgeReport.json',
+    // Must match the values already recorded in data/knowledgeManifest.json — bumping any of
+    // these invalidates every previously-embedded chunk and forces a full reindex (see
+    // priorChunksByDocument in knowledgeIndexService.js).
+    schemaVersion: '1.0.0',
+    parserVersion: 'a5fdef3073fe',
+    chunkVersion: '59c1e5914015',
+    embeddingModel: process.env.EMBEDDING_MODEL_ID || 'text-embedding-3-small',
+    indexVersion: parseInt(process.env.KNOWLEDGE_INDEX_VERSION) || 1,
     chunking: {
       strategy: process.env.CHUNKING_STRATEGY || 'semantic',
       maxChunkSizeTokens: parseInt(process.env.MAX_CHUNK_TOKENS) || 1024,
