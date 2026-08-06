@@ -5,8 +5,16 @@ const DOMAIN_BOOST_MAP = Object.freeze({
   "SAP GRC": ["grc", "ara", "arm", "eam", "brm", "firefighter", "msmp", "brf", "grac", "risk", "rulebook"],
   "SAP Cloud Identity": ["ias", "ips", "iag", "saml", "oidc", "oauth", "scim", "tenant", "idp"],
   "SAP BTP Security": ["btp", "cloud connector", "principal propagation", "subaccount", "destination", "mtls", "x.509"],
+  // interviewAnalyzer.js's DOMAIN_PATTERNS emits the combined string "SAP Cloud Identity / BTP"
+  // for IAS/IPS/IAG/BTP questions -- that string matched neither of the two keys above, so
+  // every question in this domain got zero domain boost during retrieval scoring. Merging
+  // both keyword sets under the exact string the analyzer actually produces.
+  "SAP Cloud Identity / BTP": ["ias", "ips", "iag", "saml", "oidc", "oauth", "scim", "tenant", "idp", "btp", "cloud connector", "principal propagation", "subaccount", "destination", "mtls", "x.509"],
   "SAP Fiori Security": ["fiori", "launchpad", "catalog", "group", "space", "page", "odata", "iwfnd", "iwmnd"],
-  "SAP IDM": ["idm", "identity center", "vds", "pass-vector", "repository"]
+  "SAP IDM": ["idm", "identity center", "vds", "pass-vector", "repository"],
+  // "SAP Platform" (interviewAnalyzer.js) covers S/4HANA, ECC, HANA, ABAP, BW, SuccessFactors,
+  // Netweaver, Sybase, MaxDB questions and had no boost entry at all -- same zero-boost gap.
+  "SAP Platform": ["s/4hana", "s4hana", "ecc", "hana", "universal journal", "new gl", "analytic privilege", "bw", "bw/4hana", "netweaver", "abap", "hdi container", "catalog role", "repository role"]
 });
 
 const SAP_ARTIFACT_REGEX = /\b(grac_[a-z0-9_]+|agr_[a-z0-9_]+|usr[0-9]{2}|ust[0-9]{2}|pfcg|su24|su25|su53|st01|stauthtrace|st22|slg1|sm37|sm21|se16|se16n|se11)\b/i;
