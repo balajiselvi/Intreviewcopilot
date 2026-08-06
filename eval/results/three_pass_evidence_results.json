@@ -1,0 +1,56 @@
+[
+  {
+    "domain": "SAP GRC",
+    "scores": [
+      6.83,
+      6.83,
+      6.83
+    ],
+    "mean": 6.83,
+    "stdDev": 0,
+    "baselineMean": 6.86,
+    "delta": -0.03,
+    "avgLatency": {
+      "generateMs": 8004,
+      "critiqueMs": 7765,
+      "improveMs": 7308,
+      "totalUserFacingMs": 23078
+    }
+  },
+  {
+    "domain": "SAP BTP Security",
+    "scores": [
+      6.83,
+      7.5,
+      6.83
+    ],
+    "mean": 7.05,
+    "stdDev": 0.32,
+    "baselineMean": 6.7,
+    "delta": 0.35,
+    "avgLatency": {
+      "generateMs": 6046,
+      "critiqueMs": 6603,
+      "improveMs": 8689,
+      "totalUserFacingMs": 21338
+    }
+  },
+  {
+    "domain": "HANA",
+    "scores": [
+      6.83,
+      6.83,
+      6.83
+    ],
+    "mean": 6.83,
+    "stdDev": 0,
+    "baselineMean": 6.83,
+    "delta": 0,
+    "avgLatency": {
+      "generateMs": 4257,
+      "critiqueMs": 8904,
+      "improveMs": 9862,
+      "totalUserFacingMs": 23023
+    }
+  }
+]
