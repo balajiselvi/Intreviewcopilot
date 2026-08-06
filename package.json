@@ -2,14 +2,15 @@
   "name": "latest",
   "version": "0.1.0",
   "private": true,
- "scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start",
-  "lint": "next lint",
-  "build:knowledge": "node scripts/buildKnowledge.js"
-},
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "build:knowledge": "node scripts/buildKnowledge.js"
+  },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@google/generative-ai": "^0.23.0",

@@ -352,7 +352,10 @@
     // Server-side keys are optional fallbacks for shared deployments
     apiKeys: {
       openai: process.env.OPENAI_API_KEY || null,
-      gemini: process.env.GEMINI_API_KEY || null
+      gemini: process.env.GEMINI_API_KEY || null,
+      openrouter: process.env.OPENROUTER_API_KEY || null,
+      anthropic: process.env.ANTHROPIC_API_KEY || null,
+      groq: process.env.GROQ_API_KEY || null
     },
 
     // Timeout for LLM generation requests (milliseconds)

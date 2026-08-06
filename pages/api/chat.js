@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import Anthropic from "@anthropic-ai/sdk";
 
 import { analyzeInterviewQuestion } from "../../lib/interviewAnalyzer";
 import { buildReasoningPlan } from "../../lib/reasoningPlanner";
@@ -143,8 +144,25 @@ const CONTEXTUAL_STARTERS = Object.freeze([
   "what about", "how about", "why", "how", "then", "and", "can you", "could you", "what if"
 ]);
 
+function isClaudeModel(model = "") {
+  return model?.toLowerCase?.().includes("claude") || false;
+}
+
 function isGeminiModel(model = "") {
   return model?.toLowerCase?.().startsWith("gemini") || false;
+}
+
+function isGroqModel(model = "") {
+  // Groq models include: mixtral-8x7b-32768, llama2-70b-4096, etc.
+  return model?.toLowerCase?.().includes("mixtral") ||
+         model?.toLowerCase?.().includes("llama") ||
+         model?.toLowerCase?.().includes("groq") || false;
+}
+
+function isOpenRouterModel(model = "") {
+  // OpenRouter models are typically from external providers routed through openrouter.ai
+  // Common formats: openrouter/*, anthropic/claude*, openai/gpt*, etc.
+  return !!model;  // All models can be routed through OpenRouter
 }
 
 function writeSSEChunk(res, text) {
@@ -388,6 +406,115 @@ async function streamOpenAIResponse({ apiKey, model, systemPrompt, recentHistory
   return fullText;
 }
 
+async function streamOpenRouterResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens }) {
+  // OpenRouter is API-compatible with OpenAI but uses openrouter.ai as base URL
+  const client = new OpenAI({
+    apiKey,
+    baseURL: "https://openrouter.io/api/v1",
+    defaultHeaders: {
+      "HTTP-Referer": "https://interviewcopilot.app",
+      "X-Title": "Interview Copilot"
+    }
+  });
+
+  const stream = await client.chat.completions.create(
+    {
+      model,
+      temperature: 0.1,
+      max_tokens: maxTokens,
+      stream: true,
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...recentHistory,
+        { role: "user", content: question }
+      ]
+    },
+    { signal }
+  );
+
+  let fullText = "";
+  for await (const part of stream) {
+    if (signal?.aborted) break;
+    const text = part.choices[0]?.delta?.content || "";
+    if (text) {
+      writeSSEChunk(res, text);
+      fullText += text;
+    }
+  }
+  return fullText;
+}
+
+async function streamClaudeResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens }) {
+  // Use Anthropic's Claude API
+  const client = new Anthropic({
+    apiKey: apiKey || process.env.ANTHROPIC_API_KEY
+  });
+
+  const messages = [
+    ...recentHistory,
+    { role: "user", content: question }
+  ];
+
+  const stream = await client.messages.create(
+    {
+      model,
+      max_tokens: maxTokens,
+      temperature: 0.1,
+      system: systemPrompt,
+      messages,
+      stream: true
+    },
+    { signal }
+  );
+
+  let fullText = "";
+  for await (const event of stream) {
+    if (signal?.aborted) break;
+    if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
+      const text = event.delta.text || "";
+      if (text) {
+        writeSSEChunk(res, text);
+        fullText += text;
+      }
+    }
+  }
+  return fullText;
+}
+
+async function streamGroqResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens }) {
+  // Groq is OpenAI-compatible but uses groq.com as base URL
+  const client = new OpenAI({
+    apiKey,
+    baseURL: "https://api.groq.com/openai/v1"
+  });
+
+  const stream = await client.chat.completions.create(
+    {
+      model,
+      temperature: 0.1,
+      max_tokens: maxTokens,
+      stream: true,
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...recentHistory,
+        { role: "user", content: question }
+      ]
+    },
+    { signal }
+  );
+
+  let fullText = "";
+  for await (const part of stream) {
+    if (signal?.aborted) break;
+    const text = part.choices[0]?.delta?.content || "";
+    if (text) {
+      writeSSEChunk(res, text);
+      fullText += text;
+    }
+  }
+  return fullText;
+}
+
 function setSSEHeaders(res) {
   try {
     res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
@@ -471,20 +598,32 @@ export default async function handler(req, res) {
   // Client-supplied key (Settings dialog) takes priority; env var is the fallback for
   // deployments running a shared server-side key. Neither is required in
   // retrieval-only mode, since no LLM call is made.
-  const envApiKey = isGeminiModel(model)
-    ? APP_CONFIG?.llm?.apiKeys?.gemini
-    : APP_CONFIG?.llm?.apiKeys?.openai;
+  let envApiKey = "";
+  if (isClaudeModel(model)) {
+    envApiKey = APP_CONFIG?.llm?.apiKeys?.anthropic;
+  } else if (isGeminiModel(model)) {
+    envApiKey = APP_CONFIG?.llm?.apiKeys?.gemini;
+  } else if (isGroqModel(model)) {
+    envApiKey = APP_CONFIG?.llm?.apiKeys?.groq;
+  } else {
+    // Try OpenRouter first, fallback to OpenAI
+    envApiKey = APP_CONFIG?.llm?.apiKeys?.openrouter || APP_CONFIG?.llm?.apiKeys?.openai;
+  }
   const apiKey = clientApiKey || envApiKey || "";
 
   // Production mode requires an API key
   if (isProduction && !apiKey) {
+    let provider = 'openai';
+    if (isClaudeModel(model)) provider = 'anthropic';
+    else if (isGeminiModel(model)) provider = 'gemini';
+
     logger?.warn?.({
       event: 'interview.missing_api_key',
       model,
-      provider: isGeminiModel(model) ? 'gemini' : 'openai'
+      provider
     });
     return res.status(400).json({
-      error: "An API key is required for production mode — supply one in Settings or configure OPENAI_API_KEY/GEMINI_API_KEY."
+      error: "An API key is required for production mode — supply one in Settings or configure OPENAI_API_KEY/GEMINI_API_KEY/ANTHROPIC_API_KEY/OPENROUTER_API_KEY."
     });
   }
 
@@ -591,9 +730,19 @@ export default async function handler(req, res) {
         hasApiKey: !!apiKey
       });
 
-      const fullAnswerText = isGeminiModel(model)
-        ? await streamGeminiResponse(streamOptions)
-        : await streamOpenAIResponse(streamOptions);
+      let fullAnswerText = "";
+
+      if (isClaudeModel(model)) {
+        fullAnswerText = await streamClaudeResponse(streamOptions);
+      } else if (isGeminiModel(model)) {
+        fullAnswerText = await streamGeminiResponse(streamOptions);
+      } else if (isGroqModel(model)) {
+        fullAnswerText = await streamGroqResponse(streamOptions);
+      } else if (APP_CONFIG?.llm?.apiKeys?.openrouter || process.env.OPENROUTER_API_KEY) {
+        fullAnswerText = await streamOpenRouterResponse(streamOptions);
+      } else {
+        fullAnswerText = await streamOpenAIResponse(streamOptions);
+      }
 
       // Post-answer evaluation: pure heuristics, no LLM call, runs only after every
       // content chunk is already on the wire — never delays the spoken answer, and a
