@@ -158,6 +158,27 @@ const DEEPEN_FOLLOW_UP_PATTERNS = Object.freeze([
   "drill into", "drill down", "go into detail", "get into the technical", "unpack that"
 ]);
 
+// A recovery signal ("I'm blank", "wait, sorry", "where was I") carries NO topic content --
+// it's the user under live pressure losing their thread, not asking a new question or asking
+// for more depth. Treating it as a generic follow-up caused the model to restart the whole
+// explanation from scratch, which is exactly backwards: what actually helps is a short, calm
+// reminder of where they were and what's next, so they can pick the thread back up themselves.
+const RECOVERY_SIGNAL_PATTERNS = Object.freeze([
+  "im blank", "i blanked", "blanking", "lost my train of thought", "lost my thought",
+  "where was i", "what was i saying", "i forgot what i was saying", "give me a second",
+  "give me a sec", "one sec", "hold on", "sorry wait", "wait sorry", "i lost it",
+  "my mind went blank", "i went blank", "sorry i lost", "can you remind me", "remind me where"
+]);
+
+function isRecoverySignal(question = "") {
+  const normalized = question.trim().toLowerCase().replace(/[^\w\s]/g, "");
+  if (RECOVERY_SIGNAL_PATTERNS.some(p => normalized.includes(p))) return true;
+  // Bare "wait" / "wait..." with no other content is a recovery signal; "wait, why..." or
+  // "wait, what about..." is a real contextual question and should not be swallowed here.
+  if (normalized === "wait" || normalized === "sorry") return true;
+  return false;
+}
+
 function isDeepenFollowUp(question = "") {
   const normalized = question.trim().toLowerCase().replace(/[^\w\s]/g, "");
   return DEEPEN_FOLLOW_UP_PATTERNS.some(p => normalized.includes(p));
@@ -661,8 +682,9 @@ export default async function handler(req, res) {
   let streamStarted = false;
 
   try {
-    const deepenFollowUp = isDeepenFollowUp(question);
-    const isFollowUp = isFollowUpUtterance(question, history) || deepenFollowUp;
+    const recoverySignal = isRecoverySignal(question) && history.length > 0;
+    const deepenFollowUp = !recoverySignal && isDeepenFollowUp(question);
+    const isFollowUp = recoverySignal || isFollowUpUtterance(question, history) || deepenFollowUp;
 
     // Classification must not run on the follow-up utterance in isolation -- "walk me through
     // what you actually did" carries zero SAP keywords on its own, so classifying it alone
@@ -684,6 +706,7 @@ export default async function handler(req, res) {
     analysis.secondaryCategories = secondaryCategories;
     analysis.isFollowUp = isFollowUp;
     analysis.isDeepenFollowUp = deepenFollowUp;
+    analysis.isRecoverySignal = recoverySignal;
 
     const reasoningPlan = buildReasoningPlan(question, analysis);
     const sapComponents = selectSapComponents(question, analysis);
