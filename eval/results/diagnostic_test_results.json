@@ -1,0 +1,56 @@
+[
+  {
+    "domain": "Troubleshooting",
+    "question": "Walk me through how you'd diagnose a user access issue reported as urgent.",
+    "answer": "First, I scope the symptom by gathering details about the access issue. Understanding whether it's a specific transaction failure or a broader role assignment problem is crucial. I start with transaction SU53 to capture the last authorization check failure, which provides immediate insight into what authorization objects are causing the issue.\n\nNext, I run ST01 to trace the authorization checks in real-time. This helps identify if the failure is due to configuration issues or missing authorizations. I also check the system logs with SM21 for any related errors that might indicate broader system issues.\n\nThe key tension here is balancing the urgency of the request with the need for thorough diagnostics. If the issue is critical, I might temporarily grant emergency access through EAM while I investigate further. \n\nIn practice, I categorize failures into configuration, authorization, or provisioning issues. This structured approach allows me to isolate the root cause effectively before making any changes. After resolving the issue, I recommend implementing preventive monitoring to catch similar issues early, ensuring we maintain a secure and compliant environment.",
+    "judge": {
+      "technical_accuracy": 9,
+      "production_experience": 8,
+      "business_context": 7,
+      "communication": 8,
+      "architecture_thinking": 6,
+      "leadership": 5,
+      "overall_score": 7.17,
+      "confidence_score": 8,
+      "remaining_weaknesses": [
+        "Limited discussion on stakeholder communication or collaboration.",
+        "Lacks specific examples of past experiences or outcomes.",
+        "Does not address potential impacts on business operations or user productivity."
+      ],
+      "suggested_follow_up_questions": [
+        "Can you provide an example of a particularly challenging access issue you resolved?",
+        "How do you communicate with stakeholders during a critical access issue?",
+        "What preventive measures have you implemented in the past to avoid similar issues?",
+        "How do you prioritize multiple urgent access issues when they arise simultaneously?"
+      ]
+    },
+    "findingCount": 6
+  },
+  {
+    "domain": "Production Support",
+    "question": "A user reports they are unable to access their Firefighter ID in SAP GRC Emergency Access Management. How do you troubleshoot this?",
+    "answer": "Start by verifying the user's role assignments in SU01 to ensure they have the necessary permissions for the Firefighter ID. Next, check the Firefighter ID configuration in GRC, specifically looking at the controller and owner assignments to confirm they are correctly set up. Use transaction ST01 to trace authorization checks and identify any failed authorization objects that might be blocking access. \n\nThe key tension here is balancing immediate access needs with security protocols. If the user still can't access their ID, review the session logs for any error messages or failed attempts, which can provide insights into the root cause. \n\nIn practice, I’ve found that documenting these troubleshooting steps is crucial for future reference and compliance. This approach not only resolves the immediate issue but also strengthens the overall governance framework. Which is why I always dig into the configuration details and user context to ensure a comprehensive resolution.",
+    "judge": {
+      "technical_accuracy": 8,
+      "production_experience": 7,
+      "business_context": 6,
+      "communication": 7,
+      "architecture_thinking": 5,
+      "leadership": 6,
+      "overall_score": 6.5,
+      "confidence_score": 7,
+      "remaining_weaknesses": [
+        "Lacks specific examples of past troubleshooting experiences.",
+        "Does not mention collaboration with other teams or stakeholders.",
+        "Limited discussion on the implications of access issues on business operations."
+      ],
+      "suggested_follow_up_questions": [
+        "Can you provide an example of a time when you successfully resolved a similar access issue?",
+        "How do you ensure that your troubleshooting process aligns with security policies?",
+        "What steps would you take if the issue persists after your initial troubleshooting?",
+        "How do you communicate with users about access issues and resolutions?"
+      ]
+    },
+    "findingCount": 7
+  }
+]
