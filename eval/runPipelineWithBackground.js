@@ -7,7 +7,7 @@ const { critiqueAnswer } = require("./lib/critic");
 const { judgeAnswer } = require("./lib/judge");
 const { CANDIDATE_BACKGROUND } = require("./lib/candidateBackground");
 
-const OUT_PATH = path.join(__dirname, "results", "pipeline_with_background_results.json");
+const OUT_PATH = path.join(__dirname, "results", "pipeline_with_real_cv_results.json");
 
 function overallOf(scores) {
   const dims = ["technical_accuracy", "production_experience", "business_context", "communication", "architecture_thinking", "leadership"];
