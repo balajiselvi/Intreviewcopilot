@@ -606,8 +606,10 @@ export default async function handler(req, res) {
   } else if (isGroqModel(model)) {
     envApiKey = APP_CONFIG?.llm?.apiKeys?.groq;
   } else {
-    // Try OpenRouter first, fallback to OpenAI
-    envApiKey = APP_CONFIG?.llm?.apiKeys?.openrouter || APP_CONFIG?.llm?.apiKeys?.openai;
+    // Prefer a directly-configured OpenAI key; only fall back to OpenRouter when
+    // no OpenAI key is set, so a stray/placeholder OPENROUTER_API_KEY in the host
+    // environment can't silently hijack requests meant for OpenAI.
+    envApiKey = APP_CONFIG?.llm?.apiKeys?.openai || APP_CONFIG?.llm?.apiKeys?.openrouter;
   }
   const apiKey = clientApiKey || envApiKey || "";
 
@@ -738,7 +740,9 @@ export default async function handler(req, res) {
         fullAnswerText = await streamGeminiResponse(streamOptions);
       } else if (isGroqModel(model)) {
         fullAnswerText = await streamGroqResponse(streamOptions);
-      } else if (APP_CONFIG?.llm?.apiKeys?.openrouter || process.env.OPENROUTER_API_KEY) {
+      } else if (APP_CONFIG?.llm?.apiKeys?.openai) {
+        fullAnswerText = await streamOpenAIResponse(streamOptions);
+      } else if (APP_CONFIG?.llm?.apiKeys?.openrouter) {
         fullAnswerText = await streamOpenRouterResponse(streamOptions);
       } else {
         fullAnswerText = await streamOpenAIResponse(streamOptions);
