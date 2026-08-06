@@ -1,0 +1,68 @@
+[
+  {
+    "domain": "SAP Security",
+    "scores": [
+      6.83,
+      7.5
+    ],
+    "mean": 7.17,
+    "stdDev": 0.33,
+    "min": 6.83,
+    "max": 7.5
+  },
+  {
+    "domain": "SAP GRC",
+    "scores": [
+      6.83,
+      7
+    ],
+    "mean": 6.92,
+    "stdDev": 0.08,
+    "min": 6.83,
+    "max": 7
+  },
+  {
+    "domain": "SAP BTP Security",
+    "scores": [
+      6.5,
+      7.5
+    ],
+    "mean": 7,
+    "stdDev": 0.5,
+    "min": 6.5,
+    "max": 7.5
+  },
+  {
+    "domain": "HANA",
+    "scores": [
+      6.83,
+      6.83
+    ],
+    "mean": 6.83,
+    "stdDev": 0,
+    "min": 6.83,
+    "max": 6.83
+  },
+  {
+    "domain": "SAC",
+    "scores": [
+      6.83,
+      6.83
+    ],
+    "mean": 6.83,
+    "stdDev": 0,
+    "min": 6.83,
+    "max": 6.83
+  },
+  {
+    "domain": "Audit",
+    "scores": [
+      6.83,
+      6.83
+    ],
+    "mean": 6.83,
+    "stdDev": 0,
+    "min": 6.83,
+    "max": 6.83
+  }
+]
