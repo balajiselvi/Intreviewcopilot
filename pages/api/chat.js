@@ -144,6 +144,25 @@ const CONTEXTUAL_STARTERS = Object.freeze([
   "what about", "how about", "why", "how", "then", "and", "can you", "could you", "what if"
 ]);
 
+// A "deepen" follow-up ("can you go deeper", "walk me through what you actually did") is a
+// different interviewer move from a plain continuation ("then what?", "okay") -- it's a
+// request for more technical specificity on what was just said, not a request to move on.
+// Treating both identically meant the model had no signal to actually increase depth instead
+// of just avoiding repetition.
+const DEEPEN_FOLLOW_UP_PATTERNS = Object.freeze([
+  "go deeper", "dive deeper", "deep dive", "more technical", "be more technical",
+  "more specific", "be more specific", "more detail", "more details", "in more detail",
+  "explain that technically", "explain the technical", "walk me through what you actually did",
+  "walk me through what you did", "walk me through exactly what you did",
+  "what did you actually do", "how exactly", "specifically how", "technically how",
+  "drill into", "drill down", "go into detail", "get into the technical", "unpack that"
+]);
+
+function isDeepenFollowUp(question = "") {
+  const normalized = question.trim().toLowerCase().replace(/[^\w\s]/g, "");
+  return DEEPEN_FOLLOW_UP_PATTERNS.some(p => normalized.includes(p));
+}
+
 function isClaudeModel(model = "") {
   return model?.toLowerCase?.().includes("claude") || false;
 }
@@ -642,13 +661,29 @@ export default async function handler(req, res) {
   let streamStarted = false;
 
   try {
-    const isFollowUp = isFollowUpUtterance(question, history);
-    const { primaryCategory, secondaryCategories } = classifyWeightedIntents(question);
+    const deepenFollowUp = isDeepenFollowUp(question);
+    const isFollowUp = isFollowUpUtterance(question, history) || deepenFollowUp;
 
-    const analysis = analyzeInterviewQuestion(question);
+    // Classification must not run on the follow-up utterance in isolation -- "walk me through
+    // what you actually did" carries zero SAP keywords on its own, so classifying it alone
+    // always collapses to category "General", discarding whatever topic (EAM, ARM, SU24...)
+    // the conversation was actually about. A follow-up inherits the prior turn's topic; only a
+    // genuinely fresh question should be classified on its own text.
+    const lastUserTurn = isFollowUp
+      ? [...history].reverse().find(item => item?.role === "user" && item?.content)?.content || ""
+      : "";
+    const classificationText = lastUserTurn ? `${lastUserTurn} ${question}` : question;
+    const { primaryCategory, secondaryCategories } = classifyWeightedIntents(classificationText);
+
+    // Same reasoning applies to domain/intent detection (analyzeInterviewQuestion) -- it also
+    // pattern-matches on the question text alone, so it needs the inherited context too, or
+    // analysis.domain silently falls back to "General SAP" for every follow-up and the
+    // domain-boost retrieval scoring never engages.
+    const analysis = analyzeInterviewQuestion(classificationText);
     analysis.category = primaryCategory;
     analysis.secondaryCategories = secondaryCategories;
     analysis.isFollowUp = isFollowUp;
+    analysis.isDeepenFollowUp = deepenFollowUp;
 
     const reasoningPlan = buildReasoningPlan(question, analysis);
     const sapComponents = selectSapComponents(question, analysis);
@@ -660,7 +695,12 @@ export default async function handler(req, res) {
       interviewer
     );
 
-    const knowledgeContext = isFollowUp
+    // A plain continuation ("then what?") doesn't need fresh retrieval -- the prior context
+    // already covers it. A "go deeper" follow-up is the opposite case: the interviewer is
+    // asking for MORE technical specificity than the first pass gave, which is exactly when
+    // additional targeted retrieval helps most. Skipping it there was starving the one
+    // follow-up type that most needed grounding.
+    const knowledgeContext = (isFollowUp && !deepenFollowUp)
       ? ""
       : await fetchKnowledgeContext(question, primaryCategory, secondaryCategories, history, analysis);
 
