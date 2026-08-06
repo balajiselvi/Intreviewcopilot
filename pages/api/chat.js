@@ -279,7 +279,7 @@ function synthesizeRetrievalQuery(question, history) {
   return `${question} ${newTopicTokens.join(" ")}`.trim();
 }
 
-async function fetchKnowledgeContext(question, primaryCategory, secondaryCategories, history) {
+async function fetchKnowledgeContext(question, primaryCategory, secondaryCategories, history, analysis) {
   let topK = TOP_K_BY_CATEGORY[primaryCategory] || TOP_K_BY_CATEGORY.General;
   if (secondaryCategories && secondaryCategories.length > 0) {
     const maxSecondaryK = Math.max(
@@ -289,7 +289,11 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
   }
 
   const retrievalQuery = synthesizeRetrievalQuery(question, history);
-  const chunks = await searchKnowledge(retrievalQuery, topK);
+  // searchKnowledge's real signature is (question, analysis, topK, options) -- passing topK
+  // as the second positional argument here previously landed it in the `analysis` slot,
+  // silently zeroing out domain/intent boost scoring and discarding this topK entirely in
+  // favor of the function's own internal default.
+  const chunks = await searchKnowledge(retrievalQuery, analysis, topK);
   if (!chunks || chunks.length === 0) return "";
 
   const maxChars = APP_CONFIG?.maxContextCharacters || 3000;
@@ -658,7 +662,7 @@ export default async function handler(req, res) {
 
     const knowledgeContext = isFollowUp
       ? ""
-      : await fetchKnowledgeContext(question, primaryCategory, secondaryCategories, history);
+      : await fetchKnowledgeContext(question, primaryCategory, secondaryCategories, history, analysis);
 
     const promptPayload = {
       question,
