@@ -1,0 +1,226 @@
+[
+  {
+    "label": "BASELINE_fixed_direct_mode",
+    "size": 15420,
+    "hitCount": 0,
+    "n": 5,
+    "sample": [
+      {
+        "run": 1,
+        "hit": false
+      },
+      {
+        "run": 2,
+        "hit": false
+      },
+      {
+        "run": 3,
+        "hit": false
+      },
+      {
+        "run": 4,
+        "hit": false
+      },
+      {
+        "run": 5,
+        "hit": false
+      }
+    ]
+  },
+  {
+    "label": "remove_REASONING_TEMPLATE",
+    "size": 15207,
+    "hitCount": 0,
+    "n": 5,
+    "sample": [
+      {
+        "run": 1,
+        "hit": false
+      },
+      {
+        "run": 2,
+        "hit": false
+      },
+      {
+        "run": 3,
+        "hit": false
+      },
+      {
+        "run": 4,
+        "hit": false
+      },
+      {
+        "run": 5,
+        "hit": false
+      }
+    ]
+  },
+  {
+    "label": "remove_INTERVIEWER_CONTEXT",
+    "size": 14945,
+    "hitCount": 0,
+    "n": 5,
+    "sample": [
+      {
+        "run": 1,
+        "hit": false
+      },
+      {
+        "run": 2,
+        "hit": false
+      },
+      {
+        "run": 3,
+        "hit": false
+      },
+      {
+        "run": 4,
+        "hit": false
+      },
+      {
+        "run": 5,
+        "hit": false
+      }
+    ]
+  },
+  {
+    "label": "remove_TECHNICAL_REASONING",
+    "size": 14776,
+    "hitCount": 1,
+    "n": 5,
+    "sample": [
+      {
+        "run": 1,
+        "hit": false
+      },
+      {
+        "run": 2,
+        "hit": false
+      },
+      {
+        "run": 3,
+        "hit": true
+      },
+      {
+        "run": 4,
+        "hit": false
+      },
+      {
+        "run": 5,
+        "hit": false
+      }
+    ]
+  },
+  {
+    "label": "remove_DETERMINISTIC_CONSTRAINTS",
+    "size": 14879,
+    "hitCount": 0,
+    "n": 5,
+    "sample": [
+      {
+        "run": 1,
+        "hit": false
+      },
+      {
+        "run": 2,
+        "hit": false
+      },
+      {
+        "run": 3,
+        "hit": false
+      },
+      {
+        "run": 4,
+        "hit": false
+      },
+      {
+        "run": 5,
+        "hit": false
+      }
+    ]
+  },
+  {
+    "label": "remove_DECISION_ACCOUNTABILITY_REASONING",
+    "size": 11610,
+    "hitCount": 0,
+    "n": 5,
+    "sample": [
+      {
+        "run": 1,
+        "hit": false
+      },
+      {
+        "run": 2,
+        "hit": false
+      },
+      {
+        "run": 3,
+        "hit": false
+      },
+      {
+        "run": 4,
+        "hit": false
+      },
+      {
+        "run": 5,
+        "hit": false
+      }
+    ]
+  },
+  {
+    "label": "remove_SIMULATE_BEFORE_CONSTRAINT_ONLY",
+    "size": 14231,
+    "hitCount": 0,
+    "n": 5,
+    "sample": [
+      {
+        "run": 1,
+        "hit": false
+      },
+      {
+        "run": 2,
+        "hit": false
+      },
+      {
+        "run": 3,
+        "hit": false
+      },
+      {
+        "run": 4,
+        "hit": false
+      },
+      {
+        "run": 5,
+        "hit": false
+      }
+    ]
+  },
+  {
+    "label": "remove_DOMAIN_SPECIFIC_DEPTH",
+    "size": 14908,
+    "hitCount": 0,
+    "n": 5,
+    "sample": [
+      {
+        "run": 1,
+        "hit": false
+      },
+      {
+        "run": 2,
+        "hit": false
+      },
+      {
+        "run": 3,
+        "hit": false
+      },
+      {
+        "run": 4,
+        "hit": false
+      },
+      {
+        "run": 5,
+        "hit": false
+      }
+    ]
+  }
+]
