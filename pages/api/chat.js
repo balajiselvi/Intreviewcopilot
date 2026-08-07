@@ -264,6 +264,16 @@ function classifyWeightedIntents(question = "") {
 }
 
 function isFollowUpUtterance(question = "", history = []) {
+  // FOLLOW_UP_PATTERNS includes bare "how" and "why" as openers -- legitimate follow-up
+  // signals ("How about the SoD side?") ONLY when there's a prior turn to follow up on. With
+  // no history, `normalized.startsWith("how ")` matches every "How would you...", "How do
+  // you..." first-turn question, which is one of the two most common ways real interview
+  // questions are phrased -- misclassifying them as follow-ups, which skips retrieval
+  // (knowledgeContext = "") and injects "do not repeat background information" on turn one.
+  // Gating this behind history.length > 0 matches the (already-correct) gating already applied
+  // to CONTEXTUAL_STARTERS and the pronoun check just below.
+  if (history.length === 0) return false;
+
   const trimmed = question.trim().toLowerCase();
   const normalized = trimmed.replace(/[^\w\s]/g, "");
 
@@ -271,16 +281,14 @@ function isFollowUpUtterance(question = "", history = []) {
     return true;
   }
 
-  if (history.length > 0) {
-    if (CONTEXTUAL_STARTERS.some(starter => normalized.startsWith(starter))) {
+  if (CONTEXTUAL_STARTERS.some(starter => normalized.startsWith(starter))) {
+    return true;
+  }
+  const words = normalized.split(/\s+/);
+  if (words.length <= 5) {
+    const pronouns = ["this", "that", "it", "those", "same", "again"];
+    if (words.some(w => pronouns.includes(w))) {
       return true;
-    }
-    const words = normalized.split(/\s+/);
-    if (words.length <= 5) {
-      const pronouns = ["this", "that", "it", "those", "same", "again"];
-      if (words.some(w => pronouns.includes(w))) {
-        return true;
-      }
     }
   }
 
