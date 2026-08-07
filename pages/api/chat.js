@@ -744,6 +744,13 @@ export default async function handler(req, res) {
     if (company?.trim()) promptPayload.company = company.trim();
 
     const systemPrompt = buildSapInterviewPrompt(promptPayload);
+    // Opt-in diagnostic (off by default, zero effect unless DEBUG_DUMP_PROMPT is set): dumps
+    // the exact raw prompt sent to the model to a file, so information-flow questions ("is X
+    // actually in the prompt, and where") can be answered by observation instead of inferred
+    // from source code.
+    if (process.env.DEBUG_DUMP_PROMPT) {
+      require("fs").writeFileSync(process.env.DEBUG_DUMP_PROMPT, systemPrompt, "utf-8");
+    }
     const recentHistory = prepareConversationHistory(history);
 
     // Ceiling is sized to the question's length tier (see lib/prompt/interviewPrompt.js) —
