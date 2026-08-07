@@ -272,3 +272,64 @@ already-dense background bullet) may matter more than its topic, though this doe
 explain why the similarly-positioned Fiori insertion worked. None of these should be acted on
 without their own single-variable test -- this section documents what was ruled out, not a new
 recommendation to implement blind.
+
+## Research-engineer cycle: Builder -> Examiner -> Researcher -> Hypothesis -> Experiment
+
+Candidate explanation (a) from the section above was tested next, using a strict 5-phase
+methodology instead of another ad hoc prompt tweak.
+
+**Phase 1 (Builder):** generated one real production answer (live `/api/chat`, real
+`CANDIDATE_BACKGROUND`, unmodified system) for the GRC question. No critique, no changes.
+
+**Phase 2 (Examiner):** read it as a skeptical senior architect interviewing another architect.
+Weaknesses only, no fixes proposed. Key findings: the opening announces a generic 3-part
+taxonomy instead of engaging with what makes *this* landscape complex; a cited number (11
+countries, 250+ rules) illustrates a step every generic answer also takes rather than explaining
+a decision; several sentences read as textbook definitions ("this framework would help classify
+risks...") despite the system being told to assume the interviewer already understands SAP;
+exactly one concrete technical artifact (`GRAC_SPM`) in the whole answer; and, most
+importantly, **no alternative is ever named and rejected**, despite the prompt already asking
+for one.
+
+**Phase 3 (Researcher):** mapped each weakness to a failed reasoning operation, not a wording
+problem. The generic/textbook sentences trace to **decision commitment never occurring** --
+the model describes a solution's shape without picking a defensible side on anything
+contestable. The missing rejected alternative traces to **alternative generation never
+happening** -- and this is upstream of decision commitment, since there's nothing to commit
+against without a competing option in view.
+
+**Phase 4 (Hypothesis, exactly one):** for GRC/SoD-remediation-shaped questions, the model
+begins composing the three-part textbook structure before generating and comparing even one
+alternative -- even though an explicit "name a realistic alternative" instruction already
+exists in the current prompt, because it's buried inside a dense multi-question paragraph
+rather than isolated as a first-class step.
+
+**Phase 5 (Experiment):** isolated the SAME existing instruction (no new content) as a
+standalone mandatory step, in a minimal test harness (`eval/testAlternativeGenerationHypothesis.js`).
+Measured ONE outcome: does a genuine rejected alternative appear in the text (manually
+verified, not regex-trusted). Result: **0/10 control -> 10/10 treatment**, and the alternatives
+were real and substantive when read in full ("a purely automated SoD remediation tool... I
+reject this because it can lead to over-reliance on automation, missing nuanced business
+context").
+
+**Production verification (the step that changed the outcome):** implemented the minimum
+change -- isolated the same instruction inside `ROLE & RULES` in `lib/prompt/interviewPrompt.js`,
+adding no new content -- and re-ran n=10 against the TRUE full production prompt
+(`eval/retestGrcAfterAltGenFix.js`), not the minimal harness. Result: **0/10 rejection
+language**, leverage 2/10 (statistically unchanged from the 10% pre-fix baseline at this n).
+The isolated-prompt effect did not survive merging into the full ~17KB production prompt.
+**Reverted** -- net diff to `interviewPrompt.js` is a comment documenting the negative result,
+no functional change.
+
+### What this cycle actually established
+The specific fix failed, but the diagnostic method worked exactly as intended: it correctly
+identified alternative generation as the failed reasoning operation (Phase 5's minimal-harness
+result confirms this precisely), and it correctly avoided shipping an ineffective change by
+insisting on full-production verification before declaring success. Three separate isolated
+fixes this session (the domain-depth topic clause, this alternative-generation clause, and by
+extension the original REASONING TEMPLATE/RULES/TECHNICAL REASONING clauses that DID survive at
+scale during the earlier Activation investigation) show a consistent pattern: whether an
+isolated instruction survives full-prompt merging is not predictable from the isolated-harness
+result alone, and needs to be measured every time, not assumed. Per the project direction change
+following this cycle, further single-clause prompt patching is no longer the primary path
+forward -- see the Experience Acquisition Engine design doc for the new direction.
