@@ -211,12 +211,64 @@ than either original hypothesis alone. This inference has NOT been tested with a
 experiment (e.g. rewording the GRC narrative to match one of the 5 existing checklist topics)
 and should be treated as a hypothesis, not a conclusion.
 
-## Recommended next step (not yet done, no prompt change proposed)
-Test the content-topic/template-topic mismatch hypothesis directly: rewrite the GRC decision
-narrative so its topic matches an existing checklist bullet (e.g. frame the MSMP/routing
-decision as part of "ARM control design: how controls map to ARA risks, remediation assignment"
-rather than as an unrelated workflow-design aside), re-run the same n=10 test, and see whether
-leverage rises. If it does, that confirms the topic-matching hypothesis and points toward a
-future (not-yet-proposed) prompt change: either loosening GRC's checklist to accept an
-open-ended trade-off the way Fiori's template does, or explicitly telling the model that
-background content outside the checklist's named topics is still worth surfacing.
+## GRC repair attempt: topic-filtering hypothesis tested and DISPROVEN
+
+### Root cause diagnosis first: ruled out retrieval/truncation with hard evidence
+Before touching any code, checked whether `candidateResume` goes through `vectorSearch.js`
+chunking/retrieval at all -- it does not. `grep candidateResume services/vectorSearch.js`
+returns zero matches; `lib/prompt/interviewPrompt.js` interpolates `candidateResume` directly
+into the prompt string (`` `CANDIDATE BACKGROUND (ground truth...): ${candidateResume}` ``) with
+no chunking, no similarity threshold, no length limit. Confirmed empirically via
+`DEBUG_DUMP_PROMPT`: the enriched GRC sentence ("rejected a single global MSMP...") is present
+verbatim in the actual prompt sent to the model. This rules out payload truncation/retrieval as
+the mechanism -- the content reaches the model's context every time; something at generation
+time causes the model not to use it.
+
+### Fix applied (single-variable, per the freeze's own regression-exception clause)
+Added one clause to `getDomainDepthGuidance()` in `lib/prompt/interviewPrompt.js`: "These
+bullets are areas to prioritize, not an exhaustive limit -- if CANDIDATE BACKGROUND describes a
+specific real decision, trade-off, or rejected alternative in this domain that isn't covered by
+the bullets above, include that instead of or alongside them." This tested the hypothesis that
+GRC's 5-bullet checklist (ARA rule evaluation, ARM control design, rule types, certification,
+monitoring) was acting as a topic filter with no slot for "approval workflow design" content.
+
+### Result: null, not just unconfirmed
+Re-ran n=10 for GRC with the enriched background (foreground, not backgrounded, to avoid the
+console/file reliability issue noted above; result independently verified by reading the saved
+file and recomputing counts from its `judged[]` array -- confirmed to match in-memory counts).
+
+| | Narrative surfaced | Leverage rate |
+|---|---|---|
+| Before fix | 0/10 | 10% (1/10) |
+| After fix | 0/10 | 0% (0/10, within noise of the 10% baseline at n=10) |
+
+Both the enriched narrative AND the new clause were confirmed present in the actual prompt sent
+for every one of these 10 requests. The model still never engaged with the workflow-design
+content -- every answer independently converged on the same "risk assessment -> control
+design/remediation -> continuous monitoring" three-part structure, with the same recycled scale
+numbers (8,700 users, 45 systems) attached as illustration, regardless of the new instruction.
+The topic-filtering hypothesis is **disproven for GRC**, not merely unconfirmed: the fix
+targeted exactly the mechanism the diagnosis proposed, and produced zero measurable change.
+
+### Change reverted
+Per this project's discipline, an addition with no measured benefit is not kept as unproven
+prompt bulk -- the clause was removed from `getDomainDepthGuidance()`, restoring it to its
+pre-experiment state (the original, previously-validated grounding clause is unchanged and
+still in place). See the comment above `getDomainDepthGuidance()` for the full negative-result
+note left in the source for future reference.
+
+### Status: true root cause still unresolved
+What's established: the enriched content reaches the model every time (verified), and it is a
+specific, resistant pattern -- the same rigid three-part structure appears in 100% of the ~30
+GRC generations across this investigation (original benchmark, first enrichment test, and this
+retest), independent of background content or the domain-depth clause. What's NOT established:
+why this specific question/category is so much more resistant to structural deviation than
+Fiori's. Candidate explanations not yet tested: (a) `MANDATORY STRUCTURE`'s "name 3-5 points"
+instruction may be the actual source of the fixed three-part shape, not the domain-depth
+checklist; (b) the model's pretrained default answer shape for "SoD remediation + EAM" questions
+may simply be a very strong prior that a single instruction clause can't override, regardless of
+where in the prompt it lives; (c) the new sentence's position (mid-paragraph, buried in an
+already-dense background bullet) may matter more than its topic, though this doesn't obviously
+explain why the similarly-positioned Fiori insertion worked. None of these should be acted on
+without their own single-variable test -- this section documents what was ruled out, not a new
+recommendation to implement blind.
