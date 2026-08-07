@@ -1,0 +1,106 @@
+[
+  {
+    "label": "TRANSCRIPT A: two decisions, one with a decoy 'alternative' mention",
+    "spans": [
+      "So on that engagement we had two separate problems come up. First was the SoD ruleset -- we had 320 conflicting rules after consolidating from three legacy systems, and country compliance meant we couldn't just waive them. I ended up going with a derived role model instead of one big global role, because localizing a single shared role for every country would have been a mess. That held up fine through the audit.",
+      "Then separately, later in the same project, we had to secure the Cloud Connector between BTP and the on-prem backend. There wasn't really an alternative I seriously considered there -- I just went with the standard TrustStore-based certificate setup and mutual TLS, following the reference architecture. That part was pretty uneventful."
+    ],
+    "records": [
+      {
+        "situation": "engagement with two separate problems related to SoD ruleset after consolidating from three legacy systems",
+        "problem": "320 conflicting SoD rules after consolidation",
+        "constraint": "country compliance meant we couldn't just waive the conflicting rules",
+        "decision": "went with a derived role model instead of one big global role",
+        "alternative_rejected": {
+          "approach": "one big global role",
+          "reason_rejected": "localizing a single shared role for every country would have been a mess"
+        },
+        "implementation": null,
+        "outcome": "held up fine through the audit",
+        "lesson_learned": null,
+        "experience_type": "architecture_decision",
+        "candidate_stated_confidence": "explicit",
+        "reusable_for_categories": [
+          "Architecture",
+          "Audit"
+        ],
+        "sap_products": [],
+        "domain": "SAP GRC",
+        "recall_confidence": "high"
+      },
+      {
+        "situation": "securing the Cloud Connector between BTP and the on-prem backend in a project",
+        "problem": null,
+        "constraint": null,
+        "decision": "went with the standard TrustStore-based certificate setup and mutual TLS",
+        "alternative_rejected": null,
+        "implementation": null,
+        "outcome": "that part was pretty uneventful",
+        "lesson_learned": null,
+        "experience_type": "architecture_decision",
+        "candidate_stated_confidence": "explicit",
+        "reusable_for_categories": [
+          "Architecture",
+          "Security"
+        ],
+        "sap_products": [],
+        "domain": "SAP Cloud Identity / BTP",
+        "recall_confidence": "high"
+      }
+    ]
+  },
+  {
+    "label": "TRANSCRIPT B: production failure, no alternative, no explicit lesson",
+    "spans": [
+      "We had an emergency once -- a Firefighter session got left open way longer than it should have because the controller review didn't happen on time, over a weekend. I ended up tightening the reason-code enforcement and set up an automated alert if a session ran past 4 hours. After that we didn't have another lapse like it."
+    ],
+    "records": [
+      {
+        "situation": "An emergency situation involving an open Firefighter session that was left open too long due to a delayed controller review over a weekend.",
+        "problem": "A Firefighter session was left open longer than it should have been.",
+        "constraint": "The controller review did not happen on time.",
+        "decision": "Tightened the reason-code enforcement and set up an automated alert for sessions running past 4 hours.",
+        "alternative_rejected": null,
+        "implementation": "Set up an automated alert if a session ran past 4 hours.",
+        "outcome": "After implementing the changes, there were no further lapses like it.",
+        "lesson_learned": null,
+        "experience_type": "process_design",
+        "candidate_stated_confidence": "explicit",
+        "reusable_for_categories": [
+          "Troubleshooting",
+          "Production Support"
+        ],
+        "sap_products": [],
+        "domain": "SAP Security",
+        "recall_confidence": "high"
+      }
+    ]
+  },
+  {
+    "label": "TRANSCRIPT C: hedging language about facts",
+    "spans": [
+      "This was a while back, I think maybe two or three years into that role, so I don't remember the exact numbers, but it was something like two thousand users, roughly. We redesigned the authorization model for Finance and HR to be least-privilege -- separated access so payroll data was locked down at the infotype level. I'm fairly sure that was driven by an internal audit finding, though I don't recall the exact finding wording."
+    ],
+    "records": [
+      {
+        "situation": "Redesigned the authorization model for Finance and HR to be least-privilege.",
+        "problem": "Need to secure payroll data access.",
+        "constraint": "Internal audit finding that necessitated changes.",
+        "decision": "Separated access so payroll data was locked down at the infotype level.",
+        "alternative_rejected": null,
+        "implementation": null,
+        "outcome": null,
+        "lesson_learned": null,
+        "experience_type": "audit_finding",
+        "candidate_stated_confidence": "implied",
+        "reusable_for_categories": [
+          "Architecture",
+          "Audit"
+        ],
+        "sap_products": [],
+        "domain": "SAP Security",
+        "recall_confidence": "low"
+      }
+    ]
+  }
+]
