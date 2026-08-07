@@ -9,6 +9,7 @@ import { buildSapInterviewPrompt, getMaxTokensForCategory } from "../../lib/prom
 import { profileInterviewer } from "../../lib/interviewerProfiler";
 import { buildTechnicalReasoning } from "../../lib/technicalReasoner";
 import { searchKnowledge } from "../../services/vectorSearch";
+import { searchEngineeringMemory, renderEngineeringJudgmentSection } from "../../lib/engineeringMemory/retrieval";
 import { logger } from "../../lib/logger";
 import { runPostAnswerEvaluation } from "../../lib/prompt";
 import APP_CONFIG from "../../config/appConfig";
@@ -735,6 +736,17 @@ export default async function handler(req, res) {
       ? ""
       : await fetchKnowledgeContext(question, primaryCategory, secondaryCategories, history, analysis);
 
+    // Engineering Memory Platform integration (docs/EXPERIENCE_ACQUISITION_ENGINE_DESIGN.md
+    // section 9) -- additive, new prompt section, does not touch CANDIDATE BACKGROUND's
+    // existing grounding clauses or any other currently-frozen Experience Activation content.
+    // Same skip-on-plain-follow-up reasoning as knowledgeContext above. searchEngineeringMemory
+    // itself short-circuits to a zero-cost no-op when the store is empty, so this is safe to
+    // leave on unconditionally rather than gating behind whether records exist yet.
+    const engineeringJudgment = (isFollowUp && !deepenFollowUp)
+      ? { principles: [], records: [] }
+      : await searchEngineeringMemory({ question: classificationText, analysis, topK: 3 });
+    const engineeringJudgmentContext = renderEngineeringJudgmentSection(engineeringJudgment);
+
     const promptPayload = {
       question,
       analysis,
@@ -742,6 +754,7 @@ export default async function handler(req, res) {
       technicalReasoning,
       interviewer,
       knowledgeContext,
+      engineeringJudgmentContext,
       model,
       sapComponents: technicalReasoning.recommendedComponents
     };
