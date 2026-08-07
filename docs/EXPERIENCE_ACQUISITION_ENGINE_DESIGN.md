@@ -1,8 +1,8 @@
-# Engineering Memory — Architectural Design
+# Engineering Memory Platform — Architectural Design
 
-Status: **design only, not implemented.** Per the project direction change (see
-`eval/results/LEVERAGING_BENCHMARK_2026-08-07.md` for the evidence that motivated it), this
-document is a proposal to review before any code is written.
+Status: **approved for Version 1 implementation**, scoped intentionally small (see section 0.5).
+Interview Copilot is the first consumer of this platform, not the platform itself — a distinction
+that matters for section 0.5 and everything downstream of it.
 
 Revision history:
 - v1: subsystem named "Judgment Store," atomic unit "Judgment Record."
@@ -11,10 +11,14 @@ Revision history:
   inputs too. Flattened the record into an explicit 8-stage pipeline. Governing principle
   stated explicitly: *store engineering judgment that happens to have been learned through
   experience, not experience itself.*
-- v3 (this revision): adds the layer above individual records — **Engineering Principles**,
+- v3: adds the layer above individual records — **Engineering Principles**,
   reverses the retrieval sequence to be reasoning-first rather than similarity-first, and adds a
   human-stated recall-confidence field. This is the change that takes the system from "a memory
   of what happened" to "a model of how this person thinks" — see section 4.
+- v4 (this revision): renamed to **Engineering Memory Platform**, and adds the mindset section
+  below (0.5) that governs everything downstream of it — the design was previously being treated
+  as a thing to finish, when it's actually a thing that has to keep changing shape as real usage
+  reveals what today's understanding is missing.
 
 ## 0. Why prompt engineering hit a ceiling (one paragraph, for context)
 
@@ -28,6 +32,38 @@ instructions just compete with each other over a mostly-empty well. `CANDIDATE_B
 today is achievement/scope prose ("delivered ARA, ARM, EAM... 11 countries, 250+ rules"), not
 judgment ("I did X instead of Y because Z"). No prompt instruction can manufacture judgment that
 was never captured.
+
+## 0.5 Continuous learning philosophy — the mindset that governs every section below
+
+This section exists because "the design is done" was the wrong frame, and it's worth stating
+why in the document itself, not just in a commit message.
+
+**The Engineering Memory Platform is not a static database. It is a continuously evolving
+representation of the candidate's engineering experience.** Every subsystem below should be
+designed assuming today's understanding of that experience is incomplete — not as a hedge, but
+as the actual operating assumption. Every future interview, every new project discussed, every
+production incident recalled, every architectural discussion had, should have the potential to
+improve the Platform. New patterns, new principles, new project types, new domains, and new
+engineering habits are expected to emerge over time, not enumerated up front. Design every
+subsystem so knowledge quality naturally increases with use — avoid any design that implicitly
+assumes the initial Judgment Record set is complete, or that today's `experience_type`
+vocabulary, domain taxonomy, or scenario-type list is final. Those are starting points, not
+walls.
+
+The practical consequence: **optimize Version 1 for learnability, not completeness.** A smaller,
+simpler V1 that captures real signal cleanly and is easy to extend beats a more "complete" V1
+that locks in assumptions before any real Judgment Record exists to test them against. Sections
+2-9 below describe the full target shape of the system; section 10 (build order) is where this
+principle actually bites — it deliberately sequences the simplest, most reversible pieces first
+and defers anything that requires volume or usage data to have accumulated.
+
+**Interview Copilot is the first consumer, not the platform.** The schema, extraction pipeline,
+and retrieval strategy below are written generically enough that a future Resume Builder,
+Technical Mentor, Career Coach, or Knowledge Explorer application could consume the same
+Judgment Records and Engineering Principles — none of section 2's schema or section 3's mining
+logic is Interview-Copilot-specific. Section 5 (retrieval) and section 9 (the answer-generation
+sequence) ARE Interview-Copilot-specific, and that's the correct boundary: the Platform stores
+and organizes judgment; each consuming application decides how to reason from it.
 
 ## 1. The design question, and why it's the right one
 
@@ -364,14 +400,18 @@ neither a Judgment Record nor a Principle yet exists — coverage is necessarily
 long time. The system reasons from Engineering Memory and Engineering Principles first when
 available, falling back to CV prose only for gaps.
 
-## 10. Integration and validation plan (still design, not implementation)
+## 10. Integration and build plan — Version 1, status: building
 
-Proposed build order, each gated on the same evidence-before-code discipline as the rest of this
-project. Principle mining is explicitly LAST — not because it's unimportant, but because it
-needs volume (the "not immediately, but design for it now" framing from review) and would be
-untestable before records exist to mine:
+Per section 0.5: **this build order optimizes for learnability, not completeness.** Version 1 is
+deliberately the smallest slice that lets real Judgment Records start existing and being read
+back correctly — not the full target shape from sections 2-9. Every later step is expected to
+change section 2's schema, section 5's scoring weights, and section 6's scenario-type list once
+real records exist to test them against; nothing here is meant to be final on first pass.
+Principle mining is explicitly LAST — not because it's unimportant, but because it needs volume
+and would be untestable before records exist to mine.
 
-1. Judgment Record schema + `data/engineeringMemory.json` read/write helpers (no LLM yet).
+1. **Judgment Record schema + `data/engineeringMemory.json` read/write helpers (no LLM yet).**
+   ← starting here.
 2. Extraction pipeline (section 7), validated OFFLINE against hand-written transcripts spanning
    multiple `experience_type` values, before touching a live conversation.
 3. `searchEngineeringMemory()` + the new prompt section (section 5), tested via the same
