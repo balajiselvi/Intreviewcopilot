@@ -82,11 +82,65 @@ Per the phase-transition directive, Experience Activation code (`interviewPrompt
 measurement only. The corrected baseline is **41.4% average leverage rate**, with domain
 variance from 10% (GRC, Fiori) to 90% (Architecture). This is the number to beat, not 91.4%.
 
-## Recommended next step (not yet done)
-Investigate why GRC and Fiori collapse to near-zero leverage despite real, decision-relevant
-detail existing in `CANDIDATE_BACKGROUND` (a 320-rule-scale SoD framework, a specific Firefighter
-governance model) -- is the real background genuinely undifferentiated from best practice for
-these two domains specifically, or is the prompt failing to surface decision-relevant detail
-(as opposed to scale numbers) for these categories the way it does for Architecture/HANA? That
-diagnostic question, not a prompt change, is the appropriate next step under the "establish
-baseline, form hypothesis, change one variable" discipline this project has followed throughout.
+## Root cause diagnosis: GRC/Fiori low leverage (read-only, no prompt files touched)
+
+### Method
+Set `DEBUG_DUMP_PROMPT` and ran one live diagnostic generation for each question (real
+`CANDIDATE_BACKGROUND`), then inspected the exact prompt actually sent -- category classified,
+`REASONING TEMPLATE` used, and `DOMAIN-SPECIFIC TECHNICAL DEPTH` block injected. No
+`interviewPrompt.js`/`chat.js`/`vectorSearch.js` edits were made.
+
+### What was actually injected
+- **GRC** ("SoD remediation + EAM" question) classified as `Category: Architecture` --
+  `CATEGORY_TEMPLATES` has no dedicated GRC entry, so it falls back to the generic 4-step
+  architecture structure (`Component Topology -> Runtime Protocols -> Integration Mechanisms ->
+  Production Considerations`). Its `DOMAIN-SPECIFIC TECHNICAL DEPTH` block is a 5-bullet
+  **coverage checklist** (ARA rule evaluation, ARM control design, rule types, certification
+  cycles, SoD monitoring) -- it asks the model to *cover* facts; it never asks for a trade-off
+  or a rejected alternative.
+- **Fiori** also has no dedicated `CATEGORY_TEMPLATES` entry, so it falls back to the **General**
+  template -- which, unlike GRC's, explicitly demands "Explicit Trade-off or Rejected
+  Alternative (name what you didn't choose and why, not just what you recommend)."
+
+### Option A vs Option B
+If template rigidity (Option B) were the dominant cause, Fiori's trade-off-mandating template
+should produce meaningfully more leverage than GRC's plain coverage checklist. It doesn't --
+both land at 10%. That rules out template rigidity as the primary driver: a template that
+explicitly asks for a trade-off still failed to produce one, because there was no
+candidate-specific trade-off available to surface.
+
+Checking `CANDIDATE_BACKGROUND` directly confirms **Option A**: for GRC it states *"Full SAP GRC
+Access Control delivery -- ARA, ARM, BRM, EAM/Firefighter... supporting SOX 404, ITGC"*; for
+Fiori, *"Fiori and Gateway/OData authorization models (catalogs, groups, spaces, pages...)"*.
+Both are **inventories of modules/scope touched**, never a **decision-and-rationale** statement
+("we used X instead of Y because Z constraint"). Every GRC/Fiori MENTIONED verdict in the raw
+judge output says the same thing in different words: the test answer's decision sequence (ARA ->
+remediation -> Firefighter; tile mapping -> CSP/CORS -> caching) is the same sequence every
+control answer also reaches on its own, with the same recycled scale numbers (11 countries,
+8,700 users, "Fortune 500 client") attached regardless of relevance to the specific question --
+because the background gives the model scope to cite but no decision to differ on.
+
+**Why Architecture/HANA leverage higher, for honesty's sake:** neither succeeds via genuine
+trade-off narrative either -- there isn't one anywhere in `CANDIDATE_BACKGROUND` for any domain.
+Architecture leverages because the question is *literally about* multi-country regulatory
+variance, so the 11-country/28-entity scope **is** the substance of that specific question, not
+decoration. HANA leverages via cross-domain synthesis (the model pulling the candidate's real
+GRC breadth into an adjacent HANA-privilege answer), not a stated rationale. So 41.4% overall
+leverage is currently earned almost entirely through scope-happens-to-match-the-question and
+cross-domain capability synthesis -- not through decision rationale, because the background
+doesn't contain any.
+
+### Conclusion
+**Primary root cause: Option A, background content gap** -- `CANDIDATE_BACKGROUND` is written
+as an achievements/scope list, not a decisions log, for every domain, and this is exposed
+specifically in GRC/Fiori because their questions ask about the standard playbook those domains'
+scope facts don't differentiate. GRC's checklist-style domain-depth block (a weaker form of
+Option B) is a secondary, compounding factor -- but Fiori's counterexample shows fixing template
+phrasing alone would not be sufficient without also addressing the content gap.
+
+## Recommended next step (not yet done, no prompt change proposed)
+Any future experiment here should target background CONTENT (does it contain at least one real
+decision-and-rationale statement per domain, not just scope), not prompt template wording, given
+Fiori's template already asks for a trade-off and still fails. Per this project's discipline,
+that would be its own single-variable test (a revised background payload, re-run through the
+existing benchmark) -- not something to implement inside this diagnostic pass.
