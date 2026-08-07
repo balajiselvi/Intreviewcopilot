@@ -42,16 +42,23 @@ variable, the judge's decision criteria:
   SoD), does NOT count as leverage on its own -- naming the obvious default isn't evidence
   experience changed anything.
 
+**Correction (2026-08-07, later pass):** the table below originally misreported Fiori as 10%
+(actual: 0%), Security as 30% (actual: 20%), and the overall average as 41.4% (actual: 38.6%) --
+a transcription error made when relaying console output to the user, not a bug in the script or
+the saved data. The saved JSON (`eval/results/leveraging_benchmark_v2.json`) was correct
+throughout; verified by recomputing each domain's leverage rate directly from its `judged[]`
+array. Corrected values below.
+
 | Domain | v1 Leverage | v2 Leverage | v2 Mentioned | v2 Absent | v2 Avg Quality | v2 Consistency |
 |---|---|---|---|---|---|---|
 | GRC | 100% | **10%** | 90% | 0% | 8.0 | 0.90 |
 | BTP | 80% | **60%** | 40% | 0% | 8.0 | 0.60 |
 | HANA | 100% | **70%** | 30% | 0% | 8.0 | 0.70 |
-| Security | 100% | **30%** | 70% | 0% | 8.0 | 0.70 |
+| Security | 100% | **20%** | 80% | 0% | 8.0 | 0.80 |
 | IDM | 70% | **20%** | 80% | 0% | 7.8 | 0.80 |
-| Fiori | 90% | **10%** | 90% | 0% | 8.0 | 0.90 |
+| Fiori | 90% | **0%** | 100% | 0% | 8.0 | 1.00 |
 | Architecture | 100% | **90%** | 10% | 0% | 8.0 | 0.90 |
-| **Overall avg** | **91.4%** | **41.4%** | 58.6% | 0% | -- | -- |
+| **Overall avg** | **91.4%** | **38.6%** | 61.4% | 0% | -- | -- |
 
 Manually verified both directions of the shift: a flipped HANA case correctly identifies that
 "11-country," "8,700 users" are attached to the exact same generic steps (define roles, analytic
@@ -65,11 +72,12 @@ controls) with a concrete, substantive justification.
   a real architectural fork (global-vs-local role strategy, GRC-integration-vs-PFCG-alone), and
   the candidate's real multi-country/large-landscape scope gives the model material for a
   substantively different answer.
-- **GRC (10%) and Fiori (10%) barely leverage at all** -- for these questions, the model's
-  default-competent answer and the "real experience" answer converge on the same textbook
-  decision sequence (ARA -> remediation -> EAM controls; tile security -> CSP/CORS -> caching),
-  with real numbers/tools bolted on as evidence rather than changing the recommendation.
-- **Security (30%) and IDM (20%) are similarly low** -- generic role-design and provisioning
+- **GRC (10%) and especially Fiori (0%) barely leverage at all** -- for these questions, the
+  model's default-competent answer and the "real experience" answer converge on the same
+  textbook decision sequence (ARA -> remediation -> EAM controls; tile security -> CSP/CORS ->
+  caching), with real numbers/tools bolted on as evidence rather than changing the
+  recommendation.
+- **Security (20%) and IDM (20%) are similarly low** -- generic role-design and provisioning
   questions where the obvious-best-practice answer and the experience-grounded answer are, in
   substance, the same answer.
 - **0% ABSENT everywhere** -- confirms Experience Activation is working as intended (background
@@ -79,8 +87,8 @@ controls) with a concrete, substantive justification.
 ## Status: baseline established, no prompt changes proposed
 Per the phase-transition directive, Experience Activation code (`interviewPrompt.js`,
 `chat.js` classification, `vectorSearch.js`) was NOT touched during this benchmark -- this is
-measurement only. The corrected baseline is **41.4% average leverage rate**, with domain
-variance from 10% (GRC, Fiori) to 90% (Architecture). This is the number to beat, not 91.4%.
+measurement only. The corrected baseline is **38.6% average leverage rate**, with domain
+variance from 0% (Fiori) to 90% (Architecture). This is the number to beat, not 91.4%.
 
 ## Root cause diagnosis: GRC/Fiori low leverage (read-only, no prompt files touched)
 
@@ -125,8 +133,8 @@ trade-off narrative either -- there isn't one anywhere in `CANDIDATE_BACKGROUND`
 Architecture leverages because the question is *literally about* multi-country regulatory
 variance, so the 11-country/28-entity scope **is** the substance of that specific question, not
 decoration. HANA leverages via cross-domain synthesis (the model pulling the candidate's real
-GRC breadth into an adjacent HANA-privilege answer), not a stated rationale. So 41.4% overall
-leverage is currently earned almost entirely through scope-happens-to-match-the-question and
+GRC breadth into an adjacent HANA-privilege answer), not a stated rationale. So the 38.6% overall
+leverage rate is currently earned almost entirely through scope-happens-to-match-the-question and
 cross-domain capability synthesis -- not through decision rationale, because the background
 doesn't contain any.
 
@@ -138,9 +146,77 @@ scope facts don't differentiate. GRC's checklist-style domain-depth block (a wea
 Option B) is a secondary, compounding factor -- but Fiori's counterexample shows fixing template
 phrasing alone would not be sufficient without also addressing the content gap.
 
+## Single-variable experiment: enriched background content (Option 1)
+
+### Method
+Per the freeze directive, `interviewPrompt.js`/`chat.js`/`vectorSearch.js` and
+`eval/lib/evalLeveraging.js` (judge logic) were NOT modified. `eval/lib/enrichedBackgrounds.js`
+takes the real `CANDIDATE_BACKGROUND` and inserts exactly ONE sentence of genuine
+decision-and-rationale narrative into the existing GRC and Fiori project bullets -- everything
+else (scope numbers, structure, anti-fabrication rules) held constant:
+- **GRC**: added a sentence about rejecting a single global MSMP approval workflow in favor of
+  localized per-country stage-level paths (data-privacy driven), and overriding default SU24
+  proposals to prevent cross-system authorization inflation.
+- **Fiori**: added a sentence about rejecting a monolithic role-to-catalog assignment in favor
+  of fine-grained per-functional-area OData catalog splits, to fix a concurrent-load performance
+  problem, accepting higher maintenance overhead as the trade-off.
+
+`eval/testEnrichedBackgrounds.js` generated 10 fresh test answers per domain (live `/api/chat`,
+enriched background) and judged each against the *same, reused* control answers from the
+original benchmark run (control generation never used a background at all, so reuse doesn't
+introduce a confound) -- isolating background content as the only variable.
+
+### A methodology note on data integrity
+Numbers below are verified by reading `eval/results/enriched_background_experiment.json`
+directly and recomputing counts from its `judged[]` array -- NOT by trusting the live console
+output of the backgrounded run. This is the third time in this project that console output from
+a `run_in_background` script has diverged from what the same process actually persisted to disk
+(the console log for this run claimed GRC=0%/Fiori=100%; the file shows GRC=10%/Fiori=80%).
+Going forward, any number from a backgrounded script should be re-derived from its saved output
+file before being reported, not read off the console.
+
+### Results (verified against saved file)
+
+| Domain | Baseline (v2) | Enriched | Change | Narrative actually appears in answer text |
+|---|---|---|---|---|
+| GRC | 10% (1/10) | 10% (1/10) | **no change** | **0/10** |
+| Fiori | 0% (0/10) | 80% (8/10) | **+80pp** | 7/10 |
+
+**Fiori: hypothesis strongly confirmed.** Enriching the background with a genuine
+performance-vs-maintainability trade-off took leverage from 0% to 80%. Spot-checked verdicts
+show the judge citing real, specific forks lifted straight from the new content ("monolithic
+role-to-catalog assignment vs. splitting OData catalogs into functional groups").
+
+**GRC: hypothesis not confirmed -- but not refuted either, because the enrichment was never
+used.** Directly scanning all 10 generated answers' raw text for the new content (MSMP,
+"localized stage", "dynamic agent routing", "overrode", "SU24") found it in **zero** of them.
+Every GRC answer independently converged on the same structure: risk assessment -> SoD rule set
+-> ARA monitoring -> Firefighter EAM -> the same recycled scale numbers (8,700 users, 11
+countries, 250+ rules) attached as illustration. The model never had a chance to leverage the
+new narrative because it never surfaced it in the first place -- this is an ACTIVATION-layer
+finding, not a leverage-judge finding.
+
+### Why GRC suppressed the new content but Fiori didn't (read-only inference, not verified by a further experiment)
+GRC's `DOMAIN-SPECIFIC TECHNICAL DEPTH` block is a 5-bullet checklist naming specific topics:
+ARA rule evaluation, ARM control design, rule types, certification cycles, SoD monitoring. None
+of those bullets names "approval workflow design" or "routing" -- the topic the new GRC
+narrative is about. The checklist may be acting as a topic filter with no open slot for that
+content to land in. Fiori's fallback template, by contrast, asks generically for "Explicit
+Trade-off or Rejected Alternative" with no fixed topic list -- and the new Fiori narrative IS a
+trade-off, so it fits directly into an already-open slot. This reframes the original Option A/B
+framing: it's not simply "content gap vs. template rigidity" as two independent explanations --
+for GRC specifically, it may be a content-topic/template-topic MISMATCH (Option A content that
+doesn't match any of Option B's checklist topics), which is a different, more specific claim
+than either original hypothesis alone. This inference has NOT been tested with a further
+experiment (e.g. rewording the GRC narrative to match one of the 5 existing checklist topics)
+and should be treated as a hypothesis, not a conclusion.
+
 ## Recommended next step (not yet done, no prompt change proposed)
-Any future experiment here should target background CONTENT (does it contain at least one real
-decision-and-rationale statement per domain, not just scope), not prompt template wording, given
-Fiori's template already asks for a trade-off and still fails. Per this project's discipline,
-that would be its own single-variable test (a revised background payload, re-run through the
-existing benchmark) -- not something to implement inside this diagnostic pass.
+Test the content-topic/template-topic mismatch hypothesis directly: rewrite the GRC decision
+narrative so its topic matches an existing checklist bullet (e.g. frame the MSMP/routing
+decision as part of "ARM control design: how controls map to ARA risks, remediation assignment"
+rather than as an unrelated workflow-design aside), re-run the same n=10 test, and see whether
+leverage rises. If it does, that confirms the topic-matching hypothesis and points toward a
+future (not-yet-proposed) prompt change: either loosening GRC's checklist to accept an
+open-ended trade-off the way Fiori's template does, or explicitly telling the model that
+background content outside the checklist's named topics is still worth surfacing.
