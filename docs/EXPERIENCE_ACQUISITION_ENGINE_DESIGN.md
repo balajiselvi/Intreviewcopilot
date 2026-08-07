@@ -4,21 +4,17 @@ Status: **design only, not implemented.** Per the project direction change (see
 `eval/results/LEVERAGING_BENCHMARK_2026-08-07.md` for the evidence that motivated it), this
 document is a proposal to review before any code is written.
 
-Revision note: this design was reviewed and refined once already. The subsystem was originally
-named "Judgment Store"; it's renamed **Engineering Memory** here because not everything a
-senior architect carries forward is a clean decision — production failures, audit findings,
-political stakeholder situations, and mistakes are all real inputs too, and none of them force
-a tidy "I chose X over Y" shape. The atomic unit keeps the name **Judgment Record**, because the
-governing principle, stated explicitly, is:
-
-> **Do not think of this subsystem as storing experiences. Think of it as storing engineering
-> judgment that happens to have been learned through experience.**
-
-That distinction is what makes a single record reusable across technical, behavioral,
-architecture, troubleshooting, leadership, audit, and stakeholder-management questions alike
-(the same category spread `CATEGORY_TEMPLATES` in `lib/prompt/interviewPrompt.js` already
-serves) — a record is stored because of what it teaches about how this person reasons, not
-because something happened to them.
+Revision history:
+- v1: subsystem named "Judgment Store," atomic unit "Judgment Record."
+- v2: renamed to **Engineering Memory** — not everything a senior architect carries forward is a
+  clean decision; production failures, audit findings, and stakeholder situations are real
+  inputs too. Flattened the record into an explicit 8-stage pipeline. Governing principle
+  stated explicitly: *store engineering judgment that happens to have been learned through
+  experience, not experience itself.*
+- v3 (this revision): adds the layer above individual records — **Engineering Principles**,
+  reverses the retrieval sequence to be reasoning-first rather than similarity-first, and adds a
+  human-stated recall-confidence field. This is the change that takes the system from "a memory
+  of what happened" to "a model of how this person thinks" — see section 4.
 
 ## 0. Why prompt engineering hit a ceiling (one paragraph, for context)
 
@@ -40,26 +36,21 @@ was never captured.
 > engineering decisions?
 
 Not a resume. Not a transcript. Not a fact database. What a mentor actually transmits in that
-scenario is a set of **judgment calls**: *"when you see a multi-country rollout, don't build
-one global role hierarchy — here's why that fails, here's what I do instead, here's the one
-time it bit me."* The junior doesn't retain everything Balaji said; they retain a manageable
-number of **heuristics**, each anchored to a real situation, each with the reasoning attached
-so it generalizes to situations that aren't identical.
+scenario is a set of **judgment calls**, and — this is the part v1/v2 of this design undersold —
+a smaller set of **principles that generalize across all of them**: *"I always centralize
+governance before automating it," said once, explains a dozen decisions the junior will
+otherwise have to be told individually.* The junior doesn't retain every project; they retain a
+manageable number of situations, and an even smaller number of rules that explain most of the
+situations at once.
 
-That reframes the deliverable. The system being designed is **not a fact-retrieval index** (that
-already exists — `services/vectorSearch.js` does that for the SAP knowledge base). It is a
-**judgment-capture system**: it elicits reasoning, not stories; it stores the "why," not the
-prose; and at answer time it hands the model a piece of judgment to reason *from*, not a
-paragraph to paraphrase.
-
-Everything below is organized around Engineering Memory's atomic unit — the Judgment Record —
-not around a generic graph schema. The graph-like connectivity between records (shared SAP
-products, shared constraints) is a retrieval convenience that falls out of tagging, not the
-starting design goal.
+That reframes the deliverable again. The system is not just a judgment-capture system anymore —
+it's a system that **captures judgment, then discovers the principles that judgment keeps
+expressing**, and reasons from whichever level (principle or record) actually answers the
+question in front of it.
 
 ## 2. The Judgment Record — the atomic unit
 
-A Judgment Record is what survives after the Extraction Pipeline (section 5) processes one real
+A Judgment Record is what survives after the Extraction Pipeline (section 6) processes one real
 conversation turn about one real piece of experience — a decision, but also a failure
 witnessed, an audit finding, or a stakeholder situation navigated, whenever it teaches something
 transferable.
@@ -94,19 +85,25 @@ JudgmentRecord {
   // --- where this came from, and how sure we are it's real ---
   provenance: {
     source_turn_id: string
-    candidate_stated_confidence: "explicit" | "implied"  // see 5.3, fabrication guard
+    candidate_stated_confidence: "explicit" | "implied"  // did extraction have to infer this
+                                                            // field, or was it stated directly?
+    recall_confidence: "high" | "medium" | "low"           // the CANDIDATE's own certainty about
+                                                            // their memory of the event -- distinct
+                                                            // from the field above. Set from direct
+                                                            // signal ("I don't remember exactly,
+                                                            // but...") detected during extraction,
+                                                            // or asked directly during acquisition
+                                                            // if not volunteered. See 6.3.
     extracted_at: timestamp
   }
 
   // --- how this gets found again ---
   tags: {
-    sap_products: string[]         // ["PFCG", "SU24", "GRC ARA"] -- controlled vocabulary, see 6.2
+    sap_products: string[]         // ["PFCG", "SU24", "GRC ARA"] -- controlled vocabulary, see 7.2
     domain: string                 // must be one of interviewAnalyzer.js's existing domains
     experience_type: string        // "architecture_decision" | "process_design" |
                                     // "production_failure" | "audit_finding" |
                                     // "stakeholder_conflict" | "mistake_and_lesson" | ...
-                                    // broadened deliberately -- not every record is a clean
-                                    // decision, see the revision note above
     reusable_for_categories: string[]  // which CATEGORY_TEMPLATES categories this can answer
                                         // (Architecture, Behavioral, Leadership, Audit,
                                         // Troubleshooting, ... -- one record often serves several)
@@ -114,225 +111,167 @@ JudgmentRecord {
 }
 ```
 
-Worked example, matching the reviewed proposal exactly:
+Design rules unchanged from v2, still load-bearing:
+- No field is free text dumped from the transcript — every field is compression toward
+  transferable judgment.
+- A record without `alternative_rejected` is valid but lower-priority coverage for
+  decision-shaped `experience_type`s specifically.
+- `lesson_learned` stays a top-level field, not buried, because interviewers ask for it
+  directly.
+- One real implementation → many records (3-6 per project, one per situation-to-lesson arc).
+
+## 3. Engineering Principles — the derived layer
+
+This is the addition that changes what kind of system this is. Individual Judgment Records
+answer "what did you do, once." Engineering Principles answer "what do you always do, and why"
+— the thing a mentor states as a rule after having demonstrated it a dozen times without ever
+stating it as a rule.
+
+### 3.1 What a principle is
 
 ```
-situation:            "Global S/4HANA rollout across multiple countries"
-problem:               "320 conflicting SoD rules surfaced during role consolidation"
-constraint:             "Country-specific compliance requirements couldn't be waived"
-decision:               "Derived role model -- one master role, country-specific derived roles"
-alternative_rejected:   { approach: "Single global role for all countries",
-                          reason_rejected: "Localization becomes impossible once every country
-                                             shares one role definition" }
-implementation:         "Master roles built centrally in PFCG; derived roles generated per
-                          country with org-level restrictions; SU24 proposals maintained once
-                          at master level"
-outcome:                "Audit passed with the derived-role structure cited as the control
-                          evidence"
-lesson_learned:         "Governance gets easier long-term if role ownership is centralized
-                          early, even though it's slower to set up initially"
+EngineeringPrinciple {
+  id: string
+  statement: string              // "Prefer localization (derived roles) over a single global
+                                  //  role when governance complexity would exceed the
+                                  //  maintenance cost of managing it centrally"
+  status: "proposed" | "confirmed" | "modified" | "rejected"
+  derived_from: string[]         // Judgment Record ids that formed the pattern -- minimum 3,
+                                  // from DIFFERENT projects/situations, not 3 mentions of the
+                                  // same project
+  domain_scope: string[]         // which domains this principle applies to -- often more than
+                                  // one, since a real principle usually generalizes past the
+                                  // domain it was first observed in
+  confirmation: {
+    confirmed_at: timestamp | null
+    candidate_wording: string | null   // if the candidate rephrased it during confirmation --
+                                        // their wording always wins over the inferred draft
+  }
+}
 ```
 
-Design rules that follow directly from the mentorship framing:
+### 3.2 Discovery is inference; adoption is never automatic
 
-- **No field is free text dumped from the transcript.** Every field is what a mentor would say
-  if forced to be concise — the extraction pipeline's job is compression toward transferable
-  judgment, not summarization of what was said.
-- **A record without `alternative_rejected` is valid but treated as lower-priority coverage.**
-  Not every real experience worth remembering has a clean rejected alternative (a production
-  failure, an audit finding) — those are still stored, and still valuable, but the Adaptive
-  Question Generator (section 4) specifically prioritizes closing gaps where a real
-  architecture/process decision exists with no alternative captured yet, since that's exactly
-  the "MENTIONED not LEVERAGED" failure mode this whole investigation diagnosed.
-- **`lesson_learned` is deliberately elevated to a top-level field**, not buried under
-  consequence, because interviewers ask for it directly and constantly ("what did you learn
-  from that?") — a record that can't answer that question unprompted is incomplete for a whole
-  class of real interview questions (Behavioral, Leadership).
-- **One real implementation → many records.** The engineering principle from the directive
-  ("capture judgment reusable across many questions, not stories") means one conversation about
-  one project should typically decompose into 3-6 Judgment Records (one per distinct
-  situation-to-lesson arc on that project), not one large record. This is what makes a single
-  four-day mentorship transfer decades of situational judgment — it's decomposed into discrete,
-  addressable units.
+This is the section where this design has to hold the line this whole project has held all
+along: **never assert something the candidate didn't confirm.** An inferred principle is
+exactly the shape of thing that could quietly become fabrication if it started shaping live
+interview answers before a human ever agreed it was true. So:
 
-## 3. Experience Acquisition Engine — orchestration
+1. **Mining (automatic, cheap, no new infrastructure):** triggered after every N new Judgment
+   Records (e.g. every 10), a clustering pass groups records by embedding similarity of their
+   `decision` + `alternative_rejected.approach` fields (reusing the same
+   `Xenova/all-MiniLM-L6-v2` embeddings and cosine-similarity function already in
+   `services/vectorSearch.js` — no new ML infrastructure). A cluster of ≥3 records from
+   different `situation`s that share a decision shape is a **candidate** principle.
+2. **Drafting (one LLM call, `chatJSON` pattern):** for each qualifying cluster, one call drafts
+   a `statement` generalizing the pattern, citing the `derived_from` records as evidence. This
+   is the ONLY generative step — it produces a `status: "proposed"` record, nothing more.
+3. **Confirmation (human-in-the-loop, mandatory):** proposed principles are surfaced back to
+   the candidate through the same acquisition UI, phrased exactly as the pattern that motivated
+   this section: *"I've noticed something. In five different projects you solved role redesign
+   by reducing custom roles before touching SoD rules. Is that an intentional engineering
+   principle?"* The candidate confirms, edits the wording, or rejects it. This is not a nice-to
+   -have UX flourish — it's the fabrication guardrail. **A `proposed` principle is never
+   retrievable at answer-generation time.** Only `confirmed` (including `modified`-then-
+   reconfirmed) principles enter the retrieval pool in section 5.
 
-This is the top-level subsystem that decides *what to ask about next*. It does not talk to the
-candidate directly in natural language generation terms — it identifies a coverage gap and hands
-a targeted prompt to a conversational UI (new, see section 9).
+### 3.3 Where this leads (stated as direction, not committed scope)
 
-### 3.1 Coverage model
+Once this loop exists, its natural extension is the apprentice framing directly: after enough
+volume, the system isn't just mining passively between sessions, it's noticing *during*
+acquisition and asking in the moment. That's a UX refinement on top of the same
+mine-draft-confirm loop, not a different mechanism — worth naming as the intended trajectory,
+not worth scoping into v1.
 
-Maintains a coverage matrix: rows = the domain taxonomy already defined in
-`lib/interviewAnalyzer.js` (SAP Security, SAP GRC, SAP Cloud Identity/BTP, SAP Fiori Security,
-SAP IDM, SAP Platform — reusing the existing taxonomy, not inventing a parallel one), columns =
-a small, fixed set of **representative scenario types per domain**, deliberately spanning more
-than architecture decisions — matching the broadened `experience_type` vocabulary in section 2.
-Example for SAP GRC, capped at 5-6 scenario types:
-
-1. SoD ruleset design (how rules get built/prioritized) — `architecture_decision`
-2. Remediation workflow (what happens when a violation is found) — `process_design`
-3. Emergency access governance (Firefighter model) — `architecture_decision`
-4. Audit/certification cycle (how compliance evidence gets produced) — `audit_finding`
-5. A production incident involving GRC (something that went wrong) — `production_failure`
-6. A stakeholder disagreement about GRC scope or control strictness — `stakeholder_conflict`
-
-A cell is "covered" once at least one Judgment Record exists for that (domain, scenario type)
-pair. For `architecture_decision`/`process_design` types specifically, a record without
-`alternative_rejected` counts as partial coverage only — per the priority rule in section 2, the
-engine will still surface a follow-up for that cell even though something was captured, because
-an alternative-free architecture record is the specific shape of the leverage failure this whole
-investigation exists to fix. `production_failure`, `audit_finding`, and `stakeholder_conflict`
-records don't require a rejected alternative to count as fully covered — that shape doesn't
-apply to them.
-
-### 3.2 Gap-driven prompting
-
-Each acquisition session, the engine:
-1. Computes the coverage matrix from existing Judgment Records.
-2. Picks the highest-priority gap — priority = (domain frequency in real interview traffic, from
-   existing analytics already logged via `lib/logger.js`) × (scenario types still uncovered in
-   that domain), with `architecture_decision`/`process_design` gaps missing an
-   `alternative_rejected` weighted above brand-new empty cells, since closing those has the most
-   direct effect on measured leverage.
-3. Generates ONE targeted elicitation prompt for that gap, in the mentor-directive's own style:
-   *"I already understand your Joiner/Mover process. I still need one representative production
-   emergency involving Firefighter IDs."* This is a templated fill, not freeform LLM generation
-   at this stage — the (domain, scenario type) pairing already determines almost all of the
-   wording; only the "already understand X" clause needs to reference the specific covered
-   scenario, filled from existing coverage data.
-4. As coverage grows, prompts get more specific automatically, because they're always phrased
-   against the *next* uncovered cell, not a generic "tell me about GRC" — specificity is a
-   side effect of the coverage model, not a separate mechanism to build.
-
-### 3.3 Termination / re-engagement
-
-Not a one-time onboarding flow. The engine re-surfaces a gap opportunistically: after a live
-interview session ends, if the transcript shows the candidate got a follow-up question they
-answered weakly in a domain with a coverage gap, that's a strong, contextual prompt for the
-*next* acquisition session ("you got asked about BRF+ conditions last week and the answer was
-generic — want to walk me through a real one now?"). This ties acquisition demand directly to
-observed weakness, rather than running acquisition and live interview support as two unrelated
-tracks.
-
-## 4. Adaptive Question Generator (detail on 3.2)
-
-Kept deliberately simple and templated rather than a separate LLM-driven system, for two
-reasons: (a) it's the one part of this design where getting it wrong has low cost and high
-observability (a bad question just gets a shrug from the candidate, not a bad interview
-answer), and (b) grounding it in the coverage matrix rather than open LLM generation avoids
-this whole project's repeated lesson about instruction competition — there's no long prompt to
-compete against here, because there's no prompt at all, just a lookup and a fill.
-
-Escalation ladder per gap cell, only advancing if the previous rung didn't yield a
-complete-enough record for that experience_type:
-1. Open scenario prompt (as in 3.2), phrased for the specific `experience_type` — a
-   `production_failure` prompt asks "walk me through a time this broke," not "what did you
-   decide," since forcing a decision-shaped question onto a failure-shaped memory produces
-   nothing useful.
-2. If the response has situation/problem/decision but no `alternative_rejected` (and the
-   experience_type is one where that matters): **direct follow-up**, generated by filling a
-   template with the specific `decision` just extracted — *"What made you choose that over
-   [most common alternative for this experience_type, from a small static lookup — e.g. 'a
-   single global role' for architecture decisions]?"* Still templated, not open generation.
-3. If the response has situation/problem/decision but no `lesson_learned`: a second templated
-   follow-up — *"Looking back, what would you tell someone about to make that same call?"*
-4. If still incomplete after these follow-ups: mark the cell "attempted, low-confidence" and
-   move on — per the extraction pipeline's fabrication guard (5.3), the system does not keep
-   pushing a candidate toward inventing a rejected alternative or a lesson that doesn't exist.
-
-## 5. Experience Extraction Pipeline
-
-Natural-language answer → Judgment Record(s). Structurally this is the same pattern already
-proven in `eval/lib/judge.js` and `eval/lib/evalLeveraging.js` this session: an LLM call
-constrained to a JSON schema via `response_format: { type: "json_object" }` (see
-`eval/lib/openaiClient.js`'s `chatJSON` for the exact existing pattern to reuse), not a new
-mechanism.
-
-### 5.1 Segmentation
-One acquisition answer may describe multiple pieces of experience (a whole project). A
-first-pass LLM call segments the raw transcript into experience-sized spans before per-span
-extraction — this directly implements "one implementation should naturally support dozens of
-interview answers" by not collapsing a multi-experience narrative into one lossy record.
-
-### 5.2 Per-span extraction
-Each span → one `chatJSON` call with the Judgment Record schema (section 2) as the required
-output shape, including a classification of which `experience_type` the span represents (which
-determines whether `alternative_rejected` is expected). System prompt instructs the extractor to
-leave any field `null` rather than infer it — this is the compression step, and it must be
-lossy in the safe direction (drop unclear content) not the unsafe direction (invent structure
-that sounds complete).
-
-### 5.3 Fabrication guard (non-negotiable, given this project's established anti-fabrication
-discipline)
-The extractor NEVER invents an `alternative_rejected`, a `lesson_learned`, or a specific
-`outcome` that the candidate didn't state. `provenance.candidate_stated_confidence` records
-whether a field was explicit or implied, and downstream retrieval (section 7) should prefer
-`explicit` records when multiple candidates exist for the same query — mirroring the
-`candidateResume` "ground truth" framing already used in `lib/prompt/interviewPrompt.js`. A
-Judgment Record with several null fields is a valid, useful, partial record — not a failure to
-be papered over with inference.
-
-### 5.4 Validation before storage
-Before a record is written, run it back through a variant of the leverage judge already built
-this session (`eval/lib/evalLeveraging.js`'s decision-fork detection) as a **quality gate**, for
-`architecture_decision`/`process_design` records specifically: does this record contain an
-actual decision fork, or did extraction just reproduce a generic best-practice statement?
-Records that fail this check are flagged for a targeted follow-up (loops back into section 4's
-escalation ladder) rather than stored as if complete. This reuses the exact judge logic already
-validated this session instead of inventing a new completeness heuristic.
-
-## 6. Storage
-
-### 6.1 No new infrastructure
-The codebase currently has zero database dependencies — `data/knowledgeIndex.json` (34MB,
-chunk+embedding pairs, loaded fully into memory and cosine-searched in
-`services/vectorSearch.js`) is the only persistence layer, alongside flat config JSON. Engineering
-Memory follows the exact same pattern: `data/engineeringMemory.json`, an array of Judgment
-Records, each carrying a pre-computed embedding of a canonical text rendering (situation +
-problem + decision, concatenated) generated via the SAME local `Xenova/all-MiniLM-L6-v2`
-pipeline already used in `services/embeddingService.js` — zero new dependencies, zero new API
-cost, consistent with the existing build step in `scripts/buildKnowledge.js`.
-
-### 6.2 Controlled vocabulary, not a new taxonomy
-`tags.domain` reuses `lib/interviewAnalyzer.js`'s existing domain strings verbatim (the same
-ones `DOMAIN_BOOST_MAP` in `services/vectorSearch.js` already keys on) so a Judgment Record and
-a knowledge-base chunk can be scored by the same domain-boost logic without a translation layer.
-`tags.sap_products` reuses the SAP artifact vocabulary already implicit in
-`SAP_ARTIFACT_REGEX` (T-codes, GRAC_* objects). No new categorical system is introduced.
-
-### 6.3 "Graph" as an emergent property, not a stored structure
-Per the reframing: no adjacency-list graph database is proposed. Connectivity between records
-(this GRC decision relates to that Fiori decision because both cite PFCG role design) is
-computed at retrieval time from shared tags and embedding similarity — the same
-`RELATED_DOMAINS` half-weight cross-domain boost mechanism already implemented and measured in
-`services/vectorSearch.js`. If a genuine need for explicit relationship edges (not just shared
-tags) emerges later, that's a targeted, evidence-driven addition to this store's schema, not a
-reason to introduce graph-database infrastructure up front.
-
-## 7. Retrieval Strategy
-
-At answer-generation time, extends the existing retrieval step in `pages/api/chat.js`
-(currently `fetchKnowledgeContext` → `searchKnowledge`) with a parallel call:
-`searchEngineeringMemory(question, analysis, topK)`, scored with the **same formula already
-proven** in `services/vectorSearch.js`:
+## 4. Revised pipeline
 
 ```
-finalScore = semanticScore * 0.55 + keywordScore * 0.20 + domainBoost + artifactBoost + intentBoost
+Judgment Records
+      ↓
+Engineering Memory  (the store -- section 7)
+      ↓
+Engineering Principles  (mined from Memory, confirmed by the candidate -- section 3)
+      ↓
+Reasoning  (retrieval + generation -- section 5)
+      ↓
+Interview Copilot
 ```
 
-applied to Judgment Records instead of knowledge chunks, with one addition: a
-`reusable_for_categories` match against the question's classified category
-(`analysis.category`) contributes an extra boost term, since a record explicitly tagged as
-reusable for the current question's category (e.g. `Behavioral`) is stronger evidence of
-relevance than semantic similarity alone.
+Principles and records are not a strict hierarchy at retrieval time — a principle without a
+concrete record to cite is a slogan; a record without the principle that explains it is trivia.
+Section 5 retrieves both together.
 
-Retrieved records are formatted into a new, dedicated prompt section — `RELEVANT ENGINEERING
-JUDGMENT`, placed adjacent to `CANDIDATE BACKGROUND & CONTEXT` (both are candidate-sourced
-ground truth) — rendering each record as the full pipeline, not just the decision, so the model
-has the same "why" a mentor would give:
+## 5. Retrieval Strategy — reasoning-first, not similarity-first
+
+### 5.1 The reversal, and why it's smaller than it sounds
+
+The instinct to avoid is: `Question → embed → cosine-search Engineering Memory → done`. That
+retrieves whatever sounds similar to the question's words, not whatever the question is actually
+*asking about* as an engineering matter. The correct sequence:
 
 ```
+Question
+   ↓
+Determine Engineering Problem   [classify category/domain/intent]
+   ↓
+Determine Memory Needed          [principle-first, record-first, or both -- by category]
+   ↓
+Retrieve                          [query built from the problem frame, not raw question text]
+   ↓
+Reason                            [generate, with both levels available]
+```
+
+The first step is **not new machinery**. `pages/api/chat.js` already runs
+`analyzeInterviewQuestion()` — a rule-based, non-LLM classifier — before any retrieval call
+today (`fetchKnowledgeContext` is called with `analysis` already computed). This design extends
+that existing step rather than adding a new LLM call in front of retrieval, which matters given
+this project's hard single-pass-latency constraint (established early this session: multi-pass
+generation was tested and rejected at +0.14 quality for 4.2x latency). Reasoning-before-retrieval
+is achievable for free because the reasoning step already exists structurally; it just wasn't
+being used to shape the Engineering Memory query yet.
+
+### 5.2 "Determine memory needed" — a lookup, not a model call
+
+A small static table, keyed on `analysis.category` (reusing `CATEGORY_TEMPLATES`' existing
+categories, no new taxonomy), decides retrieval shape:
+
+| Category shape | Retrieve principles? | Retrieve records? |
+|---|---|---|
+| Architecture, Role Design, Security (design-oriented) | Yes, first | Yes, as supporting evidence |
+| Troubleshooting, Production Support | No (rarely principle-shaped) | Yes, primary |
+| Behavioral, Leadership | Yes, if `reusable_for_categories` matches | Yes, primary |
+| Audit | Yes, if scoped to Audit domain | Yes, primary |
+
+This is the same kind of deterministic, low-latency lookup already used for
+`getDomainDepthGuidance()` in `lib/prompt/interviewPrompt.js` — consistent with the project's
+existing pattern, not a new design idiom.
+
+### 5.3 Retrieval query construction
+
+Instead of embedding the raw question, the retrieval query is synthesized from the problem
+frame — reusing the existing pattern in `pages/api/chat.js`'s `synthesizeRetrievalQuery()`
+(currently used to enrich follow-up retrieval with prior-turn topic tokens) and extending it to
+also incorporate `analysis.category`/`analysis.domain` terms, so "how would you design X" and
+"walk me through implementing X" retrieve the same underlying judgment even when their surface
+wording differs.
+
+### 5.4 Scoring
+
+Principles and records are scored with the same formula already proven in
+`services/vectorSearch.js` (`semanticScore * 0.55 + keywordScore * 0.20 + domainBoost +
+artifactBoost + intentBoost`), plus:
+- A `reusable_for_categories` match boost (as in v2).
+- A `recall_confidence` penalty: `low`-confidence records are still retrievable (a hedged real
+  memory beats a fabricated confident one) but scored down slightly and, critically, **rendered
+  differently in the prompt** — see 5.5.
+
+### 5.5 Prompt rendering
+
+```
+RELEVANT ENGINEERING PRINCIPLE (if retrieved):
+"<statement>" -- established across <N> prior situations, most recently: <newest derived_from record's situation>.
+
+RELEVANT ENGINEERING JUDGMENT:
 Situation: <situation>
 Problem: <problem>
 Constraint: <constraint>
@@ -342,47 +281,109 @@ Outcome: <outcome>
 Lesson: <lesson_learned>  [if present]
 ```
 
-This is a **new prompt section**, additive to the existing pipeline, not a re-tuning of
-`CANDIDATE BACKGROUND`'s existing grounding clauses — it does not touch the currently-frozen
-activation mechanism. Whether `CANDIDATE_BACKGROUND` (raw CV prose) should eventually be
-retired in favor of Judgment Records entirely, or kept as a fallback when no record matches, is
-an open question for the validation phase (section 9), not decided here.
+If `recall_confidence` is `low`, the record is prefixed with an explicit instruction (not
+silently dropped, not silently asserted): *"The candidate was uncertain about the exact details
+of this one -- speak from it in general/methodology terms, not as a precisely recalled
+incident."* This directly reuses the conditional-tense mechanism already validated in
+`lib/prompt/interviewPrompt.js`'s DEEPEN MODE fabrication guard (present-tense specific claims
+only when the source is certain; conditional phrasing otherwise) rather than inventing a new
+hedging mechanism.
 
-## 8. Answer Generation (the sequence from the directive)
+This whole section is a **new prompt section**, additive to the existing pipeline, not a
+re-tuning of `CANDIDATE BACKGROUND`'s existing grounding clauses — it does not touch the
+currently-frozen activation mechanism.
+
+## 6. Experience Acquisition Engine — orchestration
+
+Unchanged in structure from v2, with one addition: the acquisition flow now also surfaces
+principle-confirmation prompts (section 3.2, step 3) interleaved with gap-driven scenario
+prompts, prioritized by cluster size (a pattern seen in 5 projects is a higher-priority
+confirmation ask than one seen in 3).
+
+### 6.1 Coverage model
+Rows = `interviewAnalyzer.js` domains, columns = a small, fixed set of representative scenario
+types per domain, spanning decision-shaped and non-decision-shaped `experience_type`s alike
+(SoD ruleset design, remediation workflow, Firefighter governance, audit cycle, a production
+incident, a stakeholder disagreement — capped at 5-6 per domain, not hundreds of questions).
+
+### 6.2 Gap-driven prompting
+Templated, not open LLM generation, filling `"I already understand your X. I still need one
+representative Y."` from the coverage matrix directly.
+
+### 6.3 Recall confidence capture
+If the candidate's answer contains hedging language ("I think," "roughly," "if I remember
+right") the extractor (section 8) sets `recall_confidence: "low"` automatically. If a
+record's confidence is ambiguous, the acquisition UI asks directly once: *"How confident are
+you in those specifics?"* — a single templated question, not a repeated interrogation.
+
+### 6.4 Termination / re-engagement
+Unchanged from v2: re-surfaces gaps opportunistically after live interview sessions where a
+follow-up was answered weakly in an uncovered domain.
+
+## 7. Experience Extraction Pipeline
+
+Unchanged in mechanism from v2 (segmentation → per-span `chatJSON` extraction → fabrication
+guard → validation-before-storage via the leverage judge's decision-fork detection), with
+`recall_confidence` extraction added per 6.3, and the fabrication guard explicitly covering
+`EngineeringPrinciple.statement` now too: principle statements are drafted by the LLM (section
+3.2) but are `proposed`, never `confirmed`, until the candidate says so.
+
+## 8. Storage
+
+### 8.1 No new infrastructure
+Zero database dependencies exist today — `data/knowledgeIndex.json` is a flat JSON file, loaded
+into memory, cosine-searched. Engineering Memory follows the same pattern:
+`data/engineeringMemory.json` (Judgment Records) and `data/engineeringPrinciples.json`
+(Engineering Principles, kept as a separate small file since it's mined output, not
+directly-captured input — separating them keeps the mining job's read/write boundary clean).
+Embeddings via the same local `Xenova/all-MiniLM-L6-v2` pipeline, zero new dependencies.
+
+### 8.2 Controlled vocabulary
+`tags.domain` and `tags.sap_products` reuse `lib/interviewAnalyzer.js`/`vectorSearch.js`'s
+existing vocabularies verbatim, as in v2.
+
+### 8.3 "Graph" as an emergent property
+Unchanged from v2: no adjacency-list graph database. Record-to-record and record-to-principle
+connectivity is computed at retrieval time from shared tags and embedding similarity, reusing
+the `RELATED_DOMAINS` cross-domain boost mechanism already measured in `services/vectorSearch.js`.
+
+## 9. Answer Generation (full sequence)
 
 ```
 Question
-  → analyzeInterviewQuestion()   [existing, unchanged]
-  → searchEngineeringMemory()    [new -- retrieves relevant Judgment Records]
-  → fetchKnowledgeContext()      [existing, unchanged -- SAP factual knowledge base]
-  → buildSapInterviewPrompt()    [existing, extended with one new prompt section]
+  → analyzeInterviewQuestion()        [existing, unchanged -- the "determine engineering problem" step]
+  → determine memory needed           [new -- static lookup, section 5.2]
+  → searchEngineeringMemory()         [new -- principles + records, section 5.3-5.4]
+  → fetchKnowledgeContext()           [existing, unchanged -- SAP factual knowledge base]
+  → buildSapInterviewPrompt()         [existing, extended with the new prompt section, 5.5]
   → Interview Answer
 ```
 
-`CANDIDATE_BACKGROUND` (raw CV) is not deleted from this sequence in this design — it remains
-the fallback ground-truth source for domains where no Judgment Record yet exists (coverage is
-necessarily partial for a long time). The system reasons from Engineering Memory first when
-available, and falls back to CV prose only for gaps — this is the literal implementation of "do
-not reason from the CV alone."
+`CANDIDATE_BACKGROUND` (raw CV) remains the fallback ground-truth source for domains where
+neither a Judgment Record nor a Principle yet exists — coverage is necessarily partial for a
+long time. The system reasons from Engineering Memory and Engineering Principles first when
+available, falling back to CV prose only for gaps.
 
-## 9. Integration and validation plan (still design, not implementation)
+## 10. Integration and validation plan (still design, not implementation)
 
 Proposed build order, each gated on the same evidence-before-code discipline as the rest of this
-project:
-1. Judgment Record schema + `data/engineeringMemory.json` read/write helpers (no LLM yet) —
-   trivial, low-risk, unblocks everything else.
-2. Extraction pipeline (5.1-5.4), validated OFFLINE against a small set of hand-written
-   transcripts with known-correct expected records, covering multiple `experience_type` values
-   (not just architecture decisions), before ever touching a live conversation — mirrors how
-   `eval/lib/judge.js` was validated before being trusted.
-3. `searchEngineeringMemory()` + the new prompt section, tested via the SAME kind of
-   before/after measurement used throughout this session (generate answers with 0 vs. N seeded
-   Judgment Records for one domain, measure leverage rate with the existing
-   `eval/lib/evalLeveraging.js` judge) — this is the one place a full-production-scale check
-   matters most, given this session's repeated finding that isolated wins don't always
-   transfer.
-4. Adaptive Question Generator + acquisition UI (section 3-4) — last, since it depends on
-   1-3 being trustworthy, and is the highest-effort, most user-facing piece.
+project. Principle mining is explicitly LAST — not because it's unimportant, but because it
+needs volume (the "not immediately, but design for it now" framing from review) and would be
+untestable before records exist to mine:
+
+1. Judgment Record schema + `data/engineeringMemory.json` read/write helpers (no LLM yet).
+2. Extraction pipeline (section 7), validated OFFLINE against hand-written transcripts spanning
+   multiple `experience_type` values, before touching a live conversation.
+3. `searchEngineeringMemory()` + the new prompt section (section 5), tested via the same
+   before/after leverage-rate measurement used throughout this session (0 vs. N seeded records),
+   checked at full production scale specifically, given this session's repeated finding that
+   isolated wins don't reliably transfer.
+4. Adaptive Question Generator + acquisition UI (section 6) — depends on 1-3 being trustworthy.
+5. Engineering Principle mining + confirmation loop (section 3) — depends on 1-4 having produced
+   enough real Judgment Records (rough floor: 20-30 records across at least 2-3 domains) to have
+   any clusters worth drafting. Validated by checking that a HELD-OUT set of hand-labeled
+   "should this cluster into a principle" cases matches the mining pass's output before ever
+   surfacing a proposed principle to the real candidate.
 
 Each step should produce its own before/after evidence in `eval/results/` before the next step
 begins, consistent with how every change this session has been gated.
