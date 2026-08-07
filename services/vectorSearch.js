@@ -266,5 +266,13 @@ async function searchKnowledge(question, analysis = {}, topK = 8, options = {}) 
 module.exports = {
   searchKnowledge,
   calculateCosineSimilarity,
-  deduplicateAndDiversify
+  deduplicateAndDiversify,
+  // Exported for lib/engineeringMemory/retrieval.js to reuse the exact same scoring formula
+  // (docs/EXPERIENCE_ACQUISITION_ENGINE_DESIGN.md section 5.4) rather than duplicating it --
+  // additive export only, no behavior change to this module.
+  normalizeText,
+  computeKeywordOverlap,
+  computeDomainBoost,
+  computeArtifactBoost,
+  computeIntentBoost
 };
