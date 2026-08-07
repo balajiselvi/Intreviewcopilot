@@ -1,0 +1,27 @@
+[
+  {
+    "run": 1,
+    "hit": true,
+    "answer": "In my recent role leading the SAP GRC security workstream for a Fortune 500 manufacturing client, I architected an authorization framework for an S/4HANA transformation across 11 countries. I began by conducting a thorough analysis of each country's regulatory requirements, aligning them with a centralized SoD framework of over 250 rules. This ensured compliance while maintaining a least-privilege model. I also implemented a flexible role design, allowing for country-specific roles while leveraging composite and derived roles for efficiency. Regular audits and access reviews were integrated to adapt to changing regulations, ensuring ongoing compliance and security across the diverse landscape."
+  },
+  {
+    "run": 2,
+    "hit": true,
+    "answer": "In my recent role leading the SAP GRC security workstream for a Fortune 500 manufacturing client, I architected an authorization framework for an S/4HANA transformation across 11 countries. I began by conducting a thorough analysis of each country's regulatory requirements, aligning them with a least-privilege, SoD-aware model. I developed a 250+ rule SoD framework to ensure compliance and governance. Each country had tailored roles and authorizations, while maintaining a centralized oversight mechanism. This approach allowed us to address unique local needs while ensuring consistency across the enterprise landscape, ultimately supporting a smooth multi-phase go-live process."
+  },
+  {
+    "run": 3,
+    "hit": true,
+    "answer": "In my recent role leading the SAP GRC security workstream for a Fortune 500 manufacturing client, I architected a comprehensive authorization framework for an S/4HANA transformation across 11 countries. I started by conducting a thorough analysis of each country’s regulatory requirements, aligning them with a least-privilege, SoD-aware model. I developed a 250+ rule SoD framework to ensure compliance and governance. Each country had tailored roles and authorizations, while maintaining a centralized oversight mechanism. This approach allowed us to address local compliance needs while ensuring consistency across the enterprise landscape, ultimately supporting a smooth multi-phase go-live process."
+  },
+  {
+    "run": 4,
+    "hit": true,
+    "answer": "In my recent role leading the SAP GRC security workstream for a Fortune 500 manufacturing client, I architected an authorization framework for an S/4HANA transformation across 11 countries. I started by conducting a thorough analysis of each country's regulatory requirements, aligning them with a centralized SoD framework of over 250 rules. This ensured compliance while maintaining a least-privilege access model. I also implemented a governance structure for ongoing role maintenance and periodic audits to adapt to changing regulations. By embedding these standards across the organization, we ensured consistent compliance and minimized risk across all legal entities."
+  },
+  {
+    "run": 5,
+    "hit": true,
+    "answer": "In my recent role leading the SAP GRC security workstream for a Fortune 500 manufacturing client, I architected an authorization framework for an S/4HANA transformation across 11 countries. I began by conducting a thorough analysis of each country's regulatory requirements, aligning them with a centralized SoD framework of over 250 rules. This ensured compliance while maintaining a least-privilege model. I also implemented a flexible role design, allowing for country-specific roles while leveraging composite and derived roles for efficiency. Regular audits and access reviews were integrated to adapt to changing regulations, ensuring ongoing compliance and security across the diverse landscape."
+  }
+]
