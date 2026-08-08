@@ -1,0 +1,271 @@
+[
+  {
+    "label": "Example 1: Large-scale GRC implementation",
+    "span": "In a large-scale SAP GRC implementation, the primary business requirement was to establish a robust access control framework to mitigate segregation of duties (SoD) risks across multiple business units. The solution design involved configuring SAP Access Control to automate SoD risk analysis and implement continuous monitoring. Key decisions included defining risk classification criteria, selecting appropriate rule types for authorization objects, and mapping controls to identified risks. We faced challenges in aligning business processes with technical controls, particularly in complex environments with legacy systems. Alternatives like manual audits were considered but rejected due to scalability issues. The implementation involved configuring ARA for automated risk analysis and ARM for role management. Post go-live, continuous monitoring was established, and periodic access reviews were conducted to ensure compliance. The outcome was a significant reduction in SoD violations and improved audit readiness.",
+    "extracted": {
+      "situation": "In a large-scale SAP GRC implementation to establish a robust access control framework.",
+      "problem": "Aligning business processes with technical controls in complex environments with legacy systems.",
+      "constraint": null,
+      "decision": "Configured SAP Access Control to automate SoD risk analysis and implement continuous monitoring.",
+      "alternative_rejected": {
+        "approach": "Manual audits",
+        "reason_rejected": "Due to scalability issues."
+      },
+      "implementation": "Configured ARA for automated risk analysis and ARM for role management.",
+      "outcome": "A significant reduction in SoD violations and improved audit readiness.",
+      "lesson_learned": null,
+      "experience_type": "architecture_decision",
+      "candidate_stated_confidence": "explicit",
+      "reusable_for_categories": [
+        "Architecture",
+        "Audit",
+        "Troubleshooting"
+      ],
+      "sap_products": [
+        "ARA",
+        "ARM"
+      ],
+      "domain": "SAP GRC",
+      "recall_confidence": "high"
+    },
+    "followUps": [
+      "Looking back, what would you tell someone about to make that same call?"
+    ]
+  },
+  {
+    "label": "Example 2: SoD redesign",
+    "span": "In a complex Segregation of Duties (SoD) redesign, the challenge was integrating a new business unit into an existing SAP landscape while maintaining compliance. This involved over 200 SoD risks and approximately 500 rules, covering various authorization objects and transaction codes. The difficulty lay in harmonizing diverse business processes and legacy systems with the existing SoD framework.",
+    "extracted": {
+      "situation": "In a complex Segregation of Duties (SoD) redesign, integrating a new business unit into an existing SAP landscape while maintaining compliance.",
+      "problem": "The challenge was harmonizing diverse business processes and legacy systems with the existing SoD framework.",
+      "constraint": "Maintaining compliance while integrating the new business unit.",
+      "decision": null,
+      "alternative_rejected": null,
+      "implementation": null,
+      "outcome": null,
+      "lesson_learned": null,
+      "experience_type": "architecture_decision",
+      "candidate_stated_confidence": "implied",
+      "reusable_for_categories": [
+        "Architecture",
+        "Audit",
+        "Troubleshooting"
+      ],
+      "sap_products": [],
+      "domain": "SAP GRC",
+      "recall_confidence": "high"
+    },
+    "followUps": [
+      "What made you choose that approach over the alternative(s) you mentioned? What specifically ruled the other one out?",
+      "Looking back, what would you tell someone about to make that same call?",
+      "What actually happened as a result -- any numbers or concrete evidence of the outcome?"
+    ]
+  },
+  {
+    "label": "Example 2: SoD redesign",
+    "span": "We evaluated options such as creating custom roles versus using standard SAP roles. Custom roles offered tailored access but increased maintenance complexity, while standard roles provided consistency but required significant adjustments to fit business needs.",
+    "extracted": {
+      "situation": "Evaluating options for role design in an SAP project.",
+      "problem": null,
+      "constraint": null,
+      "decision": null,
+      "alternative_rejected": {
+        "approach": "Creating custom roles",
+        "reason_rejected": "Increased maintenance complexity"
+      },
+      "implementation": null,
+      "outcome": null,
+      "lesson_learned": null,
+      "experience_type": "architecture_decision",
+      "candidate_stated_confidence": "explicit",
+      "reusable_for_categories": [
+        "Architecture",
+        "Role Design"
+      ],
+      "sap_products": [],
+      "domain": "SAP Security",
+      "recall_confidence": "medium"
+    },
+    "followUps": [
+      "Looking back, what would you tell someone about to make that same call?",
+      "What actually happened as a result -- any numbers or concrete evidence of the outcome?"
+    ]
+  },
+  {
+    "label": "Example 2: SoD redesign",
+    "span": "The final design involved a hybrid approach: leveraging standard roles where possible and creating custom roles for unique business requirements.",
+    "extracted": {
+      "situation": "the final design of a project involving role management",
+      "problem": null,
+      "constraint": null,
+      "decision": "leveraging standard roles where possible and creating custom roles for unique business requirements",
+      "alternative_rejected": null,
+      "implementation": null,
+      "outcome": null,
+      "lesson_learned": null,
+      "experience_type": "architecture_decision",
+      "candidate_stated_confidence": "explicit",
+      "reusable_for_categories": [
+        "Architecture",
+        "Role Design"
+      ],
+      "sap_products": [],
+      "domain": "SAP Security",
+      "recall_confidence": "high"
+    },
+    "followUps": [
+      "What made you choose that approach over the alternative(s) you mentioned? What specifically ruled the other one out?",
+      "Looking back, what would you tell someone about to make that same call?",
+      "What actually happened as a result -- any numbers or concrete evidence of the outcome?"
+    ]
+  },
+  {
+    "label": "Example 2: SoD redesign",
+    "span": "We used SAP Access Control's ARA module to simulate and analyze potential SoD conflicts, ensuring that the new roles did not introduce additional risks. This approach balanced flexibility and compliance, reducing SoD violations and streamlining role management.",
+    "extracted": {
+      "situation": "Using SAP Access Control's ARA module to manage role assignments.",
+      "problem": "Ensuring that the new roles did not introduce additional risks related to SoD conflicts.",
+      "constraint": "The need to balance flexibility and compliance.",
+      "decision": "Simulated and analyzed potential SoD conflicts using the ARA module.",
+      "alternative_rejected": null,
+      "implementation": "Utilized SAP Access Control's ARA module for simulation and analysis.",
+      "outcome": "Reduced SoD violations and streamlined role management.",
+      "lesson_learned": null,
+      "experience_type": "architecture_decision",
+      "candidate_stated_confidence": "explicit",
+      "reusable_for_categories": [
+        "Architecture",
+        "Audit",
+        "Troubleshooting"
+      ],
+      "sap_products": [
+        "SAP Access Control",
+        "ARA"
+      ],
+      "domain": "SAP GRC",
+      "recall_confidence": "high"
+    },
+    "followUps": [
+      "What made you choose that approach over the alternative(s) you mentioned? What specifically ruled the other one out?",
+      "Looking back, what would you tell someone about to make that same call?"
+    ]
+  },
+  {
+    "label": "Example 2: SoD redesign",
+    "span": "Continuous monitoring and periodic reviews were implemented to maintain the integrity of the access control framework.",
+    "extracted": {
+      "situation": "implementation of access control framework",
+      "problem": null,
+      "constraint": null,
+      "decision": "Continuous monitoring and periodic reviews were implemented",
+      "alternative_rejected": null,
+      "implementation": null,
+      "outcome": null,
+      "lesson_learned": null,
+      "experience_type": "process_design",
+      "candidate_stated_confidence": "explicit",
+      "reusable_for_categories": [
+        "Audit",
+        "Security"
+      ],
+      "sap_products": [],
+      "domain": "SAP Security",
+      "recall_confidence": "high"
+    },
+    "followUps": [
+      "What made you choose that approach over the alternative(s) you mentioned? What specifically ruled the other one out?",
+      "Looking back, what would you tell someone about to make that same call?",
+      "What actually happened as a result -- any numbers or concrete evidence of the outcome?"
+    ]
+  },
+  {
+    "label": "Example 3: ARM workflow",
+    "span": "In implementing an Access Request Management (ARM) workflow for a multinational client, the goal was to streamline user provisioning while ensuring compliance with strict regulatory standards. The workflow was designed using SAP GRC's MSMP Workflow and BRF+ for decision logic, focusing on automating approvals and risk assessments. Key decisions included defining role-based access controls, integrating risk analysis using ARA, and setting up automated notifications for approvers. The workflow was designed to minimize manual intervention, reducing processing time from days to hours.",
+    "extracted": {
+      "situation": "Implementing an Access Request Management (ARM) workflow for a multinational client.",
+      "problem": "The need to streamline user provisioning while ensuring compliance with strict regulatory standards.",
+      "constraint": null,
+      "decision": "Designed the workflow using SAP GRC's MSMP Workflow and BRF+ for decision logic, focusing on automating approvals and risk assessments.",
+      "alternative_rejected": null,
+      "implementation": "Defined role-based access controls, integrated risk analysis using ARA, and set up automated notifications for approvers.",
+      "outcome": "Reduced processing time from days to hours.",
+      "lesson_learned": null,
+      "experience_type": "process_design",
+      "candidate_stated_confidence": "explicit",
+      "reusable_for_categories": [
+        "Architecture",
+        "Role Design",
+        "Audit",
+        "Workflow"
+      ],
+      "sap_products": [
+        "SAP GRC",
+        "MSMP Workflow",
+        "BRF+",
+        "ARA"
+      ],
+      "domain": "SAP GRC",
+      "recall_confidence": "high"
+    },
+    "followUps": [
+      "What made you choose that approach over the alternative(s) you mentioned? What specifically ruled the other one out?",
+      "Looking back, what would you tell someone about to make that same call?"
+    ]
+  },
+  {
+    "label": "Example 3: ARM workflow",
+    "span": "Business objections centered around the perceived rigidity of automated controls, fearing it might slow down urgent access requests. To address these concerns, we incorporated a fast-track approval path for critical roles, balancing compliance with operational needs. This approach maintained security standards while providing flexibility for urgent business requirements.",
+    "extracted": {
+      "situation": "Addressing business objections regarding automated controls in access requests.",
+      "problem": "Concerns about the rigidity of automated controls potentially slowing down urgent access requests.",
+      "constraint": null,
+      "decision": "Incorporated a fast-track approval path for critical roles.",
+      "alternative_rejected": null,
+      "implementation": null,
+      "outcome": "Maintained security standards while providing flexibility for urgent business requirements.",
+      "lesson_learned": null,
+      "experience_type": "process_design",
+      "candidate_stated_confidence": "explicit",
+      "reusable_for_categories": [
+        "Audit",
+        "Troubleshooting",
+        "Leadership"
+      ],
+      "sap_products": [],
+      "domain": "SAP GRC",
+      "recall_confidence": "high"
+    },
+    "followUps": [
+      "What made you choose that approach over the alternative(s) you mentioned? What specifically ruled the other one out?",
+      "Looking back, what would you tell someone about to make that same call?"
+    ]
+  },
+  {
+    "label": "Example 3: ARM workflow",
+    "span": "The result was a more efficient, compliant access management process that satisfied both IT and business stakeholders.",
+    "extracted": {
+      "situation": "the access management process improvement project",
+      "problem": null,
+      "constraint": null,
+      "decision": null,
+      "alternative_rejected": null,
+      "implementation": null,
+      "outcome": "a more efficient, compliant access management process that satisfied both IT and business stakeholders",
+      "lesson_learned": null,
+      "experience_type": "process_design",
+      "candidate_stated_confidence": "implied",
+      "reusable_for_categories": [
+        "Workflow",
+        "Audit",
+        "Leadership"
+      ],
+      "sap_products": [],
+      "domain": "SAP Security",
+      "recall_confidence": "medium"
+    },
+    "followUps": [
+      "What made you choose that approach over the alternative(s) you mentioned? What specifically ruled the other one out?",
+      "Looking back, what would you tell someone about to make that same call?"
+    ]
+  }
+]
