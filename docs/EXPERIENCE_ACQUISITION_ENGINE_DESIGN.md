@@ -1,8 +1,30 @@
 # Engineering Memory Platform — Architectural Design
 
-Status: **approved for Version 1 implementation**, scoped intentionally small (see section 0.5).
-Interview Copilot is the first consumer of this platform, not the platform itself — a distinction
-that matters for section 0.5 and everything downstream of it.
+Status: **Version 1 ready for internal use and iterative validation. Phase 1 (this design +
+retrieval/chat.js integration) frozen.** Interview Copilot is the first consumer of this
+platform, not the platform itself — a distinction that matters for section 0.5 and everything
+downstream of it.
+
+## Known Limitation (deferred, not blocking Version 1)
+
+**Engineering Memory participates in prompt generation but is not yet explicitly included in the
+experience-selection reasoning step.** Confirmed by direct investigation
+(`eval/results/MEMORY_ARBITRATION_INVESTIGATION.md`): the model's "does real experience apply
+here" check in `lib/prompt/interviewPrompt.js` is structurally anchored to `CANDIDATE BACKGROUND`
+by name only. `ENGINEERING MEMORY` was added as a separate, unreferenced section — not
+competing with `CANDIDATE BACKGROUND`, simply invisible to the one reasoning step that decides
+whether to speak from real experience at all. Measured consequence: with Engineering Memory as
+the *only* candidate-specific source in the prompt (no `CANDIDATE BACKGROUND`, nothing to
+compete with), the seeded decision was still only used 1/5 times — ruling out simple source
+competition as the full explanation, and pointing at the missing reference itself as the root
+cause.
+
+- **Status:** Deferred.
+- **Reason:** Not blocking Version 1 — the mechanical pipeline (retrieval, storage, extraction,
+  question-generation logic) is sound and tested; this is specifically about how strongly the
+  live prompt directs the model to use what's retrieved.
+- **Revisit:** after collecting real production usage data (per the decision below), not by
+  further benchmark iteration now.
 
 Revision history:
 - v1: subsystem named "Judgment Store," atomic unit "Judgment Record."
@@ -400,30 +422,42 @@ neither a Judgment Record nor a Principle yet exists — coverage is necessarily
 long time. The system reasons from Engineering Memory and Engineering Principles first when
 available, falling back to CV prose only for gaps.
 
-## 10. Integration and build plan — Version 1, status: building
+## 10. Integration and build plan — Version 1, status: FROZEN for internal use
 
-Per section 0.5: **this build order optimizes for learnability, not completeness.** Version 1 is
-deliberately the smallest slice that lets real Judgment Records start existing and being read
-back correctly — not the full target shape from sections 2-9. Every later step is expected to
-change section 2's schema, section 5's scoring weights, and section 6's scenario-type list once
-real records exist to test them against; nothing here is meant to be final on first pass.
-Principle mining is explicitly LAST — not because it's unimportant, but because it needs volume
-and would be untestable before records exist to mine.
+Per section 0.5: this build order optimized for learnability, not completeness — Version 1 is
+the smallest slice that lets real Judgment Records exist, be extracted correctly, be retrieved,
+and reach the live prompt. That's done. What it does NOT yet include (the acquisition UI,
+principle mining, and full arbitration between Engineering Memory and CANDIDATE BACKGROUND) is
+deliberately deferred, not abandoned — per the decision below, the right way to learn what those
+need is real usage, not more benchmark iteration.
 
-1. **Judgment Record schema + `data/engineeringMemory.json` read/write helpers (no LLM yet).**
-   ← starting here.
-2. Extraction pipeline (section 7), validated OFFLINE against hand-written transcripts spanning
-   multiple `experience_type` values, before touching a live conversation.
-3. `searchEngineeringMemory()` + the new prompt section (section 5), tested via the same
-   before/after leverage-rate measurement used throughout this session (0 vs. N seeded records),
-   checked at full production scale specifically, given this session's repeated finding that
-   isolated wins don't reliably transfer.
-4. Adaptive Question Generator + acquisition UI (section 6) — depends on 1-3 being trustworthy.
-5. Engineering Principle mining + confirmation loop (section 3) — depends on 1-4 having produced
-   enough real Judgment Records (rough floor: 20-30 records across at least 2-3 domains) to have
-   any clusters worth drafting. Validated by checking that a HELD-OUT set of hand-labeled
-   "should this cluster into a principle" cases matches the mining pass's output before ever
-   surfacing a proposed principle to the real candidate.
+1. ✅ Judgment Record schema + `data/engineeringMemory.json` read/write helpers. Verified: 6/6
+   checks (`eval/testEngineeringMemoryStore.js`).
+2. ✅ Extraction pipeline (section 7). Verified offline against 3 hand-written transcripts,
+   found and fixed 2 real bugs (segmentation over-fragmentation, recall_confidence detection)
+   before any live use (`eval/results/ENGINEERING_MEMORY_STEP2_EXTRACTION.md`).
+3. ✅ `searchEngineeringMemory()` + the new prompt section (section 5). Verified in isolation
+   (10% → 90% leverage) and wired into `pages/api/chat.js`, where a real path-resolution bug
+   (`__dirname` under Next.js's webpack bundling) was found and fixed
+   (`eval/results/ENGINEERING_MEMORY_STEP3_RETRIEVAL.md`,
+   `eval/results/ENGINEERING_MEMORY_STEP5_CHAT_INTEGRATION.md`).
+4. ⏸️ Adaptive Question Generator backend built and tested (6/6 checks,
+   `eval/testEngineeringMemoryQuestionGenerator.js`); the acquisition UI itself is **deferred**
+   — a product/UX decision, not yet made, and lower priority than real usage data per the
+   decision below.
+5. ⏸️ Engineering Principle mining — **deferred**, per its own gating condition (needs ~20-30
+   real records, none exist yet without an acquisition surface).
 
-Each step should produce its own before/after evidence in `eval/results/` before the next step
-begins, consistent with how every change this session has been gated.
+**Known limitation carried forward, not fixed in Version 1:** see the top of this document —
+Engineering Memory is not yet part of the model's experience-selection reasoning step. Logged as
+a backlog item, revisited after real usage data exists, not fixed speculatively now.
+
+## Decision: what comes after Version 1
+
+- Phase 1 (this design + the retrieval/chat.js integration above): **frozen.**
+- Version 1: **ready for internal use and iterative validation.**
+- Engineering Memory arbitration (the known limitation above): **deferred backlog item.**
+- Next effort: **build out remaining SAP knowledge coverage and validate through real interview
+  sessions, not further benchmark iteration.** Real usage is expected to surface what the
+  acquisition UI, arbitration fix, and principle mining actually need better than another round
+  of synthetic seeding and isolated testing would.
