@@ -79,6 +79,39 @@ function debounce(func, timeout = 100) {
   };
 }
 
+// Whole-utterance-only phrases -- an exact match to one of these carries no substantive
+// ask on its own. Deliberately does NOT include recovery-signal phrases ("I'm blank", "where
+// was I") -- those ARE a genuine request for the copilot's help and must keep flowing through
+// to chat.js's isRecoverySignal handling, not get silenced here.
+const FILLER_PHRASES = new Set([
+  "hmm", "hmmm", "uh", "uhh", "okay", "ok", "yes", "yeah", "yep", "right", "correct",
+  "go ahead", "continue", "carry on", "please continue", "next question", "i see",
+  "alright", "fine", "sure", "exactly", "understood", "thats right", "thats the question",
+  // "and so on" splits into "so on" by this function's own clause-splitter (which treats
+  // standalone "and" as a separator) before the phrase check ever runs -- keep both forms.
+  "and so on", "so on"
+]);
+
+// Auto-submit fires on every silence gap, so a bare interviewer acknowledgement ("Okay.",
+// "Yes, that's the question.", "Hmm, okay, go ahead.") must not trigger a full AI generation --
+// this is a copilot for ANSWERING questions, not a conversational participant. The previous
+// version of this check only did an exact-string match against a flat phrase list (so "Yes,
+// that's the question." never matched anything and fell through to askOpenAI) plus a crude
+// `length < 12` fallback that would have just as easily swallowed a genuine short question
+// ("why IAG?" is 9 characters). This instead splits the utterance into clauses the same way
+// isCompoundQuestion does server-side, and only suppresses when EVERY clause is an exact
+// filler-phrase match -- a single substantive clause anywhere ("...but why did you choose IAG
+// over ARA?") is enough to let the whole utterance through.
+function isNonSubstantiveFiller(rawText = "") {
+  const clauses = rawText
+    .toLowerCase()
+    .split(/[.?!,]+|\band\b/)
+    .map((s) => s.replace(/[^a-z0-9\s]/g, "").trim())
+    .filter(Boolean);
+  if (clauses.length === 0) return true;
+  return clauses.every((clause) => FILLER_PHRASES.has(clause));
+}
+
 export default function InterviewPage() {
   const dispatch = useDispatch();
   const transcriptionFromStore = useSelector(state => state.transcription);
@@ -229,37 +262,9 @@ export default function InterviewPage() {
     if ((source === 'system' && systemAutoModeRef.current) || (source === 'microphone' && !isManualModeRef.current)) {
       clearTimeout(silenceTimers.current[source]);
       silenceTimers.current[source] = setTimeout(() => {
-        const transcript = finalTranscript.current[source].trim().toLowerCase();
-
-// Ignore common interviewer acknowledgements
-const ignoredPhrases = [
-  "hmm",
-  "hmmm",
-  "uh",
-  "uhh",
-  "okay",
-  "ok",
-  "yes",
-  "yeah",
-  "right",
-  "correct",
-  "go ahead",
-  "continue",
-  "carry on",
-  "please continue",
-  "next question",
-  "i see",
-  "alright",
-  "fine"
-];
-
-// Ignore very short acknowledgements
-if (
-    transcript.length < 12 ||
-    ignoredPhrases.includes(transcript)
-) {
-    return;
-}
+        if (isNonSubstantiveFiller(finalTranscript.current[source])) {
+          return;
+        }
 
 askOpenAI(finalTranscript.current[source].trim(), source);
       }, currentSilenceTimerDuration * 1000);
