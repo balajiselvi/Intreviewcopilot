@@ -169,6 +169,16 @@ export default function InterviewPage() {
             });
           }
         }
+        // System audio goes through createSystemAudioConfig()'s push-stream conversion, so
+        // the raw MediaStream isn't reachable via audioConfig.privSource above -- stop it and
+        // tear down the AudioContext/pushStream pipeline explicitly via what createRecognizer
+        // attached to the recognizer instance.
+        if (recognizer._sourceMediaStream) {
+          recognizer._sourceMediaStream.getTracks().forEach(track => track.stop());
+        }
+        if (typeof recognizer._audioCleanup === 'function') {
+          recognizer._audioCleanup();
+        }
         if (recognizer.audioConfig && typeof recognizer.audioConfig.close === 'function') {
           recognizer.audioConfig.close();
         }
@@ -302,6 +312,64 @@ askOpenAI(finalTranscript.current[source].trim(), source);
     setSelectedQuestions([]);
   };
 
+  // Converts a MediaStream into an Azure Speech SDK push-stream AudioConfig by downmixing to
+  // mono 16kHz 16-bit PCM via the Web Audio API. Passing a raw MediaStream straight into
+  // SpeechSDK.AudioConfig.fromStreamInput() is only reliable for microphone-shaped (mono)
+  // input -- getDisplayMedia's tab/system audio is commonly stereo and/or a different sample
+  // rate, which the SDK fails to recognize from SILENTLY (no error thrown, no transcription
+  // ever produced) rather than raising an error, which is why this looked like "not listening"
+  // with no diagnostic to go on.
+  const createSystemAudioConfig = (mediaStream) => {
+    const pushStream = SpeechSDK.AudioInputStream.createPushStream(
+      SpeechSDK.AudioStreamFormat.getWaveFormatPCM(16000, 16, 1)
+    );
+
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    const audioContext = new AudioContextCtor();
+    const sourceNode = audioContext.createMediaStreamSource(mediaStream);
+    const processorNode = audioContext.createScriptProcessor(4096, 1, 1);
+    // ScriptProcessorNode only reliably fires onaudioprocess once connected through to the
+    // destination in some browsers -- route through a silent (gain=0) node so nothing is
+    // actually played back, which would otherwise create an audio feedback loop with the
+    // shared tab's own sound.
+    const silentGain = audioContext.createGain();
+    silentGain.gain.value = 0;
+
+    const inputSampleRate = audioContext.sampleRate;
+    const targetSampleRate = 16000;
+    const ratio = inputSampleRate / targetSampleRate;
+
+    processorNode.onaudioprocess = (event) => {
+      const inputData = event.inputBuffer.getChannelData(0);
+      const outputLength = Math.floor(inputData.length / ratio);
+      const output = new Int16Array(outputLength);
+      for (let i = 0; i < outputLength; i++) {
+        const sample = inputData[Math.floor(i * ratio)];
+        const clamped = Math.max(-1, Math.min(1, sample));
+        output[i] = clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff;
+      }
+      pushStream.write(output.buffer);
+    };
+
+    sourceNode.connect(processorNode);
+    processorNode.connect(silentGain);
+    silentGain.connect(audioContext.destination);
+
+    const cleanup = () => {
+      try {
+        processorNode.disconnect();
+        sourceNode.disconnect();
+        silentGain.disconnect();
+        pushStream.close();
+        audioContext.close();
+      } catch (cleanupError) {
+        console.error('Error cleaning up system audio pipeline:', cleanupError);
+      }
+    };
+
+    return { audioConfig: SpeechSDK.AudioConfig.fromStreamInput(pushStream), cleanup };
+  };
+
   const createRecognizer = async (mediaStream, source) => {
     const currentConfig = getConfig();
     if (!currentConfig.azureToken || !currentConfig.azureRegion) {
@@ -311,8 +379,15 @@ askOpenAI(finalTranscript.current[source].trim(), source);
     }
 
     let audioConfig;
+    let audioCleanup = null;
     try {
-      audioConfig = SpeechSDK.AudioConfig.fromStreamInput(mediaStream);
+      if (source === 'system') {
+        const converted = createSystemAudioConfig(mediaStream);
+        audioConfig = converted.audioConfig;
+        audioCleanup = converted.cleanup;
+      } else {
+        audioConfig = SpeechSDK.AudioConfig.fromStreamInput(mediaStream);
+      }
     } catch (configError) {
       console.error(`Error creating AudioConfig for ${source}:`, configError);
       showSnackbar(`Error setting up audio for ${source}: ${configError.message}`, 'error');
@@ -328,6 +403,11 @@ askOpenAI(finalTranscript.current[source].trim(), source);
     speechConfig.setProperty("SpeechServiceConnection_InitialSilenceTimeoutMs", "3000");
 
     const recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+    // Referenced by stopRecording() -- the source stream and the (system-audio-only) Web
+    // Audio pipeline cleanup aren't reachable through the SDK's own audioConfig internals
+    // once the push-stream conversion is in play.
+    recognizer._sourceMediaStream = mediaStream;
+    recognizer._audioCleanup = audioCleanup;
 
     recognizer.recognizing = (s, e) => {
       if (e.result.reason === SpeechSDK.ResultReason.RecognizingSpeech) {
