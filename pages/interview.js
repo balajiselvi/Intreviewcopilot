@@ -596,6 +596,8 @@ askOpenAI(finalTranscript.current[source].trim(), source);
           responseLength: "interview",
           customInstructions: currentConfig.gptSystemPrompt,
           candidateResume: currentConfig.candidateResume,
+          jobDescription: currentConfig.jobDescription,
+          company: currentConfig.company,
         }),
       });
       if (!response.ok) {

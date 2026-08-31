@@ -39,6 +39,9 @@ const defaultConfig = {
   systemAutoMode: true,
   isManualMode: false,
   candidateResume: '', // Only content entered here may be phrased as personal experience in answers.
+  jobDescription: '', // Target role's JD text -- kept separate from candidateResume so the model
+                       // knows what's being asked for vs. what's actually true about the candidate.
+  company: '',
 };
 
 export function getConfig() {

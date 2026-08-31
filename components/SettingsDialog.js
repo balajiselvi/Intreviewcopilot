@@ -186,6 +186,18 @@ export default function SettingsDialog({ open, onClose, onSave }) {
           helperText="Only what you enter here can be phrased as personal experience ('I implemented...'). Leave blank to keep every answer in knowledge-framing."
           sx={{mt:2}}
         />
+        <TextField
+          fullWidth margin="dense" name="jobDescription" label="Target Job Description" multiline rows={4}
+          value={settings.jobDescription || ''} onChange={handleChange}
+          helperText="Paste the JD for the role you're interviewing for. Used to weight relevance and phrasing -- never as a source of claimed experience."
+          sx={{mt:2}}
+        />
+        <TextField
+          fullWidth margin="dense" name="company" label="Target Company"
+          value={settings.company || ''} onChange={handleChange}
+          helperText="Optional -- lets answers reference the target company by name where relevant."
+          sx={{mt:2}}
+        />
 
         <Divider sx={{ my: 3 }} />
         <Typography variant="h6" gutterBottom>Manage Custom AI Models</Typography>
