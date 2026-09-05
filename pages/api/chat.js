@@ -101,6 +101,18 @@ const TOP_K_BY_CATEGORY = Object.freeze({
 const CATEGORY_RULES = Object.freeze([
   { category: "Troubleshooting", keywords: ["troubleshoot", "error", "dump", "st22", "su53", "bug", "fix", "issue", "fail", "exception"], weight: 3 },
   { category: "Production Support", keywords: ["production support", "ticket", "incident", "p1", "sla", "support"], weight: 3 },
+  // CATEGORY_TEMPLATES.Behavioral/Leadership/Hypercare/Transports/Audit/Cutover (interviewPrompt.js)
+  // all existed with zero rule here ever producing their exact category string -- same dead-code
+  // class as the S/4HANA/BTP Security key-mismatch fixed earlier today, but Behavioral is the
+  // highest-stakes of the six: its anti-fabrication guard (never invent a specific incident the
+  // candidate can't defend under follow-up) never activated for a single behavioral question,
+  // silently falling through to the generic template instead.
+  { category: "Behavioral", keywords: ["tell me about a time", "describe a situation", "describe a time", "how did you handle", "walk me through a time", "give me an example of a time", "have you ever had to", "difficult stakeholder", "disagreement with", "mistake you made", "a failure you", "biggest challenge you faced", "conflict with a"], weight: 4 },
+  { category: "Leadership", keywords: ["led a team", "lead a team", "influence without authority", "mentored", "convinced stakeholders", "managing up", "difficult conversation with leadership"], weight: 4 },
+  { category: "Hypercare", keywords: ["hypercare", "post go-live support", "post-go-live support", "go-live support"], weight: 4 },
+  { category: "Transports", keywords: ["transport request", "stms", "se09", "se10", "transport landscape", "change request approval"], weight: 4 },
+  { category: "Audit", keywords: ["sox audit", "sox compliance", "audit evidence", "audit trail", "control testing", "internal audit", "external audit", "audit finding"], weight: 4 },
+  { category: "Cutover", keywords: ["cutover", "go-live", "go live plan", "parallel run", "cutover plan", "cutover strategy"], weight: 4 },
   { category: "Architecture", keywords: ["architecture", "landscape", "design", "diagram", "topology"], weight: 3 },
   { category: "BTP", keywords: ["btp", "business technology platform"], weight: 4 },
   { category: "IAS", keywords: ["ias", "identity authentication service"], weight: 4 },
