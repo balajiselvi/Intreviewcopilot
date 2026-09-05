@@ -219,6 +219,19 @@ function writeSSEChunk(res, text) {
   }
 }
 
+// The prompt's explicit "no markdown formatting" rule (lib/prompt/interviewPrompt.js) is
+// unreliable in practice -- live-validation runs reproduced literal ** bold markers around
+// T-codes/table names (e.g. **SU53**, **AGR_USERS**) 2/2 despite the rule. A real second
+// LLM pass to restructure/clean the answer was already built and measured for this exact
+// class of problem (eval/results/EVIDENCE_SUMMARY_2026-08-06.md): +0.14 quality, inside the
+// ~0.35 noise floor, for 4.2x the latency (5.4s -> 22.6s) -- unacceptable for a live-interview
+// tool built around a single-pass ~5-6s target. Stripping asterisks is a per-character,
+// chunk-boundary-independent operation, so it can run on every streamed token with no
+// buffering and zero added latency, unlike a real reformatting pass.
+function stripStreamMarkdown(text) {
+  return text.replace(/\*/g, "");
+}
+
 function writeSSEError(res, errorMessage) {
   try {
     if (!res?.writable) {
@@ -420,7 +433,7 @@ async function streamGeminiResponse({ apiKey, model, systemPrompt, recentHistory
   const resultStream = await chat.sendMessageStream(question, { signal });
   for await (const chunk of resultStream.stream) {
     if (signal?.aborted) break;
-    const chunkText = chunk.text();
+    const chunkText = stripStreamMarkdown(chunk.text());
     if (chunkText) {
       writeSSEChunk(res, chunkText);
       fullText += chunkText;
@@ -450,7 +463,7 @@ async function streamOpenAIResponse({ apiKey, model, systemPrompt, recentHistory
   let fullText = "";
   for await (const part of stream) {
     if (signal?.aborted) break;
-    const text = part.choices[0]?.delta?.content || "";
+    const text = stripStreamMarkdown(part.choices[0]?.delta?.content || "");
     if (text) {
       writeSSEChunk(res, text);
       fullText += text;
@@ -488,7 +501,7 @@ async function streamOpenRouterResponse({ apiKey, model, systemPrompt, recentHis
   let fullText = "";
   for await (const part of stream) {
     if (signal?.aborted) break;
-    const text = part.choices[0]?.delta?.content || "";
+    const text = stripStreamMarkdown(part.choices[0]?.delta?.content || "");
     if (text) {
       writeSSEChunk(res, text);
       fullText += text;
@@ -524,7 +537,7 @@ async function streamClaudeResponse({ apiKey, model, systemPrompt, recentHistory
   for await (const event of stream) {
     if (signal?.aborted) break;
     if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
-      const text = event.delta.text || "";
+      const text = stripStreamMarkdown(event.delta.text || "");
       if (text) {
         writeSSEChunk(res, text);
         fullText += text;
@@ -559,7 +572,7 @@ async function streamGroqResponse({ apiKey, model, systemPrompt, recentHistory, 
   let fullText = "";
   for await (const part of stream) {
     if (signal?.aborted) break;
-    const text = part.choices[0]?.delta?.content || "";
+    const text = stripStreamMarkdown(part.choices[0]?.delta?.content || "");
     if (text) {
       writeSSEChunk(res, text);
       fullText += text;
