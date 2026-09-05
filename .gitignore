@@ -19,3 +19,6 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Ruflo autopilot state churn (auto-updates on nearly every tool call, not meaningful history)
+.claude-flow/
