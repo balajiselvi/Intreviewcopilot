@@ -19,10 +19,24 @@ quality is the current primary development lever.
 
 ## Current Development Phase
 
-**Phase: Knowledge Platform population.** Infrastructure work (retrieval, chunking,
-indexing, folder architecture, production config) is complete and frozen. Content
-population is in progress, domain by domain, following the Standard Domain Workflow
-below.
+**Phase: Principal Architect reasoning & answer-quality layer** (starting fresh as of
+2026-09-06). The prior phase — **retrieval/classification stabilization** — is
+complete as of 2026-09-05 (branch `feature/interview-engine-v2`): a candidate-recall
+bug that made 96.7% of the knowledge corpus structurally unreachable was found and
+fixed, stage-1 scoring's scale-imbalance defect was normalized (causally proven, not
+just correlated), several category/domain contract mismatches were fixed, SAC and PMP
+were made first-class categories, an experience-fabrication defect was fixed at the
+prompt-contract level, and BW got its first real knowledge content (was a confirmed
+0-byte gap). Full detail: `CHANGELOG.md`'s 2026-09-05 entry. Retrieval/scoring/
+classification are now considered stable — see "Frozen Components" below, which
+carries forward the same "do not reintroduce content-only scoring bonuses" principle
+that was already documented here from an earlier fix of the identical bug class,
+confirming this defect shape has recurred more than once and deserves permanent
+vigilance in code review, not just a one-time fix.
+
+The current focus is generation quality: causal reasoning structure, trade-off
+articulation, follow-up anticipation, and stronger reasoning for complex/scenario/
+hybrid questions — not further retrieval or classification tuning.
 
 ## High-Level Architecture
 
@@ -165,12 +179,28 @@ fine; architectural rewrites are not.
 
 ## Known Limitations
 
+- **SAP+PMP hybrid questions** ("lead a global S/4HANA Security transformation across
+  multiple countries") retrieve S/4-only content, never genuine project-management
+  evidence, because `analysis.category` is a single mutually-exclusive string that
+  can't represent two simultaneously-active dimensions. Deliberately deferred
+  (2026-09-05) pending evidence this is common enough in practice to justify a
+  multi-dimensional representation change — most cross-product questions that name
+  multiple *SAP* products already work correctly (e.g. SuccessFactors→IPS→IAS→BTP), so
+  the gap is specifically "SAP product + non-SAP delivery dimension," not multi-product
+  questions in general.
 - Comparison-style questions naming two topics ("difference between X and Y") don't
   reliably surface both documents in the top-K results — each chunk is scored
   independently against a single query vector, so one topic's chunks can crowd out the
   other's even when both are genuinely relevant. Not fixed further per explicit
   instruction to stabilize and return focus to content; a real limitation of the
-  current single-query-vector retrieval shape, not a bug in any one function.
+  current single-query-vector retrieval shape, not a bug in any one function. Worth
+  re-testing now that stage-1 scoring is normalized — this may be partially improved
+  as a side effect, not yet verified either way.
+- `knowledge/bw/` has one substantive file (`bw-security.md`, added 2026-09-05) but two
+  sibling stub files (`analysis-authorizations.md`, `infoproviders.md`) remain 0 bytes
+  and unindexed — the "110/110 files" / "bw: 3/3" counts elsewhere in this document
+  predate that discovery and should be read as approximate, not as a current literal
+  count. Not consolidated or backfilled; out of scope for the session that found it.
 - The `experienceConsistency`/`ownership` heuristic in `lib/prompt/evaluation.js` is a
   regex-based approximation (checks whether a mentioned SAP component's name appears
   in the candidate's resume text), not semantic verification — documented as a known
@@ -184,7 +214,22 @@ fine; architectural rewrites are not.
 
 ## Current Priorities
 
-**Project Status Transition: Workstream A → Product Maturity Engineering (Workstreams B, C, D)**
+**The Workstream A/B/C/D framing below (Aug 2026) has been superseded in practice** —
+the actual work since then went through a retrieval/classification stabilization pass
+(2026-09-05, see Changelog) rather than the originally-planned quality-benchmarking
+track. The Workstream B "7.5→8.5/10" baseline numbers were never revisited after that
+pass and should not be treated as current. Kept below for historical continuity, not
+as an active tracking framework.
+
+**Actual current priority (2026-09-06 onward): Principal Architect reasoning &
+answer-quality layer.** Causal reasoning structure (business objective → architecture →
+implementation → runtime → troubleshooting), trade-off articulation, follow-up
+anticipation, appropriate technical depth calibration, and stronger reasoning for
+complex/scenario/hybrid questions — building on retrieval/classification now being
+stable rather than tuning them further.
+
+<details>
+<summary>Historical: Workstream A/B/C/D framing (Aug 2026, superseded)</summary>
 
 1. **Workstream A (PRIMARY - COMPLETE):** All 110 knowledge files populated ✓
    - Roadmap: 100% achievement
@@ -206,6 +251,8 @@ fine; architectural rewrites are not.
    - Evaluate: Cross-domain reasoning quality
    - Validate: Feature completeness within 20-domain framework
    - Document: Architectural gaps and expansion opportunities
+
+</details>
 
 ## Standard Domain Workflow
 
@@ -240,6 +287,25 @@ For every domain, in order, no exceptions:
 
 ## Next Immediate Tasks
 
+**As of 2026-09-06, starting fresh on:**
+1. Evaluate whether generated answers naturally produce causal reasoning chains
+   (troubleshooting: symptom→isolation→evidence→root cause→fix→prevention;
+   architecture: requirement→constraints→architecture→security→integration→
+   operations→trade-offs; migration: current→target→gap→migration→coexistence→
+   cutover→validation→contingency; PMP: objective→stakeholders→scope→risk→plan→
+   execution→control→change→outcome) or whether they need explicit prompt/structure
+   support to get there consistently.
+2. Trade-off articulation and follow-up-question readiness as explicit quality
+   dimensions, not just factual correctness.
+3. Re-verify the "Comparison-style questions" known limitation now that stage-1
+   scoring is normalized — may already be partially improved, not yet checked.
+4. Continue deferring the SAP+PMP multi-dimensional representation question until
+   there's concrete evidence the single-category model is the binding constraint for
+   real interview questions, not just the one tested scenario.
+
+<details>
+<summary>Historical: Workstream A/B/C/D next-tasks framing (Aug 2026, superseded)</summary>
+
 **Workstream A — COMPLETE ✓**
 1. ✅ **COMPLETED:** All 110 knowledge files populated across 20 domains
 2. ✅ **COMPLETED:** Knowledge index rebuilt (21MB)
@@ -265,3 +331,5 @@ For every domain, in order, no exceptions:
 **Decision Point (After Workstream B Reaches 8.5+/10):**
 - Evaluate strategic domain extensions (integration, analytics, enterprise-iam, successfactors)
 - Decide: Continue with current 110 domains or expand roadmap
+
+</details>

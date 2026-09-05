@@ -2,7 +2,76 @@
 
 All notable changes to Interview Copilot are documented here. This file records the development history, bug fixes, feature additions, and architectural decisions with dates and context.
 
-## [Unreleased] — Current Development Phase
+## 2026-09-05 — Retrieval/classification stabilization (feature/interview-engine-v2)
+
+The single biggest finding of this session: **96.7% of the knowledge corpus was
+structurally unreachable by retrieval**, for every query, regardless of topic — a
+candidate-truncation-before-scoring bug in `retrievalService.js` (`candidateLimit`
+sliced the eligible-candidate array in raw file order *before* any relevance scoring
+ran, so only `knowledge/audit/`'s first ~50 chunks could ever reach the scorer). This
+was not visible from generation quality alone — hand-authored `CATEGORY_TEMPLATES`
+content was silently carrying nearly all real answer grounding. Fixed and proven with
+before/after ranking data (see commits below); do not reintroduce this pattern.
+
+Commits (chronological), each independently regression-tested and live-verified against
+the running app, not just unit-level:
+
+1. **Dead category templates reactivated** — `Behavioral`, `Leadership`, `Hypercare`,
+   `Transports`, `Audit`, `Cutover`, `RISE`, `HANA`, `Datasphere` all existed in
+   `CATEGORY_TEMPLATES` with no matching `CATEGORY_RULES` entry ever producing that
+   exact string — silently falling through to the generic template. Behavioral was the
+   highest-stakes instance: its anti-fabrication guard never activated for a single
+   real behavioral question.
+2. **Category precedence fixes** — BTP-vs-IAS and IAG-vs-RISE ties were previously
+   resolved only by accidental `CATEGORY_RULES` array order. Made explicit
+   (`applyCategoryPrecedence`).
+3. **Markdown/token-budget fixes** — asterisk bleed-through in streamed answers
+   (prompt-only "no markdown" instruction proven unreliable; fixed with a deterministic
+   per-token strip, not a second LLM pass), and a token-ceiling too small for the
+   enriched Authorization/Troubleshooting templates.
+4. **Candidate-recall bug (the big one)** — see above. Fixed by scoring the full
+   eligible candidate set before applying `candidateLimit`, not after.
+5. **Stage-1 scoring scale-imbalance bug** — `semanticScore` (bounded 0-1) was combined
+   with `lexicalScore`/`componentScore`/`intentScore` (unbounded raw counts) under
+   nominal weights that didn't represent those proportions. Normalized each signal to
+   its own validated ceiling (query-relative for lexical/intent, domain-relative for
+   component). Causally proven: `hana-authorization.md` moved from rank #38 of 1775 to
+   rank #1 using the same real production sub-scores, no domain-classification change.
+6. **Contract-mismatch audit** — `COMPONENT_KEYWORDS` (retrievalService.js) was missing
+   two domain keys that `analyzeInterviewQuestion()` actually emits ("SAP Cloud
+   Identity / BTP", "SAP Platform"), silently zeroing component credit for BTP/IAS/
+   IPS/IAG/SAC and S/4/ECC/HANA/BW questions respectively. Fixed.
+7. **SAC and PMP made first-class** (classifier category, domain pattern, component
+   keywords, stage-2 domain-boost, `CATEGORY_TEMPLATES` entry) — both previously had
+   zero representation anywhere in the pipeline. SAC was also misrouting into the
+   `Datasphere` category via an overly broad keyword. PMP context-classification uses
+   co-occurrence pairs (anchor + context word, e.g. `stakeholder` + `blocking`), not
+   bare single words — bare `risk` was tested and rejected as too collision-prone with
+   SAP GRC's own risk-analysis vocabulary.
+8. **Experience-fabrication fix** — a global tense-discipline rule added to `ROLE &
+   RULES` (previously this discipline only existed inside the Behavioral-question
+   special case). A live test caught a plain S/4 architecture question with no
+   candidate background inventing "during a previous project involving multiple
+   countries..."; re-tested clean after the fix.
+9. **BW knowledge authored** — `knowledge/bw/bw-security.md` replaces a confirmed
+   0-byte stub (two sibling stub files, `analysis-authorizations.md`/
+   `infoproviders.md`, remain empty and unindexed — not yet consolidated into the new
+   file). Covers the execution-authorization-vs-analysis-authorization distinction,
+   RSECADMIN, S_RS_AUTH, S_RS_COMP/S_RS_COMP1, 0TCAIPROV/0TCAVALID/0TCAACTVT, and the
+   "login works but query returns no data" scenario.
+
+**Known limitation carried forward, not fixed this session:** SAP+PMP hybrid questions
+("lead a global S/4HANA Security transformation") still retrieve S/4-only content —
+`analysis.category` is a single mutually-exclusive string, so a question spanning two
+genuinely separate dimensions can't be represented simultaneously. Deferred pending
+evidence that the common cases (single-product cross-references, e.g. SuccessFactors→
+IPS→IAS→BTP, already work fine) don't already cover most real interview questions.
+
+**Next phase (starting fresh):** Principal Architect reasoning and answer-quality layer
+— causal reasoning structure, trade-off articulation, follow-up anticipation — now that
+retrieval and classification are stable. Not a retrieval/classification task.
+
+## [Unreleased] — Prior Development Phase (superseded by the above; kept for history)
 
 **Transition:** From Workstream A (Knowledge Population) to Product Maturity Engineering (Workstreams B, C, D)
 

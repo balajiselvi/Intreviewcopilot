@@ -1,5 +1,38 @@
 # Enterprise Interview Intelligence Platform - Current Status
 
+## ⚠️ Update — 2026-09-05: this document is superseded below this point
+
+Everything from here to the historical record (August 5 snapshot, further down) is
+stale — the Workstream A/B/C/D framing it describes was not the path actually taken
+after that date. See `docs/CHANGELOG.md`'s **2026-09-05** entry and `docs/PROJECT_STATE.md`
+for the accurate current state. Short version:
+
+- **Retrieval/classification stabilization is complete** (branch
+  `feature/interview-engine-v2`, commits through `d1bfcec`): a candidate-recall bug
+  that made 96.7% of the knowledge corpus unreachable was found and fixed; stage-1
+  scoring's scale-imbalance defect was normalized (causally proven — HANA went from
+  rank #38 to rank #1 of 1775 candidates using the same real sub-scores); several
+  category/domain contract mismatches were fixed; SAC and PMP were made first-class
+  categories; an experience-fabrication defect was fixed at the prompt-contract level;
+  BW got its first real knowledge content.
+- **Known limitation, deliberately deferred:** SAP+PMP hybrid questions (e.g. "lead a
+  global S/4HANA Security transformation") still don't retrieve genuine
+  project-management evidence — the single-category classifier can't represent two
+  simultaneously-active dimensions. Not fixed; needs concrete evidence it's a common
+  real-world case before justifying a multi-dimensional representation change.
+- **Current phase, starting 2026-09-06:** Principal Architect reasoning &
+  answer-quality layer — causal reasoning structure, trade-off articulation, follow-up
+  anticipation — not further retrieval/classification tuning.
+
+The knowledge-file population claims below (110/110, "100% Complete") also predate the
+discovery that `knowledge/bw/`'s two stub files (`analysis-authorizations.md`,
+`infoproviders.md`) are still 0 bytes — a `bw-security.md` file was added 2026-09-05,
+but the domain isn't fully populated the way the count below implies.
+
+---
+
+## Historical record (August 5, 2026) — kept for continuity, not current
+
 **Date:** August 5, 2026  
 **Project Phase:** Product Maturity Engineering  
 **Primary Status:** Workstream A (Knowledge Platform) - 100% Complete ✓
