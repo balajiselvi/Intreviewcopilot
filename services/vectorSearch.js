@@ -17,7 +17,32 @@ const DOMAIN_BOOST_MAP = Object.freeze({
   "SAP Platform": ["s/4hana", "s4hana", "ecc", "hana", "universal journal", "new gl", "analytic privilege", "bw", "bw/4hana", "netweaver", "abap", "hdi container", "catalog role", "repository role"]
 });
 
-const SAP_ARTIFACT_REGEX = /\b(grac_[a-z0-9_]+|agr_[a-z0-9_]+|usr[0-9]{2}|ust[0-9]{2}|pfcg|su24|su25|su53|st01|stauthtrace|st22|slg1|sm37|sm21|se16|se16n|se11)\b/i;
+// Split from one flat SAP_ARTIFACT_REGEX into two family-specific patterns: adversarial testing
+// (Test 8, "HANA catalog role vs repository role") confirmed a generic access-review chunk
+// containing "PFCG" out-ranked real, indexed, exact-match HANA content purely because ANY
+// PFCG/SU24/USRxx mention got a flat +0.08 boost regardless of the actual query's product. The
+// fix is not to delete the boost -- it's real signal for ABAP-family questions -- but to gate
+// it on the classified category, so a cloud/HANA/Datasphere question never rewards ABAP-table
+// jargon just because a candidate chunk happens to contain it.
+const ABAP_ARTIFACT_REGEX = /\b(agr_[a-z0-9_]+|usr[0-9]{2}|ust[0-9]{2}|pfcg|su24|su25|su53|st01|stauthtrace|st22|slg1|sm37|sm21|se16|se16n|se11)\b/i;
+const GRC_ARTIFACT_REGEX = /\b(grac_[a-z0-9_]+|msmp|brf\+?)\b/i;
+
+const ABAP_ARTIFACT_ELIGIBLE_CATEGORIES = new Set([
+  "S/4", "ECC", "Fiori", "Authorization", "Role Design", "Security", "BW",
+  "Troubleshooting", "Upgrade", "Configuration", "Migration", "Transports",
+  "Audit", "Production Support", "Performance", "General"
+]);
+const GRC_ARTIFACT_ELIGIBLE_CATEGORIES = new Set([
+  "ARM", "ARA", "EAM", "BRM", "IAG", "Security", "Audit", "Troubleshooting", "General"
+]);
+
+// A cloud product in play anywhere (primary OR secondary) means ABAP/GRC-table artifacts are
+// noise, not evidence -- even when Troubleshooting won primary category (Test 1: "IAS auth
+// succeeds but BTP authorization fails... troubleshoot it" classified primary=Troubleshooting,
+// secondary=[BTP,IAS], and a Troubleshooting-eligible ABAP boost would still have rewarded an
+// irrelevant PFCG-heavy chunk). This is the smallest safe precedence adjustment available
+// without restructuring the category model into separate product/intent dimensions.
+const CLOUD_ONLY_CATEGORIES = new Set(["BTP", "IAS", "IPS", "IAG", "HANA", "Datasphere", "RISE", "SAC", "SAP IDM"]);
 
 function normalizeText(text) {
   if (!text || typeof text !== "string") return "";
@@ -97,9 +122,21 @@ function computeDomainBoost(domain, contentNorm) {
   return Math.min(0.18, directBoost + relatedBoost);
 }
 
-function computeArtifactBoost(content) {
+function computeArtifactBoost(content, category, secondaryCategories = []) {
   if (!content || typeof content !== "string") return 0;
-  return SAP_ARTIFACT_REGEX.test(content) ? 0.08 : 0;
+
+  const secondaries = Array.isArray(secondaryCategories) ? secondaryCategories : [];
+  const hasCloudProductContext = CLOUD_ONLY_CATEGORIES.has(category) || secondaries.some((c) => CLOUD_ONLY_CATEGORIES.has(c));
+  if (hasCloudProductContext) return 0;
+
+  let boost = 0;
+  if (ABAP_ARTIFACT_REGEX.test(content) && ABAP_ARTIFACT_ELIGIBLE_CATEGORIES.has(category)) {
+    boost = Math.max(boost, 0.08);
+  }
+  if (GRC_ARTIFACT_REGEX.test(content) && GRC_ARTIFACT_ELIGIBLE_CATEGORIES.has(category)) {
+    boost = Math.max(boost, 0.08);
+  }
+  return boost;
 }
 
 function computeIntentBoost(intent, contentNorm) {
@@ -214,6 +251,8 @@ async function searchKnowledge(question, analysis = {}, topK = 8, options = {}) 
       const queryNorm = normalizeText(question);
       const domain = analysis?.domain || "";
       const intent = analysis?.primaryIntent || analysis?.intent || "";
+      const category = analysis?.category || "";
+      const secondaryCategories = analysis?.secondaryCategories || [];
 
       const scored = rawChunks.map((chunk) => {
         const content = chunk.content || chunk.text || "";
@@ -225,7 +264,7 @@ async function searchKnowledge(question, analysis = {}, topK = 8, options = {}) 
 
         const keywordScore = computeKeywordOverlap(queryNorm, contentNorm);
         const domainBoost = computeDomainBoost(domain, contentNorm);
-        const artifactBoost = computeArtifactBoost(content);
+        const artifactBoost = computeArtifactBoost(content, category, secondaryCategories);
         const intentBoost = computeIntentBoost(intent, contentNorm);
 
         const finalScore = Math.min(
