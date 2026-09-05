@@ -118,6 +118,17 @@ const CATEGORY_RULES = Object.freeze([
   { category: "IAS", keywords: ["ias", "identity authentication service"], weight: 4 },
   { category: "IPS", keywords: ["ips", "identity provision service", "successfactors", "success factors", "sap successfactors"], weight: 4 },
   { category: "IAG", keywords: ["iag", "identity access governance"], weight: 4 },
+  // Deliberately placed immediately after IAG: "should we replace GRC with IAG during RISE"
+  // ties IAG and RISE at the same weight, and on a tie this array's order decides primaryCategory
+  // (see classifyWeightedIntents/sort). Listing RISE right after IAG makes IAG win as primary
+  // (so the coexistence-first IAG template governs the answer's structure) with RISE demoted to
+  // secondaryCategories -- which is exactly what's needed to make the "rise" keyword entry in
+  // DOMAIN_DEPTH_GUIDANCE_MAP (interviewPrompt.js) reachable at all, since getDomainDepthGuidance
+  // only ever checks category/domain/secondaryCategories strings, never the raw question text.
+  // Before this rule existed, no category was ever literally named "RISE", so that guidance
+  // block was unreachable regardless of how a RISE question was phrased -- confirmed dead code,
+  // not just under-triggered.
+  { category: "RISE", keywords: ["rise"], weight: 4 },
   { category: "ARM", keywords: ["arm", "access request management"], weight: 4 },
   { category: "ARA", keywords: ["ara", "access risk analysis"], weight: 4 },
   { category: "EAM", keywords: ["eam", "emergency access management", "firefighter"], weight: 4 },
@@ -265,6 +276,23 @@ function tokenize(text = "") {
   return text.toLowerCase().replace(/[^\w\s]/g, " ").split(/\s+/).filter(Boolean);
 }
 
+// Plain keyword-sum scoring ties BTP and IAS at the same weight whenever a question mentions
+// both -- e.g. "authenticate through IAS" (IAS as the mechanism) vs "BTP application... gets an
+// authorization error" (BTP as the actual subject with the problem). Before this, the correct
+// answer only came out by accident of CATEGORY_RULES array order (BTP listed before IAS), which
+// is not real precedence logic and breaks the moment the array is reordered. This makes the
+// real-world rule explicit: a product named only as the authentication mechanism should not
+// out-rank the product that's actually failing.
+function applyCategoryPrecedence(scores, question) {
+  const q = question.toLowerCase();
+  const iasIsJustTheMechanism = /\b(through|via|using)\s+ias\b/.test(q);
+  const hasAuthorizationProblem = /\b(authorization (error|fail\w*|denied|issue)|access denied|not authorized|denied access|can'?t access|cannot access)\b/.test(q);
+  if (scores.has("BTP") && scores.has("IAS") && iasIsJustTheMechanism && hasAuthorizationProblem) {
+    scores.set("BTP", scores.get("BTP") + 3);
+  }
+  return scores;
+}
+
 function classifyWeightedIntents(question = "") {
   const tokens = tokenize(question);
   const tokenSet = new Set(tokens);
@@ -285,6 +313,8 @@ function classifyWeightedIntents(question = "") {
   if (scores.size === 0) {
     return { primaryCategory: "General", secondaryCategories: [] };
   }
+
+  applyCategoryPrecedence(scores, question);
 
   const sortedIntents = Array.from(scores.entries()).sort((a, b) => b[1] - a[1]);
   return {
