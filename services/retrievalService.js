@@ -20,13 +20,27 @@ AZURE_AI_SEARCH: "azure-ai-search",
 ELASTIC: "elastic"
 });
 
+// Contract audit (producer -> consumer key match) against every real value
+// analyzeInterviewQuestion() (lib/interviewAnalyzer.js DOMAIN_PATTERNS) can emit:
+//   "SAP Fiori Security" / "SAP GRC" / "SAP Platform" / "SAP Cloud Identity / BTP" /
+//   "General SAP" / "SAP Security" / "SAP IDM"
+// Two were missing here, silently producing component=0 for every candidate on real
+// questions: "SAP Cloud Identity / BTP" (the analyzer's actual combined-string output --
+// vectorSearch.js's DOMAIN_BOOST_MAP already carries an identical fix, with its own comment
+// explaining the same root cause) and "SAP Platform" (had no entry at all, so every
+// S/4HANA/ECC/HANA/BW/ABAP question scored component=0 even when correctly classified --
+// this affected the BW and SAP+PMP-hybrid test cases independent of the HANA domain-collision
+// bug). "General SAP" intentionally has no entry: no domain-specific component boost is
+// correct when nothing was classified.
 const COMPONENT_KEYWORDS = Object.freeze({
 "SAP GRC": ["ara", "arm", "eam", "firefighter", "risk", "brm", "msmp", "brf"],
 "SAP Security": ["pfcg", "su24", "su25", "su53", "st01", "authorization", "role", "usobt_c", "usobx_c"],
 "SAP Cloud Identity": ["ias", "ips", "iag", "saml", "oauth", "oidc", "scim", "tenant"],
+"SAP Cloud Identity / BTP": ["ias", "ips", "iag", "saml", "oauth", "oidc", "scim", "tenant", "cloud connector", "principal propagation", "subaccount", "destination", "x.509", "mtls"],
 "SAP Fiori Security": ["catalog", "group", "space", "page", "odata", "iwfnd", "iwmnd", "launchpad"],
 "SAP BTP Security": ["cloud connector", "principal propagation", "subaccount", "destination", "x.509", "mtls"],
-"SAP IDM": ["identity center", "vds", "repository", "pass-vector", "job", "provisioning"]
+"SAP IDM": ["identity center", "vds", "repository", "pass-vector", "job", "provisioning"],
+"SAP Platform": ["s/4hana", "s4hana", "ecc", "hana", "bw", "bw/4hana", "abap", "netweaver", "universal journal", "new gl"]
 });
 
 const SAP_KEYWORDS = Object.freeze([
@@ -252,6 +266,28 @@ if (!Array.isArray(candidates)) return [];
 return candidates.map((candidate) => RetrievedChunkSchema.parse(candidate));
 }
 
+// Controlled experiment (measured against the real 2595-chunk index, real production
+// sub-scores, no simulation): semanticScore is bounded [0,1] by construction, but
+// lexicalScore/componentScore/intentScore are unbounded raw counts. The configured weights
+// (0.4/0.2/0.2/0.2) do not represent those proportions in practice -- a component score of 48
+// contributed 9.6 to the total (48*0.2) versus a *perfect* semantic match's maximum possible
+// contribution of 0.4, so keyword/domain density could completely override genuine relevance.
+// Measured causally on "HANA catalog role vs repository role": normalizing these three signals
+// to comparable [0,1] ceilings *alone* -- no domain-classification change -- moved
+// hana-authorization.md from rank #38 of 1775 to rank #1, using the exact same raw sub-scores.
+//
+// Each signal's ceiling is derived from its own mechanism, not an arbitrary constant:
+// - lexical already caps at 3 points per query word (len>=3) that could possibly match --
+//   inherently query-relative by construction.
+// - component caps at 8 points per keyword in the CLASSIFIED DOMAIN's own COMPONENT_KEYWORDS
+//   list -- domains have 6-9 keywords, not a uniform count, so a single global cap would
+//   under-normalize shorter lists.
+// - intent can only ever credit a RE_INTENT_* pattern the QUESTION ITSELF also matches, so a
+//   fixed global cap (all 7 patterns = 35) is nearly unreachable in practice: empirically, most
+//   real questions match 0-3 of the 7 patterns and can never exceed roughly half that fixed
+//   cap even at their own true maximum, which would keep intent perpetually and misleadingly
+//   near-zero. Using the per-question achievable ceiling (5 * patterns the question matches)
+//   was validated against a query-relative vs. fixed-global comparison before implementation.
 function scoreCandidatesStage({ question, analysis, expandedQuery, embeddings, candidates, weights }) {
 const activeWeights = {
 semantic: weights?.semantic ?? 0.4,
@@ -259,6 +295,16 @@ lexical: weights?.lexical ?? 0.2,
 component: weights?.component ?? 0.2,
 intent: weights?.intent ?? 0.2
 };
+
+const domain = analysis?.domain || "";
+const componentCeiling = Math.max(1, (COMPONENT_KEYWORDS[domain] || []).length * 8);
+const qNorm = normalize((expandedQuery.queries && expandedQuery.queries[0]) || question);
+const lexicalCeiling = Math.max(1, qNorm.split(" ").filter((w) => w.length >= 3).length * 3);
+const intentPatternMatchCount = [
+RE_INTENT_ARCH, RE_INTENT_CONFIG, RE_INTENT_TROUBLESHOOT, RE_INTENT_WORKFLOW,
+RE_INTENT_PROVISIONING, RE_INTENT_TABLES, RE_INTENT_REAL_IMPL
+].filter((re) => re.test(qNorm)).length;
+const intentCeiling = Math.max(1, intentPatternMatchCount * 5);
 
 return candidates.map((chunk) => {
 let semanticScore = 0;
@@ -273,11 +319,15 @@ const lexical = lexicalScore(expandedQuery.queries, chunk.content);
 const component = componentScore(analysis, chunk.content);
 const intent = intentScore(question, analysis, chunk.content);
 
+const lexicalNorm = Math.min(1, lexical / lexicalCeiling);
+const componentNorm = Math.min(1, component / componentCeiling);
+const intentNorm = Math.min(1, intent / intentCeiling);
+
 const totalScore =
   semanticScore * activeWeights.semantic +
-  lexical * activeWeights.lexical +
-  component * activeWeights.component +
-  intent * activeWeights.intent;
+  lexicalNorm * activeWeights.lexical +
+  componentNorm * activeWeights.component +
+  intentNorm * activeWeights.intent;
 
 return RankedChunkSchema.parse({
   ...chunk,
@@ -390,20 +440,35 @@ try {
   });
 
   const rankingStartedAt = now();
-  const candidatesToScore = deduplicateChunks(
+  // P0 fix (measured architectural defect, not a tuning adjustment): candidateLimit used to
+  // slice the ELIGIBLE candidates BEFORE scoring, on an array still in raw corpus/file order.
+  // Measured against the real 2595-chunk index: the corpus is ordered by source folder, so
+  // slice(0, 50) on an unscored array meant only knowledge/audit/'s 85 chunks (positions 0-84)
+  // could ever reach scoreCandidatesStage -- 96.7% of the corpus (everything from
+  // behavioral/ onward, including all 494 grc/ chunks, all 346 project-management/ chunks,
+  // and hana/btp/rise/s4hana/sac/security) was structurally unreachable for every query
+  // regardless of topic, independent of semantic relevance. Fix: score every eligible
+  // candidate first (cheap -- dot products against ~1700 pre-computed embeddings, not a real
+  // cost at this corpus size), THEN cap to candidateLimit by score. Same signals, same
+  // weights, same downstream reranking -- only the ORDER of scoring vs. truncation changed.
+  const eligibleCandidates = deduplicateChunks(
     filteredCandidates.length > 0 ? filteredCandidates : candidates
-  ).slice(0, candidateLimit);
+  );
 
   const scoredCandidates = scoreCandidatesStage({
     question: normalizedRequest.question,
     analysis: normalizedRequest.analysis,
     expandedQuery,
     embeddings,
-    candidates: candidatesToScore,
+    candidates: eligibleCandidates,
     weights: defaultWeights
   });
 
-  const qualifyingCandidates = scoredCandidates.filter((chunk) => chunk.score >= minimumScore);
+  const candidatesToScore = [...scoredCandidates]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, candidateLimit);
+
+  const qualifyingCandidates = candidatesToScore.filter((chunk) => chunk.score >= minimumScore);
   const chunks = rankCandidatesStage(
     qualifyingCandidates.length > 0 ? qualifyingCandidates : scoredCandidates,
     normalizedRequest.topK
