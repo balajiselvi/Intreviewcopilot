@@ -95,6 +95,13 @@ const TOP_K_BY_CATEGORY = Object.freeze({
   ECC: 3,
   BW: 3,
   "S/4": 3,
+  // HANA/Datasphere/RISE were added as classifier categories without ever being added here --
+  // they silently fell back to General's topK=2, the smallest retrieval budget of any category,
+  // even though real indexed knowledge exists (knowledge/hana/hana-authorization.md,
+  // knowledge/sac/sac-security.md, knowledge/rise/*.md).
+  HANA: 3,
+  Datasphere: 3,
+  RISE: 3,
   General: 2
 });
 
