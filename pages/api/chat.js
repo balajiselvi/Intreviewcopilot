@@ -116,7 +116,7 @@ const CATEGORY_RULES = Object.freeze([
   { category: "Architecture", keywords: ["architecture", "landscape", "design", "diagram", "topology"], weight: 3 },
   { category: "BTP", keywords: ["btp", "business technology platform"], weight: 4 },
   { category: "IAS", keywords: ["ias", "identity authentication service"], weight: 4 },
-  { category: "IPS", keywords: ["ips", "identity provision service"], weight: 4 },
+  { category: "IPS", keywords: ["ips", "identity provision service", "successfactors", "success factors", "sap successfactors"], weight: 4 },
   { category: "IAG", keywords: ["iag", "identity access governance"], weight: 4 },
   { category: "ARM", keywords: ["arm", "access request management"], weight: 4 },
   { category: "ARA", keywords: ["ara", "access risk analysis"], weight: 4 },
@@ -127,6 +127,10 @@ const CATEGORY_RULES = Object.freeze([
   { category: "S/4", keywords: ["s/4", "s4", "s/4hana", "s4hana"], weight: 3 },
   { category: "ECC", keywords: ["ecc", "erp"], weight: 3 },
   { category: "BW", keywords: ["bw", "bw/4hana"], weight: 3 },
+  // No category existed for Datasphere/SAC before this -- every question fell through to
+  // General, which has no space/privilege authorization model and would default to whatever
+  // generic or BW-flavored language the model reached for.
+  { category: "Datasphere", keywords: ["datasphere", "sap analytics cloud"], weight: 4 },
   { category: "Cloud", keywords: ["cloud", "saas", "paas", "iaas"], weight: 2 },
   { category: "Role Design", keywords: ["role design", "pfcg", "single role", "composite role", "derived role"], weight: 4 },
   { category: "Authorization", keywords: ["authorization", "auth object", "auth field", "authorization object"], weight: 3 },
