@@ -14,7 +14,11 @@ const DOMAIN_BOOST_MAP = Object.freeze({
   "SAP IDM": ["idm", "identity center", "vds", "pass-vector", "repository"],
   // "SAP Platform" (interviewAnalyzer.js) covers S/4HANA, ECC, HANA, ABAP, BW, SuccessFactors,
   // Netweaver, Sybase, MaxDB questions and had no boost entry at all -- same zero-boost gap.
-  "SAP Platform": ["s/4hana", "s4hana", "ecc", "hana", "universal journal", "new gl", "analytic privilege", "bw", "bw/4hana", "netweaver", "abap", "hdi container", "catalog role", "repository role"]
+  "SAP Platform": ["s/4hana", "s4hana", "ecc", "hana", "universal journal", "new gl", "analytic privilege", "bw", "bw/4hana", "netweaver", "abap", "hdi container", "catalog role", "repository role"],
+  // SAC/PMP had no domain boost entry before this -- confirmed by direct trace that SAC content
+  // lost to IAS/IAG content purely on missing domain credit despite a better semantic score.
+  "SAC": ["sac", "story", "model", "digest", "team", "folder", "analytics cloud"],
+  "PMP": ["stakeholder", "risk register", "raid", "steering committee", "change control", "scope", "schedule", "governance", "vendor", "wbs", "milestone"]
 });
 
 // Split from one flat SAP_ARTIFACT_REGEX into two family-specific patterns: adversarial testing
@@ -42,7 +46,7 @@ const GRC_ARTIFACT_ELIGIBLE_CATEGORIES = new Set([
 // secondary=[BTP,IAS], and a Troubleshooting-eligible ABAP boost would still have rewarded an
 // irrelevant PFCG-heavy chunk). This is the smallest safe precedence adjustment available
 // without restructuring the category model into separate product/intent dimensions.
-const CLOUD_ONLY_CATEGORIES = new Set(["BTP", "IAS", "IPS", "IAG", "HANA", "Datasphere", "RISE", "SAC", "SAP IDM"]);
+const CLOUD_ONLY_CATEGORIES = new Set(["BTP", "IAS", "IPS", "IAG", "HANA", "Datasphere", "RISE", "SAC", "SAP IDM", "PMP"]);
 
 function normalizeText(text) {
   if (!text || typeof text !== "string") return "";
@@ -93,7 +97,13 @@ const RELATED_DOMAINS = Object.freeze({
   "SAP Cloud Identity / BTP": ["SAP Security", "SAP GRC", "SAP IDM"],
   "SAP Fiori Security": ["SAP Security", "SAP BTP Security"],
   "SAP IDM": ["SAP GRC", "SAP Cloud Identity"],
-  "SAP Platform": ["SAP Security", "SAP GRC", "SAP Fiori Security"]
+  "SAP Platform": ["SAP Security", "SAP GRC", "SAP Fiori Security"],
+  // SAC commonly integrates via IAS/BTP (a "SAC via IAS" question is legitimately cross-product)
+  // -- a half-weight related-domain boost lets that context still count without letting it
+  // override SAC's own primary content the way it did before SAC had any identity at all.
+  // PMP deliberately has no related-domains entry: no SAP-domain relation is appropriate here,
+  // and adding one would risk reintroducing the contamination this fix is meant to prevent.
+  "SAC": ["SAP Cloud Identity / BTP"]
 });
 
 function computeDomainBoost(domain, contentNorm) {

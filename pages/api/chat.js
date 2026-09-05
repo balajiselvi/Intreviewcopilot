@@ -102,6 +102,8 @@ const TOP_K_BY_CATEGORY = Object.freeze({
   HANA: 3,
   Datasphere: 3,
   RISE: 3,
+  SAC: 3,
+  PMP: 3,
   General: 2
 });
 
@@ -148,7 +150,22 @@ const CATEGORY_RULES = Object.freeze([
   // No category existed for Datasphere/SAC before this -- every question fell through to
   // General, which has no space/privilege authorization model and would default to whatever
   // generic or BW-flavored language the model reached for.
-  { category: "Datasphere", keywords: ["datasphere", "sap analytics cloud"], weight: 4 },
+  { category: "Datasphere", keywords: ["datasphere"], weight: 4 },
+  // Was previously folded into Datasphere via the "sap analytics cloud" keyword -- confirmed by
+  // direct trace to be wrong: a pure SAC question ("How do you design authorization for SAP
+  // Analytics Cloud?") classified as category=Datasphere, and SAC has no representation of its
+  // own anywhere (classifier, domain, or component keywords), so it could never win against
+  // IAS/IAG/BTP content even when SAC's own semantic match was measurably better. SAC and
+  // Datasphere are related but distinct products; giving SAC its own identity here is what
+  // makes the domain/component fixes below actually reachable.
+  { category: "SAC", keywords: ["sac", "sap analytics cloud", "sac story", "sac folder"], weight: 4 },
+  // PMP had zero representation anywhere before this -- confirmed real project-management
+  // knowledge exists (346 chunks) but was only ever reached by accident, when no SAP-flavored
+  // word happened to compete. Deliberately multi-word, PM-distinctive phrases only -- a bare
+  // "risk" keyword was tested and rejected: it's exactly the kind of shared-vocabulary word
+  // that also legitimately belongs to SAP GRC risk analysis, and a live test confirmed a real
+  // "risk register" PM question pulling in grc-overview.md/sox.md content instead.
+  { category: "PMP", keywords: ["stakeholder management", "risk register", "scope creep", "change control", "steering committee", "project governance", "raid log", "project charter", "behind schedule", "vendor management", "resource conflict", "project schedule"], weight: 4 },
   // No category existed for HANA either -- a live test confirmed the General fallback produced
   // generic RBAC/ABAC textbook language instead of HANA's actual five privilege types. Bare
   // "hana" as a token is safe against "s4hana"/"s/4hana" (tokenize splits "/" into separate

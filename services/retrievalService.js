@@ -40,7 +40,14 @@ const COMPONENT_KEYWORDS = Object.freeze({
 "SAP Fiori Security": ["catalog", "group", "space", "page", "odata", "iwfnd", "iwmnd", "launchpad"],
 "SAP BTP Security": ["cloud connector", "principal propagation", "subaccount", "destination", "x.509", "mtls"],
 "SAP IDM": ["identity center", "vds", "repository", "pass-vector", "job", "provisioning"],
-"SAP Platform": ["s/4hana", "s4hana", "ecc", "hana", "bw", "bw/4hana", "abap", "netweaver", "universal journal", "new gl"]
+"SAP Platform": ["s/4hana", "s4hana", "ecc", "hana", "bw", "bw/4hana", "abap", "netweaver", "universal journal", "new gl"],
+// SAC/PMP had no entry at all before this -- confirmed by direct trace that SAC content lost
+// to IAS/IAG/BTP content purely on component=0 even with a better semantic score. These are
+// scoped to fire only once the domain has already resolved to "SAC"/"PMP" (see
+// DOMAIN_PATTERNS in lib/interviewAnalyzer.js), so broader terms here (e.g. "story", "team")
+// don't risk contaminating unrelated questions the way a global keyword would.
+"SAC": ["sac", "story", "model", "digest", "team", "folder", "analytics cloud"],
+"PMP": ["stakeholder", "risk register", "raid", "steering committee", "change control", "scope", "schedule", "governance", "vendor", "wbs", "milestone"]
 });
 
 const SAP_KEYWORDS = Object.freeze([
