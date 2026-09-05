@@ -322,6 +322,40 @@ function applyCategoryPrecedence(scores, question) {
   return scores;
 }
 
+// Narrowly scoped context-aware PMP detection. The exact-phrase PMP keywords in CATEGORY_RULES
+// ("stakeholder management", "risk register", etc.) miss real paraphrases ("a stakeholder is
+// blocking a critical decision" contains neither exact phrase). Bare single words like "risk",
+// "schedule", "scope", or "change" can't be trusted as standalone PMP keywords either -- a live
+// test already proved bare "risk" pulls a genuine PM question into SAP GRC content. The fix is
+// co-occurrence, not a bigger keyword list: an anchor word plus a genuine PM-context word,
+// present ANYWHERE in the question regardless of order or adjacency, is a reliable signal that
+// an exact-phrase match would miss and a bare-word match would over-trigger on.
+const PMP_CONTEXT_PAIRS = Object.freeze([
+  ["stakeholder", ["decision", "blocking", "escalation"]],
+  ["vendor", ["delivery", "deliver", "contract", "performance"]],
+  ["schedule", ["delay", "recovery", "critical path", "behind"]],
+  ["scope", ["creep", "change", "control"]],
+  ["project", ["risk", "register", "mitigation"]],
+  ["procurement", ["supplier", "vendor"]],
+  ["raid", ["project", "program"]],
+  ["milestone", ["delay", "recovery"]]
+]);
+
+function matchesPmpContextTerm(tokenSet, questionLower, term) {
+  return term.includes(" ") ? questionLower.includes(term) : tokenSet.has(term);
+}
+
+function scorePmpContextPairs(scores, tokenSet, questionLower) {
+  for (const [anchor, contexts] of PMP_CONTEXT_PAIRS) {
+    if (!matchesPmpContextTerm(tokenSet, questionLower, anchor)) continue;
+    if (contexts.some((c) => matchesPmpContextTerm(tokenSet, questionLower, c))) {
+      scores.set("PMP", (scores.get("PMP") || 0) + 4);
+      break; // one matching pair is enough signal; don't let several simultaneous pairs
+             // inflate PMP's score disproportionately relative to single-keyword categories
+    }
+  }
+}
+
 function classifyWeightedIntents(question = "") {
   const tokens = tokenize(question);
   const tokenSet = new Set(tokens);
@@ -338,6 +372,8 @@ function classifyWeightedIntents(question = "") {
       }
     }
   }
+
+  scorePmpContextPairs(scores, tokenSet, question.toLowerCase());
 
   if (scores.size === 0) {
     return { primaryCategory: "General", secondaryCategories: [] };
