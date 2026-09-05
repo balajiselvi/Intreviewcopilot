@@ -142,6 +142,11 @@ const CATEGORY_RULES = Object.freeze([
   // General, which has no space/privilege authorization model and would default to whatever
   // generic or BW-flavored language the model reached for.
   { category: "Datasphere", keywords: ["datasphere", "sap analytics cloud"], weight: 4 },
+  // No category existed for HANA either -- a live test confirmed the General fallback produced
+  // generic RBAC/ABAC textbook language instead of HANA's actual five privilege types. Bare
+  // "hana" as a token is safe against "s4hana"/"s/4hana" (tokenize splits "/" into separate
+  // tokens, and "s4hana" is one token, neither of which equals "hana").
+  { category: "HANA", keywords: ["hana", "analytic privilege", "sql privilege"], weight: 4 },
   { category: "Cloud", keywords: ["cloud", "saas", "paas", "iaas"], weight: 2 },
   { category: "Role Design", keywords: ["role design", "pfcg", "single role", "composite role", "derived role"], weight: 4 },
   { category: "Authorization", keywords: ["authorization", "auth object", "auth field", "authorization object"], weight: 3 },
