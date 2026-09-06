@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import Anthropic from "@anthropic-ai/sdk";
 
 import { analyzeInterviewQuestion } from "../../lib/interviewAnalyzer";
-import { buildReasoningPlan } from "../../lib/reasoningPlanner";
+import { buildReasoningContract } from "../../lib/reasoningPlanner";
 import { selectSapComponents } from "../../lib/componentSelector";
 import { buildSapInterviewPrompt, getMaxTokensForCategory } from "../../lib/prompt/interviewPrompt";
 import { profileInterviewer } from "../../lib/interviewerProfiler";
@@ -841,7 +841,7 @@ export default async function handler(req, res) {
     analysis.isDeepenFollowUp = deepenFollowUp;
     analysis.isRecoverySignal = recoverySignal;
 
-    const reasoningPlan = buildReasoningPlan(question, analysis);
+    const reasoningContract = buildReasoningContract(question, analysis);
     const sapComponents = selectSapComponents(question, analysis);
     const interviewer = profileInterviewer(question, analysis);
     const technicalReasoning = buildTechnicalReasoning(
@@ -874,7 +874,7 @@ export default async function handler(req, res) {
     const promptPayload = {
       question,
       analysis,
-      reasoningPlan,
+      reasoningContract,
       technicalReasoning,
       interviewer,
       knowledgeContext,
