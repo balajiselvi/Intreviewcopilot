@@ -19,24 +19,53 @@ quality is the current primary development lever.
 
 ## Current Development Phase
 
-**Phase: Principal Architect reasoning & answer-quality layer** (starting fresh as of
-2026-09-06). The prior phase — **retrieval/classification stabilization** — is
-complete as of 2026-09-05 (branch `feature/interview-engine-v2`): a candidate-recall
-bug that made 96.7% of the knowledge corpus structurally unreachable was found and
-fixed, stage-1 scoring's scale-imbalance defect was normalized (causally proven, not
-just correlated), several category/domain contract mismatches were fixed, SAC and PMP
-were made first-class categories, an experience-fabrication defect was fixed at the
-prompt-contract level, and BW got its first real knowledge content (was a confirmed
-0-byte gap). Full detail: `CHANGELOG.md`'s 2026-09-05 entry. Retrieval/scoring/
-classification are now considered stable — see "Frozen Components" below, which
-carries forward the same "do not reintroduce content-only scoring bonuses" principle
-that was already documented here from an earlier fix of the identical bug class,
-confirming this defect shape has recurred more than once and deserves permanent
+**Phase: Principal Architect reasoning & answer-quality layer — implemented and
+evaluated as of 2026-09-06** (branch `feature/interview-engine-v2`). A minimal,
+deterministic reasoning contract (`lib/reasoningPlanner.js`'s `buildReasoningContract`)
+now computes `{ answerIntent, reasoningMode, requiredElements }` and surfaces a compact
+`REQUIRED ANSWER ELEMENTS` prompt section, each element phrased as a concrete,
+checkable instruction rather than an abstract discourse instruction — a distinction
+proven load-bearing by a same-day controlled experiment (concrete asks are followed
+reliably; abstract ones are not, regardless of prompt position). Two related
+component-fallback defects (fabricated `PFCG`/`SU24` injected into non-SAP questions)
+were found and fixed along the way, ending with an evidence-based redesign (domain
+evidence, not a category blacklist) rather than a growing exception list. Full detail:
+`CHANGELOG.md`'s 2026-09-06 entry.
+
+A same-day A/B evaluation (reasoning contract on vs. off, real generation path, 7
+unseen questions) found the contract **materially improves 3 of 7 modes**
+(Troubleshooting, Architecture, SAP+PMP hybrid — each gains an explicit root-cause/
+trade-off/rejected-alternative the no-contract condition never states), is a **small,
+real improvement in 1** (Factual), and is **negligible-to-zero in 2** (Behavioral,
+where `CATEGORY_TEMPLATES.Behavioral`'s own STAR structure already demands the same
+content; and a PMP question misrouted to `General`, where the contract even injected
+the wrong required elements yet made no measurable difference either way — its
+contribution is gated by correct mode assignment, not guaranteed independent of it).
+Implementation mode was a wash. This is not treated as a blanket "success" or
+"failure" — it is evidence that the contract's value is concentrated specifically
+where `CATEGORY_TEMPLATES` doesn't already independently demand equivalent structure.
+
+The prior phase — **retrieval/classification stabilization** — completed 2026-09-05:
+a candidate-recall bug that made 96.7% of the knowledge corpus structurally
+unreachable was found and fixed, stage-1 scoring's scale-imbalance defect was
+normalized (causally proven, not just correlated), several category/domain contract
+mismatches were fixed, SAC and PMP were made first-class categories, an
+experience-fabrication defect was fixed at the prompt-contract level, and BW got its
+first real knowledge content (was a confirmed 0-byte gap). Full detail: `CHANGELOG.md`'s
+2026-09-05 entry.
+
+Retrieval/scoring/classification/domain-routing/component-fallback/persona-matching/
+the current reasoning contract are all now considered stable — see "Frozen Components"
+below, which carries forward the same "do not reintroduce content-only scoring bonuses"
+principle that was already documented here from an earlier fix of the identical bug
+class, confirming this defect shape has recurred more than once and deserves permanent
 vigilance in code review, not just a one-time fix.
 
-The current focus is generation quality: causal reasoning structure, trade-off
-articulation, follow-up anticipation, and stronger reasoning for complex/scenario/
-hybrid questions — not further retrieval or classification tuning.
+**Next step is evaluation-only**, not yet decided: whether to build the next
+architectural layer on top of the reasoning contract as-is, or first address that its
+contribution is null when mode assignment is wrong/redundant — see "Known Limitations"
+below. No further retrieval, classification, keyword, or prompt-wording tuning is
+planned until that decision is made.
 
 ## High-Level Architecture
 
@@ -176,18 +205,60 @@ fine; architectural rewrites are not.
 - Interview generation prompt shape (`lib/prompt/interviewPrompt.js`) and the
   single-pass, no-regeneration architecture
 - Production config surface (env vars listed above)
+- Domain/category routing (`lib/interviewAnalyzer.js`'s `DOMAIN_PATTERNS`,
+  `pages/api/chat.js`'s `classifyWeightedIntents`/`CATEGORY_RULES`) — SAC/PMP/BW routing
+  included
+- SAP-component selection and fallback (`lib/componentSelector.js`,
+  `lib/technicalReasoner.js`'s `inputComponents` fallback) — gated on genuine domain
+  evidence as of 2026-09-06, not a category blacklist
+- `lib/interviewerProfiler.js` persona-regex matching (word-boundary-fixed 2026-09-06)
+- `isSimpleFactualQuestion` depth override (`lib/prompt/interviewPrompt.js`)
+- Anti-fabrication / tense-discipline rules (CANDIDATE BACKGROUND handling, GLOBAL
+  TENSE DISCIPLINE, Behavioral special-case directives)
+- The current minimal reasoning contract (`lib/reasoningPlanner.js`'s
+  `buildReasoningContract` — `answerIntent`/`reasoningMode`/`requiredElements`) —
+  bug fixes to individual `requiredElements` wording are fine; do not redesign the
+  contract's shape or reactivate `reasoningPlanner.js`'s old dead content
 
 ## Known Limitations
 
 - **SAP+PMP hybrid questions** ("lead a global S/4HANA Security transformation across
-  multiple countries") retrieve S/4-only content, never genuine project-management
-  evidence, because `analysis.category` is a single mutually-exclusive string that
-  can't represent two simultaneously-active dimensions. Deliberately deferred
-  (2026-09-05) pending evidence this is common enough in practice to justify a
-  multi-dimensional representation change — most cross-product questions that name
-  multiple *SAP* products already work correctly (e.g. SuccessFactors→IPS→IAS→BTP), so
-  the gap is specifically "SAP product + non-SAP delivery dimension," not multi-product
-  questions in general.
+  multiple countries") still retrieve S/4-only *knowledge* content, never genuine
+  project-management evidence, because `analysis.category` is a single
+  mutually-exclusive string that can't represent two simultaneously-active dimensions
+  at the retrieval layer. Deliberately deferred (2026-09-05) pending evidence this is
+  common enough in practice to justify a multi-dimensional representation change.
+  **Update 2026-09-06:** at the *reasoning/prompt* layer (not retrieval), this case is
+  now handled better than before — the reasoning contract detects a stakeholder/
+  transformation signal independently of category and assigns a "lead" reasoning mode
+  with its own required elements (technical decision, stakeholder engagement,
+  technical-correctness-vs-timeline trade-off, outcome), live-confirmed to produce a
+  genuinely blended answer. The retrieval-side limitation above is unchanged; only the
+  generation layer's handling of this case improved.
+- **Reasoning contract's contribution is gated by correct mode assignment.** A/B
+  evaluation (2026-09-06) found the contract makes essentially no measurable difference
+  when a question's category is misrouted to `General` (so it receives a mismatched
+  `requiredElements` set) or when `CATEGORY_TEMPLATES` for that category already
+  independently demands the same structure (confirmed for Behavioral's STAR format).
+  Not a defect to patch reactively — see `CHANGELOG.md`'s 2026-09-06 entry for the full
+  evidence. Flagged as the input to the next phase's decision, not yet acted on.
+- **PMP "decide" mode's tension-naming required element** ("name the real tension
+  between two legitimate interests") was the single least-reliably-satisfied element
+  across every test run in the 2026-09-06 session, independent of prompt wording or
+  elevation — every other mode's elements were satisfied consistently once the contract
+  was in place. Not chased further per explicit instruction; noted as a candidate for
+  focused attention if reasoning-contract work resumes.
+- A Behavioral question phrased with "resolved" (e.g. "resolved a difficult
+  stakeholder conflict") still triggers fabricated `SU53`/`ST01`-style components via
+  `componentSelector.js`'s step-2 intent-based path (not the step-4 fallback fixed
+  2026-09-06) — rooted in `interviewAnalyzer.js`'s own unrelated "resolv" substring
+  match classifying it as Troubleshooting intent. Classification is frozen; out of
+  scope for both 2026-09-06 fixes.
+- Behavioral answers show run-to-run tense-discipline variance (conditional
+  "would"-framing vs. specific-sounding past-tense narrative) on repeated identical
+  prompts with no CANDIDATE BACKGROUND supplied — appears to be LLM sampling
+  variance, not a deterministic prompt defect; a wording fix on 2026-09-06 reduced but
+  did not fully eliminate it.
 - Comparison-style questions naming two topics ("difference between X and Y") don't
   reliably surface both documents in the top-K results — each chunk is scored
   independently against a single query vector, so one topic's chunks can crowd out the

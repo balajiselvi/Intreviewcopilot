@@ -1,11 +1,26 @@
 # Enterprise Interview Intelligence Platform - Current Status
 
-## ⚠️ Update — 2026-09-05: this document is superseded below this point
+## ⚠️ Update — 2026-09-06: this document is superseded below this point
 
 Everything from here to the historical record (August 5 snapshot, further down) is
 stale — the Workstream A/B/C/D framing it describes was not the path actually taken
-after that date. See `docs/CHANGELOG.md`'s **2026-09-05** entry and `docs/PROJECT_STATE.md`
-for the accurate current state. Short version:
+after that date. See `docs/CHANGELOG.md`'s **2026-09-06** and **2026-09-05** entries
+and `docs/PROJECT_STATE.md` for the accurate current state. Short version:
+
+- **Principal Architect reasoning layer implemented and evaluated (2026-09-06):** a
+  minimal, deterministic reasoning contract (`answerIntent`/`reasoningMode`/
+  `requiredElements`, `lib/reasoningPlanner.js`) now feeds a compact required-elements
+  section into the prompt. Same-day A/B evaluation (contract on vs. off, real
+  generation path) found it materially improves 3 of 7 tested modes (Troubleshooting,
+  Architecture, SAP+PMP hybrid), is a small real improvement for Factual, and makes
+  little-to-no difference for Behavioral (already covered by its own category
+  template) or a PMP question misrouted to `General`. Two related SAP-component
+  fallback bugs (fabricated `PFCG`/`SU24` on non-SAP questions) were found and fixed
+  along the way. Retrieval/classification/domain-routing/component-fallback/persona-
+  matching/the reasoning contract are all now frozen — see `docs/PROJECT_STATE.md`'s
+  Frozen Components list. Next step is a decision (not yet made) on whether to build
+  further on the contract or first address that its value is gated by correct mode
+  assignment.
 
 - **Retrieval/classification stabilization is complete** (branch
   `feature/interview-engine-v2`, commits through `d1bfcec`): a candidate-recall bug

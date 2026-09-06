@@ -2,6 +2,101 @@
 
 All notable changes to Interview Copilot are documented here. This file records the development history, bug fixes, feature additions, and architectural decisions with dates and context.
 
+## 2026-09-06 — Principal Architect reasoning & answer-quality layer (feature/interview-engine-v2)
+
+Two-part session: (1) audit-then-implement the reasoning/generation layer named as the next
+phase in the 2026-09-05 entry below, (2) a controlled experiment and evaluation to determine
+whether the resulting change actually improves answer quality, not just prompt correctness.
+
+**Audit findings (no code changed in this pass):** traced question → classification →
+retrieval → prompt → generation precisely. `lib/reasoningPlanner.js`'s entire output
+(`buildReasoningPlan`) was confirmed 100% dead — computed every request, never destructured by
+`buildSapInterviewPrompt`. `lib/technicalReasoner.js` was ~90% dead (only `.businessObjective`
+and `.recommendedComponents` reached the prompt). `lib/interviewerProfiler.js`'s 6 persona
+regexes had no word boundaries, causing live-confirmed substring misfires (`provisioning` →
+executive via `vision`; `team`/`farm`/`harm` → securityLead via `arm`/`eam`). `lib/
+componentSelector.js` and `technicalReasoner.js` both defaulted to fabricated `PFCG`/`SU24`
+components for any question where nothing else matched, including pure Behavioral/PMP
+questions with zero SAP content.
+
+Commits (chronological), each live-verified via `DEBUG_DUMP_PROMPT` against the running app and
+regression-tested against the existing classifier suites:
+
+1. **`isSimpleFactualQuestion` depth override** (`58e1274`) — a category-independent detector
+   (same cross-cutting-override shape as the existing `isCompoundQuestion`) that forces the
+   `simple` length tier and neutral interviewer framing for a bare factual question regardless
+   of which category won classification. "What is IAS?" dropped from 108 words with
+   architecture-flavored drift to ~65-75 words of direct definition, with zero regression on
+   complex questions on the same products.
+2. **Persona regex word-boundary fix** (`58e1274` follow-up / `b834a6e`) — wrapped all 6
+   `interviewerProfiler.js` patterns in `\b...\b`. 15/15 negative+positive cases pass; no new
+   keywords added.
+3. **`componentSelector.js` step-4 fallback fix** (`b834a6e`) — first attempt used a category
+   blacklist (Behavioral/PMP/Leadership); later superseded (see commit 5 below).
+4. **`reasoningPlanner.js` repurposed into a minimal reasoning contract** (`f20368f`) — replaced
+   the fully-dead `REASONING_PATTERNS`/`COMPONENT_TRIGGERS` content with
+   `buildReasoningContract(question, analysis)`, returning exactly `{ answerIntent,
+   reasoningMode, requiredElements }`. `requiredElements` are looked up by `reasoningMode` only
+   (never by question text or product name) and phrased as concrete, checkable instructions
+   ("state the primary decision in one sentence") rather than abstract discourse instructions
+   ("be strategic") — validated by a same-day controlled experiment (below) that found the
+   model reliably follows the former and not the latter, regardless of prompt position. Wired
+   through the exact existing (previously-dead) plumbing: `chat.js`'s `reasoningPlan` variable
+   renamed end-to-end to `reasoningContract`, surfaced in one new compact `REQUIRED ANSWER
+   ELEMENTS` prompt section. Same commit closed `technicalReasoner.js`'s own independent
+   PFCG/SU24 fallback (it re-injected the same fabricated components even after
+   `componentSelector.js` was fixed).
+5. **Evidence-based component fallback redesign** (`ad68db9`) — a paraphrased PM question
+   classified as `General` (not `PMP`) exposed the gap in commit 3's category-blacklist
+   approach. Replaced the blacklist entirely, in both `componentSelector.js` and
+   `technicalReasoner.js`, with a positive check: only fall back to SAP-technical default
+   components when `analysis.domain` is itself a genuine matched SAP-technical domain (a real
+   `DOMAIN_PATTERNS` hit). Category is no longer inspected in this fallback at all, so it
+   generalizes to any category, including `General`, without a growing exception list.
+
+**Controlled experiment (real generation path, not a toy prompt):** compared the current full
+prompt against two variants — the relevant `CATEGORY_TEMPLATES` `PRIORITY` clause isolated as
+its own top-level section, and the global `ROLE & RULES` anchor/decision-structure mandate
+isolated the same way. Concrete, single-fact asks ("name one edge case", "state a trade-off")
+were followed reliably once elevated to their own section, regardless of category. Abstract
+discourse-structure asks ("open with a confident anchor sentence", "name decisions before
+expanding") were not followed in any condition, including maximum elevation — this is why the
+reasoning contract's `requiredElements` are written exclusively in the former style.
+
+**Evaluation (A/B: reasoning contract on vs. the same prompt with that section removed,
+otherwise identical) across 7 unseen questions, one per mode:** materially improved 3 of 7 —
+Troubleshooting (commits to an explicit root cause and remediation instead of listing checks and
+deferring to escalation), Architecture, and the SAP+PMP hybrid "lead" mode (both produce an
+explicit trade-off/rejected-alternative that the no-contract condition never states, despite
+covering similar ground otherwise). Negligible-to-zero difference in 2 of 7 — Behavioral (`
+CATEGORY_TEMPLATES.Behavioral`'s own STAR structure already demands the same content
+independently of the contract) and a PMP question that classification (unchanged) routed to
+`General`, which meant the contract even injected the *wrong* (architecture-flavored)
+`requiredElements` — yet both A and B produced near-identical, already-solid answers, showing
+the contract's contribution is gated by correct mode assignment and is null (not harmful) when
+that assignment is wrong or already redundant with the category template. Factual showed a
+small, consistent, real improvement (explicit worked example present in the on-condition,
+absent in the off-condition). Implementation was a wash.
+
+**Known residuals, explicitly not fixed this session (see report exchanges in session history
+for full reasoning):** a Behavioral question phrased with "resolved" still triggers
+`componentSelector.js` step 2 (intent-based, not the fallback path fixed above) via
+`interviewAnalyzer.js`'s own unrelated "resolv" substring match — classification is frozen, out
+of scope. PMP's "decide" mode tension-naming element was the single most-tested, least-reliably-
+satisfied required element across every run this session, independent of prompt wording.
+Behavioral tense discipline (conditional vs. fabricated past-tense framing) showed run-to-run
+variance under the model's own sampling on repeated identical prompts.
+
+**Now frozen** (do not reopen without concrete regression evidence): retrieval, scoring,
+classification, domain routing, SAC/PMP/BW routing, component selection/fallback,
+`interviewerProfiler.js` regex behavior, `isSimpleFactualQuestion`, anti-fabrication rules, the
+current reasoning contract, and single-pass generation.
+
+**Next phase:** evaluation-only, not yet implementation — determine whether the reasoning
+contract's demonstrated per-mode pattern (strong where it adds content the category template
+doesn't already demand; null where it duplicates or is misrouted) is sufficient to build on, or
+whether mode-assignment robustness needs to be solved first.
+
 ## 2026-09-05 — Retrieval/classification stabilization (feature/interview-engine-v2)
 
 The single biggest finding of this session: **96.7% of the knowledge corpus was
