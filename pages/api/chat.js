@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import Anthropic from "@anthropic-ai/sdk";
 
 import { analyzeInterviewQuestion } from "../../lib/interviewAnalyzer";
-import { buildReasoningContract } from "../../lib/reasoningPlanner";
+import { buildReasoningContract, NON_SAP_TECHNICAL_CATEGORIES, DELIVERY_GOVERNANCE_PATTERN } from "../../lib/reasoningPlanner";
 import { selectSapComponents } from "../../lib/componentSelector";
 import { buildSapInterviewPrompt, getMaxTokensForCategory } from "../../lib/prompt/interviewPrompt";
 import { profileInterviewer } from "../../lib/interviewerProfiler";
@@ -420,6 +420,99 @@ function isFollowUpUtterance(question = "", history = []) {
   return false;
 }
 
+// Day-9 context resolution -- replaces the previous approach of concatenating the prior user
+// turn's text onto the current question before classifying ("classificationText"). That
+// approach gave classifyWeightedIntents/analyzeInterviewQuestion no notion of WHICH tokens came
+// from which turn, so an established topic's keywords competed on equal footing with a genuine
+// topic change in the current turn -- live-reproduced: a BTP-established conversation followed
+// by "What about the Fiori authorization issue we discovered?" kept category=BTP primary with
+// Fiori only demoted to secondary, despite the current turn explicitly naming a different
+// product. This resolves category/domain/primaryIntent via two independent, single-turn calls
+// to the SAME existing classifiers (never a new classifier, never concatenated text), merged by
+// explicit precedence.
+//
+// "Strong" current-turn technical evidence deliberately requires AGREEMENT between the two
+// independently-built classifiers already in this pipeline -- classifyWeightedIntents'
+// CATEGORY_RULES and analyzeInterviewQuestion's DOMAIN_PATTERNS -- not either one alone. A
+// single classifier matching one generic, possibly-coincidental word (e.g. bare "role" hitting
+// the SAP Security domain pattern, or "access control" hitting the SAP GRC domain pattern on a
+// question that is not actually about either) is not strong enough on its own to either
+// override inherited context or qualify as inheritable context itself. This is the explicit
+// alternative to using `category !== "General"` as the sole test.
+function hasStrongTechnicalEvidence(category, domain) {
+  return Boolean(category) && category !== "General" && Boolean(domain) && domain !== "General SAP" && domain !== "PMP";
+}
+
+// Reuses the exact category set and pattern reasoningPlanner.js already uses to decide
+// answerIntent/hybrid-mode -- not a new signal, the same one, asked here one step earlier: does
+// the CURRENT turn, considered alone, show a people/project/governance dimension of its own?
+function hasPeopleSignal(category, question) {
+  return NON_SAP_TECHNICAL_CATEGORIES.has(category) || DELIVERY_GOVERNANCE_PATTERN.test(question);
+}
+
+// Evidence precedence (see docs/CHANGELOG.md Day-9 entry for the full design rationale):
+//   1. No history                              -> current-turn classification only (unchanged
+//                                                  from pre-Day-9 behavior for every standalone
+//                                                  question).
+//   2. Current turn has strong technical evidence -> current wins outright. Never overridden by
+//                                                     inherited context, regardless of history.
+//   3. Current turn has a people/project signal   -> current wins outright, explicitly WITHOUT
+//                                                     pulling in a prior technical domain (so
+//                                                     componentSelector's existing domain-
+//                                                     evidence gate correctly yields no
+//                                                     fabricated SAP components).
+//   4. Otherwise, if the immediately preceding user turn (only -- no deeper history search, see
+//      docs/PROJECT_STATE.md known limitations) has strong technical evidence of its own,
+//      inherit ONLY its category/domain as context. primaryIntent is deliberately NEVER
+//      inherited -- the current question, however it's phrased, still determines its own
+//      intent/reasoning behavior; only the missing product/domain context is borrowed.
+//   5. Otherwise -- no strong evidence anywhere -- do nothing. Matches today's safe default
+//      rather than guessing.
+function resolveContext(question, history) {
+  const currentClassification = classifyWeightedIntents(question);
+  const currentAnalysis = analyzeInterviewQuestion(question);
+  const currentCategory = currentClassification.primaryCategory;
+
+  const asCurrent = (contextSource) => ({
+    currentAnalysis,
+    resolvedCategory: currentCategory,
+    resolvedSecondaryCategories: currentClassification.secondaryCategories,
+    resolvedDomain: currentAnalysis.domain,
+    resolvedPrimaryIntent: currentAnalysis.primaryIntent,
+    contextSource
+  });
+
+  if (!history || history.length === 0) {
+    return asCurrent("current");
+  }
+
+  if (hasStrongTechnicalEvidence(currentCategory, currentAnalysis.domain)) {
+    return asCurrent("current");
+  }
+
+  if (hasPeopleSignal(currentCategory, question)) {
+    return asCurrent("current-people");
+  }
+
+  const lastUserTurn = [...history].reverse().find(item => item?.role === "user" && item?.content)?.content || "";
+  if (lastUserTurn) {
+    const priorClassification = classifyWeightedIntents(lastUserTurn);
+    const priorAnalysis = analyzeInterviewQuestion(lastUserTurn);
+    if (hasStrongTechnicalEvidence(priorClassification.primaryCategory, priorAnalysis.domain)) {
+      return {
+        currentAnalysis,
+        resolvedCategory: priorClassification.primaryCategory,
+        resolvedSecondaryCategories: priorClassification.secondaryCategories,
+        resolvedDomain: priorAnalysis.domain,
+        resolvedPrimaryIntent: currentAnalysis.primaryIntent,
+        contextSource: "inherited"
+      };
+    }
+  }
+
+  return asCurrent("none");
+}
+
 function extractConversationTopic(history = []) {
   if (history.length === 0) return "";
 
@@ -819,27 +912,24 @@ export default async function handler(req, res) {
     const deepenFollowUp = !recoverySignal && isDeepenFollowUp(question);
     const isFollowUp = recoverySignal || isFollowUpUtterance(question, history) || deepenFollowUp;
 
-    // Classification must not run on the follow-up utterance in isolation -- "walk me through
-    // what you actually did" carries zero SAP keywords on its own, so classifying it alone
-    // always collapses to category "General", discarding whatever topic (EAM, ARM, SU24...)
-    // the conversation was actually about. A follow-up inherits the prior turn's topic; only a
-    // genuinely fresh question should be classified on its own text.
-    const lastUserTurn = isFollowUp
-      ? [...history].reverse().find(item => item?.role === "user" && item?.content)?.content || ""
-      : "";
-    const classificationText = lastUserTurn ? `${lastUserTurn} ${question}` : question;
-    const { primaryCategory, secondaryCategories } = classifyWeightedIntents(classificationText);
-
-    // Same reasoning applies to domain/intent detection (analyzeInterviewQuestion) -- it also
-    // pattern-matches on the question text alone, so it needs the inherited context too, or
-    // analysis.domain silently falls back to "General SAP" for every follow-up and the
-    // domain-boost retrieval scoring never engages.
-    const analysis = analyzeInterviewQuestion(classificationText);
+    // Context resolution (see resolveContext above) -- runs on every request, not just
+    // follow-ups: with no history it reduces to exactly the classification every standalone
+    // question already got, so this is a no-op for the majority case. For a follow-up, it
+    // classifies the current question and (only if needed) the immediately preceding user turn
+    // independently, then merges them by explicit precedence -- current-turn evidence always
+    // wins; the prior turn's technical domain fills in only when the current turn shows no
+    // genuine evidence of its own.
+    const resolved = resolveContext(question, history);
+    const analysis = resolved.currentAnalysis;
+    const primaryCategory = resolved.resolvedCategory;
+    const secondaryCategories = resolved.resolvedSecondaryCategories;
     analysis.category = primaryCategory;
     analysis.secondaryCategories = secondaryCategories;
+    analysis.domain = resolved.resolvedDomain;
     analysis.isFollowUp = isFollowUp;
     analysis.isDeepenFollowUp = deepenFollowUp;
     analysis.isRecoverySignal = recoverySignal;
+    analysis.contextSource = resolved.contextSource;
 
     const reasoningContract = buildReasoningContract(question, analysis);
     const sapComponents = selectSapComponents(question, analysis);
@@ -868,7 +958,7 @@ export default async function handler(req, res) {
     // leave on unconditionally rather than gating behind whether records exist yet.
     const engineeringJudgment = (isFollowUp && !deepenFollowUp)
       ? { principles: [], records: [] }
-      : await searchEngineeringMemory({ question: classificationText, analysis, topK: 3 });
+      : await searchEngineeringMemory({ question, analysis, topK: 3 });
     const engineeringJudgmentContext = renderEngineeringJudgmentSection(engineeringJudgment);
 
     const promptPayload = {
