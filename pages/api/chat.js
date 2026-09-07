@@ -932,13 +932,24 @@ export default async function handler(req, res) {
     analysis.contextSource = resolved.contextSource;
 
     const reasoningContract = buildReasoningContract(question, analysis);
-    const sapComponents = selectSapComponents(question, analysis);
+    // Problem A fix: componentSelector.js/technicalReasoner.js previously never consulted
+    // analysis.category, so a question already correctly classified as Behavioral/PMP/Leadership
+    // (NON_SAP_TECHNICAL_CATEGORIES) could still receive SAP technical components purely because
+    // interviewAnalyzer.js's own domain/intent scan found an unrelated technical match (e.g.
+    // "stakeholder escalation" matching the Workflow intent pattern). reasoningContract.isHybrid
+    // is the exact, already-computed signal that already governs reasoningMode for a genuine
+    // SAP+PMP/Behavioral/Leadership question (see reasoningPlanner.js's isHybridSignal) -- passing
+    // it through here reuses that single source of truth instead of re-deriving it, so a real
+    // hybrid question (e.g. "stakeholder escalation during an SAP GRC implementation") keeps its
+    // SAP components while a pure PMP/Behavioral/Leadership question does not.
+    const sapComponents = selectSapComponents(question, analysis, reasoningContract.isHybrid);
     const interviewer = profileInterviewer(question, analysis);
     const technicalReasoning = buildTechnicalReasoning(
       question,
       analysis,
       sapComponents,
-      interviewer
+      interviewer,
+      reasoningContract.isHybrid
     );
 
     // A plain continuation ("then what?") doesn't need fresh retrieval -- the prior context
