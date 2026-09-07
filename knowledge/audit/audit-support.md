@@ -12,7 +12,7 @@ Audit support: Providing auditors evidence of effective GRC controls and risk ma
 
 Audit support approach: (1) **Evidence Collection**: Maintain documented evidence of controls (ARA reports, access reviews, role maintenance logs). (2) **Controls Framework**: Map business processes → risks → controls (preventive: design strong roles; detective: monitor violations). (3) **Internal Control Assessment**: Annual SOX 404 or equivalent - test control design (is this a good control?) and operation (is it actually working?). (4) **Audit Findings**: Formal tracking, root cause analysis, remediation with proof-of-implementation.
 
-Example: "We maintain ARA evidence repository (monthly findings, remediation logs). Annual SOX 404 test: 12 key controls selected, designed well, operating effectively. Found 3 control gaps, implemented mitigations, re-tested. Auditors receive dashboard view (KPIs, exception alerts, evidence library)."
+Illustrative approach: a candidate could describe keeping an evidence repository of risk findings and remediation logs, testing a risk-based sample of key controls annually, remediating gaps and re-testing, and giving auditors a structured view of KPIs, exceptions, and evidence. Do not invent finding counts or claim a specific audit dashboard as personal delivery.
 
 ## 60 Second Interview Answer
 

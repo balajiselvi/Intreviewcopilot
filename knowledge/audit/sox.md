@@ -12,7 +12,7 @@ SOX compliance (primarily SOX 404): Annual requirement to assess internal contro
 
 SOX 404 approach: (1) **Scope**: Identify key financial processes (GL posting, payment approval, reconciliation, period close). (2) **Control Design**: Map risks → design controls to prevent/detect (PFCG roles, SoD rules, approval workflows). (3) **Annual Testing**: Assess design (is control sound?) and operation (is it working?). Sample 20-30 transactions per control. (4) **Documentation**: Maintain evidence (test working papers, screenshots, manager sign-offs). (5) **Assessment**: Conclude whether controls are effective or gaps exist. (6) **Auditor Handoff**: Provide evidence, answer questions, close findings.
 
-Example: "We test 15 key controls annually (GL posting, payment, reconciliation, etc.). Design test: PFCG SoD rules prevent unauthorized transactions—good design. Operation test: Sample 25 transactions, all processed correctly, no violations. Conclusion: 14 controls effective, 1 with remediation plan. Auditor validated our testing in 2 weeks."
+Illustrative approach: a candidate could describe annual SOX 404 testing of key financial-process controls, assessing both design (for example whether SoD rules prevent unauthorized posting) and operation (sampling transactions), concluding which controls are effective, and handing evidence to auditors. Do not invent control counts, sample sizes, or audit durations.
 
 ## 60 Second Interview Answer
 

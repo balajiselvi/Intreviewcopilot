@@ -12,7 +12,7 @@ Access review: Periodic verification user access is still necessary and appropri
 
 Access review process: (1) **Scope**: Define reviewed systems (all ERP, or subset?), which users (all, or risk-based?). (2) **Data**: Extract user-role assignments from SAP (PFCG, SU01), ARA findings. (3) **Justify**: Ask business owners: "Does [User] still need [Role]?" (4) **Resolve**: Approve, reject (access removed), or mitigate (add monitoring). (5) **Document**: Evidence of review (spreadsheet, ARA report, sign-off).
 
-Example: "We review all 1,200 users twice yearly. ARA identifies SoD conflicts (80-100 findings), which we prioritize and mitigate. Business owners certify access. CFO signs audit evidence. SLA: 30 days to remediate critical findings."
+Illustrative approach: a candidate could describe a periodic access review covering the in-scope user population, using ARA to surface SoD conflicts, asking business owners to certify remaining access, obtaining executive sign-off on evidence, and working to an agreed remediation SLA. Use real volumes and SLAs only from candidate background.
 
 ## 60 Second Interview Answer
 

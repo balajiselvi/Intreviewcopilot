@@ -12,25 +12,23 @@ Communication skills: explain technical/business clearly, listen actively, adapt
 
 Communication approach: (1) **Clarity:** Explain technical concepts simply (no jargon, or explain jargon). (2) **Listening:** Understand before responding (ask clarifying questions). (3) **Audience adaptation:** Tailor message (technical team vs business users). (4) **Documentation:** Follow up in writing (creates trail, prevents misunderstandings). (5) **Difficult conversations:** Direct, respectful, solution-focused.
 
-Example: "I explain technical concepts to business by using analogies (comparing S/4HANA to familiar concepts). I listen actively (ask questions before giving advice). I adapt: architects get architecture details, business users get process impacts. I document decisions (email summary after meetings). When difficult conversation needed, I'm direct but respectful (focus on problem, not person)."
+Illustrative approach: a candidate could describe explaining technical concepts with analogies, listening before advising, adapting depth for architects versus business users, documenting decisions in writing, and handling difficult conversations by focusing on the problem rather than the person. Use only real incidents from candidate background; otherwise keep this as method, not a claimed story.
 
 ## 60 Second Interview Answer
 
-**Communication Example: Explaining Clean Core to Business**
+**Illustrative approach: explaining Clean Core to business**
 
-**Challenge:**
-Business doesn't understand Clean Core. They want to replicate 80% customizations in S/4HANA (because "it's how we've always done it").
+Hypothetical challenge: business wants to replicate a high share of legacy customizations in S/4HANA because that is how the process works today.
 
-**Approach:**
+Method a candidate could describe:
+1. Listen first — why the custom process matters.
+2. Find common ground — continuity of outcomes, not necessarily continuity of custom code.
+3. Use a simple analogy — new house versus renovating the old one to look identical.
+4. Quantify with the customer's actual numbers if they exist in candidate background; otherwise speak in cost-of-upgrade versus cost-of-standard trade-offs without inventing dollar figures.
+5. Ask for an explicit decision.
+6. Document the decision in writing.
 
-1. **Listen first:** "Tell me why that custom process matters."
-2. **Find common ground:** "I understand you want continuity. Let me show better way."
-3. **Use analogy:** "Think of legacy ECC as 20-year-old house custom-renovated. S/4HANA is new house built right. You can custom-renovate to look exactly like old house (defeats purpose). Or: move to new house, keep your furniture (truly competitive processes), update where new layout works better."
-4. **Quantify:** "Replicating 80% customization: $200M over 10 years. Redesigning to SAP standard: $5M one-time, then sustainable. 10-year cost: $50M. We save $150M."
-5. **Get buy-in:** "Which approach?"
-6. **Document:** Email summary: "Here's what we decided..."
-
-**Result:** Business understands trade-offs, commits to Clean Core.
+Intended outcome: business understands the trade-off and can commit to a Clean Core stance. Do not present this hypothetical as a personal delivery.
 
 ## 90 Second Interview Answer
 

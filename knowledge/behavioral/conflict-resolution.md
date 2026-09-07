@@ -12,7 +12,7 @@ Conflict resolution: navigate disagreements between stakeholders, find win-win s
 
 Conflict approach: (1) **Acknowledge both sides** (not dismissive). (2) **Listen actively** (understand perspectives). (3) **Focus on problem** (not person—don't blame). (4) **Collaborate** (find win-win, not win-lose). (5) **Assertive when needed** (don't capitulate to unreasonable demands). (6) **Document** (agreement trail, prevent future disputes).
 
-Example: "Development says scope keeps changing. Business says they need new features. Instead of blame: (1) Acknowledge: both have valid points. (2) Listen: why does business need Supply Chain urgently? Why is scope change hard for development? (3) Problem: unclear scope + unclear priorities. (4) Collaborate: establish change-control gate. (5) Assert: implement gate (business can request, CAB evaluates). (6) Document: email agreement. Result: conflict resolved, both sides respect process."
+Illustrative approach: if development says scope keeps changing and business says they need new features, a candidate could describe acknowledging both sides, listening for the underlying urgency versus delivery risk, naming the real problem as unclear scope and priorities, agreeing a change-control gate, and documenting the agreement. Present this as how you would handle it unless candidate background contains a matching incident.
 
 ## 60 Second Interview Answer
 

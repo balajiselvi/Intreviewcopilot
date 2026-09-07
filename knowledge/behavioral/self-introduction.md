@@ -12,56 +12,19 @@ Self-introduction: curated 2-3 minute narrative covering: background, career pro
 
 Self-intro structure (2-3 minutes): (1) **Opening:** "I'm [Name], I have [X years] SAP experience in [domain]." (2) **Career arc:** "Started as [role], moved to [role], now [current role]." (3) **SAP experience:** "Led [project], technologies [SAP products], outcomes [business impact]." (4) **Current focus:** "Focused on [area], interested in [growth area]." (5) **Why this role:** "Attracted to this opportunity because [reason relevant to job]."
 
-Example: "I'm Sarah, 12 years SAP Security. Started in GRC Access Control, moved to Identity Governance (IAS), now leading security for RISE implementations. Led 3 S/4HANA security designs, 50+ compliance audits, reduced access risk by 40%. Interested in cloud security and compliance architecture. Excited about this role because it combines my RISE expertise with your compliance focus."
+Illustrative approach: fill this structure only from candidate background — name, years, domains, roles, and outcomes that are actually documented. If background is missing, describe the structure you would use rather than inventing employers, headcount, or percentages.
 
 ## 60 Second Interview Answer
 
-**Self-Introduction Example: SAP Implementation Architect**
+**Self-introduction pattern (use only facts from candidate background):**
 
-"I'm [Name], 15 years SAP enterprise experience. Career: started as ABAP developer (5 years, customizations), then moved to implementation architect (7 years, led brownfield/greenfield projects), now senior architect focusing on cloud transformations (3 years, RISE implementations).
+Opening: years and domain that are documented. Career arc: roles actually held. SAP scope: products and programs listed in the resume. Current focus and why this role: mapped to the job description, not invented company research.
 
-Key projects: ECC to S/4HANA for $500M manufacturing (led architecture, 12 entities, 2-year program), S/4HANA Cloud RISE for global financial services (architecture lead, 5,000 users), cloud migration assessments (20+ companies, public vs private cloud decisions).
-
-Technologies: S/4HANA on-prem and cloud, BTP (Cloud Identity, Cloud Integration), Clean Core methodology, cloud ALM, hybrid integration patterns.
-
-Outcomes: delivered on time/budget, sub-10% customization (Clean Core discipline), quarterly update readiness, post-go-live stable systems (99.9% uptime).
-
-Currently focused on RISE cloud transformations and helping companies adopt cloud-native architecture. Interested in growing in cloud architecture leadership. Excited about your company because you're in midst of RISE migration (aligns perfectly with my expertise), and I see opportunity to build something innovative."
+If candidate background is absent, say how you would structure the intro. Do not invent employers, revenue, user counts, uptime, or savings.
 
 ## 90 Second Interview Answer
 
-**Self-Introduction: Mid-Career SAP Professional**
-
-**Background & Early Career (2 minutes):**
-"I'm [Name], I have 12 years in SAP across implementation, architecture, and leadership roles.
-
-Career started as ABAP developer (2010-2013, 3 years). Built custom code for ECC implementations (manufacturing, finance domains). Learned business processes deeply, understood how SAP works under the hood, developed strong debugging and problem-solving skills.
-
-Transitioned to implementation architect (2013-2020, 7 years). Led ECC implementations, then early S/4HANA projects. Discovered I enjoyed seeing full implementation lifecycle (requirements → design → build → go-live → support), not just coding. Led team of 20+ (architects, developers, BA). Managed $50M+ programs. Developed program management and leadership skills.
-
-Moved to cloud-first architecture (2020-now, 2 years). RISE implementations became strategic (quarterly updates, Clean Core discipline, cloud-native design). Led enterprise cloud transformation programs. Architected 5+ major RISE projects. Now senior architect focusing on cloud strategy and transformation leadership.
-
-**SAP Domain Expertise:**
-- Core: S/4HANA (on-prem and cloud), RISE with SAP
-- Cloud stack: BTP (Identity, Integration, ALM), Analytics Cloud, Cloud Portal
-- Methodologies: Clean Core, agile implementation, cloud ALM
-- Business domains: Finance, Supply Chain, Manufacturing
-- Cross-domain: security, compliance, performance optimization
-
-**Key Accomplishments:**
-- Delivered 10+ major SAP projects (on-time, on-budget)
-- Architected 3 enterprise RISE transformations (5,000+ users each)
-- Established Clean Core discipline (8-10% customization, quarterly update ready)
-- Led 50+ people across implementation teams
-- Mentored junior architects (5 now senior architects themselves)
-
-**Current Focus & Interests:**
-Currently fascinated by cloud transformation strategies. RISE is changing how enterprises think about SAP (not just technical upgrade, but business transformation). Interested in helping companies navigate cloud choices (public, private, hybrid), adoption strategies, change management.
-
-Also interested in security architecture (cloud identity, compliance), cost optimization, performance at scale.
-
-**Why This Opportunity:**
-Your company is undertaking RISE transformation (strategic initiative), and I see perfect alignment: my RISE expertise + your transformation need. Also appreciate your company's culture (innovation, customer-focused), which matches how I like to work. Excited to contribute to something meaningful and grow as architect leader."
+Same five-part structure with more room: credentials, why each career move, two documented SAP scopes, current focus, why this role. Keep numbers only when they appear in candidate background. A Principal IAM interview intro should foreground authorization design, identity lifecycle, GRC/IAG, and delivery judgment — not a fictional program biography.
 
 ## Architecture
 

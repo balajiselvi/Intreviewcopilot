@@ -12,7 +12,7 @@ SoD: Preventing any single user from having incompatible access (e.g., can't cre
 
 SoD philosophy: (1) **Risk Identification**: What frauds matter? GL posting + payment approval = high risk (embezzlement). (2) **Conflict Definition**: Define incompatible access (ARA rule set). (3) **Role Design**: Create roles that respect SoD (Accountant role: posting only. Approver role: approval only. Never both). (4) **Enforcement**: Technical (PFCG SoD rule prevents combination) or procedural (manual review). (5) **Exception Management**: Some users need exceptions (treasurer role = both functions). Manager approves, documents, monitors.
 
-Example: "We have 45 SoD rules (GL posting + approval, receipt + payment, hire + payroll). PFCG enforces most. 8-10 exceptions (treasurer, controllers). Each exception: documented approval, re-reviewed quarterly, monitoring for misuse. Result: Fraud-resistant while business functional."
+Illustrative approach: a candidate could describe a risk-based SoD ruleset covering high-fraud pairs such as posting-plus-approval, receipt-plus-payment, and hire-plus-payroll, enforcing most combinations technically, and managing a small documented exception set with periodic review and monitoring. Use actual rule counts only if they appear in candidate background.
 
 ## 60 Second Interview Answer
 

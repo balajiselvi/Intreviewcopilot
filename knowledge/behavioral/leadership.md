@@ -12,14 +12,14 @@ Leadership: guide team, make decisions, mentor staff, manage stakeholders. Evalu
 
 Leadership approach: (1) **Collaborative** (empower team, don't micromanage). (2) **Decisive** (make calls when needed). (3) **Accountable** (own decisions, own mistakes). (4) **Develop people** (mentoring, growth). (5) **Clear vision** (where are we going?).
 
-Example: "I lead collaboratively—empower team to make decisions. But I'm decisive when needed (architectural choices, priorities). I own my decisions (good and bad). I invest in junior staff (mentoring, training, growth). I communicate clear vision (what are we building, why does it matter?). Result: team is engaged, decisions are sound, junior staff grows into senior roles."
+Illustrative approach: a candidate could describe leading collaboratively while remaining decisive on architecture and priorities, owning decisions including mistakes, investing in junior staff, and communicating a clear vision. State outcomes only if they exist in candidate background; otherwise keep this as leadership method, not a claimed team result.
 
 ## 60 Second Interview Answer
 
-**Leadership Example: Guiding Implementation Team**
+**Illustrative approach: guiding an implementation team**
 
-**Situation:**
-Leading 50-person S/4HANA implementation team. Multiple domains (Finance, Supply Chain, HR), complex stakeholder landscape.
+**Hypothetical situation:**
+Leading a multi-domain S/4HANA implementation with several workstreams and a complex stakeholder landscape. Use this as a reasoning pattern. Do not treat team size, domains, or outcomes below as personal history unless they appear in candidate background.
 
 **Leadership Approach:**
 

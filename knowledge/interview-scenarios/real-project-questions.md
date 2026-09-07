@@ -12,17 +12,17 @@ Real project questions: candidate discusses actual SAP implementation/project. E
 
 Real project answer structure: (1) **Context:** Company, scope, your role (architect, implementation lead, developer). (2) **Challenge:** What was the biggest problem you faced? (3) **Solution:** How did you solve it? Specific steps, tools, approach. (4) **Outcome:** What was the business impact? (5) **Lesson:** What would you do differently? What did you learn?
 
-Example: "I led ECC to S/4HANA migration for $500M manufacturing company. 12 entity rollout. Challenge: customization heavy (80%+), hard to rearchitect. Solution: phased rollout, strong governance, business case for Clean Core (lower lifetime cost). Outcome: 2-year program, 10% customization, quarterly updates enabled. Lesson: business process change is harder than technical migration; invest in change management early."
+Illustrative approach: a real-project answer should cover context, the hardest challenge, the solution sequence, outcome, and lesson. If candidate background includes an ECC-to-S/4HANA program, use only those facts. Otherwise describe how you would structure the answer: heavy customization as the typical constraint, phased rollout and Clean Core governance as the usual levers, and change management as the lesson — without inventing company size, entity count, or percentages.
 
 ## 60 Second Interview Answer
 
-Real project example: "ECC to S/4HANA Migration, Global Manufacturing, 12-18 Month Program"
+Illustrative structure for an ECC to S/4HANA migration answer — hypothetical pattern, not a candidate engagement:
 
-**Context:**
-- Organization: $500M manufacturing company, 5,000 employees, 10 global plants
-- My role: Implementation Lead (architect, PMO, steering committee interface)
-- Scope: Finance, Supply Chain, Manufacturing (not HR, not Analytics initially)
-- Timeline: 12-18 months total, phased by geography (EU first, then Americas, then Asia)
+**Context to cover (fill only from candidate background when present):**
+- Organization type and scale, if documented
+- Actual role (architect, workstream lead, contributor)
+- In-scope modules
+- Timeline and phasing, if documented
 
 **Biggest Challenge:**
 Legacy ECC had 80%+ customization (20+ years of accumulated business logic). Business didn't want to change processes. But S/4HANA upgrades quarterly; maintaining 80% custom code made quarterly updates impossible (tested for months, expensive). Classic brownfield dilemma.

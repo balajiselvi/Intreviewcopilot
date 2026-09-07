@@ -12,7 +12,7 @@ Troubleshooting scenarios: diagnose SAP problem (wrong data, slow performance, f
 
 Troubleshooting approach: (1) **Gather data:** What's the symptom? When started? Users affected? (2) **Hypothesize:** What could cause this? (3) **Verify:** Use tools (logs, traces, queries) to check hypothesis (4) **Fix:** Address root cause, not symptom (5) **Verify fix:** Confirm problem resolved, users happy.
 
-Example: "GL balance wrong ($50K variance). Approach: (1) Ask: Which GL accounts? Which period? How big variance? (2) Hypothesis: data corruption from recent load, or posting logic error? (3) Verify: query GL_HIST table for that period, check posting log for errors (4) If data corruption: re-post from source data; if logic error: fix code (5) Revalidate: GL balance now correct."
+Illustrative approach: if a GL balance looks wrong, a candidate could describe scoping which accounts, period, and variance size; hypothesizing data-load corruption versus posting logic; verifying with period queries and posting logs; fixing the root cause; then revalidating the balance. Do not invent a dollar variance as personal history.
 
 ## 60 Second Interview Answer
 
