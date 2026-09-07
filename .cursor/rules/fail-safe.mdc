@@ -1,0 +1,10 @@
+---
+description: Implement absolute zero-crash production patterns and globally isolated process handling
+alwaysApply: true
+---
+
+# Production Readiness & Crash Prevention
+- Every single asynchronous method, database transaction, or background API query must be explicitly protected by functional try/catch blocks or specialized error-first callbacks.
+- Enforce the "Result Pattern" or type-safe fallback blocks to cleanly capture unexpected infrastructure exceptions without bringing down the core service runtime environment.
+- Never write open, naked exceptions or placeholder comments that could bypass error capture modules.
+- Ensure that the primary application layer isolates any runtime faults to its local controller domain, allowing the application engine to recover instantly and remain functional continuously.
