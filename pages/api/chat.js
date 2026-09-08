@@ -172,7 +172,7 @@ const CATEGORY_RULES = Object.freeze([
   // tokens, and "s4hana" is one token, neither of which equals "hana").
   { category: "HANA", keywords: ["hana", "analytic privilege", "sql privilege"], weight: 4 },
   { category: "Cloud", keywords: ["cloud", "saas", "paas", "iaas"], weight: 2 },
-  { category: "Role Design", keywords: ["role design", "pfcg", "single role", "composite role", "derived role"], weight: 4 },
+  { category: "Role Design", keywords: ["role design", "pfcg", "single role", "composite role", "derived role", "role catalog", "role mining", "role rationalization", "rationalize roles", "overlapping sap roles", "duplicate roles", "unused roles", "thousands of sap roles", "thousands of roles"], weight: 4 },
   { category: "Authorization", keywords: ["authorization", "auth object", "auth field", "authorization object"], weight: 3 },
   { category: "Security", keywords: ["security", "audit", "compliance", "encryption", "sod"], weight: 2 },
   { category: "Performance", keywords: ["performance", "optimization", "st03n", "trace", "slow", "bottleneck"], weight: 3 },

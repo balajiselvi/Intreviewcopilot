@@ -10,7 +10,7 @@ Start with a trustworthy extract: AGR_USERS, AGR_1251, user lock flags, last log
 
 ## 30 Second Interview Answer
 
-I would not rationalize 8,000 roles by creating more composites. I would profile the catalog: unused roles, duplicate menus, derived-vs-copy, SoD-dense composites, and users with extreme role counts. Then I would retire or merge with owner sign-off, keep derived roles for org variance, and only use composites as a thin provisioning shell over already-clean singles.
+I would not rationalize thousands of roles by creating more composites, and I would not start in SU24. I would take AGR_USERS, AGR_1251, lock/last-logon from USR02, and ST03N/STAD usage, then cluster unused roles, near-duplicates, and org-copied masters that should have been derived. Remediate in waves with owner sign-off, SoD simulation, PFUD/user comparison, and a rollback assignment list. Composites stay a thin provisioning shell over already-clean singles.
 
 ## 60 Second Interview Answer
 

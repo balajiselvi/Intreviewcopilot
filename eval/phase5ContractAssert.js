@@ -11,7 +11,9 @@ assert.match(rp, /Identity Source/);
 assert.match(rp, /operational reality/);
 assert.match(tr, /does not host PFCG roles/);
 assert.match(tr, /SU53 explains one failed check/);
-assert.match(tr, /reduce composites/);
+assert.match(tr, /SU24 is proposal data/);
+assert.match(tr, /never expand DCL/);
+assert.match(rp, /do not invent a recent ticket/);
 assert.match(chat, /Only recent USER questions contribute topic tokens/);
 assert.match(prompt, /Boundary: \$\{technicalReasoning\.governanceConsideration\}/);
 

@@ -10,7 +10,7 @@ IAG is the governance plane: Access Analysis, Role Design, Access Request, Acces
 
 ## 30 Second Interview Answer
 
-IAG decides whether access is appropriate. Access Analysis evaluates SoD against a ruleset and connected systems. Access Request plus approval is where a human or policy accepts risk. Certification recertifies remaining access. PAM is break-glass with review, parallel to GRC EAM. S/4 still enforces in PFCG. IPS still writes the assignment after approval. IAS still only authenticates.
+IAG decides whether access is appropriate. Access Analysis evaluates SoD against a ruleset and connected systems. Access Request plus approval is where a human or policy accepts risk. Certification recertifies remaining access. PAM is break-glass with review, parallel to GRC EAM. After approval, IPS or ARM writes the assignment. S/4 still enforces in PFCG. BTP still enforces XSUAA role collections — those objects do not live in IAG. IAS still only authenticates.
 
 ## 60 Second Interview Answer
 
