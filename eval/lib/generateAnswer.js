@@ -3,10 +3,11 @@ const { APP_BASE_URL } = require("./env");
 // Calls the LIVE production endpoint exactly as a real interview session would —
 // single-pass, streaming, no critic/improve loop. This is deliberate: the point
 // of this stage is to capture what actually ships, not an idealized answer.
-async function generateAnswer(question, { model = "gpt-4o-mini", candidateResume } = {}) {
+async function generateAnswer(question, { model = "gpt-4o-mini", candidateResume, jobDescription } = {}) {
   const start = Date.now();
   const body = { model, question };
   if (candidateResume) body.candidateResume = candidateResume;
+  if (jobDescription) body.jobDescription = jobDescription;
   const res = await fetch(`${APP_BASE_URL}/api/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

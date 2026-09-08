@@ -5,6 +5,7 @@ export const builtInModelGroups = [
       { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
       { value: "gpt-4", label: "GPT-4" },
       { value: "gpt-4-turbo-preview", label: "GPT-4 Turbo Preview" },
+      { value: "gpt-4o-mini", label: "GPT-4o mini (recommended for live interview)" },
       { value: "gpt-4o", label: "GPT-4o (Omni)" },
     ]
   },
@@ -22,10 +23,20 @@ export const builtInModelGroups = [
 ];
 
 
+export const TARGET_JOB_DESCRIPTION = `Head of Global SAP IT Security & Compliance — Principal SAP Security / IAM architect interview.
+
+Landscape: S/4HANA, SuccessFactors, BW/4HANA, SAC, Datasphere, Ariba, CAR, BTP, hybrid/RISE.
+
+Identity planes (do not collapse): SuccessFactors/HR = lifecycle attributes; IAS = authentication, federation, SSO, MFA, trust; IPS = provisioning, transformations, mappings, sync; IAG = Access Request, Access Analysis, Certification, PAM; target application = enforcement (PFCG, SF RBP, RSECADMIN, XSUAA role collections, Ariba groups).
+
+Highest-value topics: SAP role/authorization design, IAG, IAS, IPS, JML, SoD, Access Analysis, role rationalization/remediation, governance, SAP/non-SAP IAM, RISE/hybrid shared responsibility, data quality on user/role extracts, stakeholder management, go-live/hypercare.
+
+Answer as a Principal Architect: business objective → architectural decision → identity/security boundaries → mechanisms → governance → trade-offs → operational reality. Never invent employers, projects, tickets, countries, or metrics beyond CANDIDATE BACKGROUND.`;
+
 const defaultConfig = {
   openaiKey: '',
   geminiKey: '',
-  aiModel: 'gpt-3.5-turbo', // Default to a common one
+  aiModel: 'gpt-4o-mini',
   silenceTimerDuration: 1.2, 
   responseLength: 'medium',
   gptSystemPrompt: `You are an AI interview assistant. Your role is to:
@@ -39,8 +50,7 @@ const defaultConfig = {
   systemAutoMode: true,
   isManualMode: false,
   candidateResume: '', // Only content entered here may be phrased as personal experience in answers.
-  jobDescription: '', // Target role's JD text -- kept separate from candidateResume so the model
-                       // knows what's being asked for vs. what's actually true about the candidate.
+  jobDescription: TARGET_JOB_DESCRIPTION,
   company: '',
 };
 
@@ -57,6 +67,12 @@ export function getConfig() {
     // Ensure customModels is an array
     if (!Array.isArray(parsed.customModels)) {
         parsed.customModels = [];
+    }
+    if (!parsed.jobDescription || !String(parsed.jobDescription).trim()) {
+      parsed.jobDescription = TARGET_JOB_DESCRIPTION;
+    }
+    if (!parsed.aiModel || parsed.aiModel === "gpt-3.5-turbo") {
+      parsed.aiModel = "gpt-4o-mini";
     }
 
     return { ...defaultConfig, ...parsed };

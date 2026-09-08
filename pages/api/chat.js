@@ -126,6 +126,9 @@ const CATEGORY_RULES = Object.freeze([
   { category: "BTP", keywords: ["btp", "business technology platform"], weight: 4 },
   { category: "IAS", keywords: ["ias", "identity authentication service"], weight: 4 },
   { category: "IPS", keywords: ["ips", "identity provision service", "successfactors", "success factors", "sap successfactors"], weight: 4 },
+  { category: "SuccessFactors", keywords: ["rbp", "role-based permission", "role based permission", "permission role", "employee central", "sf rbp"], weight: 4 },
+  { category: "Ariba", keywords: ["ariba"], weight: 4 },
+  { category: "CAR", keywords: ["customer activity repository", "sap car"], weight: 4 },
   { category: "IAG", keywords: ["iag", "identity access governance"], weight: 4 },
   // Deliberately placed immediately after IAG: "should we replace GRC with IAG during RISE"
   // ties IAG and RISE at the same weight, and on a tie this array's order decides primaryCategory
@@ -172,7 +175,7 @@ const CATEGORY_RULES = Object.freeze([
   // tokens, and "s4hana" is one token, neither of which equals "hana").
   { category: "HANA", keywords: ["hana", "analytic privilege", "sql privilege"], weight: 4 },
   { category: "Cloud", keywords: ["cloud", "saas", "paas", "iaas"], weight: 2 },
-  { category: "Role Design", keywords: ["role design", "pfcg", "single role", "composite role", "derived role", "role catalog", "role mining", "role rationalization", "rationalize roles", "overlapping sap roles", "duplicate roles", "unused roles", "thousands of sap roles", "thousands of roles"], weight: 4 },
+  { category: "Role Design", keywords: ["role design", "pfcg", "single role", "composite role", "derived role", "role catalog", "role mining", "role rationalization", "rationalize roles", "overlapping sap roles", "duplicate roles", "unused roles", "thousands of sap roles", "thousands of roles", "user-role extract", "user role extract", "assignment extract", "agr_users"], weight: 4 },
   { category: "Authorization", keywords: ["authorization", "auth object", "auth field", "authorization object"], weight: 3 },
   { category: "Security", keywords: ["security", "audit", "compliance", "encryption", "sod"], weight: 2 },
   { category: "Performance", keywords: ["performance", "optimization", "st03n", "trace", "slow", "bottleneck"], weight: 3 },
@@ -318,6 +321,11 @@ function applyCategoryPrecedence(scores, question) {
   const hasAuthorizationProblem = /\b(authorization (error|fail\w*|denied|issue)|access denied|not authorized|denied access|can'?t access|cannot access)\b/.test(q);
   if (scores.has("BTP") && scores.has("IAS") && iasIsJustTheMechanism && hasAuthorizationProblem) {
     scores.set("BTP", scores.get("BTP") + 3);
+  }
+  const sfEnforcement = /\b(rbp|role[- ]based permission|permission role|infotype|hr data)\b/.test(q);
+  const ipsLifecycle = /\b(ips|provision|joiner|leaver|mover|jml|identity lifecycle|sync job)\b/.test(q);
+  if (sfEnforcement && !ipsLifecycle) {
+    scores.set("SuccessFactors", (scores.get("SuccessFactors") || 0) + 5);
   }
   return scores;
 }

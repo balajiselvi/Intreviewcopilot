@@ -183,13 +183,13 @@ export default function SettingsDialog({ open, onClose, onSave }) {
         <TextField
           fullWidth margin="dense" name="candidateResume" label="Your Real Background" multiline rows={4}
           value={settings.candidateResume || ''} onChange={handleChange}
-          helperText="Only what you enter here can be phrased as personal experience ('I implemented...'). Leave blank to keep every answer in knowledge-framing."
+          helperText="Paste your real CV here before the interview. Only this text may be phrased as personal experience. Leave blank only if you want methodology voice with no past-tense stories."
           sx={{mt:2}}
         />
         <TextField
           fullWidth margin="dense" name="jobDescription" label="Target Job Description" multiline rows={4}
           value={settings.jobDescription || ''} onChange={handleChange}
-          helperText="Paste the JD for the role you're interviewing for. Used to weight relevance and phrasing -- never as a source of claimed experience."
+          helperText="Defaults to the Head of Global SAP IT Security & Compliance JD. Edit if the interviewer’s scope differs. Never used as claimed experience."
           sx={{mt:2}}
         />
         <TextField
