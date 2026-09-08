@@ -18,5 +18,8 @@ assert.match(rp, /isPersonalHistoryAsk/);
 assert.match(tr, /secondaryCategories/);
 assert.match(chat, /reasoningMode === "resolve"/);
 assert.match(prompt, /Boundary: \$\{technicalReasoning\.governanceConsideration\}/);
+assert.match(prompt, /it is not hypercare monitoring or cutover proof/);
+assert.doesNotMatch(prompt, /Monitoring Tools \(ST03\/SM21\/SU53\)/);
+assert.match(prompt, /methodology voice only/);
 
 console.log("phase5 source contract assertions: PASS");
