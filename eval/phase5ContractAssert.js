@@ -14,7 +14,9 @@ assert.match(tr, /SU53 explains one failed check/);
 assert.match(tr, /SU24 is proposal data/);
 assert.match(tr, /never expand DCL/);
 assert.match(rp, /do not invent a recent ticket/);
-assert.match(chat, /Only recent USER questions contribute topic tokens/);
+assert.match(rp, /isPersonalHistoryAsk/);
+assert.match(tr, /secondaryCategories/);
+assert.match(chat, /reasoningMode === "resolve"/);
 assert.match(prompt, /Boundary: \$\{technicalReasoning\.governanceConsideration\}/);
 
 console.log("phase5 source contract assertions: PASS");

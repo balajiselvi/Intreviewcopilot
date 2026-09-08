@@ -936,6 +936,9 @@ export default async function handler(req, res) {
     analysis.contextSource = resolved.contextSource;
 
     const reasoningContract = buildReasoningContract(question, analysis);
+    if (reasoningContract.reasoningMode === "resolve") {
+      analysis.isBehavioral = true;
+    }
     // Problem A fix: componentSelector.js/technicalReasoner.js previously never consulted
     // analysis.category, so a question already correctly classified as Behavioral/PMP/Leadership
     // (NON_SAP_TECHNICAL_CATEGORIES) could still receive SAP technical components purely because
