@@ -10,14 +10,15 @@ Ariba authorization is group and permission-based inside the realm. Sourcing, co
 
 ## 30 Second Interview Answer
 
-I would not secure Ariba with PFCG. Users authenticate through the enterprise IdP, often via IAS. Inside Ariba, groups and permissions control which realm activities they can perform — creating a purchase requisition is not the same as approving it. Provisioning and SoD have to be designed explicitly; they are not inherited from S/4.
+Ariba is realm-based. Authentication is usually SAML/OIDC through the corporate IdP, often with IAS as the SAP-facing IdP. Authorization is Ariba groups and permissions inside the realm — buyer versus approver versus sourcing versus contracts. That is not PFCG and it is not a BTP role collection. IPS or an IAM feed may create the user; IAG/GRC SoD only applies if that connector and ruleset exist. Create-versus-approve on purchasing documents is the classic procurement control, and it must be designed in Ariba (and in S/4 if POs post there), not assumed from an S/4 composite.
 
 ## Architecture Notes
 
-- Authentication: SAML/OIDC federation, commonly IAS as SAP-facing IdP
-- Authorization: Ariba groups and permissions in the realm
-- Provisioning: IPS or IAM feed if automated; otherwise operational user admin
-- Governance: only if IAG/GRC has Ariba in scope — do not assume it
+- Authentication: SAML/OIDC federation, commonly IAS as SAP-facing IdP (not Ariba-as-IdP)
+- Authorization: realm groups and permissions (buying, invoicing, contracting, sourcing, supplier)
+- Procurement SoD: requester versus approver versus invoice processor — in Ariba and in S/4 if documents post there
+- Provisioning: IPS/SCIM or IAM feed; correlation key must match HR person ID
+- Governance: IAG/GRC only if the Ariba connector and ruleset are in scope — never assume
 
 ## Related Topics
 

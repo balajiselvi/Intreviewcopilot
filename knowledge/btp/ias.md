@@ -6,11 +6,11 @@ SAP Identity Authentication Service (IAS) is a cloud-based identity provider tha
 
 ## Interview Summary
 
-SAP Identity Authentication Service (IAS) is SAP's cloud identity provider. It authenticates users (OIDC/SAML), enforces MFA and step-up authentication, manages sessions, and issues tokens that BTP applications trust. Think of it as the authentication gatekeeper — users log in once to IAS, and all connected applications recognize them.
+SAP Identity Authentication Service (IAS) is SAP's cloud identity provider. It authenticates users (OIDC/SAML), enforces MFA and step-up authentication, manages sessions, and issues tokens that applications trust. It is not an authorization engine: PFCG roles, BTP role collections (XSUAA), Ariba groups, and SoD rulesets do not live in IAS. IPS provisions; IAG/GRC governs; the application enforces.
 
 ## 30 Second Interview Answer
 
-Identity Authentication Service is SAP's cloud identity provider. Users authenticate to IAS (with MFA if required), IAS issues a token, and the user is authenticated to all connected BTP and SAP applications. It's similar to Okta or Azure AD in the cloud, but built specifically for SAP. Key features: MFA, passwordless authentication (biometric, hardware keys), device compliance checking, and session management.
+IAS authenticates and federates. Users prove identity to IAS or a corporate IdP that IAS trusts; IAS issues SAML/OIDC tokens and applies MFA and session policy. Application authorization stays in the target — PFCG, XSUAA role collections, SF RBP. I would never say IAS "governs authorization" or hosts role collections.
 
 ## 60 Second Interview Answer
 

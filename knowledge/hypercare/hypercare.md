@@ -8,9 +8,11 @@ Hypercare for SAP security is short-cycle defect handling after cutover, not a s
 
 A Principal Architect sets severity, owners, and what may be hotfixed versus what must wait for a role redesign. Firefighter is for true production blockages. Permanent role copies during hypercare recreate the catalog problem you just went live with.
 
+SU53 shows why one AUTHORITY-CHECK failed for one user. It is not evidence that role cutover, Fiori catalogs, or org values are complete. Cutover proof is SUIM versus the approved matrix, UAT smoke tests, PFUD/user comparison, IPS job logs, and Firefighter controller review.
+
 ## 30 Second Interview Answer
 
-In hypercare I would treat access defects as production incidents with evidence. Unlock a real go-live blocker quickly, preferably through privileged access with logging if the role change cannot be transported the same day. I would not solve volume tickets by widening roles globally. I would trend defects into design fixes for the first stabilization release.
+In hypercare I would treat access defects as production incidents with evidence. A real process blocker gets logged Firefighter or a transported role fix after impact assessment — not an unlogged widen of a shared composite. I would smoke-test critical roles, reconcile SUIM to the gold matrix, drain IPS/IAG error queues, review FF logs daily, and park catalog redesign for the first stabilization transport. SU53 is for triage of a single failure, not the hypercare operating model.
 
 ## 60 Second Interview Answer
 
@@ -24,11 +26,13 @@ Trade-off: speed versus least privilege. I would rather a logged Firefighter ses
 
 ## Stabilization Checks
 
-- Firefighter log review daily
-- Failed IPS/GRC provisioning queue
+- Firefighter log review daily (GRAC_SPM / IAG PAM) with ticket-linked reason codes
+- Failed IPS/GRC/IAG provisioning queue
 - Duplicate users created at cutover
-- Roles transported but not generated
+- Roles transported but not generated; PFUD/user comparison not run
+- Fiori catalog/space/page mismatches versus backend PFCG
 - SoD mitigations that were “temporary” on go-live day
+- Rollback pack: prior AGR_USERS extract and transport list
 
 ## Related Topics
 

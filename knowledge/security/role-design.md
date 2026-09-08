@@ -10,7 +10,7 @@ Good role design starts with job function analysis, not with copying an existing
 
 ## 30 Second Interview Answer
 
-Role design is about translating what someone actually does in their job into the smallest set of access that lets them do it. You start with the business process, not an existing role template. Then you decide the structure — single role, derived if it repeats across org units, composite if it bundles multiple functions — and you run segregation of duties analysis before anything goes live, not after.
+Role design starts from the job function and an owner, not from cloning PFCG. Single roles hold the objects; derived roles vary org levels off one master; composites are a thin provisioning shell — they are not a rationalization strategy. I would SoD-simulate in ARA or IAG before production, and I would refuse to "fix" an 8,000-role catalog by stacking more composites.
 
 ## 60 Second Interview Answer
 

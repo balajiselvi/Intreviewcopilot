@@ -6,11 +6,11 @@ SAP Identity Provisioning Service (IPS) is the enterprise-grade user lifecycle m
 
 ## Interview Summary
 
-Identity Provisioning Service automates user lifecycle management across a multi-system landscape. One source of truth (HR, corporate directory), IPS applies transformation rules, and users are automatically created/updated/deleted in all connected systems. No spreadsheets, no manual provisioning, complete audit trail.
+Identity Provisioning Service automates user lifecycle writes across a multi-system landscape. HR or a directory is typically the source; IPS transforms, correlates, and synchronizes to targets. IPS executes mappings. It does not authenticate users, and it does not approve SoD-sensitive access — that remains IAG/GRC Access Request plus application enforcement.
 
 ## 30 Second Interview Answer
 
-SAP Identity Provisioning Service (IPS) automates user provisioning across your entire application landscape. You connect an HR system or corporate directory as the source, define which systems are targets (BTP, SuccessFactors, Concur, etc.), and IPS automatically creates/updates users when they join, changes when they move roles, and deactivates them when they leave. Complete audit trail; no manual spreadsheet work.
+IPS is the provisioning plane. A joiner, mover, or leaver in SuccessFactors is read through a source connector, transformed (mappings, filters, correlation), and written to targets on delta or full jobs. Birthright can be mapped in IPS; high-risk roles still go through IAG or GRC simulation and approval. Mover design must replace or reconcile old access, not append it.
 
 ## 60 Second Interview Answer
 

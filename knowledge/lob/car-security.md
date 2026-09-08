@@ -10,7 +10,7 @@ CAR access usually combines HANA database privileges, application users, and som
 
 ## 30 Second Interview Answer
 
-I would secure CAR by separating the POS ingestion technical users from reporting users, then applying HANA object and analytic privileges on the activity data. If SAC or BW sits on top, that layer has its own authorization model — CAR HANA access is not the same as a SAC story permission.
+CAR is a retail POS and customer-activity platform on HANA. I would separate technical users that load POS from analysts who query activity, then enforce HANA object privileges and analytic privileges on sensitive customer and basket data. Downstream BW analysis authorizations or SAC teams/folders are additional planes — a SAC story permission does not replace CAR HANA access. Enterprise IAM still authenticates via IdP/IAS and provisions the CAR/HANA user; it does not invent a PFCG catalog for CAR. Privacy and PCI-adjacent POS data need explicit purpose limitation, not generic encryption talk.
 
 ## Distinctions
 

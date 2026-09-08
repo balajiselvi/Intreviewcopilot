@@ -516,20 +516,24 @@ function resolveContext(question, history) {
 function extractConversationTopic(history = []) {
   if (history.length === 0) return "";
 
-  const recentHistory = history.slice(-4);
-  const topicTokens = new Set();
+  // Prior assistant answers are spoken prose. Tokenizing them into the retrieval query
+  // drowns the current follow-up (live defect: "Where does IPS fit?" retrieved a bag of
+  // prior-answer tokens). Only recent USER questions contribute topic tokens.
+  const recentUserTurns = history
+    .filter((item) => item?.role === "user" && item?.content)
+    .slice(-2);
 
-  for (const item of recentHistory) {
-    if (!item?.content) continue;
+  const topicTokens = new Set();
+  for (const item of recentUserTurns) {
     const tokens = tokenize(item.content);
     for (const token of tokens) {
-      if (token.length > 3) {
+      if (token.length > 3 && token.length < 28) {
         topicTokens.add(token);
       }
     }
   }
 
-  return Array.from(topicTokens).join(" ");
+  return Array.from(topicTokens).slice(0, 16).join(" ");
 }
 
 function synthesizeRetrievalQuery(question, history) {

@@ -6,11 +6,11 @@ RISE security differs fundamentally from on-premise SAP implementations. In a cl
 
 ## Interview Summary
 
-RISE operates in a shared security model: SAP provides foundational infrastructure security (encryption, network isolation, DDoS protection); the customer provides data governance (classification, access controls, audit oversight). Success requires understanding cloud security principles, authorization design, compliance obligations, and data protection strategies.
+RISE operates a shared responsibility model: SAP runs infrastructure and the private-cloud operations boundary; the customer still owns identity design, role catalog, SoD, and audit evidence. Typical customer stack: corporate IdP → IAS (authentication), IPS (provisioning), IAG and/or GRC (governance), S/4 PFCG (enforcement), BTP XSUAA for extensions, Cloud Connector for hybrid principal propagation. SU01 remains the S/4 user master; it is not a substitute for IAS.
 
 ## 30 Second Interview Answer
 
-RISE security operates on a shared responsibility model: SAP Cloud Infrastructure (SCI) provides foundational security (encryption, network, firewalls, DDoS protection); the customer implements data security (access controls, encryption at rest, masking sensitive data, audit logging). Key RISE security domains: user access control (who can do what), data access control (which data can be viewed/changed), compliance (audit trail, retention, regulatory requirements), and secure communications (TLS, API authentication). Most RISE security incidents result from misconfigured authorization, not infrastructure failures.
+Under RISE with S/4HANA Cloud Private Edition I would draw four boundaries: SAP operates the infrastructure; we still design PFCG and Fiori business roles; IAS/IPS handle cloud identity and lifecycle; IAG/GRC govern SoD and requests to the extent connectors exist. IAS authenticates; it does not replace S/4 authorization. Hypercare still needs Firefighter/PAM, SUIM validation, and a rollback, not a shared-responsibility shrug.
 
 ## 60 Second Interview Answer
 

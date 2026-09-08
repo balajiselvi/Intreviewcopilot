@@ -60,6 +60,7 @@ HR termination → disable identity → deprovision targets → revoke privilege
 
 ## Related Topics
 
+- knowledge/idm/identity-control-planes.md
 - knowledge/idm/idm-architecture.md
 - knowledge/btp/ips.md
 - knowledge/security/role-data-quality.md

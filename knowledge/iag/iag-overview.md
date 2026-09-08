@@ -6,11 +6,11 @@ SAP Cloud Identity Access Governance is a cloud-native access governance service
 
 ## Interview Summary
 
-IAG covers the same governance ground as classic GRC Access Control — segregation of duties analysis, access requests, certification — but is delivered as a BTP service and is built to govern a hybrid landscape: on-premise ABAP systems and cloud applications from a single, centralized platform. It integrates with SAP Identity Authentication Service (IAS) for authentication, which is a meaningfully different architecture from on-prem GRC's direct RFC/ABAP connector model.
+IAG is the governance plane: Access Analysis, Role Design, Access Request, Access Certification, Privileged Access Management. Users sign in to the IAG application via IAS. That is application authentication into IAG, not IAS becoming the enterprise authorization service. IAG only analyzes or provisions what its connectors and ruleset actually cover. On-prem GRC may coexist via a bridge; do not claim both stacks see every cloud app by default.
 
 ## 30 Second Interview Answer
 
-SAP Cloud IAG is the cloud-native counterpart to SAP GRC Access Control. It has five core services — Access Analysis, Role Design, Access Request, Access Certification, and Privileged Access Management — running on BTP instead of as an ABAP add-on. It's built for hybrid landscapes, governing both on-premise and cloud applications from one place, and it authenticates through SAP Identity Authentication Service rather than classic ABAP logon.
+IAG decides whether access is appropriate. Access Analysis evaluates SoD against a ruleset and connected systems. Access Request plus approval is where a human or policy accepts risk. Certification recertifies remaining access. PAM is break-glass with review, parallel to GRC EAM. S/4 still enforces in PFCG. IPS still writes the assignment after approval. IAS still only authenticates.
 
 ## 60 Second Interview Answer
 

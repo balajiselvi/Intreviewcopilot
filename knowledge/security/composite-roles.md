@@ -10,7 +10,7 @@ Composite roles exist to simplify provisioning, not to design authorization. Whe
 
 ## 30 Second Interview Answer
 
-A composite role is a container for other roles — it bundles single and derived roles together so a user can be assigned all of them at once. It doesn't hold any authorization data of its own; if you open the authorization tab on a composite role, it's empty. All the real access comes from whatever roles are assigned as members.
+A composite role is a container for other roles — it bundles single and derived roles together so a user can be assigned all of them at once. It doesn't hold any authorization data of its own. Rationalizing a bloated catalog by wrapping more singles into new composites usually hides SoD and duplicates; composites are a provisioning shell after the singles are clean, not the cleanup method.
 
 ## 60 Second Interview Answer
 
