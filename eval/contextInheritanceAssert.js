@@ -46,6 +46,14 @@ assert.strictEqual(shouldInheritPriorDomain({
 }), false, "different strong product must win");
 
 assert.strictEqual(shouldInheritPriorDomain({
+  question: "The user can log in but cannot open the story. Where would you look?",
+  currentCategory: "Troubleshooting",
+  currentDomain: "SAP Security",
+  priorCategory: "SAC",
+  priorDomain: "SAC"
+}), true, "product-less SAC troubleshooting must inherit");
+
+assert.strictEqual(shouldInheritPriorDomain({
   question: "okay then what",
   currentCategory: "General",
   currentDomain: "General SAP",

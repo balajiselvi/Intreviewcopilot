@@ -21,7 +21,7 @@ assert.match(prompt, /Boundary: \$\{technicalReasoning\.governanceConsideration\
 assert.match(prompt, /it is not hypercare monitoring or cutover proof/);
 assert.doesNotMatch(prompt, /Monitoring Tools \(ST03\/SM21\/SU53\)/);
 assert.match(tr, /Ariba groups\/permissions enforce/);
-assert.match(tr, /never say SAP owns or operates Cloud Connector/);
+assert.match(tr, /never say SAP owns or operates (?:the )?Cloud Connector/);
 assert.match(prompt, /DOCUMENTED EXPERIENCE MATCH/);
 assert.match(chat, /recallExperience/);
 assert.match(chat, /DEFAULT_CAREER_BACKGROUND/);
@@ -30,7 +30,7 @@ assert.match(prompt, /Dover/);
 assert.match(prompt, /Five tiers/);
 assert.match(prompt, /Datasphere: spaces/);
 assert.match(prompt, /Omit this section unless/);
-assert.match(prompt, /never say SAP owns or operates Cloud Connector/);
+assert.match(prompt, /never say SAP owns or operates (?:the )?Cloud Connector/i);
 assert.match(prompt, /ACTIVE DOMAIN SCOPE/);
 assert.match(prompt, /MASTER HANDS-ON BANK/);
 assert.match(fs.readFileSync(path.join(__dirname, "../eval/lib/expertiseCards.js"), "utf8"), /CLAIM CLASSES/);
