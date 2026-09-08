@@ -20,5 +20,5 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
-# Ruflo autopilot state churn (auto-updates on nearly every tool call, not meaningful history)
-.claude-flow/
+# Local dumps (exceed GitHub 100MB limit; not source of truth)
+codebase.txt
