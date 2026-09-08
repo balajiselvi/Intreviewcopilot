@@ -30,6 +30,33 @@ Do not enter agent-following loops. Make the engineering decision from current e
 
 The full policy lives in `.cursor/rules/agent-decision-policy.mdc`. Claude is evidence, not authority.
 
+## Session Recovery
+
+Unexpected laptop restart or Cursor shutdown must not cause work to restart from zero.
+
+Use `.cursor/task_state.md` as a local recovery checkpoint.
+
+When the user says `RESUME`, `CONTINUE`, or `RESUME FROM WHERE WE LEFT OFF`:
+
+1. Read the checkpoint.
+2. Verify Git branch/HEAD/status.
+3. Inspect the current diff.
+4. Verify the checkpoint against the actual repository.
+5. Identify the first unfinished step.
+6. Continue from there.
+
+The checkpoint is historical context, not authoritative truth.
+
+Never blindly trust its recorded commit, test results, or completion status.
+
+Do not repeat already-completed work.
+
+Do not ask the user to explain the previous state when it can be reconstructed from the repository.
+
+Keep `.cursor/task_state.md` local unless the repository explicitly requires it to be committed.
+
+Canonical keyword: `RESUME`. Evidence order: repository / Git / tests / runtime → Cursor verification → `.cursor/task_state.md` → previous-agent reports.
+
 ## Mission
 
 Build and maintain a Principal Architect-level SAP Security / IAM interview assistant.

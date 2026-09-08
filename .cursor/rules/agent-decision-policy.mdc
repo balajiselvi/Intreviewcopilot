@@ -166,3 +166,200 @@ Do not repeatedly ask another AI agent what to do next.
 The purpose of this policy is to make Cursor capable of independently evaluating the repository and deciding the next engineering action.
 
 Use previous-agent information to accelerate investigation, NOT to outsource the decision.
+
+## Evidence hierarchy
+
+```
+ACTUAL REPOSITORY / GIT / TESTS / RUNTIME
+              ↓
+        Cursor verification
+              ↓
+    .cursor/task_state.md
+              ↓
+Previous Claude/AI-agent reports
+```
+
+`.cursor/task_state.md` helps recover after an interruption. It is never a source of truth.
+
+Canonical resume keyword: `RESUME`. `CONTINUE` and `RESUME FROM WHERE WE LEFT OFF` mean the same thing.
+
+# Work Persistence and Resume Protocol
+
+## 12. Unexpected interruption / laptop restart
+
+The laptop, Cursor, terminal, development server, or agent session may terminate unexpectedly at any time.
+
+The agent MUST assume that an interrupted task may need to be resumed later.
+
+Do not restart the task from the beginning automatically.
+
+Before starting substantial work on any task, maintain a lightweight persistent task checkpoint in:
+
+`.cursor/task_state.md`
+
+This file is LOCAL working state and must normally remain uncommitted.
+
+## 13. Task checkpoint requirements
+
+During multi-step work, update `.cursor/task_state.md` at meaningful milestones.
+
+The checkpoint should contain:
+
+- Task being worked on
+- Objective
+- Current branch
+- Current HEAD/commit
+- Working-tree status
+- Files inspected
+- Files changed
+- Changes already completed
+- Tests/evaluations already run
+- Test results
+- Current step
+- Next intended step
+- Known issues/blockers
+- Important decisions already made
+- Important evidence discovered
+- Whether a commit/push has occurred
+- Any temporary processes/servers relevant to the task
+
+Keep the checkpoint concise and factual.
+
+Do NOT store secrets, API keys, credentials, tokens, or sensitive values in this file.
+
+## 14. Checkpoint before risky operations
+
+Before any operation that could interrupt work, such as:
+
+- large refactor;
+- long-running evaluation;
+- server restart;
+- rebuilding indexes;
+- changing generated artifacts;
+- Git commit;
+- Git push;
+
+update `.cursor/task_state.md` with the latest verified state.
+
+## 15. Resume keyword
+
+The user may return after an interruption and say:
+
+`RESUME`
+
+or:
+
+`CONTINUE`
+
+or:
+
+`RESUME FROM WHERE WE LEFT OFF`
+
+Treat any of these as a request to recover the previous task. `RESUME` is the canonical keyword.
+
+## 16. Resume procedure
+
+When the user says `RESUME`, do NOT immediately start changing code.
+
+First reconstruct the actual state from evidence:
+
+1. Read `.cursor/task_state.md` if it exists.
+2. Inspect `git status`.
+3. Inspect current branch.
+4. Inspect current HEAD.
+5. Compare HEAD with the recorded checkpoint.
+6. Inspect the current diff.
+7. Check whether the files mentioned in the checkpoint still exist and contain the expected changes.
+8. Verify whether previously reported tests actually remain applicable.
+9. Check whether the task was committed or pushed.
+10. Check whether any development server/process state is still relevant.
+
+Treat `.cursor/task_state.md` as a recovery hint, NOT as authoritative truth.
+
+The repository and reproducible evidence take precedence.
+
+## 17. Resume decision
+
+After reconstructing state, determine independently which situation applies:
+
+### A. Task completed
+Verify the result and report that the task is already complete.
+
+### B. Task partially completed
+Identify exactly where execution stopped and continue from the first unfinished step.
+
+### C. Changes exist but are uncommitted
+Inspect and validate them before continuing.
+
+Do NOT discard them merely because the checkpoint is incomplete.
+
+### D. Checkpoint is stale or incorrect
+Ignore the incorrect portions and reconstruct the actual state from Git and repository evidence.
+
+### E. Task state cannot be reliably reconstructed
+Do not guess.
+
+Perform repository inspection and testing to establish the current state first.
+
+## 18. Never duplicate completed work
+
+When resuming:
+
+- Do not repeat completed edits unnecessarily.
+- Do not create duplicate files.
+- Do not re-run expensive operations unless validation requires it.
+- Do not overwrite good work simply because the previous session ended unexpectedly.
+- Preserve valid uncommitted work.
+
+## 19. Continue autonomously
+
+After reconstructing the state, continue the original task automatically.
+
+Do not ask the user to re-explain what the previous session was doing when the repository/checkpoint provides enough evidence.
+
+Only ask the user when the actual state contains an ambiguity that cannot reasonably be resolved from repository evidence.
+
+## 20. End-of-session checkpoint
+
+Before stopping or concluding a substantial task, update `.cursor/task_state.md` with:
+
+STATUS: <completed / in-progress / blocked>
+
+CURRENT STEP:
+<what was last completed>
+
+NEXT STEP:
+<exact next action>
+
+VERIFIED COMMIT:
+<commit SHA or NONE>
+
+PUSH STATUS:
+<pushed / not pushed / unknown>
+
+TEST STATUS:
+<tests and result>
+
+IMPORTANT NOTES:
+<only information needed to resume safely>
+
+This checkpoint exists specifically to allow recovery after a crash, reboot, terminal closure, or Cursor restart.
+
+## 21. Git policy for task state
+
+`.cursor/task_state.md` is normally LOCAL ONLY.
+
+Do not commit it unless the repository explicitly requires persistent task-state files to be version controlled.
+
+Never push machine-local Cursor/Claude runtime state merely because it exists.
+
+## 22. Recovery principle
+
+The goal is:
+
+INTERRUPTION → CHECKPOINT → RECONSTRUCT → VERIFY → CONTINUE
+
+not:
+
+INTERRUPTION → START OVER
+
