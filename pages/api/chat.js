@@ -10,9 +10,15 @@ import { profileInterviewer } from "../../lib/interviewerProfiler";
 import { buildTechnicalReasoning } from "../../lib/technicalReasoner";
 import { searchKnowledge } from "../../services/vectorSearch";
 import { searchEngineeringMemory, renderEngineeringJudgmentSection } from "../../lib/engineeringMemory/retrieval";
+import { createRequire } from "module";
 import { logger } from "../../lib/logger";
 import { runPostAnswerEvaluation } from "../../lib/prompt";
 import APP_CONFIG from "../../config/appConfig";
+
+const require = createRequire(import.meta.url);
+const { recallExperience, formatMemoryCard } = require("../../eval/lib/expertiseCards.js");
+const { DEFAULT_CAREER_BACKGROUND } = require("../../eval/lib/careerTimeline.js");
+const { shouldInheritPriorDomain, hasStrongTechnicalEvidence, isPlaneFoil, isTopicContinuation } = require("../../lib/contextInheritance.js");
 
 const MAX_HISTORY_ITEMS = 6;
 const DEFAULT_TIMEOUT_MS = 25000;
@@ -447,35 +453,18 @@ function isFollowUpUtterance(question = "", history = []) {
 // question that is not actually about either) is not strong enough on its own to either
 // override inherited context or qualify as inheritable context itself. This is the explicit
 // alternative to using `category !== "General"` as the sole test.
-function hasStrongTechnicalEvidence(category, domain) {
-  return Boolean(category) && category !== "General" && Boolean(domain) && domain !== "General SAP" && domain !== "PMP";
-}
-
-// Reuses the exact category set and pattern reasoningPlanner.js already uses to decide
-// answerIntent/hybrid-mode -- not a new signal, the same one, asked here one step earlier: does
-// the CURRENT turn, considered alone, show a people/project/governance dimension of its own?
+// Evidence precedence:
+//   1. No history -> current-turn only.
+//   2. Current turn is people/project (no technical product named as the subject) -> current-people.
+//   3. Continuation / plane-foil after a strong prior product -> inherit prior category/domain.
+//      Does not freeze the topic: explicit "what about X" and a different strong product win current.
+//   4. Current turn has strong technical evidence -> current wins.
+//   5. Else inherit prior strong evidence if present.
+//   6. Else none.
 function hasPeopleSignal(category, question) {
   return NON_SAP_TECHNICAL_CATEGORIES.has(category) || DELIVERY_GOVERNANCE_PATTERN.test(question);
 }
 
-// Evidence precedence (see docs/CHANGELOG.md Day-9 entry for the full design rationale):
-//   1. No history                              -> current-turn classification only (unchanged
-//                                                  from pre-Day-9 behavior for every standalone
-//                                                  question).
-//   2. Current turn has strong technical evidence -> current wins outright. Never overridden by
-//                                                     inherited context, regardless of history.
-//   3. Current turn has a people/project signal   -> current wins outright, explicitly WITHOUT
-//                                                     pulling in a prior technical domain (so
-//                                                     componentSelector's existing domain-
-//                                                     evidence gate correctly yields no
-//                                                     fabricated SAP components).
-//   4. Otherwise, if the immediately preceding user turn (only -- no deeper history search, see
-//      docs/PROJECT_STATE.md known limitations) has strong technical evidence of its own,
-//      inherit ONLY its category/domain as context. primaryIntent is deliberately NEVER
-//      inherited -- the current question, however it's phrased, still determines its own
-//      intent/reasoning behavior; only the missing product/domain context is borrowed.
-//   5. Otherwise -- no strong evidence anywhere -- do nothing. Matches today's safe default
-//      rather than guessing.
 function resolveContext(question, history) {
   const currentClassification = classifyWeightedIntents(question);
   const currentAnalysis = analyzeInterviewQuestion(question);
@@ -494,28 +483,45 @@ function resolveContext(question, history) {
     return asCurrent("current");
   }
 
-  if (hasStrongTechnicalEvidence(currentCategory, currentAnalysis.domain)) {
-    return asCurrent("current");
-  }
-
   if (hasPeopleSignal(currentCategory, question)) {
     return asCurrent("current-people");
   }
 
   const lastUserTurn = [...history].reverse().find(item => item?.role === "user" && item?.content)?.content || "";
-  if (lastUserTurn) {
-    const priorClassification = classifyWeightedIntents(lastUserTurn);
-    const priorAnalysis = analyzeInterviewQuestion(lastUserTurn);
-    if (hasStrongTechnicalEvidence(priorClassification.primaryCategory, priorAnalysis.domain)) {
-      return {
-        currentAnalysis,
-        resolvedCategory: priorClassification.primaryCategory,
-        resolvedSecondaryCategories: priorClassification.secondaryCategories,
-        resolvedDomain: priorAnalysis.domain,
-        resolvedPrimaryIntent: currentAnalysis.primaryIntent,
-        contextSource: "inherited"
-      };
-    }
+  const priorClassification = lastUserTurn ? classifyWeightedIntents(lastUserTurn) : null;
+  const priorAnalysis = lastUserTurn ? analyzeInterviewQuestion(lastUserTurn) : null;
+  const inherit = lastUserTurn && shouldInheritPriorDomain({
+    question,
+    currentCategory,
+    currentDomain: currentAnalysis.domain,
+    priorCategory: priorClassification.primaryCategory,
+    priorDomain: priorAnalysis.domain
+  });
+
+  if (inherit) {
+    return {
+      currentAnalysis,
+      resolvedCategory: priorClassification.primaryCategory,
+      resolvedSecondaryCategories: priorClassification.secondaryCategories,
+      resolvedDomain: priorAnalysis.domain,
+      resolvedPrimaryIntent: currentAnalysis.primaryIntent,
+      contextSource: "inherited"
+    };
+  }
+
+  if (hasStrongTechnicalEvidence(currentCategory, currentAnalysis.domain)) {
+    return asCurrent("current");
+  }
+
+  if (lastUserTurn && hasStrongTechnicalEvidence(priorClassification.primaryCategory, priorAnalysis.domain)) {
+    return {
+      currentAnalysis,
+      resolvedCategory: priorClassification.primaryCategory,
+      resolvedSecondaryCategories: priorClassification.secondaryCategories,
+      resolvedDomain: priorAnalysis.domain,
+      resolvedPrimaryIntent: currentAnalysis.primaryIntent,
+      contextSource: "inherited"
+    };
   }
 
   return asCurrent("none");
@@ -922,7 +928,6 @@ export default async function handler(req, res) {
   try {
     const recoverySignal = isRecoverySignal(question) && history.length > 0;
     const deepenFollowUp = !recoverySignal && isDeepenFollowUp(question);
-    const isFollowUp = recoverySignal || isFollowUpUtterance(question, history) || deepenFollowUp;
 
     // Context resolution (see resolveContext above) -- runs on every request, not just
     // follow-ups: with no history it reduces to exactly the classification every standalone
@@ -932,9 +937,14 @@ export default async function handler(req, res) {
     // wins; the prior turn's technical domain fills in only when the current turn shows no
     // genuine evidence of its own.
     const resolved = resolveContext(question, history);
+    const isFollowUp = recoverySignal
+      || isFollowUpUtterance(question, history)
+      || deepenFollowUp
+      || (resolved.contextSource === "inherited" && (isPlaneFoil(question) || isTopicContinuation(question)));
     const analysis = resolved.currentAnalysis;
     const primaryCategory = resolved.resolvedCategory;
     const secondaryCategories = resolved.resolvedSecondaryCategories;
+    analysis.inheritedDomain = resolved.contextSource === "inherited" ? resolved.resolvedDomain : "";
     analysis.category = primaryCategory;
     analysis.secondaryCategories = secondaryCategories;
     analysis.domain = resolved.resolvedDomain;
@@ -996,11 +1006,31 @@ export default async function handler(req, res) {
       knowledgeContext,
       engineeringJudgmentContext,
       model,
-      sapComponents: technicalReasoning.recommendedComponents
+      sapComponents: technicalReasoning.recommendedComponents,
+      activeDomainScope: resolved.contextSource === "inherited" ? resolved.resolvedDomain : ""
     };
 
     if (customInstructions?.trim()) promptPayload.customInstructions = customInstructions.trim();
-    if (candidateResume?.trim()) promptPayload.candidateResume = candidateResume.trim();
+    try {
+      const extra = candidateResume?.trim();
+      promptPayload.candidateResume = extra
+        ? `${DEFAULT_CAREER_BACKGROUND}\n\nADDITIONAL BACKGROUND FROM SETTINGS:\n${extra}`
+        : DEFAULT_CAREER_BACKGROUND;
+    } catch (error) {
+      logger?.error?.("Career timeline inject failed:", error);
+      if (candidateResume?.trim()) promptPayload.candidateResume = candidateResume.trim();
+    }
+    try {
+      const recallQuery = resolved.contextSource === "inherited" && resolved.resolvedDomain
+        ? `${question} ${resolved.resolvedDomain}`
+        : question;
+      const { strongest } = recallExperience(recallQuery);
+      if (strongest) {
+        promptPayload.documentedExperience = formatMemoryCard(strongest);
+      }
+    } catch (error) {
+      logger?.error?.("Experience recall failed:", error);
+    }
     if (jobDescription?.trim()) promptPayload.jobDescription = jobDescription.trim();
     if (company?.trim()) promptPayload.company = company.trim();
 
