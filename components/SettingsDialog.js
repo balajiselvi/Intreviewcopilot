@@ -183,13 +183,13 @@ export default function SettingsDialog({ open, onClose, onSave }) {
         <TextField
           fullWidth margin="dense" name="candidateResume" label="Your Real Background" multiline rows={4}
           value={settings.candidateResume || ''} onChange={handleChange}
-          helperText="Paste your real CV here before the interview. Only this text may be phrased as personal experience. Leave blank only if you want methodology voice with no past-tense stories."
+          helperText="Paste your expertise narrative/CV. The live Copilot uses this plus documented case-study cards as short-term memory. Only this text plus those cards may be phrased as personal experience."
           sx={{mt:2}}
         />
         <TextField
           fullWidth margin="dense" name="jobDescription" label="Target Job Description" multiline rows={4}
           value={settings.jobDescription || ''} onChange={handleChange}
-          helperText="Defaults to the Head of Global SAP IT Security & Compliance JD. Edit if the interviewer’s scope differs. Never used as claimed experience."
+          helperText="Defaults to the Chalhoub IAM Lead JD (no claimed experience). Rehearsal targeting only."
           sx={{mt:2}}
         />
         <TextField

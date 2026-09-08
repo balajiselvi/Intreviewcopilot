@@ -23,15 +23,7 @@ export const builtInModelGroups = [
 ];
 
 
-export const TARGET_JOB_DESCRIPTION = `Head of Global SAP IT Security & Compliance — Principal SAP Security / IAM architect interview.
-
-Landscape: S/4HANA, SuccessFactors, BW/4HANA, SAC, Datasphere, Ariba, CAR, BTP, hybrid/RISE.
-
-Identity planes (do not collapse): SuccessFactors/HR = lifecycle attributes; IAS = authentication, federation, SSO, MFA, trust; IPS = provisioning, transformations, mappings, sync; IAG = Access Request, Access Analysis, Certification, PAM; target application = enforcement (PFCG, SF RBP, RSECADMIN, XSUAA role collections, Ariba groups).
-
-Highest-value topics: SAP role/authorization design, IAG, IAS, IPS, JML, SoD, Access Analysis, role rationalization/remediation, governance, SAP/non-SAP IAM, RISE/hybrid shared responsibility, data quality on user/role extracts, stakeholder management, go-live/hypercare.
-
-Answer as a Principal Architect: business objective → architectural decision → identity/security boundaries → mechanisms → governance → trade-offs → operational reality. Never invent employers, projects, tickets, countries, or metrics beyond CANDIDATE BACKGROUND.`;
+export const TARGET_JOB_DESCRIPTION = `Chalhoub Group — Lead, Identity Security & Access Management (Dubai). SAP S/4HANA IAM/Security workstream lead on a large transformation: architecture, governance, delivery. Role design, access controls, user lifecycle, legacy access migration, access reviews, independent technical decisions. Partners: Enterprise Security Architect, Information Security, implementation partner, functional teams. Hands-on S/4 Security & IAM plus IAG/authorisations/access governance. Do not invent Chalhoub/retail/Accenture experience.`;
 
 const defaultConfig = {
   openaiKey: '',
