@@ -21,6 +21,7 @@ const { DEFAULT_CAREER_BACKGROUND } = require("../../eval/lib/careerTimeline.js"
 const { shouldInheritPriorDomain, hasStrongTechnicalEvidence, isPlaneFoil, isTopicContinuation } = require("../../lib/contextInheritance.js");
 const { publicLlmError } = require("../../lib/generationGuard.js");
 const { appendQa } = require("../../lib/interviewSessionStore.js");
+const { resolveInterviewContext, sanitizeDebugContext, toHistoryContext, QUESTION_INTENTS } = require("../../lib/interviewContext.js");
 
 const MAX_HISTORY_ITEMS = 6;
 const DEFAULT_TIMEOUT_MS = 25000;
@@ -312,6 +313,16 @@ function writeSSEError(res, errorMessage) {
   }
 }
 
+function writeSSEEvent(res, event, payload) {
+  try {
+    if (!res?.writable) return false;
+    return res.write(`event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`);
+  } catch (error) {
+    logger?.error?.(`Failed to write SSE ${event} event:`, error);
+    return false;
+  }
+}
+
 function tokenize(text = "") {
   return text.toLowerCase().replace(/[^\w\s]/g, " ").split(/\s+/).filter(Boolean);
 }
@@ -580,7 +591,7 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
   // silently zeroing out domain/intent boost scoring and discarding this topK entirely in
   // favor of the function's own internal default.
   const chunks = await searchKnowledge(retrievalQuery, analysis, topK);
-  if (!chunks || chunks.length === 0) return "";
+  if (!chunks || chunks.length === 0) return { text: "", evidence: [] };
 
   const maxChars = APP_CONFIG?.maxContextCharacters || 3000;
   const seenParagraphs = new Set();
@@ -615,27 +626,37 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
     if (currentLength >= maxChars) break;
   }
 
-  return cleanParagraphs.join("\n\n");
+  return {
+    text: cleanParagraphs.join("\n\n"),
+    evidence: chunks.slice(0, 6).map((chunk) => ({
+      id: String(chunk.id || chunk.chunkId || chunk.documentId || "").slice(0, 100),
+      label: String(chunk.heading || chunk.section || chunk.sourceFile || chunk.documentId || "knowledge").slice(0, 160)
+    }))
+  };
 }
 
 function prepareConversationHistory(history = []) {
   const validHistory = history.filter(
     item => item?.content && ["user", "assistant"].includes(item.role)
   );
+  const providerSafe = (items) => items.map((item) => ({
+    role: item.role,
+    content: String(item.content).slice(0, 1600)
+  }));
 
   if (validHistory.length <= MAX_HISTORY_ITEMS) {
-    return validHistory;
+    return providerSafe(validHistory);
   }
 
   const recentHistory = validHistory.slice(-MAX_HISTORY_ITEMS);
   if (recentHistory.length > 0 && recentHistory[0].role === "assistant") {
     const prevIdx = validHistory.length - MAX_HISTORY_ITEMS - 1;
     if (prevIdx >= 0 && validHistory[prevIdx].role === "user") {
-      return [validHistory[prevIdx], ...recentHistory];
+      return providerSafe([validHistory[prevIdx], ...recentHistory]);
     }
   }
 
-  return recentHistory;
+  return providerSafe(recentHistory);
 }
 
 async function streamGeminiResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens }) {
@@ -876,6 +897,7 @@ export default async function handler(req, res) {
     jobDescription,
     company,
     interviewSessionId,
+    debug: requestDebug,
     retryCount: clientRetryCount
   } = req.body || {};
 
@@ -969,6 +991,7 @@ export default async function handler(req, res) {
   let tokenUsage = null;
   const qaStartedMs = Date.now();
   let qaRecorded = false;
+  let interviewContext = null;
   const recordLiveQa = (fields) => {
     if (qaRecorded) return;
     try {
@@ -990,8 +1013,33 @@ export default async function handler(req, res) {
   };
 
   try {
+    interviewContext = resolveInterviewContext({
+      questionRaw: question,
+      history,
+      source: req.body?.source,
+      questionId: req.body?.questionId
+    });
+    const effectiveQuestion = interviewContext.questionResolved || question;
+    const debugEnabled = requestDebug === true || req.query?.debug === "1" || process.env.INTERVIEW_DEBUG === "1";
+    const contextualIntents = new Set([
+      QUESTION_INTENTS.FOLLOW_UP,
+      QUESTION_INTENTS.CLARIFICATION,
+      QUESTION_INTENTS.CORRECTION,
+      QUESTION_INTENTS.CHALLENGE,
+      QUESTION_INTENTS.PROBE_DEEPER,
+      QUESTION_INTENTS.REQUEST_FOR_EXAMPLE,
+      QUESTION_INTENTS.REQUEST_FOR_TECHNICAL_STEPS,
+      QUESTION_INTENTS.REQUEST_FOR_VALIDATION,
+      QUESTION_INTENTS.REQUEST_FOR_REMEDIATION,
+      QUESTION_INTENTS.REQUEST_FOR_EXPERIENCE,
+      QUESTION_INTENTS.FRAGMENT
+    ]);
     const recoverySignal = isRecoverySignal(question) && history.length > 0;
-    const deepenFollowUp = !recoverySignal && isDeepenFollowUp(question);
+    const deepenFollowUp = !recoverySignal && (
+      isDeepenFollowUp(question) ||
+      interviewContext.questionIntent === QUESTION_INTENTS.PROBE_DEEPER ||
+      interviewContext.depth === "deep"
+    );
 
     // Context resolution (see resolveContext above) -- runs on every request, not just
     // follow-ups: with no history it reduces to exactly the classification every standalone
@@ -1000,8 +1048,9 @@ export default async function handler(req, res) {
     // independently, then merges them by explicit precedence -- current-turn evidence always
     // wins; the prior turn's technical domain fills in only when the current turn shows no
     // genuine evidence of its own.
-    const resolved = resolveContext(question, history);
+    const resolved = resolveContext(effectiveQuestion, history);
     const isFollowUp = recoverySignal
+      || (history.length > 0 && contextualIntents.has(interviewContext.questionIntent))
       || isFollowUpUtterance(question, history)
       || deepenFollowUp
       || (resolved.contextSource === "inherited" && (isPlaneFoil(question) || isTopicContinuation(question)));
@@ -1016,8 +1065,9 @@ export default async function handler(req, res) {
     analysis.isDeepenFollowUp = deepenFollowUp;
     analysis.isRecoverySignal = recoverySignal;
     analysis.contextSource = resolved.contextSource;
+    analysis.interviewContext = interviewContext;
 
-    const reasoningContract = buildReasoningContract(question, analysis);
+    const reasoningContract = buildReasoningContract(effectiveQuestion, analysis);
     if (reasoningContract.reasoningMode === "resolve") {
       analysis.isBehavioral = true;
     }
@@ -1031,10 +1081,10 @@ export default async function handler(req, res) {
     // it through here reuses that single source of truth instead of re-deriving it, so a real
     // hybrid question (e.g. "stakeholder escalation during an SAP GRC implementation") keeps its
     // SAP components while a pure PMP/Behavioral/Leadership question does not.
-    const sapComponents = selectSapComponents(question, analysis, reasoningContract.isHybrid);
-    const interviewer = profileInterviewer(question, analysis);
+    const sapComponents = selectSapComponents(effectiveQuestion, analysis, reasoningContract.isHybrid);
+    const interviewer = profileInterviewer(effectiveQuestion, analysis);
     const technicalReasoning = buildTechnicalReasoning(
-      question,
+      effectiveQuestion,
       analysis,
       sapComponents,
       interviewer,
@@ -1046,9 +1096,13 @@ export default async function handler(req, res) {
     // asking for MORE technical specificity than the first pass gave, which is exactly when
     // additional targeted retrieval helps most. Skipping it there was starving the one
     // follow-up type that most needed grounding.
-    const knowledgeContext = (isFollowUp && !deepenFollowUp)
-      ? ""
-      : await fetchKnowledgeContext(question, primaryCategory, secondaryCategories, history, analysis);
+    const shouldRetrieve = interviewContext.retrievalDecision === "retrieve"
+      || interviewContext.retrievalDecision === "active-context";
+    const knowledgeResult = shouldRetrieve
+      ? await fetchKnowledgeContext(interviewContext.retrievalQuery || effectiveQuestion, primaryCategory, secondaryCategories, history, analysis)
+      : { text: "", evidence: [] };
+    const knowledgeContext = knowledgeResult.text;
+    interviewContext.retrievalEvidence = knowledgeResult.evidence;
 
     // Engineering Memory Platform integration (docs/EXPERIENCE_ACQUISITION_ENGINE_DESIGN.md
     // section 9) -- additive, new prompt section, does not touch CANDIDATE BACKGROUND's
@@ -1056,13 +1110,14 @@ export default async function handler(req, res) {
     // Same skip-on-plain-follow-up reasoning as knowledgeContext above. searchEngineeringMemory
     // itself short-circuits to a zero-cost no-op when the store is empty, so this is safe to
     // leave on unconditionally rather than gating behind whether records exist yet.
-    const engineeringJudgment = (isFollowUp && !deepenFollowUp)
+    const engineeringJudgment = !shouldRetrieve
       ? { principles: [], records: [] }
-      : await searchEngineeringMemory({ question, analysis, topK: 3 });
+      : await searchEngineeringMemory({ question: interviewContext.retrievalQuery || effectiveQuestion, analysis, topK: 3 });
     const engineeringJudgmentContext = renderEngineeringJudgmentSection(engineeringJudgment);
 
     const promptPayload = {
-      question,
+      question: effectiveQuestion,
+      interviewContext,
       analysis,
       reasoningContract,
       technicalReasoning,
@@ -1085,12 +1140,14 @@ export default async function handler(req, res) {
       if (candidateResume?.trim()) promptPayload.candidateResume = candidateResume.trim();
     }
     try {
-      const recallQuery = resolved.contextSource === "inherited" && resolved.resolvedDomain
-        ? `${question} ${resolved.resolvedDomain}`
-        : question;
+      const recallQuery = `${effectiveQuestion} ${resolved.resolvedDomain || ""}`.trim();
       const { strongest } = recallExperience(recallQuery);
       if (strongest) {
         promptPayload.documentedExperience = formatMemoryCard(strongest);
+        promptPayload.experienceSelection = {
+          confidence: strongest.strength || strongest.confidence || "medium",
+          label: strongest.topic || strongest.title || strongest.id || "documented match"
+        };
       }
     } catch (error) {
       logger?.error?.("Experience recall failed:", error);
@@ -1111,14 +1168,48 @@ export default async function handler(req, res) {
     // Ceiling is sized to the question's length tier (see lib/prompt/interviewPrompt.js) —
     // the main lever for keeping generation under the ~5-6s target in a single-pass
     // architecture, since streaming wall-clock time scales with tokens produced.
-    const maxTokens = getMaxTokensForCategory(analysis.category, analysis.secondaryCategories, question, analysis.isDeepenFollowUp, reasoningContract.reasoningMode);
+    const maxTokens = getMaxTokensForCategory(analysis.category, analysis.secondaryCategories, effectiveQuestion, analysis.isDeepenFollowUp, reasoningContract.reasoningMode, interviewContext.depth);
+
+    if (debugEnabled) {
+      writeSSEEvent(res, "context", sanitizeDebugContext(interviewContext, {
+        latencyMs: Date.now() - qaStartedMs,
+        classification: primaryCategory,
+        domain: analysis.domain,
+        reasoning: { mode: reasoningContract.reasoningMode },
+        components: technicalReasoning.recommendedComponents,
+        experienceConfidence: promptPayload.experienceSelection?.confidence || "low",
+        experienceLabel: promptPayload.experienceSelection?.label || "expertise-only",
+        requestedAnswerLength: interviewContext.depth
+      }));
+    }
+
+    if (interviewContext.retrievalDecision === "clarify") {
+      streamStarted = true;
+      recordedAnswer = interviewContext.questionTopic === "General"
+        ? "Could you finish the question so I stay on the exact topic?"
+        : `Could you finish that question about ${interviewContext.questionTopic}?`;
+      writeSSEChunk(res, recordedAnswer);
+      recordLiveQa({
+        question,
+        questionRaw: question,
+        questionResolved: effectiveQuestion,
+        interviewContext,
+        answerShown: recordedAnswer,
+        status: "completed",
+        model,
+        source: req.body?.source,
+        latencyMs: Date.now() - qaStartedMs
+      });
+      res.write("data: [DONE]\n\n");
+      return;
+    }
 
     const streamOptions = {
       apiKey,
       model,
       systemPrompt,
       recentHistory,
-      question,
+      question: effectiveQuestion,
       res,
       signal: controller.signal,
       maxTokens,
@@ -1151,7 +1242,6 @@ export default async function handler(req, res) {
         category: analysis.category,
         sapComponents: technicalReasoning.recommendedComponents,
         knowledgeContextChars: knowledgeContext.length,
-        knowledgeContextPreview: knowledgeContext.slice(0, 500),
         systemPromptChars: systemPrompt.length,
         timestamp: new Date().toISOString()
       };
@@ -1185,12 +1275,17 @@ export default async function handler(req, res) {
       recordedAnswer = fullAnswerText || "";
       recordLiveQa({
         question,
+        questionRaw: question,
+        questionResolved: effectiveQuestion,
+        interviewContext,
         answerShown: recordedAnswer,
         status: recordedAnswer.trim() ? "completed" : "empty",
         model,
         retryCount: Number(clientRetryCount) || 0,
         latencyMs: Date.now() - qaStartedMs,
         usage: tokenUsage,
+        source: req.body?.source,
+        retrieval: knowledgeResult.evidence,
         errorCode: null
       });
 
@@ -1206,6 +1301,7 @@ export default async function handler(req, res) {
           interviewer,
           candidateResume: promptPayload.candidateResume || ""
         });
+        qualityAnalysis.contextSummary = toHistoryContext(interviewContext);
         if (res?.writable) {
           res.write(`event: analysis\ndata: ${JSON.stringify(qualityAnalysis)}\n\n`);
         }
@@ -1227,12 +1323,17 @@ export default async function handler(req, res) {
 
     recordLiveQa({
       question,
+      questionRaw: question,
+      questionResolved: interviewContext?.questionResolved || question,
+      interviewContext,
       answerShown: recordedAnswer,
       status: recordedAnswer.trim() ? "partial" : "failed",
       model,
       retryCount: Number(clientRetryCount) || 0,
       latencyMs: Date.now() - qaStartedMs,
       usage: tokenUsage,
+      source: req.body?.source,
+      retrieval: interviewContext?.retrievalEvidence || [],
       errorCode: controller.signal.aborted ? "timeout" : (classified.code || "failed")
     });
 

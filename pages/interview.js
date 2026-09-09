@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { classifyGenerationFailure } from '../lib/generationGuard';
+import { buildBoundedHistory, isClearlyIncompleteFragment, removeSubmittedSnapshot } from '../lib/interviewContext';
 import {
   attachLiveSessionErrorShield,
   invokeSpeechCallback,
@@ -135,6 +136,7 @@ function getLiveInterviewSessionId() {
 }
 
 export default function InterviewPage() {
+  const router = useRouter();
   const dispatch = useDispatch();
   const transcriptionFromStore = useSelector(state => state.transcription);
   const aiResponseFromStore = useSelector(state => state.aiResponse);
@@ -163,6 +165,8 @@ export default function InterviewPage() {
   const [autoScroll, setAutoScroll] = useState(true);
   const [aiResponseSortOrder, setAiResponseSortOrder] = useState('newestAtTop');
   const [isPipWindowActive, setIsPipWindowActive] = useState(false);
+  const [debugEnabled, setDebugEnabled] = useState(false);
+  const [debugContext, setDebugContext] = useState(null);
 
   const pipWindowRef = useRef(null);
   const documentPipWindowRef = useRef(null);
@@ -178,7 +182,9 @@ export default function InterviewPage() {
   const isProcessingRef = useRef(false);
   const historyRef = useRef(history);
   const pendingAnalysisRef = useRef(null);
+  const pendingContextRef = useRef(null);
   const lastAskRef = useRef({ text: "", source: "microphone" });
+  const fragmentHoldRef = useRef({ system: "", microphone: "" });
 
   const showSnackbar = useCallback((message, severity = 'info') => {
     setSnackbarMessage(message);
@@ -195,6 +201,9 @@ export default function InterviewPage() {
   useEffect(() => { isManualModeRef.current = isManualMode; }, [isManualMode]);
   useEffect(() => { systemAutoModeRef.current = systemAutoMode; }, [systemAutoMode]);
   useEffect(() => { historyRef.current = history; }, [history]);
+  useEffect(() => {
+    if (router.isReady) setDebugEnabled(router.query.debug === "1");
+  }, [router.isReady, router.query.debug]);
 
   useEffect(() => {
     throttledDispatchSetAIResponseRef.current = throttle((payload) => {
@@ -312,8 +321,17 @@ export default function InterviewPage() {
         if (isNonSubstantiveFiller(finalTranscript.current[source])) {
           return;
         }
-
-askOpenAI(finalTranscript.current[source].trim(), source);
+        const snapshot = finalTranscript.current[source].trim();
+        if (isClearlyIncompleteFragment(snapshot) && fragmentHoldRef.current[source] !== snapshot) {
+          fragmentHoldRef.current[source] = snapshot;
+          silenceTimers.current[source] = setTimeout(() => {
+            const merged = finalTranscript.current[source].trim();
+            if (!isNonSubstantiveFiller(merged)) askOpenAI(merged, source);
+          }, Math.min(800, Math.max(350, currentSilenceTimerDuration * 250)));
+          return;
+        }
+        fragmentHoldRef.current[source] = "";
+        askOpenAI(snapshot, source);
       }, currentSilenceTimerDuration * 1000);
     }
   };
@@ -653,17 +671,16 @@ askOpenAI(finalTranscript.current[source].trim(), source);
     }
     if (source === 'system' || source === 'microphone') clearTimeout(silenceTimers.current[source]);
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const questionId = `q_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const submittedSnapshot = text;
     let streamedResponse = '';
 
-    dispatch(addToHistory({ type: 'question', text, timestamp, source, status: 'pending' }));
+    dispatch(addToHistory({ type: 'question', text, timestamp, source, questionId, status: 'completed' }));
     dispatch(setAIResponse(''));
 
     let requestController;
     try {
-      const conversationHistoryForAPI = historyRef.current
-        .filter(event => event.text && (event.type === 'question' || event.type === 'response') && event.status !== 'pending')
-        .slice(-4)
-        .map(event => ({ role: event.type === 'question' ? 'user' : 'assistant', content: event.text }));
+      const conversationHistoryForAPI = buildBoundedHistory(historyRef.current);
       activeRequestRef.current?.abort();
       requestController = new AbortController();
       activeRequestRef.current = requestController;
@@ -678,6 +695,9 @@ askOpenAI(finalTranscript.current[source].trim(), source);
         jobDescription: currentConfig.jobDescription,
         company: currentConfig.company,
         interviewSessionId: getLiveInterviewSessionId(),
+        source,
+        questionId,
+        debug: debugEnabled,
         retryCount: lastAskRef.current?.retryCount || 0,
       });
       const postChat = () => fetch('/api/chat', {
@@ -736,6 +756,17 @@ askOpenAI(finalTranscript.current[source].trim(), source);
               }
               continue;
             }
+            if (event.includes("event: context")) {
+              const payload = event.split("\ndata: ")[1];
+              try {
+                const parsed = JSON.parse(payload || "{}");
+                pendingContextRef.current = parsed;
+                setDebugContext(parsed);
+              } catch (parseError) {
+                console.error("Error parsing sanitized SSE context event:", parseError);
+              }
+              continue;
+            }
             const payload = event.split("data: ")[1];
             if (!payload || payload === "[DONE]") continue;
             try {
@@ -765,8 +796,19 @@ askOpenAI(finalTranscript.current[source].trim(), source);
       dispatch(setAIResponse(streamedResponse));
 
       const finalTimestamp = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-      dispatch(addToHistory({ type: "response", text: streamedResponse, timestamp: finalTimestamp, status: "completed", analysis: pendingAnalysisRef.current }));
+      dispatch(addToHistory({
+        type: "response",
+        text: streamedResponse,
+        timestamp: finalTimestamp,
+        answerId: `a_${Date.now()}`,
+        questionId,
+        source: "copilot",
+        status: "completed",
+        analysis: pendingAnalysisRef.current,
+        context: pendingAnalysisRef.current?.contextSummary || pendingContextRef.current
+      }));
       pendingAnalysisRef.current = null;
+      pendingContextRef.current = null;
       setGenerationError(null);
 
     } catch (error) {
@@ -807,13 +849,14 @@ askOpenAI(finalTranscript.current[source].trim(), source);
       if (isCurrentRequest) {
         activeRequestRef.current = null;
         if ((source === 'system' && systemAutoModeRef.current) || (source === 'microphone' && !isManualModeRef.current)) {
-          finalTranscript.current[source] = '';
+          finalTranscript.current[source] = removeSubmittedSnapshot(
+            finalTranscript.current[source],
+            submittedSnapshot
+          );
           if (source === 'system') {
-            systemInterimTranscription.current = '';
-            dispatch(setTranscription(''));
+            dispatch(setTranscription(finalTranscript.current.system + systemInterimTranscription.current));
           } else {
-            micInterimTranscription.current = '';
-            setMicTranscription('');
+            setMicTranscription(finalTranscript.current.microphone + micInterimTranscription.current);
           }
         }
         isProcessingRef.current = false;
@@ -1141,6 +1184,11 @@ askOpenAI(finalTranscript.current[source].trim(), source);
                 <SettingsIcon />
               </IconButton>
             </Tooltip>
+            <FormControlLabel
+              control={<Switch size="small" checked={debugEnabled} onChange={(event) => setDebugEnabled(event.target.checked)} />}
+              label="Debug"
+              sx={{ ml: 1, color: 'text.secondary' }}
+            />
           </Toolbar>
         </AppBar>
 
@@ -1222,6 +1270,16 @@ askOpenAI(finalTranscript.current[source].trim(), source);
                   </ScrollToBottom>
                 </CardContent>
               </Card>
+              {debugEnabled && (
+                <Card sx={{ mt: 2 }}>
+                  <CardHeader title="Interview Context" sx={{ pb: 0 }} />
+                  <CardContent>
+                    <Typography component="pre" variant="caption" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', m: 0 }}>
+                      {debugContext ? JSON.stringify(debugContext, null, 2) : 'Submit a question to view sanitized context.'}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              )}
             </Grid>
 
             {/* Center Panel */}
