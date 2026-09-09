@@ -8,8 +8,7 @@ const Q = "How did you handle user identity provisioning during your S/4HANA clo
   console.log(answer);
   console.log("\n--- layout score ---");
   const checks = [
-    ["DIRECT SPOKEN OPENING", /DIRECT SPOKEN OPENING/],
-    ["TECHNICAL STEPS AND REAL TIME EVIDENCE", /TECHNICAL STEPS AND REAL TIME EVIDENCE/],
+    ["no layout headings", /DIRECT SPOKEN OPENING|TECHNICAL STEPS AND REAL TIME EVIDENCE|TRAP \/ DEFENSE WARNING/i, false],
     ["first person I", /\bI\b/],
     ["IPS provisioning", /IPS/i],
     ["IAS not mixed as provisioner", /IAS/i],

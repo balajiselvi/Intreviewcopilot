@@ -294,7 +294,7 @@ function writeSSEChunk(res, text) {
 // chunk-boundary-independent operation, so it can run on every streamed token with no
 // buffering and zero added latency, unlike a real reformatting pass.
 function stripStreamMarkdown(text) {
-  return text.replace(/\*/g, "");
+  return String(text || "").replace(/\*/g, "");
 }
 
 function writeSSEError(res, errorMessage) {
@@ -1047,9 +1047,7 @@ export default async function handler(req, res) {
     // Ceiling is sized to the question's length tier (see lib/prompt/interviewPrompt.js) —
     // the main lever for keeping generation under the ~5-6s target in a single-pass
     // architecture, since streaming wall-clock time scales with tokens produced.
-    // Speak path: 90–120 words. Cap tokens so gpt-4o-mini cannot overrun the live budget.
-    const requestedTokens = getMaxTokensForCategory(analysis.category, analysis.secondaryCategories, question, analysis.isDeepenFollowUp, reasoningContract.reasoningMode);
-    const maxTokens = Math.min(requestedTokens, 200);
+    const maxTokens = getMaxTokensForCategory(analysis.category, analysis.secondaryCategories, question, analysis.isDeepenFollowUp, reasoningContract.reasoningMode);
 
     const streamOptions = {
       apiKey,

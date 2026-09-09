@@ -36,7 +36,7 @@ function score(item, answer) {
 function sacHistory() {
   return [
     { role: "user", content: "Explain SAC security." },
-    { role: "assistant", content: "DIRECT SPOKEN OPENING\nI keep SAC teams and stories separate from Datasphere and S/4 data rights after IAS login.\nTECHNICAL STEPS AND REAL TIME EVIDENCE\n1. IAS authenticates. 2. SAC team and folder rights control the story." }
+    { role: "assistant", content: "I keep SAC teams and stories separate from Datasphere and S/4 data rights after IAS login. If login works, I check team and folder rights on the story, then the model and source." }
   ];
 }
 
