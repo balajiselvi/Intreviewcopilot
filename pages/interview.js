@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { classifyGenerationFailure } from '../lib/generationGuard';
+import {
+  attachLiveSessionErrorShield,
+  invokeSpeechCallback,
+  safeCloseAudioConfig,
+  safeDisposeRecognizer,
+  stopMediaTracks
+} from '../lib/speechSessionGuard';
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -138,6 +145,9 @@ export default function InterviewPage() {
 
   const [systemRecognizer, setSystemRecognizer] = useState(null);
   const [micRecognizer, setMicRecognizer] = useState(null);
+  const systemRecognizerRef = useRef(null);
+  const micRecognizerRef = useRef(null);
+  const stopInFlightRef = useRef({ system: false, microphone: false });
   const [systemAutoMode, setSystemAutoMode] = useState(initialConfig.systemAutoMode !== undefined ? initialConfig.systemAutoMode : true);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [isMicrophoneActive, setIsMicrophoneActive] = useState(false);
@@ -198,52 +208,72 @@ export default function InterviewPage() {
     };
   }, [dispatch]);
 
+  useEffect(() => attachLiveSessionErrorShield((error) => {
+    console.error('Live session non-fatal error:', error);
+  }), []);
+
   useEffect(() => () => {
     clearTimeout(silenceTimers.current.system);
     clearTimeout(silenceTimers.current.microphone);
     activeRequestRef.current?.abort();
+    try {
+      stopMediaTracks(systemRecognizerRef.current?._sourceMediaStream);
+      if (typeof systemRecognizerRef.current?._audioCleanup === 'function') {
+        systemRecognizerRef.current._audioCleanup();
+      }
+    } catch (error) {
+      console.error('System audio unmount cleanup failed:', error);
+    }
+    try {
+      stopMediaTracks(micRecognizerRef.current?._sourceMediaStream);
+      if (typeof micRecognizerRef.current?._audioCleanup === 'function') {
+        micRecognizerRef.current._audioCleanup();
+      }
+    } catch (error) {
+      console.error('Microphone unmount cleanup failed:', error);
+    }
   }, []);
 
   const handleSnackbarClose = () => setSnackbarOpen(false);
 
   const stopRecording = async (source) => {
-    const recognizer = source === 'system' ? systemRecognizer : micRecognizer;
-    if (recognizer && typeof recognizer.stopContinuousRecognitionAsync === 'function') {
-      try {
-        await recognizer.stopContinuousRecognitionAsync();
-        if (recognizer.audioConfig && recognizer.audioConfig.privSource && recognizer.audioConfig.privSource.privStream) {
-          const stream = recognizer.audioConfig.privSource.privStream;
-          if (stream instanceof MediaStream) {
-            stream.getTracks().forEach(track => {
-              track.stop();
-            });
-          }
-        }
-        // System audio goes through createSystemAudioConfig()'s push-stream conversion, so
-        // the raw MediaStream isn't reachable via audioConfig.privSource above -- stop it and
-        // tear down the AudioContext/pushStream pipeline explicitly via what createRecognizer
-        // attached to the recognizer instance.
-        if (recognizer._sourceMediaStream) {
-          recognizer._sourceMediaStream.getTracks().forEach(track => track.stop());
-        }
-        if (typeof recognizer._audioCleanup === 'function') {
+    if (stopInFlightRef.current[source]) return;
+    stopInFlightRef.current[source] = true;
+    const recognizer = source === 'system' ? systemRecognizerRef.current : micRecognizerRef.current;
+    try {
+      if (recognizer && typeof recognizer.stopContinuousRecognitionAsync === 'function') {
+        await invokeSpeechCallback(recognizer.stopContinuousRecognitionAsync, recognizer, {
+          swallowError: true,
+          timeoutMs: 8000
+        });
+      }
+      if (recognizer?.audioConfig?.privSource?.privStream instanceof MediaStream) {
+        stopMediaTracks(recognizer.audioConfig.privSource.privStream);
+      }
+      stopMediaTracks(recognizer?._sourceMediaStream);
+      if (typeof recognizer?._audioCleanup === 'function') {
+        try {
           recognizer._audioCleanup();
-        }
-        if (recognizer.audioConfig && typeof recognizer.audioConfig.close === 'function') {
-          recognizer.audioConfig.close();
-        }
-      } catch (error) {
-        console.error(`Error stopping ${source} recognition:`, error);
-        showSnackbar(`Error stopping ${source} audio: ${error.message}`, 'error');
-      } finally {
-        if (source === 'system') {
-          setIsSystemAudioActive(false);
-          setSystemRecognizer(null);
-        } else {
-          setIsMicrophoneActive(false);
-          setMicRecognizer(null);
+        } catch (cleanupError) {
+          console.error(`Error cleaning ${source} audio pipeline:`, cleanupError);
         }
       }
+      await safeCloseAudioConfig(recognizer?.audioConfig);
+      await safeDisposeRecognizer(recognizer);
+    } catch (error) {
+      console.error(`Error stopping ${source} recognition:`, error);
+      showSnackbar(`${source === 'system' ? 'Tab audio' : 'Microphone'} stopped. You can start it again.`, 'warning');
+    } finally {
+      if (source === 'system') {
+        systemRecognizerRef.current = null;
+        setIsSystemAudioActive(false);
+        setSystemRecognizer(null);
+      } else {
+        micRecognizerRef.current = null;
+        setIsMicrophoneActive(false);
+        setMicRecognizer(null);
+      }
+      stopInFlightRef.current[source] = false;
     }
   };
 
@@ -397,7 +427,7 @@ askOpenAI(finalTranscript.current[source].trim(), source);
     const currentConfig = getConfig();
     if (!currentConfig.azureToken || !currentConfig.azureRegion) {
       showSnackbar('Azure Speech credentials missing. Please set them in Settings.', 'error');
-      mediaStream.getTracks().forEach(track => track.stop());
+      stopMediaTracks(mediaStream);
       return null;
     }
 
@@ -413,8 +443,8 @@ askOpenAI(finalTranscript.current[source].trim(), source);
       }
     } catch (configError) {
       console.error(`Error creating AudioConfig for ${source}:`, configError);
-      showSnackbar(`Error setting up audio for ${source}: ${configError.message}`, 'error');
-      mediaStream.getTracks().forEach(track => track.stop());
+      showSnackbar(`Error setting up audio for ${source}. You can try again.`, 'error');
+      stopMediaTracks(mediaStream);
       return null;
     }
 
@@ -433,25 +463,31 @@ askOpenAI(finalTranscript.current[source].trim(), source);
     recognizer._audioCleanup = audioCleanup;
 
     recognizer.recognizing = (s, e) => {
-      if (e.result.reason === SpeechSDK.ResultReason.RecognizingSpeech) {
-        const interimText = e.result.text;
-        if (source === 'system') {
-          systemInterimTranscription.current = interimText;
-          dispatch(setTranscription(finalTranscript.current.system + interimText));
-        } else {
-          micInterimTranscription.current = interimText;
-          setMicTranscription(finalTranscript.current.microphone + interimText);
+      try {
+        if (e.result.reason === SpeechSDK.ResultReason.RecognizingSpeech) {
+          const interimText = e.result.text;
+          if (source === 'system') {
+            systemInterimTranscription.current = interimText;
+            dispatch(setTranscription(finalTranscript.current.system + interimText));
+          } else {
+            micInterimTranscription.current = interimText;
+            setMicTranscription(finalTranscript.current.microphone + interimText);
+          }
         }
+      } catch (eventError) {
+        console.error(`recognizing handler failed for ${source}:`, eventError);
       }
     };
 
     recognizer.recognized = (s, e) => {
-      if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech && e.result.text) {
-        if (source === 'system') systemInterimTranscription.current = '';
-        else micInterimTranscription.current = '';
-        handleTranscriptionEvent(e.result.text, source);
-      } else if (e.result.reason === SpeechSDK.ResultReason.NoMatch) {
-        // console.log(`NOMATCH: Speech could not be recognized for ${source}.`);
+      try {
+        if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech && e.result.text) {
+          if (source === 'system') systemInterimTranscription.current = '';
+          else micInterimTranscription.current = '';
+          handleTranscriptionEvent(e.result.text, source);
+        }
+      } catch (eventError) {
+        console.error(`recognized handler failed for ${source}:`, eventError);
       }
     };
 
@@ -460,41 +496,51 @@ askOpenAI(finalTranscript.current[source].trim(), source);
       if (e.reason === SpeechSDK.CancellationReason.Error) {
         console.error(`CANCELED: ErrorCode=${e.errorCode}`);
         console.error(`CANCELED: ErrorDetails=${e.errorDetails}`);
-        showSnackbar(`Speech recognition error for ${source}: ${e.errorDetails}`, 'error');
+        showSnackbar(`Speech recognition error for ${source}. Capture stopped; you can start it again.`, 'error');
       }
-      stopRecording(source);
+      if (!stopInFlightRef.current[source]) {
+        stopRecording(source);
+      }
     };
 
     recognizer.sessionStopped = (s, e) => {
       console.log(`Session stopped event for ${source}.`);
-      stopRecording(source);
+      if (!stopInFlightRef.current[source]) {
+        stopRecording(source);
+      }
     };
 
     try {
-      await recognizer.startContinuousRecognitionAsync();
+      await invokeSpeechCallback(recognizer.startContinuousRecognitionAsync, recognizer, { timeoutMs: 15000 });
       return recognizer;
     } catch (error) {
       console.error(`Error starting ${source} continuous recognition:`, error);
-      showSnackbar(`Failed to start ${source} recognition: ${error.message}`, 'error');
-      if (audioConfig && typeof audioConfig.close === 'function') audioConfig.close();
-      mediaStream.getTracks().forEach(track => track.stop());
+      showSnackbar(`Failed to start ${source} recognition. You can try again.`, 'error');
+      try {
+        if (typeof audioCleanup === 'function') audioCleanup();
+      } catch (cleanupError) {
+        console.error(`Error cleaning ${source} audio after start failure:`, cleanupError);
+      }
+      await safeCloseAudioConfig(audioConfig);
+      await safeDisposeRecognizer(recognizer);
+      stopMediaTracks(mediaStream);
       return null;
     }
   };
 
   const startSystemAudioRecognition = async () => {
-    if (isSystemAudioActive) {
-      await stopRecording('system');
-      return;
-    }
-
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-      showSnackbar('Screen sharing is not supported by your browser.', 'error');
-      setIsSystemAudioActive(false);
-      return;
-    }
-
     try {
+      if (isSystemAudioActive) {
+        await stopRecording('system');
+        return;
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+        showSnackbar('Screen sharing is not supported by your browser.', 'error');
+        setIsSystemAudioActive(false);
+        return;
+      }
+
       const mediaStream = await navigator.mediaDevices.getDisplayMedia({
         audio: true,
         video: {
@@ -506,27 +552,30 @@ askOpenAI(finalTranscript.current[source].trim(), source);
       const audioTracks = mediaStream.getAudioTracks();
       if (audioTracks.length === 0) {
         showSnackbar('No audio track detected. Please ensure you share a tab with audio.', 'warning');
-        mediaStream.getTracks().forEach(track => track.stop());
+        stopMediaTracks(mediaStream);
         return;
       }
 
-      if (systemRecognizer) {
+      if (systemRecognizerRef.current) {
         await stopRecording('system');
       }
 
       const recognizerInstance = await createRecognizer(mediaStream, 'system');
       if (recognizerInstance) {
+        systemRecognizerRef.current = recognizerInstance;
         setSystemRecognizer(recognizerInstance);
         setIsSystemAudioActive(true);
         showSnackbar('System audio recording started.', 'success');
         mediaStream.getTracks().forEach(track => {
           track.onended = () => {
             showSnackbar('Tab sharing ended.', 'info');
-            stopRecording('system');
+            stopRecording('system').catch((stopError) => {
+              console.error('Error after tab sharing ended:', stopError);
+            });
           };
         });
       } else {
-        mediaStream.getTracks().forEach(track => track.stop());
+        stopMediaTracks(mediaStream);
       }
     } catch (error) {
       console.error('System audio capture error:', error);
@@ -537,35 +586,36 @@ askOpenAI(finalTranscript.current[source].trim(), source);
       } else if (error.name === "NotSupportedError") {
         showSnackbar('System audio capture not supported by your browser.', 'error');
       } else {
-        showSnackbar(`Failed to start system audio capture: ${error.message || 'Unknown error'}`, 'error');
+        showSnackbar('Failed to start tab audio capture. You can try again.', 'error');
       }
       setIsSystemAudioActive(false);
     }
   };
 
   const startMicrophoneRecognition = async () => {
-    if (isMicrophoneActive) {
-      await stopRecording('microphone');
-      return;
-    }
     try {
+      if (isMicrophoneActive) {
+        await stopRecording('microphone');
+        return;
+      }
       const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (micRecognizer) await stopRecording('microphone');
+      if (micRecognizerRef.current) await stopRecording('microphone');
 
       const recognizerInstance = await createRecognizer(mediaStream, 'microphone');
       if (recognizerInstance) {
+        micRecognizerRef.current = recognizerInstance;
         setMicRecognizer(recognizerInstance);
         setIsMicrophoneActive(true);
         showSnackbar('Microphone recording started.', 'success');
       } else {
-        mediaStream.getTracks().forEach(track => track.stop());
+        stopMediaTracks(mediaStream);
       }
     } catch (error) {
       console.error('Microphone capture error:', error);
       if (error.name === "NotAllowedError" || error.name === "NotFoundError") {
         showSnackbar('Permission denied for microphone. Please allow access.', 'error');
       } else {
-        showSnackbar(`Failed to access microphone: ${error.message || 'Unknown error'}`, 'error');
+        showSnackbar('Failed to access microphone. You can try again.', 'error');
       }
       setIsMicrophoneActive(false);
     }
