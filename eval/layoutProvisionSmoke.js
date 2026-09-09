@@ -12,7 +12,7 @@ const Q = "How did you handle user identity provisioning during your S/4HANA clo
     ["first person I", /\bI\b/],
     ["IPS provisioning", /IPS/i],
     ["IAS not mixed as provisioner", /IAS/i],
-    ["JML metric or 30 min", /30\s*min|three days|3 days/i],
+    ["Dover or SCIM", /Dover|SCIM/i],
     ["no 35 percent", /35\s*%|35 percent/i, false],
     ["no Chalhoub/Accenture", /Chalhoub|Accenture/i, false],
     ["no markdown asterisks", /\*/, false]

@@ -20,5 +20,4 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
-# Local dumps (exceed GitHub 100MB limit; not source of truth)
-codebase.txt
+data/interview-sessions/

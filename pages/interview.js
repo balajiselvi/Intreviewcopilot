@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { classifyGenerationFailure } from '../lib/generationGuard';
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -112,6 +113,20 @@ function isNonSubstantiveFiller(rawText = "") {
   return clauses.every((clause) => FILLER_PHRASES.has(clause));
 }
 
+const LIVE_SESSION_KEY = "interviewCopilot.liveSessionId";
+
+function getLiveInterviewSessionId() {
+  try {
+    const existing = sessionStorage.getItem(LIVE_SESSION_KEY);
+    if (existing && /^[a-zA-Z0-9_-]{8,80}$/.test(existing)) return existing;
+    const created = `live_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+    sessionStorage.setItem(LIVE_SESSION_KEY, created);
+    return created;
+  } catch {
+    return `live_${Date.now().toString(36)}_nosess`;
+  }
+}
+
 export default function InterviewPage() {
   const dispatch = useDispatch();
   const transcriptionFromStore = useSelector(state => state.transcription);
@@ -134,6 +149,7 @@ export default function InterviewPage() {
   const [isManualMode, setIsManualMode] = useState(initialConfig.isManualMode !== undefined ? initialConfig.isManualMode : false);
   const [micTranscription, setMicTranscription] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [generationError, setGenerationError] = useState(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const [aiResponseSortOrder, setAiResponseSortOrder] = useState('newestAtTop');
   const [isPipWindowActive, setIsPipWindowActive] = useState(false);
@@ -152,6 +168,7 @@ export default function InterviewPage() {
   const isProcessingRef = useRef(false);
   const historyRef = useRef(history);
   const pendingAnalysisRef = useRef(null);
+  const lastAskRef = useRef({ text: "", source: "microphone" });
 
   const showSnackbar = useCallback((message, severity = 'info') => {
     setSnackbarMessage(message);
@@ -293,6 +310,7 @@ askOpenAI(finalTranscript.current[source].trim(), source);
   const handleKeyPress = (e, source) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      if (isProcessingRef.current) return;
       handleManualSubmit(source);
     }
   };
@@ -573,6 +591,16 @@ askOpenAI(finalTranscript.current[source].trim(), source);
 
     isProcessingRef.current = true;
     setIsProcessing(true);
+    setGenerationError(null);
+    if (lastAskRef.current?.text !== text) {
+      lastAskRef.current = { text, source, retryCount: 0 };
+    } else {
+      lastAskRef.current = {
+        text,
+        source,
+        retryCount: Number(lastAskRef.current.retryCount) || 0
+      };
+    }
     if (source === 'system' || source === 'microphone') clearTimeout(silenceTimers.current[source]);
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     let streamedResponse = '';
@@ -589,90 +617,141 @@ askOpenAI(finalTranscript.current[source].trim(), source);
       activeRequestRef.current?.abort();
       requestController = new AbortController();
       activeRequestRef.current = requestController;
-      const response = await fetch('/api/chat', {
+      const chatBody = JSON.stringify({
+        apiKey,
+        model: currentConfig.aiModel,
+        question: text,
+        history: conversationHistoryForAPI,
+        responseLength: "interview",
+        customInstructions: currentConfig.gptSystemPrompt,
+        candidateResume: currentConfig.candidateResume,
+        jobDescription: currentConfig.jobDescription,
+        company: currentConfig.company,
+        interviewSessionId: getLiveInterviewSessionId(),
+        retryCount: lastAskRef.current?.retryCount || 0,
+      });
+      const postChat = () => fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: requestController.signal,
-        body: JSON.stringify({
-          apiKey,
-          model: currentConfig.aiModel,
-          question: text,
-          history: conversationHistoryForAPI,
-          responseLength: "interview",
-          customInstructions: currentConfig.gptSystemPrompt,
-          candidateResume: currentConfig.candidateResume,
-          jobDescription: currentConfig.jobDescription,
-          company: currentConfig.company,
-        }),
+        body: chatBody,
       });
-      if (!response.ok) {
-        let errorMessage = 'Failed to get AI response.';
+      const classifyHttpFailure = async (res) => {
+        let raw = "";
         try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorMessage;
+          const errorData = await res.json();
+          raw = errorData.error || "";
         } catch {
           try {
-            const text = await response.text();
-            if (text) errorMessage = text;
+            raw = await res.text();
           } catch {
-            errorMessage = `HTTP ${response.status}: ${response.statusText || 'Unknown error'}`;
+            raw = "";
           }
         }
-        throw new Error(errorMessage);
-      }
-      if (!response.body) throw new Error('Response body is empty. Please try again.');
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const events = buffer.split('\n\n');
-        buffer = events.pop() || '';
-        for (const event of events) {
-          if (event.includes('event: error')) {
-            const payload = event.split('\ndata: ')[1];
-            throw new Error(JSON.parse(payload || '{}').error || 'AI request failed.');
-          }
-          if (event.includes('event: analysis')) {
-            const payload = event.split('\ndata: ')[1];
-            try {
-              pendingAnalysisRef.current = JSON.parse(payload || '{}');
-            } catch (parseError) {
-              console.error('Error parsing SSE analysis event:', parseError);
+        return classifyGenerationFailure({ httpStatus: res.status, message: raw });
+      };
+      const consumeChatStream = async (okResponse) => {
+        if (!okResponse.body) {
+          throw Object.assign(new Error("Could not generate an answer."), {
+            classified: classifyGenerationFailure({ message: "empty body" })
+          });
+        }
+        const reader = okResponse.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const events = buffer.split("\n\n");
+          buffer = events.pop() || "";
+          for (const event of events) {
+            if (event.includes("event: error")) {
+              let classified = classifyGenerationFailure({ message: "stream error" });
+              try {
+                const payload = event.split("\ndata: ")[1];
+                const parsed = JSON.parse(payload || "{}");
+                classified = classifyGenerationFailure({ message: parsed.error || "" });
+              } catch {
+                // keep generic copy — never surface raw API payloads
+              }
+              throw Object.assign(new Error(classified.userMessage), { classified });
             }
-            continue;
-          }
-          const payload = event.split('data: ')[1];
-          if (!payload || payload === '[DONE]') continue;
-          try {
-            const chunkText = JSON.parse(payload).text || '';
-            streamedResponse += chunkText;
-            throttledDispatchSetAIResponseRef.current?.(streamedResponse);
-          } catch (parseError) {
-            console.error('Error parsing SSE chunk:', parseError);
+            if (event.includes("event: analysis")) {
+              const payload = event.split("\ndata: ")[1];
+              try {
+                pendingAnalysisRef.current = JSON.parse(payload || "{}");
+              } catch (parseError) {
+                console.error("Error parsing SSE analysis event:", parseError);
+              }
+              continue;
+            }
+            const payload = event.split("data: ")[1];
+            if (!payload || payload === "[DONE]") continue;
+            try {
+              const chunkText = JSON.parse(payload).text || "";
+              streamedResponse += chunkText;
+              throttledDispatchSetAIResponseRef.current?.(streamedResponse);
+            } catch (parseError) {
+              console.error("Error parsing SSE chunk:", parseError);
+            }
           }
         }
+      };
+      let response = await postChat();
+      if (!response.ok) {
+        const classified = await classifyHttpFailure(response);
+        throw Object.assign(new Error(classified.userMessage), { classified });
       }
-      if (throttledDispatchSetAIResponseRef.current && typeof throttledDispatchSetAIResponseRef.current.cancel === 'function') {
+      await consumeChatStream(response);
+      if (!streamedResponse.trim()) {
+        throw Object.assign(new Error("Could not generate an answer."), {
+          classified: classifyGenerationFailure({ message: "empty generation" })
+        });
+      }
+      if (throttledDispatchSetAIResponseRef.current && typeof throttledDispatchSetAIResponseRef.current.cancel === "function") {
         throttledDispatchSetAIResponseRef.current.cancel();
       }
       dispatch(setAIResponse(streamedResponse));
 
-      const finalTimestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      dispatch(addToHistory({ type: 'response', text: streamedResponse, timestamp: finalTimestamp, status: 'completed', analysis: pendingAnalysisRef.current }));
+      const finalTimestamp = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      dispatch(addToHistory({ type: "response", text: streamedResponse, timestamp: finalTimestamp, status: "completed", analysis: pendingAnalysisRef.current }));
       pendingAnalysisRef.current = null;
+      setGenerationError(null);
 
     } catch (error) {
-      if (error?.name === 'AbortError' || requestController?.signal.aborted) {
+      const superseded = activeRequestRef.current !== requestController;
+      const aborted = error?.name === "AbortError" || requestController?.signal.aborted;
+      if (aborted && superseded) {
         return;
       }
-      console.error("AI request error:", error);
-      const errorMessage = `AI request failed: ${error.message || 'Unknown error'}`;
-      showSnackbar(errorMessage, 'error');
-      dispatch(setAIResponse(`Error: ${errorMessage}`));
-      dispatch(addToHistory({ type: 'response', text: `Error: ${errorMessage}`, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), status: 'error' }));
+      if (streamedResponse.trim()) {
+        dispatch(setAIResponse(streamedResponse));
+        dispatch(addToHistory({
+          type: "response",
+          text: streamedResponse,
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          status: aborted ? "interrupted" : "completed",
+          analysis: pendingAnalysisRef.current
+        }));
+        pendingAnalysisRef.current = null;
+      }
+      if (aborted && superseded) return;
+      const classified = error?.classified || classifyGenerationFailure({
+        message: error?.message,
+        name: error?.name
+      });
+      setGenerationError({ ...classified, question: text, source });
+      showSnackbar(classified.userMessage, "error");
+      if (!streamedResponse.trim()) {
+        dispatch(setAIResponse(""));
+        dispatch(addToHistory({
+          type: "response",
+          text: classified.userMessage,
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          status: "error"
+        }));
+      }
     } finally {
       const isCurrentRequest = activeRequestRef.current === requestController;
       if (isCurrentRequest) {
@@ -762,6 +841,25 @@ askOpenAI(finalTranscript.current[source].trim(), source);
             <Typography variant="caption" color="text.secondary">{item.timestamp}</Typography>
           </Box>
           {formatAndDisplayResponse(item.text)}
+          {item.status === 'error' && (
+            <Button
+              size="small"
+              sx={{ mt: 1 }}
+              disabled={isProcessing}
+              onClick={() => {
+                const q = lastAskRef.current?.text;
+                const src = lastAskRef.current?.source || 'microphone';
+                if (!q) return;
+                lastAskRef.current = {
+                  ...lastAskRef.current,
+                  retryCount: (Number(lastAskRef.current.retryCount) || 0) + 1
+                };
+                askOpenAI(q, src);
+              }}
+            >
+              Retry
+            </Button>
+          )}
           {item.analysis && <AnswerQualityPanel analysis={item.analysis} />}
         </Paper>
       </ListItem>
@@ -1118,6 +1216,26 @@ askOpenAI(finalTranscript.current[source].trim(), source);
                         <ListItem sx={{ justifyContent: 'center', py: 2 }}>
                           <CircularProgress size={24} />
                           <Typography variant="caption" sx={{ ml: 1 }}>AI is thinking...</Typography>
+                        </ListItem>
+                      )}
+                      {!isProcessing && generationError && (
+                        <ListItem sx={{ justifyContent: 'center', py: 1 }}>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => {
+                              const q = lastAskRef.current?.text;
+                              const src = lastAskRef.current?.source || 'microphone';
+                              if (!q) return;
+                              lastAskRef.current = {
+                                ...lastAskRef.current,
+                                retryCount: (Number(lastAskRef.current.retryCount) || 0) + 1
+                              };
+                              askOpenAI(q, src);
+                            }}
+                          >
+                            Retry
+                          </Button>
                         </ListItem>
                       )}
                     </List>

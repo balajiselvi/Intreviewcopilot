@@ -19,6 +19,8 @@ const require = createRequire(import.meta.url);
 const { recallExperience, formatMemoryCard } = require("../../eval/lib/expertiseCards.js");
 const { DEFAULT_CAREER_BACKGROUND } = require("../../eval/lib/careerTimeline.js");
 const { shouldInheritPriorDomain, hasStrongTechnicalEvidence, isPlaneFoil, isTopicContinuation } = require("../../lib/contextInheritance.js");
+const { publicLlmError } = require("../../lib/generationGuard.js");
+const { appendQa } = require("../../lib/interviewSessionStore.js");
 
 const MAX_HISTORY_ITEMS = 6;
 const DEFAULT_TIMEOUT_MS = 25000;
@@ -664,15 +666,14 @@ async function streamGeminiResponse({ apiKey, model, systemPrompt, recentHistory
   return fullText;
 }
 
-async function streamOpenAIResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens }) {
-  const client = new OpenAI({ apiKey });
-
-  const stream = await client.chat.completions.create(
+async function createOpenAiChatStream(client, { model, systemPrompt, recentHistory, question, maxTokens, signal }) {
+  return client.chat.completions.create(
     {
       model,
       temperature: 0.1,
       max_tokens: maxTokens,
       stream: true,
+      stream_options: { include_usage: true },
       messages: [
         { role: "system", content: systemPrompt },
         ...recentHistory,
@@ -681,15 +682,53 @@ async function streamOpenAIResponse({ apiKey, model, systemPrompt, recentHistory
     },
     { signal }
   );
+}
+
+function isTransientLlmError(error) {
+  const classified = publicLlmError(error);
+  return classified.autoRetry === true;
+}
+
+async function streamOpenAIResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens, onUsage, onChunk }) {
+  const client = new OpenAI({ apiKey });
+  const args = { model, systemPrompt, recentHistory, question, maxTokens, signal };
+  let stream;
+  try {
+    stream = await createOpenAiChatStream(client, args);
+  } catch (error) {
+    if (signal?.aborted) throw error;
+    if (isTransientLlmError(error)) {
+      stream = await createOpenAiChatStream(client, args);
+    } else {
+      const safe = publicLlmError(error);
+      const wrapped = new Error(safe.userMessage);
+      wrapped.status = error?.status;
+      throw wrapped;
+    }
+  }
 
   let fullText = "";
+  let usage = null;
   for await (const part of stream) {
     if (signal?.aborted) break;
+    if (part.usage) {
+      usage = {
+        prompt_tokens: part.usage.prompt_tokens,
+        completion_tokens: part.usage.completion_tokens,
+        total_tokens: part.usage.total_tokens
+      };
+    }
     const text = stripStreamMarkdown(part.choices[0]?.delta?.content || "");
     if (text) {
       writeSSEChunk(res, text);
       fullText += text;
+      if (typeof onChunk === "function") {
+        try { onChunk(text); } catch { /* history only */ }
+      }
     }
+  }
+  if (typeof onUsage === "function" && usage) {
+    try { onUsage(usage); } catch { /* metadata only */ }
   }
   return fullText;
 }
@@ -835,7 +874,9 @@ export default async function handler(req, res) {
     customInstructions,
     candidateResume,
     jobDescription,
-    company
+    company,
+    interviewSessionId,
+    retryCount: clientRetryCount
   } = req.body || {};
 
   // Falls back to the configured default (OPENAI_MODEL) when the client doesn't
@@ -924,6 +965,29 @@ export default async function handler(req, res) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
   let streamStarted = false;
+  let recordedAnswer = "";
+  let tokenUsage = null;
+  const qaStartedMs = Date.now();
+  let qaRecorded = false;
+  const recordLiveQa = (fields) => {
+    if (qaRecorded) return;
+    try {
+      if (!interviewSessionId) return;
+      const result = appendQa(
+        interviewSessionId,
+        {
+          jobLabel: String(company || "").slice(0, 80),
+          company: String(company || "").slice(0, 80),
+          model,
+          source: "live-interview"
+        },
+        fields
+      );
+      if (result.ok) qaRecorded = true;
+    } catch {
+      // History is non-critical. Generation must continue.
+    }
+  };
 
   try {
     const recoverySignal = isRecoverySignal(question) && history.length > 0;
@@ -1057,7 +1121,13 @@ export default async function handler(req, res) {
       question,
       res,
       signal: controller.signal,
-      maxTokens
+      maxTokens,
+      onUsage: (usage) => {
+        tokenUsage = usage;
+      },
+      onChunk: (text) => {
+        recordedAnswer += text;
+      }
     };
 
     streamStarted = true;
@@ -1112,6 +1182,17 @@ export default async function handler(req, res) {
       } else {
         fullAnswerText = await streamOpenAIResponse(streamOptions);
       }
+      recordedAnswer = fullAnswerText || "";
+      recordLiveQa({
+        question,
+        answerShown: recordedAnswer,
+        status: recordedAnswer.trim() ? "completed" : "empty",
+        model,
+        retryCount: Number(clientRetryCount) || 0,
+        latencyMs: Date.now() - qaStartedMs,
+        usage: tokenUsage,
+        errorCode: null
+      });
 
       // Post-answer evaluation: pure heuristics, no LLM call, runs only after every
       // content chunk is already on the wire — never delays the spoken answer, and a
@@ -1139,9 +1220,21 @@ export default async function handler(req, res) {
   } catch (error) {
     logger?.error?.("Interview Copilot Error:", error);
 
+    const classified = publicLlmError(error);
     const errorMessage = controller.signal.aborted
       ? "Request timed out while generating response."
-      : error?.message || "Failed to generate AI response.";
+      : classified.userMessage;
+
+    recordLiveQa({
+      question,
+      answerShown: recordedAnswer,
+      status: recordedAnswer.trim() ? "partial" : "failed",
+      model,
+      retryCount: Number(clientRetryCount) || 0,
+      latencyMs: Date.now() - qaStartedMs,
+      usage: tokenUsage,
+      errorCode: controller.signal.aborted ? "timeout" : (classified.code || "failed")
+    });
 
     if (streamStarted && res?.writable) {
       writeSSEError(res, errorMessage);

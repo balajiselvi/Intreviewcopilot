@@ -542,16 +542,32 @@ function recallExperience(question = "") {
   };
 }
 
+const STALE_VS_CV = /10,?000\s*\+?\s*user|power query|20\s*(to|-|–)\s*25\s*%|20\s*(to|-|–)\s*25\s*percent|3 days to under 30|70\s*(to|-|–)\s*80\s*percent|false-positive cut|recent S\/4HANA (transformation|rollout)|in a recent project/i;
+
+function fieldConflictsWithCv(text) {
+  return Boolean(text) && STALE_VS_CV.test(String(text));
+}
+
 function formatMemoryCard(card) {
   if (!card) {
     return "PERSONAL EXPERIENCE DETAIL NOT EXPLICITLY DOCUMENTED in the expertise narrative. Use technical knowledge only, labelled as such.";
   }
-  const verify = (card.verify || []).length
-    ? `\nVERIFY FROM MEMORY BEFORE SAYING: ${card.verify.join("; ")}`
+  const verifyKeep = (card.verify || []).filter((v) => !fieldConflictsWithCv(v));
+  const verify = verifyKeep.length
+    ? `\nVERIFY FROM MEMORY BEFORE SAYING: ${verifyKeep.join("; ")}`
     : "";
-  const spoken = card.spoken
-    ? `SPOKEN ANSWER (prefer this wording; stay first-person; no client names):\n${card.spoken}\n`
+  const spoken = card.spoken && !fieldConflictsWithCv(card.spoken)
+    ? `TECHNICAL METHOD FROM CARD (do not copy metrics or unnamed programmes; CANDIDATE BACKGROUND / CV wins):\n${card.spoken}\n`
     : "";
+  const result = fieldConflictsWithCv(card.result)
+    ? "RESULT: omit card metrics — use only CANDIDATE BACKGROUND / CV numbers for this question."
+    : `RESULT (as written in the document): ${card.result}`;
+  const responsibility = fieldConflictsWithCv(card.responsibility)
+    ? "MY PERSONAL RESPONSIBILITY: use CANDIDATE BACKGROUND for user-volume and outcome metrics."
+    : `MY PERSONAL RESPONSIBILITY: ${card.responsibility}`;
+  const actions = (card.actions || []).filter((a) => !fieldConflictsWithCv(a));
+  const terms = (card.terms || []).filter((t) => !fieldConflictsWithCv(t) && !/power query/i.test(t));
+  const followUps = (card.followUps || []).filter((f) => !fieldConflictsWithCv(f) && !/35 percent/i.test(f));
   return [
     spoken,
     "CLAIM CLASSES: CV/DOCUMENT SUPPORTED = PROJECT, EMPLOYER, RESULT, VERIFY lines only. TECHNICAL KNOWLEDGE = T-codes and product mechanics. MEMORY VERIFICATION REQUIRED = any extra incident, partner split, or business-refusal anecdote not written here — omit those.",
@@ -559,18 +575,18 @@ function formatMemoryCard(card) {
     `MY ROLE: ${card.role}`,
     `BUSINESS CONTEXT: ${card.context}`,
     `PROBLEM: ${card.problem}`,
-    `MY PERSONAL RESPONSIBILITY: ${card.responsibility}`,
-    `TECHNICAL ACTIONS: ${card.actions.join("; ") || "(none documented)"}`,
+    responsibility,
+    `TECHNICAL ACTIONS: ${actions.join("; ") || "(none documented)"}`,
     `KEY DECISION: ${card.decision || "not documented"}`,
     `WHY: ${card.why || "not documented"}`,
     `GOVERNANCE: ${card.governance || "not documented"}`,
-    `RESULT (as written in the document): ${card.result}`,
-    `KEY TECHNICAL TERMS: ${card.terms.join(", ")}`,
-    `LIKELY FOLLOW-UP: ${(card.followUps || []).join(" | ")}`,
+    result,
+    `KEY TECHNICAL TERMS: ${terms.join(", ")}`,
+    `LIKELY FOLLOW-UP: ${followUps.join(" | ")}`,
     `STRENGTH: ${card.strength}`,
     card.employer ? `EMPLOYER TO NAME IF ASKED CHRONOLOGY: ${card.employer}` : "",
     verify
   ].filter(Boolean).join("\n");
 }
 
-module.exports = { EXPERIENCE_CARDS, recallExperience, formatMemoryCard, PHRASE_BOOSTS };
+module.exports = { EXPERIENCE_CARDS, recallExperience, formatMemoryCard, PHRASE_BOOSTS, fieldConflictsWithCv, STALE_VS_CV };

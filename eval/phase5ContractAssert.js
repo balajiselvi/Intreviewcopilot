@@ -34,7 +34,7 @@ assert.match(prompt, /never say SAP owns or operates (?:the )?Cloud Connector/i)
 assert.match(prompt, /ACTIVE DOMAIN SCOPE/);
 assert.match(prompt, /MASTER HANDS-ON BANK/);
 assert.match(fs.readFileSync(path.join(__dirname, "../eval/lib/expertiseCards.js"), "utf8"), /CLAIM CLASSES/);
-assert.match(prompt, /20-25 percent/);
+assert.match(prompt, /1,650 PFCG/);
 assert.match(prompt, /AGR_USERS, AGR_1251, last logon/);
 
 console.log("phase5 source contract assertions: PASS");
