@@ -1020,6 +1020,7 @@ export default async function handler(req, res) {
       questionId: req.body?.questionId
     });
     const effectiveQuestion = interviewContext.questionResolved || question;
+    const providerQuestion = interviewContext.answerTarget || interviewContext.questionRaw || question;
     const debugEnabled = requestDebug === true || req.query?.debug === "1" || process.env.INTERVIEW_DEBUG === "1";
     const contextualIntents = new Set([
       QUESTION_INTENTS.FOLLOW_UP,
@@ -1116,7 +1117,7 @@ export default async function handler(req, res) {
     const engineeringJudgmentContext = renderEngineeringJudgmentSection(engineeringJudgment);
 
     const promptPayload = {
-      question: effectiveQuestion,
+      question: providerQuestion,
       interviewContext,
       analysis,
       reasoningContract,
@@ -1209,7 +1210,7 @@ export default async function handler(req, res) {
       model,
       systemPrompt,
       recentHistory,
-      question: effectiveQuestion,
+      question: providerQuestion,
       res,
       signal: controller.signal,
       maxTokens,

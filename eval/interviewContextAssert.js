@@ -153,7 +153,7 @@ const debug = sanitizeDebugContext({
   reasoning: { mode: "architecture", hiddenThought: "secret" },
   components: ["IAG", "IPS"]
 });
-assert.match(JSON.stringify(debug), /chunk-1/);
+assert.match(debug.answerTarget, /IAG is configured except JML/);
 assert.doesNotMatch(JSON.stringify(debug), /secret prompt|sk-secret|private evidence|hiddenThought/);
 
 const paraphrases = [
@@ -178,11 +178,17 @@ const promptSource = fs.readFileSync(path.join(__dirname, "../lib/prompt/intervi
 const chatSource = fs.readFileSync(path.join(__dirname, "../pages/api/chat.js"), "utf8");
 const interviewSource = fs.readFileSync(path.join(__dirname, "../pages/interview.js"), "utf8");
 assert.match(promptSource, /CURRENT INTERVIEW CONTEXT/);
+assert.match(promptSource, /Answer target:/);
+assert.match(promptSource, /answerTarget \|\| interviewContext.questionRaw/);
+assert.match(promptSource, /Active technical chain:/);
+assert.match(promptSource, /Current question meaning: which authorization object FIELD VALUE is driving the conflict, not business\/ROI value/);
+assert.match(promptSource, /Do not restart by answering earlier clauses/);
 assert.match(promptSource, /Confidence: low/);
 assert.match(promptSource, /30-60/);
 assert.match(promptSource, /150-250/);
 assert.match(chatSource, /effectiveQuestion = interviewContext.questionResolved \|\| question/);
-assert.match(chatSource, /question: effectiveQuestion/);
+assert.match(chatSource, /providerQuestion = interviewContext.answerTarget \|\| interviewContext.questionRaw \|\| question/);
+assert.match(chatSource, /question: providerQuestion/);
 assert.match(chatSource, /event", sanitizeDebugContext|writeSSEEvent\(res, "context"/);
 assert.doesNotMatch(chatSource, /knowledgeContextPreview/);
 assert.match(interviewSource, /removeSubmittedSnapshot/);
@@ -266,6 +272,37 @@ assert.match(valueFollowUp.questionResolved, /authorization object/i);
 assert.match(valueFollowUp.questionResolved, /value/i);
 assert.strictEqual(valueFollowUp.depth, "deep");
 
+const whatValueShort = resolveInterviewContext({
+  questionRaw: "What value?",
+  history: valueHistory
+});
+assert.match(whatValueShort.interviewerObjective, /field.*value/i);
+assert.strictEqual(whatValueShort.questionRaw, "What value?");
+assert.strictEqual(whatValueShort.answerTarget, "Which authorization field value is causing the SoD conflict? No actual field value is supplied in the current context, so explain how you would trace the exact value and do not invent one.");
+assert.match(whatValueShort.questionResolved, /authorization object/i);
+assert.notStrictEqual(whatValueShort.answerTarget, whatValueShort.questionRaw);
+assert.match(whatValueShort.retrievalQuery, /No actual field value is supplied in the current context/);
+
+const whatAboutValue = resolveInterviewContext({
+  questionRaw: "What about the value?",
+  history: excelValidateHistory
+});
+assert.strictEqual(whatAboutValue.questionRaw, "What about the value?");
+assert.strictEqual(whatAboutValue.answerTarget, "What about the value?");
+
+const sacWhatValue = resolveInterviewContext({
+  questionRaw: "What value?",
+  history: [
+    turn("user", "How do you design SAC security and access?", {
+      context: { questionTopic: "SAC", questionResolved: "How do you design SAC security and access?" }
+    }),
+    turn("assistant", "I separate teams, content, and source data authorization.")
+  ]
+});
+assert.strictEqual(sacWhatValue.questionTopic, "SAC");
+assert.strictEqual(sacWhatValue.questionRaw, "What value?");
+assert.strictEqual(sacWhatValue.answerTarget, "What value?");
+
 const fioriSustain = [
   turn("user", "How do you make the deviated Manage Purchase Order design sustainable?", {
     context: { questionTopic: "Fiori", questionResolved: "How do you make the deviated Manage Purchase Order design sustainable?" }
@@ -292,9 +329,8 @@ for (const [questionRaw, expectedIntent, resolvedRe] of dependentComplete) {
   assert.strictEqual(ctx.questionIntent, expectedIntent, questionRaw);
   assert.strictEqual(ctx.questionTopic, "GRC", questionRaw);
   assert.match(ctx.questionResolved, resolvedRe, questionRaw);
-  const providerUserMessage = ctx.questionResolved || questionRaw;
-  assert.strictEqual(providerUserMessage, ctx.questionResolved);
-  assert.doesNotMatch(providerUserMessage, /^Is the conflict genuine\?$/);
+  assert.strictEqual(ctx.questionRaw, questionRaw);
+  assert.notStrictEqual(ctx.questionRaw, ctx.questionResolved);
 }
 
 const whySustainable = resolveInterviewContext({
