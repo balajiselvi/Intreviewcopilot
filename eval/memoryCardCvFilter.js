@@ -20,4 +20,15 @@ if (sod && sod.spoken && fieldConflictsWithCv(sod.spoken + " " + (sod.result || 
   assert.doesNotMatch(sodCard, /70\s*(to|-|–)\s*80\s*percent/);
 }
 
+const idm = EXPERIENCE_CARDS.find((c) => c.id === "idm80-eminov");
+assert.ok(idm);
+assert.strictEqual(idm.strength, "thin");
+assert.doesNotMatch(idm.spoken, /At Eminnov I worked SAP IDM 8\.0 in Developer Studio/i);
+assert.match(idm.spoken, /skill/i);
+
+const ariba = EXPERIENCE_CARDS.find((c) => c.id === "ariba-iam");
+assert.ok(ariba);
+assert.strictEqual(ariba.strength, "thin");
+assert.match(ariba.spoken, /not a documented engagement/i);
+
 console.log("memoryCardCvFilter: PASS");

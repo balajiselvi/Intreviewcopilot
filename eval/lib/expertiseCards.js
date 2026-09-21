@@ -163,26 +163,25 @@ const EXPERIENCE_CARDS = [
   {
     id: "idm80-eminov",
     tags: ["idm 8", "idm8", "developer studio", "idm 7", "repository type", "idm pass", "nw idm"],
-    project: "SAP IDM 8.0 at Eminnov Technologies",
-    role: "IDM 8.0 developer / connector work, plus IPS/IAS deployment",
-    context: "On-prem IDM 8.0 identity store and custom connectors, then early IPS/IAS.",
-    problem: "Interviewers collapse IDM 8.0 into IAG on BTP.",
-    responsibility: "Developer Studio jobs: Passes, Scripts, Constants, Variants, JavaScript payload parsing for custom connectors and repository types.",
+    project: "SAP IDM 8.0 as a skill — not the Eminnov programme architecture",
+    role: "Product knowledge of IDM 8.0; Eminnov delivery was S/4 Security & GRC conversion",
+    context: "The CV forbids describing Eminnov as an IDM 8.0 Developer Studio delivery. IDM may appear as a skill only.",
+    problem: "Interviewers collapse IDM 8.0 into IAG, or invent Developer Studio as the Eminnov architecture.",
+    responsibility: "Keep IDM 8.0, IAG, and IPS as distinct products. Do not first-person Developer Studio at Eminnov or Dover.",
     actions: [
-      "IDM 8.0 Developer Studio",
-      "Passes, Scripts, Constants, Variants",
-      "JavaScript payload parsing for custom connectors",
-      "Repository types; later IPS/IAS deployment — still not IAG"
+      "Name IDM 8.0 as its own stack (Developer Studio, passes) only as product knowledge",
+      "Eminnov: GRC AC 12.0 and S/4 conversion security as documented on the CV",
+      "Dover: IAG on BTP with IPS and IAS — not IDM 8.0"
     ],
-    decision: "Speak IDM 8.0 as its own stack. Do not call it IAG or IPS Admin UI.",
-    why: "A follow-up on IAG Access Analysis will expose mixing the products.",
-    governance: "IDM approvals are IDM workflow, not IAG Access Request.",
-    result: "No IAG metric on this card.",
-    spoken: "At Eminnov I worked SAP IDM 8.0 in Developer Studio — passes, scripts, constants, variants, and JavaScript to parse payloads for custom connectors and repository types. We also deployed IPS and IAS there. That is not the Dover IAG-on-BTP stack. IAG does access request and SoD; IDM 8.0 does not become IAG by renaming it.",
-    employer: "Eminnov Technologies",
-    terms: ["IDM 8.0", "Developer Studio", "Passes", "Variants"],
+    decision: "Skill vs delivery: IDM 8.0 is not IAG and is not the Eminnov project architecture.",
+    why: "A follow-up on IAG Access Analysis or Eminnov cutover will expose a fabricated IDM programme.",
+    governance: "IDM workflow is not IAG Access Request.",
+    result: "No IDM programme metric. Use CV GRC/S/4 numbers only if the question is that engagement.",
+    spoken: "SAP IDM 8.0 is a skill, not the architecture of my Eminnov engagement. At Eminnov I led S/4HANA conversion security and GRC AC 12.0. Dover is IAG on BTP with IPS and IAS. I do not treat IDM 8.0 as IAG, and I do not describe Eminnov as Developer Studio delivery.",
+    employer: "Do not name Eminnov as an IDM 8.0 client",
+    terms: ["IDM 8.0", "IAG", "IPS"],
     followUps: ["IDM 8.0 vs IPS jobs?", "Did you run IAG at Eminnov?"],
-    strength: "direct"
+    strength: "thin"
   },
   {
     id: "azure-idaas-fabtech",
@@ -368,11 +367,11 @@ const EXPERIENCE_CARDS = [
     why: "Biggest mistake is stopping at a successful createUser.",
     governance: "SoD is business function, not the product name.",
     result: "Central JML SLA if asked; no Ariba-only invented metric.",
-    spoken: "My Ariba depth is enterprise IAM, not every Ariba security switch. I connect Ariba to IAS for SSO and IPS for SCIM JML, and IAG looks at procurement SoD with S/4. A mover or leaver must revoke Ariba groups, not only S/4. Provisioning success is not proof of the right business access.",
-    employer: "Dover Corporation — central IAM",
+    spoken: "Ariba module configuration is not a documented engagement on my CV. In an enterprise IAM design I would treat Ariba as a target application: IAS for SSO, IPS for SCIM group lifecycle, IAG for procurement SoD with S/4, and Ariba groups as the enforcement. I would not invent an Ariba-only programme or metric, and provisioning success is not proof of the right business access.",
+    employer: "Do not invent an Ariba client",
     terms: ["Ariba groups", "IPS", "IAS", "IAG"],
     followUps: ["Ariba SoD with S/4?"],
-    strength: "direct"
+    strength: "thin"
   },
   {
     id: "car-blueprint",
