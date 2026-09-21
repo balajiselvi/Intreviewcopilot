@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import Anthropic from "@anthropic-ai/sdk";
 
 import { analyzeInterviewQuestion } from "../../lib/interviewAnalyzer";
-import { buildReasoningContract, NON_SAP_TECHNICAL_CATEGORIES, DELIVERY_GOVERNANCE_PATTERN } from "../../lib/reasoningPlanner";
+import { buildReasoningContract, NON_SAP_TECHNICAL_CATEGORIES, DELIVERY_GOVERNANCE_PATTERN, isTechnicalFailureAsk } from "../../lib/reasoningPlanner";
 import { selectSapComponents } from "../../lib/componentSelector";
 import { buildSapInterviewPrompt, getMaxTokensForCategory } from "../../lib/prompt/interviewPrompt";
 import { profileInterviewer } from "../../lib/interviewerProfiler";
@@ -155,7 +155,9 @@ const CATEGORY_RULES = Object.freeze([
   { category: "EAM", keywords: ["eam", "emergency access management", "firefighter"], weight: 4 },
   { category: "BRM", keywords: ["brm", "business role management"], weight: 4 },
   { category: "SAP IDM", keywords: ["sap idm", "identity management"], weight: 4 },
-  { category: "Fiori", keywords: ["fiori", "launchpad", "ui5"], weight: 3 },
+  // "tile" and "target mapping" are launchpad vocabulary with no other product meaning here --
+  // without them "add a tile" classified as General and never reached the Fiori structure.
+  { category: "Fiori", keywords: ["fiori", "launchpad", "ui5", "tile", "target mapping"], weight: 3 },
   { category: "S/4", keywords: ["s/4", "s4", "s/4hana", "s4hana"], weight: 3 },
   { category: "ECC", keywords: ["ecc", "erp"], weight: 3 },
   { category: "BW", keywords: ["bw", "bw/4hana"], weight: 3 },
@@ -346,6 +348,14 @@ function applyCategoryPrecedence(scores, question) {
   if (sfEnforcement && !ipsLifecycle) {
     scores.set("SuccessFactors", (scores.get("SuccessFactors") || 0) + 5);
   }
+  // Project-control co-occurrence already scored PMP. An equal-weight SAP ops noun
+  // (hypercare/cutover/support) must not win the tie when the interviewer did not report a
+  // system failure. "Troubleshoot X during hypercare" keeps the technical path.
+  const pmpScore = scores.get("PMP") || 0;
+  const opsTied = ["Hypercare", "Cutover", "Production Support"].some((name) => scores.has(name));
+  if (pmpScore > 0 && opsTied && !isTechnicalFailureAsk(question)) {
+    scores.set("PMP", pmpScore + 3);
+  }
   return scores;
 }
 
@@ -359,17 +369,25 @@ function applyCategoryPrecedence(scores, question) {
 // an exact-phrase match would miss and a bare-word match would over-trigger on.
 const PMP_CONTEXT_PAIRS = Object.freeze([
   ["stakeholder", ["decision", "blocking", "escalation"]],
-  ["vendor", ["delivery", "deliver", "contract", "performance"]],
-  ["schedule", ["delay", "recovery", "critical path", "behind"]],
+  ["vendor", ["delivery", "deliver", "delay", "contract", "performance"]],
+  ["schedule", ["delay", "recovery", "recover", "critical path", "behind", "slip"]],
   ["scope", ["creep", "change", "control"]],
   ["project", ["risk", "register", "mitigation"]],
   ["procurement", ["supplier", "vendor"]],
-  ["raid", ["project", "program"]],
+  ["raid", ["project", "program", "escalate", "item"]],
   ["milestone", ["delay", "recovery"]]
 ]);
 
 function matchesPmpContextTerm(tokenSet, questionLower, term) {
-  return term.includes(" ") ? questionLower.includes(term) : tokenSet.has(term);
+  if (term.includes(" ")) return questionLower.includes(term);
+  if (tokenSet.has(term)) return true;
+  // Inflection of the listed PM-control term only (delay→delayed, recover→recovery).
+  const stem = term.endsWith("y") && term.length > 5 ? term.slice(0, -1) : term;
+  if (stem.length < 4) return false;
+  for (const tok of tokenSet) {
+    if (tok.length >= stem.length && tok.startsWith(stem)) return true;
+  }
+  return false;
 }
 
 function scorePmpContextPairs(scores, tokenSet, questionLower) {
@@ -401,6 +419,16 @@ function classifyWeightedIntents(question = "") {
   }
 
   scorePmpContextPairs(scores, tokenSet, question.toLowerCase());
+  // Compressing a delivery phase is a project objective even when the phase noun is SAP ops
+  // vocabulary (hypercare/cutover). A reported system failure still stays technical.
+  const qLower = question.toLowerCase();
+  if (
+    /\b(?:hypercare|cutover|go-?live|stabilization)\b/i.test(qLower)
+    && /\b(?:cut|compress|shorten|reduce|behind|delay|slip|late|pull(?:ing)? in|bring(?:ing)? forward)\b/i.test(qLower)
+    && !isTechnicalFailureAsk(question)
+  ) {
+    scores.set("PMP", (scores.get("PMP") || 0) + 4);
+  }
 
   if (scores.size === 0) {
     return { primaryCategory: "General", secondaryCategories: [] };
@@ -1169,7 +1197,7 @@ export default async function handler(req, res) {
     // Ceiling is sized to the question's length tier (see lib/prompt/interviewPrompt.js) —
     // the main lever for keeping generation under the ~5-6s target in a single-pass
     // architecture, since streaming wall-clock time scales with tokens produced.
-    const maxTokens = getMaxTokensForCategory(analysis.category, analysis.secondaryCategories, effectiveQuestion, analysis.isDeepenFollowUp, reasoningContract.reasoningMode, interviewContext.depth);
+    const maxTokens = getMaxTokensForCategory(analysis.category, analysis.secondaryCategories, effectiveQuestion, analysis.isDeepenFollowUp, reasoningContract.reasoningMode, interviewContext.depth, interviewContext.answerScope);
 
     if (debugEnabled) {
       writeSSEEvent(res, "context", sanitizeDebugContext(interviewContext, {

@@ -178,6 +178,8 @@ const promptSource = fs.readFileSync(path.join(__dirname, "../lib/prompt/intervi
 const chatSource = fs.readFileSync(path.join(__dirname, "../pages/api/chat.js"), "utf8");
 const interviewSource = fs.readFileSync(path.join(__dirname, "../pages/interview.js"), "utf8");
 assert.match(promptSource, /CURRENT INTERVIEW CONTEXT/);
+assert.match(promptSource, /CURRENT SCENARIO/);
+assert.match(promptSource, /Current utterance \/ Answer target wins/);
 assert.match(promptSource, /Answer target:/);
 assert.match(promptSource, /answerTarget \|\| interviewContext.questionRaw/);
 assert.match(promptSource, /Active technical chain:/);
@@ -259,7 +261,13 @@ assert.match(genuineFollowUp.questionResolved, /Is the conflict genuine\?/i);
 
 const valueHistory = [
   turn("user", "How do you identify the authorization object and value causing the conflict?", {
-    context: { questionTopic: "GRC", questionResolved: "How do you identify the authorization object and value causing the conflict?", depth: "deep" }
+    context: {
+      questionTopic: "GRC",
+      questionResolved: "How do you identify the authorization object and value causing the conflict?",
+      depth: "deep",
+      scenarioMode: "ACTIVE",
+      scenarioType: "SOD_INVESTIGATION"
+    }
   }),
   turn("assistant", "I trace function to action to object to field to value.")
 ];
@@ -282,6 +290,16 @@ assert.strictEqual(whatValueShort.answerTarget, "Which authorization field value
 assert.match(whatValueShort.questionResolved, /authorization object/i);
 assert.notStrictEqual(whatValueShort.answerTarget, whatValueShort.questionRaw);
 assert.match(whatValueShort.retrievalQuery, /No actual field value is supplied in the current context/);
+
+const whatObjectShort = resolveInterviewContext({
+  questionRaw: "What object?",
+  history: valueHistory
+});
+assert.strictEqual(whatObjectShort.questionRaw, "What object?");
+assert.match(whatObjectShort.answerTarget, /No actual object is supplied/);
+assert.notStrictEqual(whatObjectShort.answerTarget, whatObjectShort.questionRaw);
+assert.notStrictEqual(whatObjectShort.depth, "brief");
+assert.doesNotMatch(whatObjectShort.answerTarget, /is S_TABU_NAM|the object is S_TCODE/i);
 
 const whatAboutValue = resolveInterviewContext({
   questionRaw: "What about the value?",
@@ -416,5 +434,290 @@ const planeCases = [
 for (const [questionRaw, expectedTopic] of planeCases) {
   assert.strictEqual(resolveInterviewContext({ questionRaw }).questionTopic, expectedTopic);
 }
+
+const fioriTileFail = resolveInterviewContext({
+  questionRaw: "A business user cannot open a Fiori tile. How do you diagnose it?"
+});
+assert.strictEqual(fioriTileFail.scenarioMode, "ACTIVE");
+assert.strictEqual(fioriTileFail.scenarioType, "TROUBLESHOOTING");
+assert.notStrictEqual(fioriTileFail.questionIntent, QUESTION_INTENTS.FRAGMENT);
+
+const fioriTileDesign = resolveInterviewContext({
+  questionRaw: "How would you design a Fiori tile catalog so it stays maintainable?"
+});
+assert.notStrictEqual(fioriTileDesign.scenarioType, "TROUBLESHOOTING");
+
+const sodStillConcept = resolveInterviewContext({ questionRaw: "What is SoD?" });
+assert.strictEqual(sodStillConcept.scenarioMode, "NONE");
+
+const haveYou = resolveInterviewContext({
+  questionRaw: "Have you actually implemented this?",
+  history: [
+    turn("user", "You find an SoD conflict in a business role. What would you do?", {
+      context: toHistoryContext(resolveInterviewContext({
+        questionRaw: "You find an SoD conflict in a business role. What would you do?"
+      }))
+    })
+  ]
+});
+assert.strictEqual(haveYou.questionIntent, QUESTION_INTENTS.REQUEST_FOR_EXPERIENCE);
+assert.strictEqual(haveYou.depth, "normal");
+
+const whichObjectPara = resolveInterviewContext({
+  questionRaw: "Which object is controlling that?",
+  history: [
+    turn("user", "You find an SoD conflict in a business role. What would you do?", {
+      context: toHistoryContext(resolveInterviewContext({
+        questionRaw: "You find an SoD conflict in a business role. What would you do?"
+      }))
+    })
+  ]
+});
+assert.strictEqual(whichObjectPara.step, "IDENTIFY_EXACT_CONTROL");
+assert.notStrictEqual(whichObjectPara.depth, "brief");
+
+const exactControl = resolveInterviewContext({
+  questionRaw: "Which exact control should I look at?",
+  history: [
+    turn("user", "You find an SoD conflict in a business role. What would you do?", {
+      context: toHistoryContext(resolveInterviewContext({
+        questionRaw: "You find an SoD conflict in a business role. What would you do?"
+      }))
+    })
+  ]
+});
+assert.strictEqual(exactControl.step, "IDENTIFY_EXACT_CONTROL");
+
+// --- Answer scope: how much of the subject the current utterance actually asked for ---------
+const sodSeedHistory = [
+  turn("user", "You find an SoD conflict in a business role. What would you do?", {
+    context: toHistoryContext(resolveInterviewContext({
+      questionRaw: "You find an SoD conflict in a business role. What would you do?"
+    }))
+  })
+];
+
+const scopeCases = [
+  ["Which exact control handles that?", "STAGE_INVESTIGATION"],
+  ["What would you establish first?", "STAGE_INVESTIGATION"],
+  ["How would you fix it?", "STAGE_REMEDIATION"],
+  ["Have you done this hands-on?", "EXPERIENCE_CONFIRMATION"],
+  ["Was this something you actually owned?", "EXPERIENCE_CONFIRMATION"],
+  ["Where have you implemented this?", "EXPERIENCE_CONFIRMATION"],
+  ["What exactly did you implement?", "EXPERIENCE_DEEP_DIVE"],
+  ["Walk me through your implementation.", "EXPERIENCE_DEEP_DIVE"],
+  ["What was your role and what was the outcome?", "EXPERIENCE_DEEP_DIVE"]
+];
+for (const [questionRaw, expectedScope] of scopeCases) {
+  const scoped = resolveInterviewContext({ questionRaw, history: sodSeedHistory });
+  assert.strictEqual(scoped.answerScope, expectedScope, `${questionRaw} -> ${scoped.answerScope}`);
+}
+
+// An experience confirmation must stay a claim-sized answer, never a project narrative.
+const confirmDepth = resolveInterviewContext({
+  questionRaw: "Have you done this hands-on?",
+  history: sodSeedHistory
+});
+assert.notStrictEqual(confirmDepth.depth, "project");
+assert.notStrictEqual(confirmDepth.depth, "brief");
+
+// An explicit design request is never treated as an investigative stage, even mid-scenario.
+const designScope = resolveInterviewContext({
+  questionRaw: "How would you design the role architecture for a new S/4 rollout?"
+});
+assert.strictEqual(designScope.answerScope, "DEFAULT");
+
+// The fix cue sits in a subordinate clause; the request itself is for evidence.
+const evidenceBeforeFix = resolveInterviewContext({
+  questionRaw: "What evidence would you collect before deciding on a fix?",
+  history: sodSeedHistory
+});
+assert.notStrictEqual(evidenceBeforeFix.questionIntent, QUESTION_INTENTS.REQUEST_FOR_REMEDIATION);
+assert.strictEqual(evidenceBeforeFix.answerScope, "STAGE_INVESTIGATION");
+
+// Uncontracted negation is the same reported failure as the contracted form.
+const uncontractedSymptom = resolveInterviewContext({
+  questionRaw: "A business user reports the purchasing app will not start for them."
+});
+assert.strictEqual(uncontractedSymptom.scenarioMode, "ACTIVE");
+assert.strictEqual(uncontractedSymptom.scenarioType, "TROUBLESHOOTING");
+
+// "Do you have experience..." is the same question as "have you...", built with a different
+// auxiliary; it must reach the confirmation scope rather than the scenario stage.
+for (const questionRaw of [
+  "Do you have hands-on experience with this?",
+  "Have you had exposure to this?",
+  "Any experience with IAG rulesets?"
+]) {
+  const possession = resolveInterviewContext({ questionRaw, history: sodSeedHistory });
+  assert.strictEqual(possession.questionIntent, QUESTION_INTENTS.REQUEST_FOR_EXPERIENCE, questionRaw);
+  assert.strictEqual(possession.answerScope, "EXPERIENCE_CONFIRMATION", questionRaw);
+}
+
+// A bare "tell me more" has no subject of its own: it inherits what was just asked.
+const deepenAfterExperience = resolveInterviewContext({
+  questionRaw: "Tell me more.",
+  history: [
+    ...sodSeedHistory,
+    { role: "user", content: "Have you done this hands-on?" },
+    { role: "assistant", content: "Yes, at Dover Corporation." }
+  ]
+});
+assert.strictEqual(deepenAfterExperience.answerScope, "EXPERIENCE_DEEP_DIVE");
+const deepenAfterInvestigation = resolveInterviewContext({
+  questionRaw: "Tell me more.",
+  history: [
+    ...sodSeedHistory,
+    { role: "user", content: "What would you establish first?" },
+    { role: "assistant", content: "I would establish the symptom." }
+  ]
+});
+assert.strictEqual(deepenAfterInvestigation.answerScope, "STAGE_INVESTIGATION");
+
+// Asking for the fix without the word "fix": verb + object + result state is still remediation,
+// because answering a remediation request with more investigation is the costlier error.
+for (const questionRaw of ["How do you put it right?", "How do you get it working again?"]) {
+  const resultative = resolveInterviewContext({ questionRaw, history: sodSeedHistory });
+  assert.strictEqual(resultative.questionIntent, QUESTION_INTENTS.REQUEST_FOR_REMEDIATION, questionRaw);
+  assert.strictEqual(resultative.answerScope, "STAGE_REMEDIATION", questionRaw);
+}
+const buildNotFix = resolveInterviewContext({
+  questionRaw: "How do you put the ruleset together?",
+  history: sodSeedHistory
+});
+assert.notStrictEqual(buildNotFix.questionIntent, QUESTION_INTENTS.REQUEST_FOR_REMEDIATION);
+
+// Constraints are instructions the model has to read; they must survive intact, not be cut
+// mid-sentence by the field bound.
+const constrained = resolveInterviewContext({
+  questionRaw: "What authorization artifact would you inspect?",
+  history: sodSeedHistory
+});
+assert.ok(constrained.constraints.length > 0, "expected an anti-invention constraint");
+for (const constraint of constrained.constraints) {
+  assert.ok(/[.!?]$/.test(constraint.trim()), `constraint truncated: ${constraint}`);
+}
+
+// "How is this actually done?" is its own question type: not a concept, not a design, not a
+// failure. It must reach the walkthrough scope from the question's grammar -- a HOW/walk-me-
+// through request plus a realization verb -- and not from any particular product or phrasing.
+for (const questionRaw of [
+  "I have given you a requirement to add a tile. How are you going to do that?",
+  "Walk me through configuring a new tile.",
+  "How do you set up an IPS provisioning job?",
+  "How would you configure IAS SSO with Azure AD?",
+  "How do you create a derived role for a new plant?",
+  "How do you configure a GRC connector for access risk analysis?",
+  "How do you set up analysis authorizations in BW?",
+  "How do you add a new space and assign privileges in Datasphere?",
+  "If I give you a requirement to onboard a new application to IAG, how will you implement it?",
+  "How do you build the JML flow from the HR source to S/4?",
+  "How do you put the ruleset together?"
+]) {
+  const implementation = resolveInterviewContext({ questionRaw });
+  assert.strictEqual(implementation.questionIntent, QUESTION_INTENTS.REQUEST_FOR_TECHNICAL_STEPS, questionRaw);
+  assert.strictEqual(implementation.answerScope, "IMPLEMENTATION_WALKTHROUGH", questionRaw);
+}
+
+// The neighbours of that scope, each of which must keep its own behavior: a concept question
+// stays a concept question, a design question stays architecture, a reported failure stays
+// investigative, and a past-tense personal question stays on the experience path.
+const notImplementation = [
+  ["What is a Fiori catalog?", "DEFAULT"],
+  ["What is target mapping?", "DEFAULT"],
+  ["Why would you use a catalog?", "DEFAULT"],
+  ["What is the difference between a catalog and a target mapping?", "DEFAULT"],
+  ["How would you design Fiori security for S/4?", "DEFAULT"],
+  ["How would you architect identity for a RISE migration?", "DEFAULT"],
+  ["How would you model the role design for finance?", "DEFAULT"],
+  ["The tile is visible but won't launch.", "STAGE_INVESTIGATION"],
+  ["Have you actually implemented Fiori security?", "EXPERIENCE_CONFIRMATION"],
+  ["How did you implement the catalog model at your last client?", "EXPERIENCE_DEEP_DIVE"]
+];
+for (const [questionRaw, expectedScope] of notImplementation) {
+  const control = resolveInterviewContext({ questionRaw });
+  assert.strictEqual(control.answerScope, expectedScope, questionRaw);
+  if (expectedScope !== "IMPLEMENTATION_WALKTHROUGH") {
+    assert.notStrictEqual(control.answerScope, "IMPLEMENTATION_WALKTHROUGH", questionRaw);
+  }
+}
+
+// A procedure request describes no situation, so it must not open a scenario -- but an actual
+// reported failure still does, even when the interviewer also asks how to configure the fix.
+const procedureNoScenario = resolveInterviewContext({ questionRaw: "Walk me through configuring a new tile." });
+assert.notStrictEqual(procedureNoScenario.scenarioMode, "ACTIVE");
+const symptomPlusProcedure = resolveInterviewContext({
+  questionRaw: "The purchasing app will not start for the user. How do you set the catalog up correctly?"
+});
+assert.strictEqual(symptomPlusProcedure.scenarioMode, "ACTIVE");
+
+// Generalized collisions: diagnostic HOW must not become a walkthrough because a realization
+// verb appears in the symptom clause; particle-less "wire" is still a realization verb;
+// walk-through of what the candidate implemented is experience content, not a new scenario step.
+{
+  const conceptualSoD = resolveInterviewContext({ questionRaw: "What exactly is SoD?" });
+  assert.strictEqual(conceptualSoD.answerScope, "DEFAULT");
+  assert.notStrictEqual(conceptualSoD.scenarioMode, "ACTIVE");
+
+  const diagnosticHow = resolveInterviewContext({
+    questionRaw: "Walk me through investigating an IPS job that stopped creating users."
+  });
+  assert.notStrictEqual(diagnosticHow.answerScope, "IMPLEMENTATION_WALKTHROUGH");
+  assert.notStrictEqual(diagnosticHow.questionIntent, QUESTION_INTENTS.REQUEST_FOR_TECHNICAL_STEPS);
+
+  const diagnosticParaphrase = resolveInterviewContext({
+    questionRaw: "Take me through diagnosing a provisioning run that keeps creating duplicates."
+  });
+  assert.notStrictEqual(diagnosticParaphrase.answerScope, "IMPLEMENTATION_WALKTHROUGH");
+
+  const wireConnector = resolveInterviewContext({
+    questionRaw: "How do you actually wire Cloud Connector so a BTP app can reach the on-prem backend?"
+  });
+  assert.strictEqual(wireConnector.answerScope, "IMPLEMENTATION_WALKTHROUGH");
+  assert.strictEqual(wireConnector.questionIntent, QUESTION_INTENTS.REQUEST_FOR_TECHNICAL_STEPS);
+
+  const whatYouImplemented = resolveInterviewContext({
+    questionRaw: "Walk me through exactly what you implemented for JML."
+  });
+  assert.strictEqual(whatYouImplemented.answerScope, "EXPERIENCE_DEEP_DIVE");
+
+  const takeMeThroughBuilt = resolveInterviewContext({
+    questionRaw: "Take me through what you configured in IAG."
+  });
+  assert.strictEqual(takeMeThroughBuilt.answerScope, "EXPERIENCE_DEEP_DIVE");
+}
+
+// HOW + diagnostic procedure is investigation without a symptom clause, and is not a
+// realization walkthrough. The verb class is diagnostic, not a product name.
+for (const questionRaw of [
+  "How would you troubleshoot an authorization failure?",
+  "How would you troubleshoot an IPS issue?",
+  "How would you troubleshoot a synchronization problem?",
+  "How would you troubleshoot a login problem?",
+  "Walk me through diagnosing a Cloud Connector outage."
+]) {
+  const diagnosticHow = resolveInterviewContext({ questionRaw });
+  assert.strictEqual(diagnosticHow.answerScope, "STAGE_INVESTIGATION", questionRaw);
+  assert.notStrictEqual(diagnosticHow.answerScope, "IMPLEMENTATION_WALKTHROUGH", questionRaw);
+}
+
+for (const questionRaw of [
+  "How would you design the role?",
+  "How would you implement the role?"
+]) {
+  const notDiagnostic = resolveInterviewContext({ questionRaw });
+  assert.notStrictEqual(notDiagnostic.answerScope, "STAGE_INVESTIGATION", questionRaw);
+}
+
+const schedulePressure = resolveInterviewContext({
+  questionRaw: "We are two weeks behind during hypercare. How would you handle this?"
+});
+assert.notStrictEqual(schedulePressure.answerScope, "STAGE_INVESTIGATION");
+assert.notStrictEqual(schedulePressure.answerScope, "IMPLEMENTATION_WALKTHROUGH");
+
+const technicalHypercare = resolveInterviewContext({
+  questionRaw: "How would you troubleshoot a production issue during hypercare?"
+});
+assert.strictEqual(technicalHypercare.answerScope, "STAGE_INVESTIGATION");
 
 console.log("interviewContextAssert: PASS");
