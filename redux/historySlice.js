@@ -7,8 +7,19 @@ const historySlice = createSlice({
     addToHistory: (state, action) => {
       state.push(action.payload);
     },
+    updateLatestQuestion: (state, action) => {
+      const { utteranceId, text, status } = action.payload || {};
+      if (!utteranceId) return;
+      for (let i = state.length - 1; i >= 0; i -= 1) {
+        if (state[i].type === "question" && state[i].utteranceId === utteranceId) {
+          if (typeof text === "string") state[i].text = text;
+          if (status) state[i].status = status;
+          return;
+        }
+      }
+    },
   },
 });
 
-export const { addToHistory } = historySlice.actions;
+export const { addToHistory, updateLatestQuestion } = historySlice.actions;
 export default historySlice.reducer;
