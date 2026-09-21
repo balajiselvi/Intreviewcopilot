@@ -7,6 +7,7 @@ const historySlice = createSlice({
     addToHistory: (state, action) => {
       state.push(action.payload);
     },
+    clearHistory: () => [],
     updateLatestQuestion: (state, action) => {
       const { utteranceId, text, status } = action.payload || {};
       if (!utteranceId) return;
@@ -21,5 +22,5 @@ const historySlice = createSlice({
   },
 });
 
-export const { addToHistory, updateLatestQuestion } = historySlice.actions;
+export const { addToHistory, clearHistory, updateLatestQuestion } = historySlice.actions;
 export default historySlice.reducer;
