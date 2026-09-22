@@ -88,7 +88,7 @@ const EXPERIENCE_CARDS = [
     why: "Without SU24, every landscape rebuilds objects differently and bloat returns.",
     governance: "Role maintenance standard across the transport path.",
     result: "No percentage. Speak SU24 and derived roles.",
-    spoken: "I enforce single functional roles with clear organizational derived role structures. I avoid assigning direct T-codes or composite roles with overlapping authorization objects. Any custom authorization object changes must be updated in SU24 defaults so PFCG role maintenance stays standardized across dev, test, and prod.",
+    spoken: "I enforce single functional roles with derived organizational variants. Composites are assignment packaging over already-clean singles — I do not use overlapping composites as a substitute for role design, and I do not assign direct T-codes. Custom authorization object changes go into SU24 so PFCG stays consistent across dev, test, and prod.",
     terms: ["SU24", "derived roles", "PFCG"],
     followUps: ["Who approves SU24 changes?", "How do you stop emergency composites?"],
     strength: "direct"

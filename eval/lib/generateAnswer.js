@@ -22,6 +22,8 @@ async function generateAnswer(question, { model = "gpt-4o-mini", candidateResume
   let buffer = "";
   let answer = "";
   let errorMsg = null;
+  let generation = null;
+  let context = null;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -38,6 +40,10 @@ async function generateAnswer(question, { model = "gpt-4o-mini", candidateResume
         const obj = JSON.parse(payload);
         if (obj.text) answer += obj.text;
         if (obj.error) errorMsg = obj.error;
+        if (obj.finish_reason || obj.maxTokens != null || obj.completion_tokens != null) {
+          generation = { ...(generation || {}), ...obj };
+        }
+        if (obj.intent && obj.answerScope) context = obj;
       } catch (e) {
         // ignore malformed SSE fragments
       }
@@ -45,7 +51,7 @@ async function generateAnswer(question, { model = "gpt-4o-mini", candidateResume
   }
 
   if (errorMsg) throw new Error(`Generator error: ${errorMsg}`);
-  return { answer: answer.trim(), latencyMs: Date.now() - start };
+  return { answer: answer.trim(), latencyMs: Date.now() - start, generation, context };
 }
 
 module.exports = { generateAnswer };

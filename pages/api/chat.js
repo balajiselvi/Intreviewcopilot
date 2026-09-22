@@ -762,10 +762,15 @@ async function streamOpenAIResponse({ apiKey, model, systemPrompt, recentHistory
     if (signal?.aborted) break;
     if (part.usage) {
       usage = {
+        ...(usage || {}),
         prompt_tokens: part.usage.prompt_tokens,
         completion_tokens: part.usage.completion_tokens,
         total_tokens: part.usage.total_tokens
       };
+    }
+    const finish = part.choices?.[0]?.finish_reason;
+    if (finish) {
+      usage = { ...(usage || {}), finish_reason: finish };
     }
     const text = stripStreamMarkdown(part.choices[0]?.delta?.content || "");
     if (text) {
@@ -1127,9 +1132,38 @@ export default async function handler(req, res) {
     // follow-up type that most needed grounding.
     const shouldRetrieve = interviewContext.retrievalDecision === "retrieve"
       || interviewContext.retrievalDecision === "active-context";
-    const knowledgeResult = shouldRetrieve
-      ? await fetchKnowledgeContext(interviewContext.retrievalQuery || effectiveQuestion, primaryCategory, secondaryCategories, history, analysis)
-      : { text: "", evidence: [] };
+    const abortIfTimedOut = () => {
+      if (controller.signal.aborted) {
+        throw Object.assign(new Error("Request timed out while generating response."), { name: "AbortError" });
+      }
+    };
+    let knowledgeResult = { text: "", evidence: [] };
+    if (shouldRetrieve) {
+      let onAbort = null;
+      try {
+        knowledgeResult = await Promise.race([
+          fetchKnowledgeContext(interviewContext.retrievalQuery || effectiveQuestion, primaryCategory, secondaryCategories, history, analysis),
+          new Promise((_, reject) => {
+            const fail = () => reject(Object.assign(new Error("Request timed out while generating response."), { name: "AbortError" }));
+            if (controller.signal.aborted) {
+              fail();
+              return;
+            }
+            onAbort = fail;
+            controller.signal.addEventListener("abort", fail, { once: true });
+          })
+        ]);
+      } finally {
+        if (onAbort) {
+          try {
+            controller.signal.removeEventListener("abort", onAbort);
+          } catch {
+            // listener already fired or signal already closed
+          }
+        }
+      }
+    }
+    abortIfTimedOut();
     const knowledgeContext = knowledgeResult.text;
     interviewContext.retrievalEvidence = knowledgeResult.evidence;
 
@@ -1139,9 +1173,21 @@ export default async function handler(req, res) {
     // Same skip-on-plain-follow-up reasoning as knowledgeContext above. searchEngineeringMemory
     // itself short-circuits to a zero-cost no-op when the store is empty, so this is safe to
     // leave on unconditionally rather than gating behind whether records exist yet.
-    const engineeringJudgment = !shouldRetrieve
-      ? { principles: [], records: [] }
-      : await searchEngineeringMemory({ question: interviewContext.retrievalQuery || effectiveQuestion, analysis, topK: 3 });
+    let engineeringJudgment = { principles: [], records: [] };
+    if (shouldRetrieve) {
+      try {
+        abortIfTimedOut();
+        engineeringJudgment = await searchEngineeringMemory({
+          question: interviewContext.retrievalQuery || effectiveQuestion,
+          analysis,
+          topK: 3
+        });
+      } catch (error) {
+        if (error?.name === "AbortError") throw error;
+        logger?.error?.("Engineering memory retrieval failed (non-fatal):", error);
+      }
+    }
+    abortIfTimedOut();
     const engineeringJudgmentContext = renderEngineeringJudgmentSection(engineeringJudgment);
 
     const promptPayload = {
@@ -1302,6 +1348,15 @@ export default async function handler(req, res) {
         fullAnswerText = await streamOpenAIResponse(streamOptions);
       }
       recordedAnswer = fullAnswerText || "";
+      if (res?.writable) {
+        writeSSEEvent(res, "generation", {
+          finish_reason: tokenUsage?.finish_reason || null,
+          maxTokens,
+          prompt_tokens: tokenUsage?.prompt_tokens ?? null,
+          completion_tokens: tokenUsage?.completion_tokens ?? null,
+          total_tokens: tokenUsage?.total_tokens ?? null
+        });
+      }
       recordLiveQa({
         question,
         questionRaw: question,
@@ -1366,10 +1421,13 @@ export default async function handler(req, res) {
       errorCode: controller.signal.aborted ? "timeout" : (classified.code || "failed")
     });
 
-    if (streamStarted && res?.writable) {
+    if (res?.writable) {
       writeSSEError(res, errorMessage);
-    } else if (!streamStarted) {
-      return res.status(500).json({ error: errorMessage });
+      try {
+        res.write("data: [DONE]\n\n");
+      } catch {
+        // stream may already be closing
+      }
     }
   } finally {
     clearTimeout(timeoutId);

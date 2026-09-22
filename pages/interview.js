@@ -2,13 +2,18 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { classifyGenerationFailure } from '../lib/generationGuard';
 import { buildBoundedHistory, isClearlyIncompleteFragment, isTruncatedScenarioSetup, removeSubmittedSnapshot } from '../lib/interviewContext';
 import {
+  armGenerationTimeout,
   canStartTurn,
+  CLIENT_GENERATION_TIMEOUT_MS,
   deriveOperatorState,
+  enqueueLatestSpeechTurn,
+  GENERATION_WATCHDOG_GRACE_MS,
   getOrCreateLiveSessionId,
   historyForGeneration,
   nextResetSnapshot,
   rotateLiveSessionId,
-  shouldReuseQuestionRow
+  shouldReuseQuestionRow,
+  shouldSkipAutoSubmit
 } from '../lib/liveSessionOperator';
 import {
   attachLiveSessionErrorShield,
@@ -70,6 +75,7 @@ import SendIcon from '@mui/icons-material/Send';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import SpeakerNotesIcon from '@mui/icons-material/SpeakerNotes';
+import StopIcon from '@mui/icons-material/Stop';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 
@@ -97,39 +103,6 @@ function debounce(func, timeout = 100) {
       func.apply(this, args);
     }, timeout);
   };
-}
-
-// Whole-utterance-only phrases -- an exact match to one of these carries no substantive
-// ask on its own. Deliberately does NOT include recovery-signal phrases ("I'm blank", "where
-// was I") -- those ARE a genuine request for the copilot's help and must keep flowing through
-// to chat.js's isRecoverySignal handling, not get silenced here.
-const FILLER_PHRASES = new Set([
-  "hmm", "hmmm", "uh", "uhh", "okay", "ok", "yes", "yeah", "yep", "right", "correct",
-  "go ahead", "continue", "carry on", "please continue", "next question", "i see",
-  "alright", "fine", "sure", "exactly", "understood", "thats right", "thats the question",
-  // "and so on" splits into "so on" by this function's own clause-splitter (which treats
-  // standalone "and" as a separator) before the phrase check ever runs -- keep both forms.
-  "and so on", "so on"
-]);
-
-// Auto-submit fires on every silence gap, so a bare interviewer acknowledgement ("Okay.",
-// "Yes, that's the question.", "Hmm, okay, go ahead.") must not trigger a full AI generation --
-// this is a copilot for ANSWERING questions, not a conversational participant. The previous
-// version of this check only did an exact-string match against a flat phrase list (so "Yes,
-// that's the question." never matched anything and fell through to askOpenAI) plus a crude
-// `length < 12` fallback that would have just as easily swallowed a genuine short question
-// ("why IAG?" is 9 characters). This instead splits the utterance into clauses the same way
-// isCompoundQuestion does server-side, and only suppresses when EVERY clause is an exact
-// filler-phrase match -- a single substantive clause anywhere ("...but why did you choose IAG
-// over ARA?") is enough to let the whole utterance through.
-function isNonSubstantiveFiller(rawText = "") {
-  const clauses = rawText
-    .toLowerCase()
-    .split(/[.?!,]+|\band\b/)
-    .map((s) => s.replace(/[^a-z0-9\s]/g, "").trim())
-    .filter(Boolean);
-  if (clauses.length === 0) return true;
-  return clauses.every((clause) => FILLER_PHRASES.has(clause));
 }
 
 function getLiveInterviewSessionId() {
@@ -188,6 +161,7 @@ export default function InterviewPage() {
   const throttledDispatchSetAIResponseRef = useRef(null);
   const activeRequestRef = useRef(null);
   const isProcessingRef = useRef(false);
+  const generationStartedAtRef = useRef(0);
   const historyRef = useRef(history);
   const pendingAnalysisRef = useRef(null);
   const pendingContextRef = useRef(null);
@@ -242,6 +216,26 @@ export default function InterviewPage() {
       } catch { /* ignore */ }
     };
   }, [debugEnabled]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (!isProcessingRef.current) return;
+      const started = generationStartedAtRef.current;
+      if (!started) return;
+      if (Date.now() - started < CLIENT_GENERATION_TIMEOUT_MS + GENERATION_WATCHDOG_GRACE_MS) return;
+      try { activeRequestRef.current?.abort(); } catch { /* ignore */ }
+      activeRequestRef.current = null;
+      isProcessingRef.current = false;
+      generationStartedAtRef.current = 0;
+      setIsProcessing(false);
+      pendingSpeechQueueRef.current = [];
+      setQueuedTurnCount(0);
+      const classified = classifyGenerationFailure({ name: "AbortError", message: "The answer timed out." });
+      setGenerationError(classified);
+      showSnackbar(classified.userMessage, "error");
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     throttledDispatchSetAIResponseRef.current = throttle((payload) => {
@@ -376,17 +370,16 @@ export default function InterviewPage() {
         syncTranscriptDisplay(source, text, detector.getFinalText());
       },
       onFinalize({ text, utteranceId }) {
-        if (isNonSubstantiveFiller(text)) {
+        if (shouldSkipAutoSubmit(text)) {
           detector.reset();
           return;
         }
         if (isProcessingRef.current) {
-          const queue = pendingSpeechQueueRef.current;
-          const existing = queue.findIndex((item) => item.utteranceId === utteranceId);
-          const row = { text, utteranceId, source };
-          if (existing >= 0) queue[existing] = row;
-          else queue.push(row);
-          setQueuedTurnCount(queue.length);
+          pendingSpeechQueueRef.current = enqueueLatestSpeechTurn(
+            pendingSpeechQueueRef.current,
+            { text, utteranceId, source }
+          );
+          setQueuedTurnCount(pendingSpeechQueueRef.current.length);
           pushSpeechLog({ type: "queue-while-busy", utteranceId, text, source });
           return;
         }
@@ -816,6 +809,7 @@ export default function InterviewPage() {
 
     const requestEpoch = sessionEpochRef.current;
     isProcessingRef.current = true;
+    generationStartedAtRef.current = Date.now();
     setIsProcessing(true);
     setGenerationError(null);
     const retryCount = meta.retry
@@ -849,11 +843,13 @@ export default function InterviewPage() {
     dispatch(setAIResponse(''));
 
     let requestController;
+    let disarmTimeout = () => {};
     try {
       const conversationHistoryForAPI = buildBoundedHistory(historyForGeneration(historyRef.current));
       activeRequestRef.current?.abort();
       requestController = new AbortController();
       activeRequestRef.current = requestController;
+      disarmTimeout = armGenerationTimeout(requestController, CLIENT_GENERATION_TIMEOUT_MS);
       const chatBody = JSON.stringify({
         apiKey,
         model: currentConfig.aiModel,
@@ -899,55 +895,77 @@ export default function InterviewPage() {
         const reader = okResponse.body.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
+        const takeText = (payload) => {
+          try {
+            const obj = JSON.parse(payload);
+            if (obj.error) {
+              const classified = classifyGenerationFailure({ message: obj.error || "stream error" });
+              throw Object.assign(new Error(classified.userMessage), { classified });
+            }
+            const chunkText = obj.text || "";
+            if (!chunkText) return;
+            streamedResponse += chunkText;
+            throttledDispatchSetAIResponseRef.current?.(streamedResponse);
+          } catch (parseError) {
+            if (parseError?.classified) throw parseError;
+          }
+        };
+        const processEvent = (event) => {
+          if (!event || !String(event).trim()) return;
+          const eventName = (/^event:\s*(.+)$/m.exec(event) || [])[1]?.trim() || "message";
+          if (eventName === "error") {
+            let classified = classifyGenerationFailure({ message: "stream error" });
+            try {
+              const payload = event.split("data: ").pop();
+              const parsed = JSON.parse(payload || "{}");
+              classified = classifyGenerationFailure({ message: parsed.error || "" });
+            } catch {
+              // keep generic copy — never surface raw API payloads
+            }
+            throw Object.assign(new Error(classified.userMessage), { classified });
+          }
+          if (eventName === "analysis") {
+            const payload = event.split("data: ").pop();
+            try {
+              pendingAnalysisRef.current = JSON.parse(payload || "{}");
+            } catch (parseError) {
+              console.error("Error parsing SSE analysis event:", parseError);
+            }
+            return;
+          }
+          if (eventName === "context") {
+            const payload = event.split("data: ").pop();
+            try {
+              const parsed = JSON.parse(payload || "{}");
+              pendingContextRef.current = parsed;
+              setDebugContext(parsed);
+            } catch (parseError) {
+              console.error("Error parsing sanitized SSE context event:", parseError);
+            }
+            return;
+          }
+          if (eventName === "generation") {
+            return;
+          }
+          for (const line of event.split("\n")) {
+            if (!line.startsWith("data: ")) continue;
+            const payload = line.slice(6).trim();
+            if (!payload || payload === "[DONE]") continue;
+            takeText(payload);
+          }
+        };
         while (true) {
           const { value, done } = await reader.read();
           if (done) break;
-          buffer += decoder.decode(value, { stream: true });
+          buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, "\n").replace(/\r/g, "\n");
           const events = buffer.split("\n\n");
           buffer = events.pop() || "";
           for (const event of events) {
-            if (event.includes("event: error")) {
-              let classified = classifyGenerationFailure({ message: "stream error" });
-              try {
-                const payload = event.split("\ndata: ")[1];
-                const parsed = JSON.parse(payload || "{}");
-                classified = classifyGenerationFailure({ message: parsed.error || "" });
-              } catch {
-                // keep generic copy — never surface raw API payloads
-              }
-              throw Object.assign(new Error(classified.userMessage), { classified });
-            }
-            if (event.includes("event: analysis")) {
-              const payload = event.split("\ndata: ")[1];
-              try {
-                pendingAnalysisRef.current = JSON.parse(payload || "{}");
-              } catch (parseError) {
-                console.error("Error parsing SSE analysis event:", parseError);
-              }
-              continue;
-            }
-            if (event.includes("event: context")) {
-              const payload = event.split("\ndata: ")[1];
-              try {
-                const parsed = JSON.parse(payload || "{}");
-                pendingContextRef.current = parsed;
-                setDebugContext(parsed);
-              } catch (parseError) {
-                console.error("Error parsing sanitized SSE context event:", parseError);
-              }
-              continue;
-            }
-            const payload = event.split("data: ")[1];
-            if (!payload || payload === "[DONE]") continue;
-            try {
-              const chunkText = JSON.parse(payload).text || "";
-              streamedResponse += chunkText;
-              throttledDispatchSetAIResponseRef.current?.(streamedResponse);
-            } catch (parseError) {
-              console.error("Error parsing SSE chunk:", parseError);
-            }
+            processEvent(event);
           }
         }
+        buffer += decoder.decode().replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+        if (buffer.trim()) processEvent(buffer);
       };
       let response = await postChat();
       if (!response.ok) {
@@ -989,38 +1007,55 @@ export default function InterviewPage() {
         return;
       }
       if (streamedResponse.trim()) {
+        if (throttledDispatchSetAIResponseRef.current && typeof throttledDispatchSetAIResponseRef.current.cancel === "function") {
+          throttledDispatchSetAIResponseRef.current.cancel();
+        }
         dispatch(setAIResponse(streamedResponse));
         commitHistory({
           type: "response",
           text: streamedResponse,
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          answerId: `a_${Date.now()}`,
+          questionId,
+          source: "copilot",
           status: aborted ? "interrupted" : "completed",
           analysis: pendingAnalysisRef.current
         });
         pendingAnalysisRef.current = null;
+        pendingContextRef.current = null;
+        if (aborted) {
+          const classified = classifyGenerationFailure({ name: "AbortError", message: "The answer timed out." });
+          setGenerationError({ ...classified, question: text, source });
+          showSnackbar("The answer may be incomplete. You can Retry.", "warning");
+        } else {
+          setGenerationError(null);
+        }
+        return;
       }
-      if (aborted && superseded) return;
       const classified = error?.classified || classifyGenerationFailure({
         message: error?.message,
         name: error?.name
       });
       setGenerationError({ ...classified, question: text, source });
       showSnackbar(classified.userMessage, "error");
-      if (!streamedResponse.trim()) {
-        dispatch(setAIResponse(""));
-        commitHistory({
-          type: "response",
-          text: classified.userMessage,
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          status: "error",
-          questionId
-        });
-      }
+      dispatch(setAIResponse(""));
+      commitHistory({
+        type: "response",
+        text: classified.userMessage,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        status: "error",
+        questionId
+      });
     } finally {
+      disarmTimeout();
       if (sessionEpochRef.current !== requestEpoch) return;
-      const isCurrentRequest = activeRequestRef.current === requestController;
+      const isCurrentRequest = !requestController
+        || activeRequestRef.current === requestController
+        || activeRequestRef.current == null;
       if (isCurrentRequest) {
-        activeRequestRef.current = null;
+        if (activeRequestRef.current === requestController) {
+          activeRequestRef.current = null;
+        }
         if ((source === 'system' && systemAutoModeRef.current) || (source === 'microphone' && !isManualModeRef.current)) {
           if (speechTurnsRef.current[source]) {
             speechTurnsRef.current[source].notifyGenerationSettled(utteranceId);
@@ -1037,6 +1072,7 @@ export default function InterviewPage() {
           }
         }
         isProcessingRef.current = false;
+        generationStartedAtRef.current = 0;
         setIsProcessing(false);
         drainQueuedSpeechTurn();
       }
@@ -1059,6 +1095,7 @@ export default function InterviewPage() {
     }
     activeRequestRef.current = null;
     isProcessingRef.current = false;
+    generationStartedAtRef.current = 0;
     setIsProcessing(false);
     const snapshot = nextResetSnapshot();
     pendingSpeechQueueRef.current = snapshot.pendingSpeechQueue;
@@ -1085,6 +1122,21 @@ export default function InterviewPage() {
     const src = lastAskRef.current?.source || "microphone";
     if (!q) return;
     askOpenAI(q, src, { retry: true });
+  };
+
+  const stopInFlightGeneration = () => {
+    pendingSpeechQueueRef.current = [];
+    setQueuedTurnCount(0);
+    const controller = activeRequestRef.current;
+    if (controller) {
+      try { controller.abort(); } catch { /* ignore */ }
+      return;
+    }
+    isProcessingRef.current = false;
+    generationStartedAtRef.current = 0;
+    setIsProcessing(false);
+    const classified = classifyGenerationFailure({ name: "AbortError", message: "Generation stopped." });
+    setGenerationError(classified);
   };
 
   const operatorState = deriveOperatorState({
@@ -1148,7 +1200,7 @@ export default function InterviewPage() {
   }, []);
 
   const renderHistoryItem = (item, index) => {
-    if (item.type !== 'response') return null;
+    if (item.type !== 'response' && item.type !== 'current_streaming') return null;
     const Icon = SmartToyIcon;
     const title = 'AI Assistant';
     const avatarBgColor = theme.palette.secondary.light;
@@ -1161,7 +1213,7 @@ export default function InterviewPage() {
         <Paper variant="outlined" sx={{ p: 1.5, flexGrow: 1, bgcolor: theme.palette.background.default, borderColor: theme.palette.divider, overflowX: 'auto' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
             <Typography variant="subtitle2" fontWeight="bold">
-              {item.status === 'error' ? 'Generation failed' : item.status === 'interrupted' ? 'Interrupted' : title}
+              {item.type === 'current_streaming' ? 'AI Assistant' : item.status === 'error' ? 'Generation failed' : item.status === 'interrupted' ? 'Interrupted' : title}
             </Typography>
             <Typography variant="caption" color="text.secondary">{item.timestamp}</Typography>
           </Box>
@@ -1229,8 +1281,14 @@ export default function InterviewPage() {
     let responses = history.filter(item => item.type === 'response').slice();
     const currentStreamingText = aiResponseFromStore;
 
-    if (isProcessing && currentStreamingText && currentStreamingText.trim() !== '') {
-      responses.push({ text: currentStreamingText, timestamp: 'Streaming...', type: 'current_streaming' });
+    if (isProcessing) {
+      responses.push({
+        text: currentStreamingText && String(currentStreamingText).trim() !== ''
+          ? currentStreamingText
+          : 'Generating answer...',
+        timestamp: 'Streaming...',
+        type: 'current_streaming'
+      });
     }
 
     if (aiResponseSortOrder === 'newestAtTop') {
@@ -1408,6 +1466,17 @@ export default function InterviewPage() {
               label={operatorState.label}
               sx={{ mr: 1 }}
             />
+            {isProcessing && (
+              <Button
+                size="small"
+                color="inherit"
+                startIcon={<StopIcon />}
+                onClick={stopInFlightGeneration}
+                sx={{ mr: 1 }}
+              >
+                Stop
+              </Button>
+            )}
             <Box sx={{ flexGrow: 1 }} />
             <Tooltip title="Start a new interview session. Clears visible Q&A; audio capture stays on.">
               <span>
@@ -1558,9 +1627,14 @@ export default function InterviewPage() {
                     <List sx={{ px: 2, py: 1 }}>
                       {getAiResponsesToDisplay().map(renderHistoryItem)}
                       {isProcessing && (
-                        <ListItem sx={{ justifyContent: 'center', py: 2 }}>
-                          <CircularProgress size={24} />
-                          <Typography variant="caption" sx={{ ml: 1 }}>{operatorState.label}</Typography>
+                        <ListItem sx={{ justifyContent: 'center', py: 2, flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <CircularProgress size={24} />
+                            <Typography variant="caption" sx={{ ml: 1 }}>{operatorState.label}</Typography>
+                          </Box>
+                          <Button size="small" variant="outlined" startIcon={<StopIcon />} onClick={stopInFlightGeneration}>
+                            Stop generating
+                          </Button>
                         </ListItem>
                       )}
                       {!isProcessing && generationError && (

@@ -10,7 +10,7 @@ Good role design starts with job function analysis, not with copying an existing
 
 ## 30 Second Interview Answer
 
-Role design starts from the job function and an owner, not from cloning PFCG. Single roles hold the objects; derived roles vary org levels off one master; composites are a thin provisioning shell — they are not a rationalization strategy. I would SoD-simulate in ARA or IAG before production, and I would refuse to "fix" an 8,000-role catalog by stacking more composites.
+Role design starts from the job function and an owner, not from cloning PFCG. Single roles hold the objects; derived roles vary org levels off one master; composites are valid assignment packaging over clean singles and derived roles — they are not generally forbidden, and they are not a rationalization strategy. I would SoD-simulate in ARA or IAG before production, and I would refuse to "fix" an 8,000-role catalog by stacking more composites.
 
 ## 60 Second Interview Answer
 

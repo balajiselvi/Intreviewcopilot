@@ -11,7 +11,13 @@ const {
   shouldReuseQuestionRow,
   historyForGeneration,
   deriveOperatorState,
-  nextResetSnapshot
+  nextResetSnapshot,
+  enqueueLatestSpeechTurn,
+  armGenerationTimeout,
+  CLIENT_GENERATION_TIMEOUT_MS,
+  MAX_QUEUED_SPEECH_TURNS,
+  shouldSkipAutoSubmit,
+  isNonSubstantiveFiller
 } = require("../lib/liveSessionOperator");
 const { buildBoundedHistory } = require("../lib/interviewContext");
 
@@ -23,6 +29,13 @@ function memoryStorage(seed = {}) {
     _store: store
   };
 }
+
+assert.strictEqual(isNonSubstantiveFiller("Okay."), true);
+assert.strictEqual(isNonSubstantiveFiller("Yes, that's the question."), true);
+assert.strictEqual(shouldSkipAutoSubmit("Yeah, have a nice day."), true);
+assert.strictEqual(shouldSkipAutoSubmit("Thanks for your time."), true);
+assert.strictEqual(shouldSkipAutoSubmit("How would you design IAG?"), false);
+assert.strictEqual(shouldSkipAutoSubmit("A user cannot post FB01."), false);
 
 const firstId = getOrCreateLiveSessionId(memoryStorage());
 assert.match(firstId, /^live_[a-z0-9]+_[a-z0-9]+$/i);
@@ -77,6 +90,24 @@ assert.strictEqual(deriveOperatorState({ generationError: { retryable: true } })
 assert.strictEqual(deriveOperatorState({ isSystemAudioActive: true }).id, OPERATOR_STATES.LISTENING);
 assert.strictEqual(deriveOperatorState({}).id, OPERATOR_STATES.READY);
 
+assert.ok(CLIENT_GENERATION_TIMEOUT_MS > 25000);
+assert.strictEqual(MAX_QUEUED_SPEECH_TURNS, 1);
+assert.deepStrictEqual(
+  enqueueLatestSpeechTurn([{ text: "old", utteranceId: "u1" }], { text: "new", utteranceId: "u2" }).map((i) => i.text),
+  ["new"]
+);
+assert.deepStrictEqual(
+  enqueueLatestSpeechTurn([{ text: "same", utteranceId: "u1" }], { text: "same-updated", utteranceId: "u1" }).map((i) => i.text),
+  ["same-updated"]
+);
+let aborted = false;
+const fake = { abort() { aborted = true; } };
+const disarm = armGenerationTimeout(fake, 20);
+assert.strictEqual(typeof disarm, "function");
+assert.strictEqual(aborted, false);
+disarm();
+assert.strictEqual(aborted, false);
+
 const reset = nextResetSnapshot();
 assert.deepStrictEqual(reset.history, []);
 assert.strictEqual(reset.generationError, null);
@@ -84,6 +115,7 @@ assert.strictEqual(reset.queuedSpeechCount, 0);
 
 const interview = fs.readFileSync(path.join(__dirname, "../pages/interview.js"), "utf8");
 const historySlice = fs.readFileSync(path.join(__dirname, "../redux/historySlice.js"), "utf8");
+const chatSrc = fs.readFileSync(path.join(__dirname, "../pages/api/chat.js"), "utf8");
 assert.match(interview, /liveSessionOperator/);
 assert.match(interview, /historyForGeneration/);
 assert.match(interview, /shouldReuseQuestionRow/);
@@ -94,6 +126,15 @@ assert.match(interview, /resetLiveInterviewSession/);
 assert.match(interview, /sessionEpochRef/);
 assert.match(interview, /queuedTurnCount/);
 assert.match(interview, /retry:\s*true/);
+assert.match(interview, /armGenerationTimeout/);
+assert.match(interview, /enqueueLatestSpeechTurn/);
+assert.match(interview, /stopInFlightGeneration/);
+assert.match(interview, /shouldSkipAutoSubmit/);
+assert.match(interview, /CLIENT_GENERATION_TIMEOUT_MS/);
+assert.match(interview, /current_streaming/);
+assert.match(interview, /The answer may be incomplete/);
+assert.match(chatSrc, /writeSSEError\(res, errorMessage\)/);
+assert.doesNotMatch(chatSrc, /else if \(!streamStarted\)/);
 assert.match(historySlice, /clearHistory/);
 assert.match(interview, /if \(!canStartTurn\(\{ isProcessing: isProcessingRef\.current \}\)\)/);
 assert.match(interview, /if \(isProcessingRef\.current\) setSelectedQuestions\(\[\]\)/);

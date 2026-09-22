@@ -35,6 +35,13 @@ assert.match(prompt, /ACTIVE DOMAIN SCOPE/);
 assert.match(prompt, /MASTER HANDS-ON BANK/);
 assert.match(fs.readFileSync(path.join(__dirname, "../eval/lib/expertiseCards.js"), "utf8"), /CLAIM CLASSES/);
 assert.match(prompt, /1,650 PFCG/);
-assert.match(prompt, /AGR_USERS, AGR_1251, last logon/);
+assert.match(rp, /AGR_USERS, AGR_1251, last logon/);
+assert.match(rp, /not a requirements workshop/);
+assert.match(rp, /verifiable artifact/);
+assert.match(rp, /Do not invent GUI button labels/);
+assert.match(prompt, /logged emergency access/);
+assert.match(prompt, /MODE_STRUCTURES/);
+assert.match(prompt, /design: "Structure: Objective and landscape boundary/);
+assert.match(prompt, /generic P1, rollback/);
 
 console.log("phase5 source contract assertions: PASS");
