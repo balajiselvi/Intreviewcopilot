@@ -43,5 +43,9 @@ assert.match(prompt, /logged emergency access/);
 assert.match(prompt, /MODE_STRUCTURES/);
 assert.match(prompt, /design: "Structure: Objective and landscape boundary/);
 assert.match(prompt, /generic P1, rollback/);
+assert.match(rp, /plane-correct technical dependencies/);
+assert.match(rp, /not an SAP Security\/GRC configuration question/);
+assert.match(prompt, /plane-correct technical dependencies/);
+assert.match(prompt, /Do not bolt SAP T-codes/);
 
 console.log("phase5 source contract assertions: PASS");

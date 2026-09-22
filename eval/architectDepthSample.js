@@ -13,6 +13,8 @@ const CASES = [
   { id: "IMP-DERIVED", q: "Take me through creating a derived role for a new company code in PFCG." },
   { id: "CMP-ROLES", q: "When would you use composite roles versus single and derived roles?" },
   { id: "ARC-PLANES", q: "How should identity boundaries sit between IAS, IPS and IAG?" },
+  { id: "IAG-AA", q: "How does IAG Access Analysis actually work?" },
+  { id: "FIORI-TILE", q: "A Fiori tile opens but returns no data. How would you investigate?" },
   { id: "LIVE-DT", q: "What will be your approach when a customer says that he faces a lot of problem with others and at downtime for the business uses?" },
   { id: "CTRL-PMP", q: "A vendor delay is affecting the cutover plan. What would you do?" }
 ];
@@ -32,7 +34,8 @@ function flags(answer) {
     su53AsUat: /\bSU53\b.{0,80}\b(?:UAT|validate the derived role|functioning as intended|user assignment test)\b/i.test(a),
     workshopOpen: /^(?:When approaching|I start by defining the business functions|gathering requirements)/i.test(a.trim()),
     genericIncident: /\b(?:incident response team|legacy system in parallel|rollback procedure to revert to a backup)\b/i.test(a),
-    namedArtifact: /\b(?:AGR_USERS|AGR_1251|AGR_1252|SU24|PFCG|PFUD|SUIM|AUTHORITY-CHECK|SAML|OIDC|MSMP|RSECADMIN|XSUAA|Firefighter|EAM|ARA|ruleset)\b/.test(a),
+    namedArtifact: /\b(?:AGR_USERS|AGR_1251|AGR_1252|SU24|PFCG|PFUD|SUIM|AUTHORITY-CHECK|SAML|OIDC|MSMP|RSECADMIN|XSUAA|Firefighter|EAM|ARA|ruleset|SCIM|SU53|STAUTHTRACE|\/UI2\/|GRAC)\b/.test(a),
+    pmpLeak: /\b(?:PFCG|SU53|Firefighter|AGR_USERS)\b/.test(a),
     genericCloser: /\b(?:improves compliance|enhances governance|enterprise security policies|that's the architectural pattern|robust and efficient)\b/i.test(a)
   };
 }
