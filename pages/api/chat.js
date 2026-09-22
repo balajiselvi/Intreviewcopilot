@@ -188,7 +188,7 @@ const CATEGORY_RULES = Object.freeze([
   { category: "Cloud", keywords: ["cloud", "saas", "paas", "iaas"], weight: 2 },
   { category: "Role Design", keywords: ["role design", "pfcg", "single role", "composite role", "derived role", "role catalog", "role mining", "role rationalization", "rationalize roles", "overlapping sap roles", "duplicate roles", "unused roles", "thousands of sap roles", "thousands of roles", "user-role extract", "user role extract", "assignment extract", "agr_users"], weight: 4 },
   { category: "Authorization", keywords: ["authorization", "auth object", "auth field", "authorization object"], weight: 3 },
-  { category: "Security", keywords: ["security", "audit", "compliance", "encryption", "sod"], weight: 2 },
+  { category: "Security", keywords: ["security", "audit", "compliance", "encryption", "sod", "siem", "threat detection", "enterprise threat detection", "security operations center", "soc"], weight: 2 },
   { category: "Performance", keywords: ["performance", "optimization", "st03n", "trace", "slow", "bottleneck"], weight: 3 },
   { category: "Migration", keywords: ["migration", "migrate", "conversion", "brownfield", "greenfield"], weight: 3 },
   { category: "Upgrade", keywords: ["upgrade", "patch", "support package", "spau"], weight: 3 },
@@ -355,6 +355,17 @@ function applyCategoryPrecedence(scores, question) {
   const opsTied = ["Hypercare", "Cutover", "Production Support"].some((name) => scores.has(name));
   if (pmpScore > 0 && opsTied && !isTechnicalFailureAsk(question)) {
     scores.set("PMP", pmpScore + 3);
+  }
+  // A question that names two or more enforcement landscapes must not be owned by the
+  // heaviest single product (live: ECC+S/4+BTP lost to BTP and became a role-collection essay).
+  const ENFORCEMENT_LANDSCAPES = ["ECC", "S/4", "BTP", "Fiori", "HANA", "BW"];
+  const landscapeHits = ENFORCEMENT_LANDSCAPES.filter((name) => scores.has(name));
+  if (landscapeHits.length >= 2) {
+    scores.set("Architecture", (scores.get("Architecture") || 0) + 5);
+  }
+  // Threat Detection / SIEM is detection telemetry, not identity and not generic architecture.
+  if (/\b(siem|threat detection|enterprise threat detection|security operations center|\bsoc\b)\b/.test(q)) {
+    scores.set("Security", (scores.get("Security") || 0) + 5);
   }
   return scores;
 }
