@@ -24,6 +24,8 @@ assert.match(tr, /Ariba groups\/permissions enforce/);
 assert.match(tr, /never say SAP owns or operates (?:the )?Cloud Connector/);
 assert.match(prompt, /DOCUMENTED EXPERIENCE MATCH/);
 assert.match(chat, /recallExperience/);
+assert.match(chat, /recallExpectedAnswer/);
+assert.match(prompt, /PREPARED ANSWER/);
 assert.match(chat, /DEFAULT_CAREER_BACKGROUND/);
 assert.match(prompt, /IDM 8.0 Developer Studio/);
 assert.match(prompt, /Dover/);

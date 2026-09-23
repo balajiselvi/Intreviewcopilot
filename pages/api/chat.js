@@ -17,6 +17,7 @@ import APP_CONFIG from "../../config/appConfig";
 
 const require = createRequire(import.meta.url);
 const { recallExperience, formatMemoryCard } = require("../../eval/lib/expertiseCards.js");
+const { recallExpectedAnswer } = require("../../eval/lib/expectedAnswers.js");
 const { DEFAULT_CAREER_BACKGROUND } = require("../../eval/lib/careerTimeline.js");
 const { shouldInheritPriorDomain, hasStrongTechnicalEvidence, isPlaneFoil, isTopicContinuation } = require("../../lib/contextInheritance.js");
 const { publicLlmError } = require("../../lib/generationGuard.js");
@@ -1226,14 +1227,19 @@ export default async function handler(req, res) {
       if (candidateResume?.trim()) promptPayload.candidateResume = candidateResume.trim();
     }
     try {
-      const recallQuery = `${effectiveQuestion} ${resolved.resolvedDomain || ""}`.trim();
-      const { strongest } = recallExperience(recallQuery);
-      if (strongest) {
-        promptPayload.documentedExperience = formatMemoryCard(strongest);
-        promptPayload.experienceSelection = {
-          confidence: strongest.strength || strongest.confidence || "medium",
-          label: strongest.topic || strongest.title || strongest.id || "documented match"
-        };
+      const prepared = recallExpectedAnswer(effectiveQuestion);
+      if (prepared?.answer) {
+        promptPayload.expectedSpokenAnswer = prepared.answer;
+      } else {
+        const recallQuery = `${effectiveQuestion} ${resolved.resolvedDomain || ""}`.trim();
+        const { strongest } = recallExperience(recallQuery);
+        if (strongest) {
+          promptPayload.documentedExperience = formatMemoryCard(strongest);
+          promptPayload.experienceSelection = {
+            confidence: strongest.strength || strongest.confidence || "medium",
+            label: strongest.topic || strongest.title || strongest.id || "documented match"
+          };
+        }
       }
     } catch (error) {
       logger?.error?.("Experience recall failed:", error);
