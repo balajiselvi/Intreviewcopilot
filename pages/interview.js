@@ -23,6 +23,7 @@ import {
   stopMediaTracks
 } from '../lib/speechSessionGuard';
 import { createSpeechTurnDetector, looksLikeContinuationShape } from '../lib/speechTurnDetector';
+import { decideInterviewTurn } from '../lib/turnDecision';
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -143,6 +144,7 @@ export default function InterviewPage() {
   const [micTranscription, setMicTranscription] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [generationError, setGenerationError] = useState(null);
+  const [turnDisposition, setTurnDisposition] = useState(null);
   const [queuedTurnCount, setQueuedTurnCount] = useState(0);
   const [autoScroll, setAutoScroll] = useState(true);
   const [aiResponseSortOrder, setAiResponseSortOrder] = useState('newestAtTop');
@@ -164,6 +166,7 @@ export default function InterviewPage() {
   const generationStartedAtRef = useRef(0);
   const historyRef = useRef(history);
   const pendingAnalysisRef = useRef(null);
+  const pendingAdmissionRef = useRef(null);
   const pendingContextRef = useRef(null);
   const lastAskRef = useRef({ text: "", source: "microphone" });
   const sessionEpochRef = useRef(0);
@@ -783,10 +786,41 @@ export default function InterviewPage() {
       return;
     }
 
+    let turn = { decision: "ANSWER", route: "GENERATION", reason: "admission-failed-open" };
+    try {
+      turn = decideInterviewTurn({ question: text, history: historyRef.current });
+    } catch (gateError) {
+      console.error("Question admission failed:", gateError);
+    }
+    if (turn.decision !== "ANSWER") {
+      const detector = speechTurnsRef.current[source];
+      if (!meta.manual && detector && meta.utteranceId) {
+        try {
+          detector.acknowledgeCommit(meta.utteranceId);
+          detector.notifyGenerationSettled(meta.utteranceId);
+        } catch (settleError) {
+          console.error("Failed to settle a non-question turn:", settleError);
+        }
+      }
+      commitHistory({
+        type: "question",
+        text,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        source,
+        questionId: `q_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        utteranceId: meta.utteranceId || null,
+        status: "completed",
+        disposition: turn.decision,
+        admissionReason: turn.reason
+      });
+      setTurnDisposition({ decision: turn.decision, route: "NONE", reason: turn.reason });
+      return;
+    }
+
     const currentConfig = getConfig();
     const isGeminiModel = currentConfig.aiModel?.toLowerCase().startsWith('gemini');
     const apiKey = isGeminiModel ? currentConfig.geminiKey : currentConfig.openaiKey;
-    if (!apiKey) {
+    if (!apiKey && turn.route !== "PREPARED_SCRIPT") {
       showSnackbar(`${isGeminiModel ? 'Gemini' : 'OpenAI'} API key required. Please set it in Settings.`, 'error');
       speechTurnsRef.current[source]?.releaseFinalize();
       return;
@@ -924,6 +958,22 @@ export default function InterviewPage() {
             }
             throw Object.assign(new Error(classified.userMessage), { classified });
           }
+          if (eventName === "admission") {
+            const payload = event.split("data: ").pop();
+            try {
+              const parsed = JSON.parse(payload || "{}");
+              pendingAdmissionRef.current = parsed;
+              setTurnDisposition({
+                decision: parsed.decision || "ANSWER",
+                route: parsed.route || "GENERATION",
+                reason: parsed.reason || "",
+                scriptId: parsed.scriptId || null
+              });
+            } catch (parseError) {
+              console.error("Error parsing SSE admission event:", parseError);
+            }
+            return;
+          }
           if (eventName === "analysis") {
             const payload = event.split("data: ").pop();
             try {
@@ -974,6 +1024,11 @@ export default function InterviewPage() {
       }
       await consumeChatStream(response);
       if (!streamedResponse.trim()) {
+        const withheld = pendingAdmissionRef.current;
+        if (withheld && withheld.decision && withheld.decision !== "ANSWER") {
+          pendingAdmissionRef.current = null;
+          return;
+        }
         throw Object.assign(new Error("Could not generate an answer."), {
           classified: classifyGenerationFailure({ message: "empty generation" })
         });
@@ -1103,7 +1158,9 @@ export default function InterviewPage() {
     lastAskRef.current = snapshot.lastAsk;
     pendingAnalysisRef.current = null;
     pendingContextRef.current = null;
+    pendingAdmissionRef.current = null;
     setGenerationError(null);
+    setTurnDisposition(null);
     setSelectedQuestions([]);
     setDebugContext(null);
     dispatch(clearHistory());
@@ -1267,7 +1324,7 @@ export default function InterviewPage() {
               {item.text}
             </Typography>
           }
-          secondary={`${title} - ${item.timestamp}`}
+          secondary={`${title} - ${item.timestamp}${item.disposition === "IGNORE" ? " — ignored" : item.disposition === "DEFER" ? " — waiting" : ""}`}
         />
       </ListItem>
     );
@@ -1466,6 +1523,14 @@ export default function InterviewPage() {
               label={operatorState.label}
               sx={{ mr: 1 }}
             />
+            {turnDisposition && (
+              <Chip
+                size="small"
+                color={turnDisposition.decision === "DEFER" ? "warning" : turnDisposition.route === "PREPARED_SCRIPT" ? "success" : turnDisposition.decision === "IGNORE" ? "default" : "info"}
+                label={turnDisposition.decision === "IGNORE" ? "Ignored — not a question" : turnDisposition.decision === "DEFER" ? "Deferred — incomplete" : turnDisposition.route === "PREPARED_SCRIPT" ? "Prepared script" : "Generated"}
+                sx={{ mr: 1 }}
+              />
+            )}
             {isProcessing && (
               <Button
                 size="small"

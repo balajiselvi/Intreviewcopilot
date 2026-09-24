@@ -18,10 +18,12 @@ import APP_CONFIG from "../../config/appConfig";
 const require = createRequire(import.meta.url);
 const { recallExperience, formatMemoryCard } = require("../../eval/lib/expertiseCards.js");
 const { recallExpectedAnswer } = require("../../eval/lib/expectedAnswers.js");
-const { DEFAULT_CAREER_BACKGROUND } = require("../../eval/lib/careerTimeline.js");
+const { DEFAULT_CAREER_BACKGROUND, scopeCareerEvidence } = require("../../eval/lib/careerTimeline.js");
 const { shouldInheritPriorDomain, hasStrongTechnicalEvidence, isPlaneFoil, isTopicContinuation } = require("../../lib/contextInheritance.js");
 const { publicLlmError } = require("../../lib/generationGuard.js");
 const { appendQa } = require("../../lib/interviewSessionStore.js");
+const { decideInterviewTurn } = require("../../lib/turnDecision.js");
+const { priorAnchor } = require("../../lib/questionAdmission.js");
 const { resolveInterviewContext, sanitizeDebugContext, toHistoryContext, QUESTION_INTENTS } = require("../../lib/interviewContext.js");
 
 const MAX_HISTORY_ITEMS = 6;
@@ -957,6 +959,57 @@ export default async function handler(req, res) {
     });
   }
 
+  let turn = { decision: "ANSWER", route: "GENERATION", reason: "admission-failed-open", scriptAnswer: "" };
+  try {
+    turn = decideInterviewTurn({ question, history });
+  } catch (error) {
+    logger?.error?.("Question admission failed:", error);
+  }
+  if (turn.decision !== "ANSWER" || turn.route === "PREPARED_SCRIPT") {
+    if (!setSSEHeaders(res)) {
+      return res.status(500).json({ error: "Failed to initialize streaming response." });
+    }
+    try {
+      writeSSEEvent(res, "admission", {
+        decision: turn.decision,
+        route: turn.route,
+        reason: turn.reason,
+        scriptId: turn.scriptId || null,
+        confidence: turn.confidence || 0,
+        evidenceMode: turn.evidenceMode || null
+      });
+      if (turn.route === "PREPARED_SCRIPT" && turn.scriptAnswer) {
+        writeSSEChunk(res, turn.scriptAnswer);
+        try {
+          if (interviewSessionId) {
+            appendQa(
+              interviewSessionId,
+              { model, company: String(company || "").slice(0, 80), source: "live-interview" },
+              {
+                question,
+                answerShown: turn.scriptAnswer,
+                status: "completed",
+                model,
+                source: "prepared-script",
+                latencyMs: 0
+              }
+            );
+          }
+        } catch (recordError) {
+          logger?.error?.("Prepared script session write failed:", recordError);
+        }
+      }
+      if (res?.writable) {
+        res.write("data: [DONE]\n\n");
+        res.end();
+      }
+    } catch (error) {
+      logger?.error?.("Admission response failed:", error);
+      try { res.end(); } catch { /* the admission response is already closed */ }
+    }
+    return;
+  }
+
   // Execution mode determines behavior: 'full' (production), 'retrieval-only' (diagnostic), 'disabled' (maintenance)
   // Defaults to 'full' for production safety; must be explicitly configured for other modes
   const validationMode = APP_CONFIG?.llm?.validationMode || 'full';
@@ -1219,9 +1272,15 @@ export default async function handler(req, res) {
     if (customInstructions?.trim()) promptPayload.customInstructions = customInstructions.trim();
     try {
       const extra = candidateResume?.trim();
-      promptPayload.candidateResume = extra
-        ? `${DEFAULT_CAREER_BACKGROUND}\n\nADDITIONAL BACKGROUND FROM SETTINGS:\n${extra}`
-        : DEFAULT_CAREER_BACKGROUND;
+      const evidence = scopeCareerEvidence(effectiveQuestion, priorAnchor(history));
+      promptPayload.evidenceMode = evidence.mode;
+      if (evidence.mode === "full") {
+        promptPayload.candidateResume = extra
+          ? `${DEFAULT_CAREER_BACKGROUND}\n\nADDITIONAL BACKGROUND FROM SETTINGS:\n${extra}`
+          : DEFAULT_CAREER_BACKGROUND;
+      } else {
+        promptPayload.candidateResume = evidence.text;
+      }
     } catch (error) {
       logger?.error?.("Career timeline inject failed:", error);
       if (candidateResume?.trim()) promptPayload.candidateResume = candidateResume.trim();
@@ -1341,6 +1400,17 @@ export default async function handler(req, res) {
         res.write(`event: retrieval_only\ndata: ${JSON.stringify(diagnostic)}\n\n`);
       }
     } else {
+      try {
+        writeSSEEvent(res, "admission", {
+          decision: "ANSWER",
+          route: "GENERATION",
+          reason: turn.reason,
+          scriptId: null,
+          evidenceMode: promptPayload.evidenceMode || "full"
+        });
+      } catch (admissionError) {
+        logger?.error?.("Generation admission event failed:", admissionError);
+      }
       // Production mode: stream the LLM response
       logger?.info?.({
         event: 'interview.streaming_llm_response',
