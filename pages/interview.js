@@ -24,6 +24,7 @@ import {
 } from '../lib/speechSessionGuard';
 import { createSpeechTurnDetector, looksLikeContinuationShape } from '../lib/speechTurnDetector';
 import { decideInterviewTurn } from '../lib/turnDecision';
+import { takeUtterance } from '../lib/deferredContinuation';
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -167,6 +168,7 @@ export default function InterviewPage() {
   const historyRef = useRef(history);
   const pendingAnalysisRef = useRef(null);
   const pendingAdmissionRef = useRef(null);
+  const pendingFragmentRef = useRef(null);
   const pendingContextRef = useRef(null);
   const lastAskRef = useRef({ text: "", source: "microphone" });
   const sessionEpochRef = useRef(0);
@@ -786,6 +788,44 @@ export default function InterviewPage() {
       return;
     }
 
+    if (meta.retry) {
+      pendingFragmentRef.current = null;
+    } else {
+      let assembly = { action: "pass", text, pending: pendingFragmentRef.current };
+      try {
+        assembly = takeUtterance(pendingFragmentRef.current, text);
+      } catch (assemblyError) {
+        console.error("Deferred continuation failed:", assemblyError);
+        assembly = { action: "pass", text, pending: null };
+      }
+      pendingFragmentRef.current = assembly.pending;
+      if (assembly.action === "hold") {
+        const detector = speechTurnsRef.current[source];
+        if (!meta.manual && detector && meta.utteranceId) {
+          try {
+            detector.acknowledgeCommit(meta.utteranceId);
+            detector.notifyGenerationSettled(meta.utteranceId);
+          } catch (settleError) {
+            console.error("Failed to settle a deferred fragment:", settleError);
+          }
+        }
+        commitHistory({
+          type: "question",
+          text: assembly.recordText || text,
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          source,
+          questionId: `q_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          utteranceId: meta.utteranceId || null,
+          status: "completed",
+          disposition: assembly.disposition || "DEFER",
+          admissionReason: "deferred-fragment"
+        });
+        setTurnDisposition({ decision: assembly.disposition || "DEFER", route: "NONE", reason: "deferred-fragment" });
+        return;
+      }
+      if (assembly.text) text = assembly.text;
+    }
+
     let turn = { decision: "ANSWER", route: "GENERATION", reason: "admission-failed-open" };
     try {
       turn = decideInterviewTurn({ question: text, history: historyRef.current });
@@ -1159,6 +1199,7 @@ export default function InterviewPage() {
     pendingAnalysisRef.current = null;
     pendingContextRef.current = null;
     pendingAdmissionRef.current = null;
+    pendingFragmentRef.current = null;
     setGenerationError(null);
     setTurnDisposition(null);
     setSelectedQuestions([]);
