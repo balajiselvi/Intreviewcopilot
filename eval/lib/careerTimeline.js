@@ -210,6 +210,10 @@ const CLAIM_PATTERNS = [
 
 const REGION_WORDS = ["india", "dubai", "uae", "qatar", "canada", "europe", "asia", "germany", "singapore", "australia", "america", "middle east"];
 
+function scopedHistoryOnly(mode) {
+  return Boolean(mode) && mode !== "full";
+}
+
 function auditHistoricalClaims(answer = "", evidenceText = "") {
   const evidence = String(evidenceText || "").replace(/,/g, "");
   const unsupported = [];
@@ -236,5 +240,6 @@ module.exports = {
   namedProgrammes,
   namedProgrammeIds,
   scopeCareerEvidence,
+  scopedHistoryOnly,
   auditHistoricalClaims
 };

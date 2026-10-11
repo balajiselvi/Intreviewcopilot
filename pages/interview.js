@@ -107,6 +107,26 @@ function debounce(func, timeout = 100) {
   };
 }
 
+function recordAdmissionTurn(question, disposition, reason) {
+  try {
+    const sessionId = getLiveInterviewSessionId();
+    fetch("/api/interview-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        interviewSessionId: sessionId,
+        question,
+        disposition,
+        reason
+      })
+    }).catch((error) => {
+      console.error("Failed to record an admission turn:", error);
+    });
+  } catch (error) {
+    console.error("Failed to record an admission turn:", error);
+  }
+}
+
 function getLiveInterviewSessionId() {
   try {
     if (typeof sessionStorage === "undefined") {
@@ -821,6 +841,7 @@ export default function InterviewPage() {
           admissionReason: "deferred-fragment"
         });
         setTurnDisposition({ decision: assembly.disposition || "DEFER", route: "NONE", reason: "deferred-fragment" });
+        recordAdmissionTurn(assembly.recordText || text, assembly.disposition || "DEFER", "deferred-fragment");
         return;
       }
       if (assembly.text) text = assembly.text;
@@ -854,6 +875,7 @@ export default function InterviewPage() {
         admissionReason: turn.reason
       });
       setTurnDisposition({ decision: turn.decision, route: "NONE", reason: turn.reason });
+      recordAdmissionTurn(text, turn.decision, turn.reason);
       return;
     }
 

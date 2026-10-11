@@ -16,9 +16,9 @@ import { runPostAnswerEvaluation } from "../../lib/prompt";
 import APP_CONFIG from "../../config/appConfig";
 
 const require = createRequire(import.meta.url);
-const { recallExperience, formatMemoryCard } = require("../../eval/lib/expertiseCards.js");
+const { recallGroundedExperience, formatMemoryCard } = require("../../eval/lib/expertiseCards.js");
 const { recallExpectedAnswer } = require("../../eval/lib/expectedAnswers.js");
-const { DEFAULT_CAREER_BACKGROUND, scopeCareerEvidence } = require("../../eval/lib/careerTimeline.js");
+const { DEFAULT_CAREER_BACKGROUND, scopeCareerEvidence, scopedHistoryOnly } = require("../../eval/lib/careerTimeline.js");
 const { shouldInheritPriorDomain, hasStrongTechnicalEvidence, isPlaneFoil, isTopicContinuation } = require("../../lib/contextInheritance.js");
 const { publicLlmError } = require("../../lib/generationGuard.js");
 const { appendQa } = require("../../lib/interviewSessionStore.js");
@@ -978,6 +978,26 @@ export default async function handler(req, res) {
         confidence: turn.confidence || 0,
         evidenceMode: turn.evidenceMode || null
       });
+      if (turn.decision !== "ANSWER" && interviewSessionId) {
+        try {
+          appendQa(
+            interviewSessionId,
+            { model, company: String(company || "").slice(0, 80), source: "live-interview" },
+            {
+              question,
+              answerShown: "",
+              status: turn.decision,
+              disposition: turn.decision,
+              route: "NONE",
+              source: "admission",
+              errorCode: turn.reason || "",
+              latencyMs: 0
+            }
+          );
+        } catch (recordError) {
+          logger?.error?.("Admission session write failed:", recordError);
+        }
+      }
       if (turn.route === "PREPARED_SCRIPT" && turn.scriptAnswer) {
         writeSSEChunk(res, turn.scriptAnswer);
         try {
@@ -991,6 +1011,10 @@ export default async function handler(req, res) {
                 status: "completed",
                 model,
                 source: "prepared-script",
+                route: "PREPARED_SCRIPT",
+                scriptId: turn.scriptId || "",
+                disposition: "ANSWER",
+                evidenceMode: turn.evidenceMode || "",
                 latencyMs: 0
               }
             );
@@ -1291,8 +1315,8 @@ export default async function handler(req, res) {
         promptPayload.expectedSpokenAnswer = prepared.answer;
       } else {
         const recallQuery = `${effectiveQuestion} ${resolved.resolvedDomain || ""}`.trim();
-        const { strongest } = recallExperience(recallQuery);
-        if (strongest) {
+        const strongest = recallGroundedExperience(recallQuery);
+        if (strongest && !scopedHistoryOnly(promptPayload.evidenceMode)) {
           promptPayload.documentedExperience = formatMemoryCard(strongest);
           promptPayload.experienceSelection = {
             confidence: strongest.strength || strongest.confidence || "medium",
@@ -1456,6 +1480,9 @@ export default async function handler(req, res) {
         latencyMs: Date.now() - qaStartedMs,
         usage: tokenUsage,
         source: req.body?.source,
+        route: "GENERATION",
+        disposition: "ANSWER",
+        evidenceMode: promptPayload.evidenceMode || "full",
         retrieval: knowledgeResult.evidence,
         errorCode: null
       });

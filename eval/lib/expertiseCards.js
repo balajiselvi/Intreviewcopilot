@@ -547,6 +547,15 @@ function fieldConflictsWithCv(text) {
   return Boolean(text) && STALE_VS_CV.test(String(text));
 }
 
+function recallGroundedExperience(question = "") {
+  const { allScored } = recallExperience(question);
+  const hit = (allScored || []).find((row) => row.score > 0
+    && row.card
+    && !fieldConflictsWithCv(row.card.spoken)
+    && !fieldConflictsWithCv(row.card.result));
+  return hit ? hit.card : null;
+}
+
 function formatMemoryCard(card) {
   if (!card) {
     return "PERSONAL EXPERIENCE DETAIL NOT EXPLICITLY DOCUMENTED in the expertise narrative. Use technical knowledge only, labelled as such.";
@@ -588,4 +597,4 @@ function formatMemoryCard(card) {
   ].filter(Boolean).join("\n");
 }
 
-module.exports = { EXPERIENCE_CARDS, recallExperience, formatMemoryCard, PHRASE_BOOSTS, fieldConflictsWithCv, STALE_VS_CV };
+module.exports = { EXPERIENCE_CARDS, recallExperience, recallGroundedExperience, formatMemoryCard, PHRASE_BOOSTS, fieldConflictsWithCv, STALE_VS_CV };
