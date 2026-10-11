@@ -2,7 +2,7 @@
 
 ## Overview
 
-S/4HANA business roles combine Fiori catalog and group assignment with backend authorization content into a single PFCG role, designed around job function rather than individual transactions. This differs from the classic ECC pattern of building roles primarily around a transaction menu.
+On-premise and private-cloud S/4HANA business roles are PFCG roles. You start from the job, assign the Fiori catalog and the space, and the backend objects still come through SU24 and role generation. Public Cloud is a different product procedure: Maintain Business Roles, business catalogs, and restrictions. There is no customer PFCG, SU24, or profile generation. Do not answer a Public Cloud question with a PFCG sequence.
 
 ## Interview Summary
 
@@ -10,7 +10,7 @@ A business role in S/4HANA is still a PFCG role technically, but the design phil
 
 ## 30 Second Interview Answer
 
-An S/4HANA business role is technically still a PFCG role, but the design approach is different from classic ECC roles. Instead of starting with a list of transactions, you start with the job function and figure out which Fiori apps that role needs, then the backend authorization objects follow from those apps. SAP ships template business roles as a starting point, but they need customization against your actual organizational structure.
+On-premise and private cloud, an S/4HANA business role is still a PFCG role. You start from the job, choose the Fiori apps, and the backend objects follow from SU24. Public Cloud does not use that path. You maintain the business role, its catalogs, and its restrictions in Maintain Business Roles, then assign the user in Maintain Business Users.
 
 ## 60 Second Interview Answer
 

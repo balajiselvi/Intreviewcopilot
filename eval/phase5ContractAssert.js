@@ -23,7 +23,12 @@ assert.doesNotMatch(prompt, /Monitoring Tools \(ST03\/SM21\/SU53\)/);
 assert.match(tr, /Ariba groups\/permissions enforce/);
 assert.match(tr, /never say SAP owns or operates (?:the )?Cloud Connector/);
 assert.match(prompt, /DOCUMENTED EXPERIENCE MATCH/);
-assert.match(chat, /recallExperience/);
+assert.match(chat, /recallGroundedExperience/);
+assert.doesNotMatch(chat, /[^d]recallExperience\(/);
+assert.match(chat, /answerScope === "IMPLEMENTATION_WALKTHROUGH"/);
+assert.match(chat, /!procedureQuestion/);
+assert.match(chat, /selectVerifiedWorkflow/);
+assert.match(chat, /VERIFIED_WORKFLOW/);
 assert.match(chat, /recallExpectedAnswer/);
 assert.match(prompt, /PREPARED ANSWER/);
 assert.match(chat, /DEFAULT_CAREER_BACKGROUND/);
@@ -61,5 +66,39 @@ assert.match(rp, /not an SAP Security\/GRC configuration question/);
 assert.match(chat, /ENFORCEMENT_LANDSCAPES/);
 assert.match(prompt, /plane-correct technical dependencies/);
 assert.match(prompt, /Do not bolt SAP T-codes/);
+
+const { recallExperience, recallGroundedExperience, fieldConflictsWithCv } = require("./lib/expertiseCards.js");
+const { selectVerifiedWorkflow } = require("../lib/verifiedWorkflow.js");
+
+const staleQuestion = "How did you use Power Query across 10,000 user records during role rationalization?";
+const rawRecall = recallExperience(staleQuestion);
+assert.ok(rawRecall.strongest, "raw recall still finds a card");
+assert.ok(
+  fieldConflictsWithCv(rawRecall.strongest.spoken) || fieldConflictsWithCv(rawRecall.strongest.result),
+  "the unfiltered card for this question conflicts with the CV"
+);
+const grounded = recallGroundedExperience(staleQuestion);
+if (grounded) {
+  assert.ok(!fieldConflictsWithCv(grounded.spoken) && !fieldConflictsWithCv(grounded.result));
+  assert.notStrictEqual(grounded.id, rawRecall.strongest.id);
+}
+
+const ruleset = selectVerifiedWorkflow("How do you upload or update a ruleset in IAG?");
+assert.strictEqual(ruleset.workflowId, "iag-analysis-ruleset");
+assert.match(ruleset.answer, /Rule Setup/);
+assert.match(ruleset.answer, /no IAG screen called Ruleset Management/);
+assert.doesNotMatch(ruleset.answer, /RequestTypeRule|open Ruleset Management|click Upload Ruleset/);
+
+const policy = selectVerifiedWorkflow("What does authorization policy mean in IAG Access Request?");
+assert.strictEqual(policy.workflowId, "iag-request-policy");
+assert.match(policy.answer, /search/);
+assert.doesNotMatch(policy.answer, /RequestTypeRule/);
+
+const experienceProcedure = selectVerifiedWorkflow("Have you set up privileged access in IAG?");
+assert.strictEqual(experienceProcedure.experienceAsk, true);
+assert.strictEqual(experienceProcedure.workflowId, "iag-pam-setup");
+const experienceCard = recallGroundedExperience("Have you set up privileged access in IAG?");
+assert.match(experienceCard.spoken, /not an IAG PAM ID/);
+assert.doesNotMatch(experienceCard.spoken, /I implemented privileged access management in IAG/);
 
 console.log("phase5 source contract assertions: PASS");

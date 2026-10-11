@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { classifyGenerationFailure } from '../lib/generationGuard';
+import { consumeChatStream } from '../lib/chatStream';
 import { buildBoundedHistory, isClearlyIncompleteFragment, isTruncatedScenarioSetup, removeSubmittedSnapshot } from '../lib/interviewContext';
 import {
   armGenerationTimeout,
@@ -620,6 +621,23 @@ export default function InterviewPage() {
     speechConfig.setProperty("SpeechServiceConnection_InitialSilenceTimeoutMs", "3000");
 
     const recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+    // Vocabulary bias only. Turn boundaries stay in lib/speechTurnDetector.js.
+    // Do not rewrite recognized text after the fact.
+    try {
+      const phraseList = SpeechSDK.PhraseListGrammar.fromRecognizer(recognizer);
+      [
+        "IAG",
+        "controllers",
+        "Privileged Access",
+        "Maintain Business Rules",
+        "Access Request",
+        "Role Designer",
+        "workflow template",
+        "ruleset"
+      ].forEach((phrase) => phraseList.addPhrase(phrase));
+    } catch (phraseError) {
+      console.error("IAG phrase list was not applied:", phraseError);
+    }
     // Referenced by stopRecording() -- the source stream and the (system-audio-only) Web
     // Audio pipeline cleanup aren't reachable through the SDK's own audioConfig internals
     // once the push-stream conversion is in play.
@@ -925,6 +943,14 @@ export default function InterviewPage() {
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const submittedSnapshot = text;
     let streamedResponse = '';
+    const requestStartedAt = performance.now();
+    let firstTextMs = null;
+    let generationMetadata = null;
+    const responseMetrics = () => ({
+      firstTextMs,
+      totalMs: Math.round(performance.now() - requestStartedAt),
+      finishReason: generationMetadata?.finish_reason || null
+    });
 
     if (continuing) {
       dispatch(updateLatestQuestion({ utteranceId, text, status: "completed" }));
@@ -982,109 +1008,36 @@ export default function InterviewPage() {
         }
         return classifyGenerationFailure({ httpStatus: res.status, message: raw });
       };
-      const consumeChatStream = async (okResponse) => {
-        if (!okResponse.body) {
-          throw Object.assign(new Error("Could not generate an answer."), {
-            classified: classifyGenerationFailure({ message: "empty body" })
-          });
-        }
-        const reader = okResponse.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
-        const takeText = (payload) => {
-          try {
-            const obj = JSON.parse(payload);
-            if (obj.error) {
-              const classified = classifyGenerationFailure({ message: obj.error || "stream error" });
-              throw Object.assign(new Error(classified.userMessage), { classified });
-            }
-            const chunkText = obj.text || "";
-            if (!chunkText) return;
-            streamedResponse += chunkText;
-            throttledDispatchSetAIResponseRef.current?.(streamedResponse);
-          } catch (parseError) {
-            if (parseError?.classified) throw parseError;
-          }
-        };
-        const processEvent = (event) => {
-          if (!event || !String(event).trim()) return;
-          const eventName = (/^event:\s*(.+)$/m.exec(event) || [])[1]?.trim() || "message";
-          if (eventName === "error") {
-            let classified = classifyGenerationFailure({ message: "stream error" });
-            try {
-              const payload = event.split("data: ").pop();
-              const parsed = JSON.parse(payload || "{}");
-              classified = classifyGenerationFailure({ message: parsed.error || "" });
-            } catch {
-              // keep generic copy — never surface raw API payloads
-            }
-            throw Object.assign(new Error(classified.userMessage), { classified });
-          }
-          if (eventName === "admission") {
-            const payload = event.split("data: ").pop();
-            try {
-              const parsed = JSON.parse(payload || "{}");
-              pendingAdmissionRef.current = parsed;
-              setTurnDisposition({
-                decision: parsed.decision || "ANSWER",
-                route: parsed.route || "GENERATION",
-                reason: parsed.reason || "",
-                scriptId: parsed.scriptId || null
-              });
-            } catch (parseError) {
-              console.error("Error parsing SSE admission event:", parseError);
-            }
-            return;
-          }
-          if (eventName === "analysis") {
-            const payload = event.split("data: ").pop();
-            try {
-              pendingAnalysisRef.current = JSON.parse(payload || "{}");
-            } catch (parseError) {
-              console.error("Error parsing SSE analysis event:", parseError);
-            }
-            return;
-          }
-          if (eventName === "context") {
-            const payload = event.split("data: ").pop();
-            try {
-              const parsed = JSON.parse(payload || "{}");
-              pendingContextRef.current = parsed;
-              setDebugContext(parsed);
-            } catch (parseError) {
-              console.error("Error parsing sanitized SSE context event:", parseError);
-            }
-            return;
-          }
-          if (eventName === "generation") {
-            return;
-          }
-          for (const line of event.split("\n")) {
-            if (!line.startsWith("data: ")) continue;
-            const payload = line.slice(6).trim();
-            if (!payload || payload === "[DONE]") continue;
-            takeText(payload);
-          }
-        };
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-          const events = buffer.split("\n\n");
-          buffer = events.pop() || "";
-          for (const event of events) {
-            processEvent(event);
-          }
-        }
-        buffer += decoder.decode().replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-        if (buffer.trim()) processEvent(buffer);
-      };
       let response = await postChat();
       if (!response.ok) {
         const classified = await classifyHttpFailure(response);
         throw Object.assign(new Error(classified.userMessage), { classified });
       }
-      await consumeChatStream(response);
+      await consumeChatStream(response, {
+        onText(chunkText) {
+          if (firstTextMs === null) firstTextMs = Math.round(performance.now() - requestStartedAt);
+          streamedResponse += chunkText;
+          throttledDispatchSetAIResponseRef.current?.(streamedResponse);
+        },
+        onEvent(name, payload) {
+          if (name === "admission") {
+            pendingAdmissionRef.current = payload;
+            setTurnDisposition({
+              decision: payload.decision || "ANSWER",
+              route: payload.route || "GENERATION",
+              reason: payload.reason || "",
+              scriptId: payload.scriptId || null
+            });
+          } else if (name === "analysis") {
+            pendingAnalysisRef.current = payload;
+          } else if (name === "context") {
+            pendingContextRef.current = payload;
+            setDebugContext(payload);
+          } else if (name === "generation") {
+            generationMetadata = payload;
+          }
+        }
+      });
       if (!streamedResponse.trim()) {
         const withheld = pendingAdmissionRef.current;
         if (withheld && withheld.decision && withheld.decision !== "ANSWER") {
@@ -1109,6 +1062,7 @@ export default function InterviewPage() {
         questionId,
         source: "copilot",
         status: "completed",
+        metrics: responseMetrics(),
         analysis: pendingAnalysisRef.current,
         context: pendingAnalysisRef.current?.contextSummary || pendingContextRef.current
       });
@@ -1135,18 +1089,18 @@ export default function InterviewPage() {
           answerId: `a_${Date.now()}`,
           questionId,
           source: "copilot",
-          status: aborted ? "interrupted" : "completed",
-          analysis: pendingAnalysisRef.current
+          status: "interrupted",
+          metrics: responseMetrics(),
+          analysis: null
         });
         pendingAnalysisRef.current = null;
         pendingContextRef.current = null;
-        if (aborted) {
-          const classified = classifyGenerationFailure({ name: "AbortError", message: "The answer timed out." });
-          setGenerationError({ ...classified, question: text, source });
-          showSnackbar("The answer may be incomplete. You can Retry.", "warning");
-        } else {
-          setGenerationError(null);
-        }
+        const classified = error?.classified || classifyGenerationFailure({
+          name: aborted ? "AbortError" : error?.name,
+          message: error?.message
+        });
+        setGenerationError({ ...classified, question: text, source });
+        showSnackbar("The answer may be incomplete. You can Retry.", "warning");
         return;
       }
       const classified = error?.classified || classifyGenerationFailure({
@@ -1338,6 +1292,17 @@ export default function InterviewPage() {
             <Typography variant="caption" color="text.secondary">{item.timestamp}</Typography>
           </Box>
           {formatAndDisplayResponse(item.text)}
+          {item.metrics && (
+            <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+              {item.metrics.firstTextMs != null ? `First text ${(item.metrics.firstTextMs / 1000).toFixed(1)}s · ` : ''}
+              {item.status === 'completed' ? 'Completed' : 'Stopped'} in {(item.metrics.totalMs / 1000).toFixed(1)}s
+            </Typography>
+          )}
+          {item.status === 'interrupted' && (
+            <Typography variant="caption" color="warning.main" display="block" sx={{ mt: 1 }}>
+              Incomplete answer — excluded from follow-up context.
+            </Typography>
+          )}
           {item.status === 'error' && (
             <Button
               size="small"

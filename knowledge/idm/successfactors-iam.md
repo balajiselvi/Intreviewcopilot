@@ -12,6 +12,18 @@ SuccessFactors holds employment status, org assignment, and often job code. IPS 
 
 I would treat SuccessFactors as the typical HR source for identity lifecycle. Joiners and leavers should follow employment status. Movers should follow org and job attributes into business-role mapping. I would still design S/4 authorization in PFCG and governance in IAG or GRC. SuccessFactors RBP protects HR data; it does not replace SoD on finance posting in S/4.
 
+## Role-based permissions
+
+SuccessFactors authorization is RBP. It is not PFCG, not a SAC role, and not a BTP role collection.
+
+1. In Admin Center, open Manage Permission Roles and grant only the permissions that persona needs.
+2. Create the permission group that identifies who receives the role.
+3. Set the target population: whose employee data that role may see. The group and the target population are different objects.
+4. Assign the permission role to the permission group.
+5. Sign in as a user in the group and confirm they see the intended data, and that a user outside the target population does not.
+
+Employee Central, compensation, and recruiting do not share one permission list. Name the module before listing grants.
+
 ## Architecture Notes
 
 - Source: Employee Central or equivalent employment objects

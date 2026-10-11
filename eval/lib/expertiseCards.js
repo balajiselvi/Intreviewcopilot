@@ -277,17 +277,17 @@ const EXPERIENCE_CARDS = [
     role: "EAM configuration and log-review governance",
     context: "Firefighter without reason codes and log review fails audit.",
     problem: "Unreviewed privileged sessions.",
-    responsibility: "IAG Emergency Access Management with workflow, reason, ticket, and 24-hour log sign-off.",
+    responsibility: "GRC Access Control EAM on the documented programmes. Dover had 95 firefighter owners.",
     actions: [
-      "IAG EAM with workflow approval",
-      "Firefighter ID requires reason code and ticket ID before activation",
-      "Session traces logged; auto report to secondary supervisor for sign-off within 24 hours"
+      "GRC AC 12.0 EAM at Dover, 95 firefighter owners",
+      "Firefighter ID is the GRC object, with a reason and a reviewed log",
+      "Do not call that ID an IAG PAM ID"
     ],
-    decision: "No firefighter without a ticket and a reviewer.",
-    why: "Unreviewed FF is an audit finding even if SoD roles are clean.",
-    governance: "Mandatory supervisor sign-off within 24 hours.",
-    result: "No landscape-wide metric. Speak the control design.",
-    spoken: "We configure Emergency Access Management in IAG with strict workflow approvals. Firefighter IDs require a mandatory reason code and ticket ID before activation. Session activity is logged, and an auto-generated log report goes to the designated secondary supervisor for mandatory sign-off within 24 hours.",
+    decision: "No firefighter without a reason and a reviewer.",
+    why: "Unreviewed firefighter use is an audit finding even if SoD roles are clean.",
+    governance: "Log review stays with the firefighter controller.",
+    result: "Dover figure to speak: 95 firefighter owners. No other firefighter metric.",
+    spoken: "At Dover, GRC Access Control 12.0 included EAM, with 95 firefighter owners. A firefighter ID is created on the GRC side, used with a reason, and the log is reviewed. That is not an IAG PAM ID. An IAG PAM ID is created in Maintain Privileged Access and provisioned down to the target.",
     terms: ["EAM", "Firefighter", "IAG PAM"],
     followUps: ["What if the supervisor misses 24 hours?", "FF ID vs FF role?"],
     strength: "direct"

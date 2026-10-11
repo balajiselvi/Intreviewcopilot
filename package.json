@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "node eval/runOffline.js",
     "build:knowledge": "node scripts/buildKnowledge.js"
   },
   "dependencies": {

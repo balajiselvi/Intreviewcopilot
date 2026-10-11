@@ -235,6 +235,15 @@ function deduplicateAndDiversify(scoredChunks, topK) {
   return selected;
 }
 
+function adjacentProductPenalty(category, chunk, question) {
+  const folder = String(chunk.sourceFolder || "");
+  const asksGrc = /\b(grc|firefighter|msmp|eam)\b/i.test(question);
+  const asksIag = /\biag\b/i.test(question);
+  if (category === "IAG" && folder === "grc" && !asksGrc) return 0.5;
+  if ((category === "EAM" || category === "ARM" || category === "ARA") && folder === "iag" && !asksIag) return 0.5;
+  return 0;
+}
+
 async function searchKnowledge(question, analysis = {}, topK = 8, options = {}) {
   if (!question || typeof question !== "string" || question.trim().length === 0) {
     return [];
@@ -277,13 +286,18 @@ async function searchKnowledge(question, analysis = {}, topK = 8, options = {}) 
         const artifactBoost = computeArtifactBoost(content, category, secondaryCategories);
         const intentBoost = computeIntentBoost(intent, contentNorm);
 
+        const folderPenalty = adjacentProductPenalty(category, chunk, question);
         const finalScore = Math.min(
           1.0,
-          semanticScore * 0.55 +
-          keywordScore * 0.20 +
-          domainBoost +
-          artifactBoost +
-          intentBoost
+          Math.max(
+            0,
+            semanticScore * 0.55 +
+            keywordScore * 0.20 +
+            domainBoost +
+            artifactBoost +
+            intentBoost -
+            folderPenalty
+          )
         );
 
         const confidenceScore = Math.min(1.0, finalScore * 1.1);

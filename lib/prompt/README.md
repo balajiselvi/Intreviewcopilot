@@ -57,6 +57,12 @@ every content chunk is already on the wire, and any evaluator error is caught an
 
 ## Known limitation
 
+The UI shows **Practice feedback**, word count, and estimated speaking time. It does not
+present the heuristic result as a technical-accuracy or experience-verification score.
+Absent scoring weights produce `overallScore: null`, not a zero for every answer.
+Short factual answers are not penalized simply for being under 70 words. Technical terms
+and CV topic overlap are hints for review, never proof that a claim is correct.
+
 The `experienceConsistency`/`ownership` check in `evaluation.js` is a heuristic approximation,
 not semantic verification: it flags ownership-sounding phrases and checks whether any mentioned
 SAP component's name literally appears in `candidateResume`'s text. It cannot verify that a claim

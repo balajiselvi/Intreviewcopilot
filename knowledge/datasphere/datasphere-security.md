@@ -12,6 +12,13 @@ Users are assigned to spaces with scoped privileges on views, tables, and data a
 
 I would design Datasphere security around spaces: who is a member, what they can consume or deploy, and which data access controls restrict rows. I would not reuse an S/4 role catalog as the Datasphere model. If SAC is in front, I would treat SAC content permission and Datasphere space permission as two checks that both have to pass.
 
+## Procedure
+
+1. The user can already sign in through the identity provider trusted by the tenant. Sign-in does not grant a space.
+2. Add the user to the space with a scoped role such as modeler or viewer. Do not use a tenant-wide administrator role to grant one space.
+3. Restrict rows with a data access control on the view, or with the source system's authorizations when the view only consumes that source.
+4. If a SAC story reads the space, the user still needs the SAC team and the story permission. Space membership does not open the story.
+
 ## Distinctions
 
 - SAC: teams, folders, stories

@@ -4,6 +4,19 @@
 
 Beyond identity and role collections covered in the BTP overview, BTP security includes connectivity security — how BTP applications reach on-premise and other cloud systems — through the Cloud Connector and destination services, plus subaccount-level security configuration like trust settings and API access control.
 
+## Role collection assignment
+
+Cloud Foundry authorization is not PFCG.
+
+1. The application already declares its role templates and scopes.
+2. In the subaccount, create the role from that template if it is not already there.
+3. Create a role collection and add the role. The collection is the object you assign.
+4. The subaccount trust must already point at IAS or the corporate identity provider.
+5. Assign the role collection to the user, or to the IAS group that is mapped to that collection.
+6. The user needs a new logon. An existing token does not gain the collection.
+
+A destination's authentication type is a separate choice: principal propagation, OAuth2 client credentials, or a technical user. Do not treat the destination user as the business user's role collection.
+
 ## Interview Summary
 
 BTP security extends past authentication and authorization into connectivity: the Cloud Connector provides a secure tunnel from BTP to on-premise systems without opening inbound firewall ports, and destinations define how an application actually reaches a target system, including which authentication method to use for that specific connection.

@@ -12,6 +12,14 @@ Ariba authorization is group and permission-based inside the realm. Sourcing, co
 
 Ariba is realm-based. Authentication is usually SAML/OIDC through the corporate IdP, often with IAS as the SAP-facing IdP. Authorization is Ariba groups and permissions inside the realm — buyer versus approver versus sourcing versus contracts. That is not PFCG and it is not a BTP role collection. IPS or an IAM feed may create the user; IAG/GRC SoD only applies if that connector and ruleset exist. Create-versus-approve on purchasing documents is the classic procurement control, and it must be designed in Ariba (and in S/4 if POs post there), not assumed from an S/4 composite.
 
+## Procedure
+
+1. Name the Ariba solution first. Buying, sourcing, contracts, and supplier management do not share one group catalog.
+2. The person must already exist in that realm, loaded by the realm's user administration or by the IPS or IAM feed that is actually in scope.
+3. Assign the group that holds the permission. That group is the authorization. It is not a PFCG role and not a BTP role collection.
+4. SSO only proves identity. It does not add the group.
+5. Sign in as that user and confirm the allowed task works and the separated task, such as create versus approve, does not.
+
 ## Architecture Notes
 
 - Authentication: SAML/OIDC federation, commonly IAS as SAP-facing IdP (not Ariba-as-IdP)

@@ -18,7 +18,7 @@ Ruleset quality is the product. Functions group actions. Risks pair incompatible
 
 Hybrid: if GRC ARA still governs ECC and IAG governs cloud, I would map ownership by system, not run two uncoordinated campaigns on the same S/4 client. The bridge exists so analysis can span; it does not remove the need for one accountable risk definition.
 
-Remediation versus mitigation: remove access when the job does not need both sides. Mitigate when the business genuinely needs a conflict, with a control owner, monitoring, and expiry. Firefighter is for break-glass, not for standing SoD.
+Remediation versus mitigation: remove access when the job does not need both sides. Mitigate when the business genuinely needs a conflict, with a control owner, monitoring, and expiry. Break-glass in IAG is a PAM ID, created in IAG and provisioned down. A classic GRC firefighter ID is a different lifecycle. Do not use one as the name of the other.
 
 Joule for IAG, where licensed, is an assistant on top of this model. It does not replace ruleset design or Access Analysis. I would describe it as a way to query and navigate governance content, and I would verify the customer’s actual IAG edition before claiming features.
 

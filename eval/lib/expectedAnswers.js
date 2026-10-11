@@ -172,7 +172,7 @@ const EXPECTED_ANSWERS = [
   },
   {
     id: "privileged",
-    re: /\b(what is )?privileged access\b|\bhow (do|would) you control privileged\b/i,
+    re: /\bwhat is privileged access\b|\bhow (do|would) you control privileged\b/i,
     answer: "Privileged access can change the system or a sensitive business outcome. I minimize standing privilege: approval, time bound, logging, and an independent review. Emergency need goes through EAM or Firefighter, not a permanent SAP_ALL."
   },
   {

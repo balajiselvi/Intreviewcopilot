@@ -16,13 +16,14 @@ import { runPostAnswerEvaluation } from "../../lib/prompt";
 import APP_CONFIG from "../../config/appConfig";
 
 const require = createRequire(import.meta.url);
-const { recallGroundedExperience, formatMemoryCard } = require("../../eval/lib/expertiseCards.js");
+const { recallGroundedExperience, formatMemoryCard, fieldConflictsWithCv } = require("../../eval/lib/expertiseCards.js");
 const { recallExpectedAnswer } = require("../../eval/lib/expectedAnswers.js");
 const { DEFAULT_CAREER_BACKGROUND, scopeCareerEvidence, scopedHistoryOnly } = require("../../eval/lib/careerTimeline.js");
 const { shouldInheritPriorDomain, hasStrongTechnicalEvidence, isPlaneFoil, isTopicContinuation } = require("../../lib/contextInheritance.js");
-const { publicLlmError } = require("../../lib/generationGuard.js");
+const { publicLlmError, isIncompleteGeneration } = require("../../lib/generationGuard.js");
 const { appendQa } = require("../../lib/interviewSessionStore.js");
 const { decideInterviewTurn } = require("../../lib/turnDecision.js");
+const { selectVerifiedWorkflow } = require("../../lib/verifiedWorkflow.js");
 const { priorAnchor } = require("../../lib/questionAdmission.js");
 const { resolveInterviewContext, sanitizeDebugContext, toHistoryContext, QUESTION_INTENTS } = require("../../lib/interviewContext.js");
 
@@ -701,7 +702,7 @@ function prepareConversationHistory(history = []) {
   return providerSafe(recentHistory);
 }
 
-async function streamGeminiResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens }) {
+async function streamGeminiResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens, onUsage, onChunk }) {
   const client = new GoogleGenerativeAI(apiKey);
   const generativeModel = client.getGenerativeModel({
     model,
@@ -719,11 +720,14 @@ async function streamGeminiResponse({ apiKey, model, systemPrompt, recentHistory
   let fullText = "";
   const resultStream = await chat.sendMessageStream(question, { signal });
   for await (const chunk of resultStream.stream) {
-    if (signal?.aborted) break;
+    signal?.throwIfAborted();
+    const finish = chunk.candidates?.[0]?.finishReason;
+    if (finish) onUsage?.({ finish_reason: finish });
     const chunkText = stripStreamMarkdown(chunk.text());
     if (chunkText) {
       writeSSEChunk(res, chunkText);
       fullText += chunkText;
+      onChunk?.(chunkText);
     }
   }
   return fullText;
@@ -753,7 +757,8 @@ function isTransientLlmError(error) {
 }
 
 async function streamOpenAIResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens, onUsage, onChunk }) {
-  const client = new OpenAI({ apiKey });
+  // One retry is owned here; disable the SDK's nested retries within the 25s budget.
+  const client = new OpenAI({ apiKey, maxRetries: 0 });
   const args = { model, systemPrompt, recentHistory, question, maxTokens, signal };
   let stream;
   try {
@@ -773,7 +778,7 @@ async function streamOpenAIResponse({ apiKey, model, systemPrompt, recentHistory
   let fullText = "";
   let usage = null;
   for await (const part of stream) {
-    if (signal?.aborted) break;
+    signal?.throwIfAborted();
     if (part.usage) {
       usage = {
         ...(usage || {}),
@@ -801,10 +806,11 @@ async function streamOpenAIResponse({ apiKey, model, systemPrompt, recentHistory
   return fullText;
 }
 
-async function streamOpenRouterResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens }) {
+async function streamOpenRouterResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens, onUsage, onChunk }) {
   // OpenRouter is API-compatible with OpenAI but uses openrouter.ai as base URL
   const client = new OpenAI({
     apiKey,
+    maxRetries: 0,
     baseURL: "https://openrouter.io/api/v1",
     defaultHeaders: {
       "HTTP-Referer": "https://interviewcopilot.app",
@@ -829,20 +835,24 @@ async function streamOpenRouterResponse({ apiKey, model, systemPrompt, recentHis
 
   let fullText = "";
   for await (const part of stream) {
-    if (signal?.aborted) break;
+    signal?.throwIfAborted();
+    const finish = part.choices?.[0]?.finish_reason;
+    if (finish) onUsage?.({ finish_reason: finish });
     const text = stripStreamMarkdown(part.choices[0]?.delta?.content || "");
     if (text) {
       writeSSEChunk(res, text);
       fullText += text;
+      onChunk?.(text);
     }
   }
   return fullText;
 }
 
-async function streamClaudeResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens }) {
+async function streamClaudeResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens, onUsage, onChunk }) {
   // Use Anthropic's Claude API
   const client = new Anthropic({
-    apiKey: apiKey || process.env.ANTHROPIC_API_KEY
+    apiKey: apiKey || process.env.ANTHROPIC_API_KEY,
+    maxRetries: 0
   });
 
   const messages = [
@@ -864,22 +874,27 @@ async function streamClaudeResponse({ apiKey, model, systemPrompt, recentHistory
 
   let fullText = "";
   for await (const event of stream) {
-    if (signal?.aborted) break;
+    signal?.throwIfAborted();
+    if (event.type === "message_delta" && event.delta?.stop_reason) {
+      onUsage?.({ finish_reason: event.delta.stop_reason });
+    }
     if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
       const text = stripStreamMarkdown(event.delta.text || "");
       if (text) {
         writeSSEChunk(res, text);
         fullText += text;
+        onChunk?.(text);
       }
     }
   }
   return fullText;
 }
 
-async function streamGroqResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens }) {
+async function streamGroqResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens, onUsage, onChunk }) {
   // Groq is OpenAI-compatible but uses groq.com as base URL
   const client = new OpenAI({
     apiKey,
+    maxRetries: 0,
     baseURL: "https://api.groq.com/openai/v1"
   });
 
@@ -900,11 +915,14 @@ async function streamGroqResponse({ apiKey, model, systemPrompt, recentHistory, 
 
   let fullText = "";
   for await (const part of stream) {
-    if (signal?.aborted) break;
+    signal?.throwIfAborted();
+    const finish = part.choices?.[0]?.finish_reason;
+    if (finish) onUsage?.({ finish_reason: finish });
     const text = stripStreamMarkdown(part.choices[0]?.delta?.content || "");
     if (text) {
       writeSSEChunk(res, text);
       fullText += text;
+      onChunk?.(text);
     }
   }
   return fullText;
@@ -1034,6 +1052,66 @@ export default async function handler(req, res) {
     return;
   }
 
+  try {
+    const verified = selectVerifiedWorkflow(question);
+    if (verified?.answer) {
+      let spoken = verified.answer;
+      if (verified.experienceAsk) {
+        try {
+          const card = recallGroundedExperience(question);
+          if (card?.spoken && !fieldConflictsWithCv(card.spoken)) {
+            spoken = card.spoken;
+          } else {
+            spoken = `I would not claim that as a completed implementation. ${verified.answer}`;
+          }
+        } catch (recallError) {
+          logger?.error?.("Verified workflow experience recall failed:", recallError);
+          spoken = `I would not claim that as a completed implementation. ${verified.answer}`;
+        }
+      }
+      if (!setSSEHeaders(res)) {
+        return res.status(500).json({ error: "Failed to initialize streaming response." });
+      }
+      writeSSEEvent(res, "admission", {
+        decision: "ANSWER",
+        route: "VERIFIED_WORKFLOW",
+        reason: "verified-procedure",
+        scriptId: verified.id,
+        confidence: 1,
+        evidenceMode: null
+      });
+      writeSSEChunk(res, spoken);
+      try {
+        if (interviewSessionId) {
+          appendQa(
+            interviewSessionId,
+            { model, company: String(company || "").slice(0, 80), source: "live-interview" },
+            {
+              question,
+              answerShown: spoken,
+              status: "completed",
+              model,
+              source: "verified-workflow",
+              route: "VERIFIED_WORKFLOW",
+              scriptId: verified.id || "",
+              disposition: "ANSWER",
+              latencyMs: 0
+            }
+          );
+        }
+      } catch (recordError) {
+        logger?.error?.("Verified workflow session write failed:", recordError);
+      }
+      if (res?.writable) {
+        res.write("data: [DONE]\n\n");
+        res.end();
+      }
+      return;
+    }
+  } catch (error) {
+    logger?.error?.("Verified workflow selection failed:", error);
+  }
+
   // Execution mode determines behavior: 'full' (production), 'retrieval-only' (diagnostic), 'disabled' (maintenance)
   // Defaults to 'full' for production safety; must be explicitly configured for other modes
   const validationMode = APP_CONFIG?.llm?.validationMode || 'full';
@@ -1108,6 +1186,8 @@ export default async function handler(req, res) {
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
+  const onDisconnect = () => { if (!res.writableEnded) controller.abort(); };
+  res.once?.("close", onDisconnect);
   let streamStarted = false;
   let recordedAnswer = "";
   let tokenUsage = null;
@@ -1316,7 +1396,8 @@ export default async function handler(req, res) {
       } else {
         const recallQuery = `${effectiveQuestion} ${resolved.resolvedDomain || ""}`.trim();
         const strongest = recallGroundedExperience(recallQuery);
-        if (strongest && !scopedHistoryOnly(promptPayload.evidenceMode)) {
+        const procedureQuestion = interviewContext.answerScope === "IMPLEMENTATION_WALKTHROUGH";
+        if (strongest && !scopedHistoryOnly(promptPayload.evidenceMode) && !procedureQuestion) {
           promptPayload.documentedExperience = formatMemoryCard(strongest);
           promptPayload.experienceSelection = {
             confidence: strongest.strength || strongest.confidence || "medium",
@@ -1389,7 +1470,7 @@ export default async function handler(req, res) {
       signal: controller.signal,
       maxTokens,
       onUsage: (usage) => {
-        tokenUsage = usage;
+        tokenUsage = { ...(tokenUsage || {}), ...usage };
       },
       onChunk: (text) => {
         recordedAnswer += text;
@@ -1459,6 +1540,7 @@ export default async function handler(req, res) {
         fullAnswerText = await streamOpenAIResponse(streamOptions);
       }
       recordedAnswer = fullAnswerText || "";
+      abortIfTimedOut();
       if (res?.writable) {
         writeSSEEvent(res, "generation", {
           finish_reason: tokenUsage?.finish_reason || null,
@@ -1474,7 +1556,7 @@ export default async function handler(req, res) {
         questionResolved: effectiveQuestion,
         interviewContext,
         answerShown: recordedAnswer,
-        status: recordedAnswer.trim() ? "completed" : "empty",
+        status: isIncompleteGeneration(tokenUsage?.finish_reason) ? "partial" : (recordedAnswer.trim() ? "completed" : "empty"),
         model,
         retryCount: Number(clientRetryCount) || 0,
         latencyMs: Date.now() - qaStartedMs,
@@ -1484,13 +1566,17 @@ export default async function handler(req, res) {
         disposition: "ANSWER",
         evidenceMode: promptPayload.evidenceMode || "full",
         retrieval: knowledgeResult.evidence,
-        errorCode: null
+        errorCode: isIncompleteGeneration(tokenUsage?.finish_reason) ? "incomplete" : null
       });
 
       // Post-answer evaluation: pure heuristics, no LLM call, runs only after every
       // content chunk is already on the wire — never delays the spoken answer, and a
       // failure here must never break the already-delivered response.
       try {
+        if (isIncompleteGeneration(tokenUsage?.finish_reason)) {
+          res.write("data: [DONE]\n\n");
+          return;
+        }
         const qualityAnalysis = runPostAnswerEvaluation({
           question,
           answer: fullAnswerText,
@@ -1545,6 +1631,7 @@ export default async function handler(req, res) {
     }
   } finally {
     clearTimeout(timeoutId);
+    res.removeListener?.("close", onDisconnect);
     if (res?.writable) {
       res.end();
     }
