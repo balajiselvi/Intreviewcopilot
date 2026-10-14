@@ -28,6 +28,12 @@ This is exactly why "user can log in but the query returns no data" is a genuine
 
 On CompositeProviders and ADSOs specifically: analysis authorization applies at the point the data is actually reported, so a CompositeProvider combining multiple underlying providers needs the authorization-relevant characteristics present and consistently modeled across all of them, or the combined result can behave inconsistently — authorized against one source, silently filtered against another. That's a design consideration, not just a troubleshooting one: authorization-relevant characteristics need to be planned into the data model from the start, not bolted on after CompositeProviders are already built.
 
+## Troubleshooting: query runs but returns no data for one user
+
+Compare the same query, filters, variables, and time range for the affected and a working user; an empty result alone does not prove an authorization denial. For ABAP BW, reproduce the query once as the affected user in RSRT or RSRT2. In RSECADMIN, enable that user's analysis-authorization log, rerun once, then inspect the final check result and rejected characteristic-value combination; an intermediate partial check may be superseded by final success. Disable the log after the test. If it confirms a denial, compare the user's effective S_RS_AUTH assignments and analysis authorizations with the query provider's authorization-relevant values, correct only the proven gap, and retest. If it shows no denial, check query variables and filters, provider joins, and data-load results instead of widening access. This BW OLAP log is distinct from SU53 or the standard authorization trace; those tools do not replace it.
+
+Source checked 2026-10-14: [SAP Help Portal, The Authorization Log in RSECADMIN](https://help.sap.com/docs/SUPPORT_CONTENT/bwplaolap/3361386582.html). This procedure applies to ABAP BW systems that provide RSECADMIN; confirm the deployed BW/BW/4HANA release and query client before using its screens.
+
 ## Architecture
 
 - Execution-level authorization: S_RS_COMP (query/component execute), S_RS_COMP1 (additional component-level check) — standard PFCG-assigned objects

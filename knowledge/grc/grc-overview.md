@@ -18,6 +18,8 @@ SAP GRC Access Control governs how access actually gets granted, not just how it
 
 The core pieces are Access Risk Analysis, which runs segregation of duties checks against a ruleset before or during a request; Access Request Management, the workflow — built on MSMP and BRF+ — that routes requests to the right approvers; Business Role Management, which manages the lifecycle of business roles mapped to technical roles; and Emergency Access Management, or Firefighter, which gives time-limited elevated access with full logging instead of standing broad access.
 
+Risk analysis can read a target system only after that system is a connector. The SAP Help integration guide for Access Control 12.0.31 registers it under Governance, Risk and Compliance, Common Components, Integration Framework: Create Connectors, Maintain Connectors and Connection Types, and Maintain Connection Settings. An ECC system is an SM59 type 3 RFC destination. The guide's worked example is SuccessFactors, so do not copy that connection type onto ECC. If SM59 succeeds and risk analysis returns nothing, KBA 2907683, for Access Control 10.0, 10.1, and 12.0, names the failure "Connector not defined in grfncciconnector table". Do not use GRFNMW_CONFIG, GRAC_SPM, or a transaction named GRACCONNECTORS for this.
+
 The point of all of this is auditability. Without GRC, a direct PFCG role assignment leaves no formal approval trail and no automatic SoD check. With GRC, every access change has a request, an approval, a risk analysis result, and a log — which is exactly what an auditor wants to see.
 
 ## 90 Second Interview Answer
@@ -85,6 +87,10 @@ Resolution: review the BRF+ rule execution for that request and correct the unde
 Common issue: a role assignment approved through ARM doesn't actually appear in the target system.
 Root cause: a connector or provisioning failure between GRC and the target system.
 Resolution: check the connector status and background job logs, then reprocess the provisioning step.
+
+Common issue: SM59 connects, but Access Control risk analysis returns nothing for that ECC system.
+Root cause: the RFC destination is not registered as an active connector for the authorization scenario.
+Resolution: register it in the Integration Framework and confirm the connector group is active. KBA 2907683 names table GRFNCCICONNECTOR when risk analysis runs against a connector that is not defined. The 12.0.31 integration guide is the source for the IMG activities. Its worked example is not ECC.
 
 Common issue: ARA isn't flagging a conflict that should exist.
 Root cause: the ruleset hasn't been updated to reflect a recent business process or role change.
@@ -175,6 +181,16 @@ An average answer lists the four GRC components. A 10/10 answer explains how the
 - No mention of the audit trail as the core value proposition
 - Not knowing the difference between ARA, ARM, BRM, and EAM
 - Treating Firefighter as equivalent to standing elevated access
+
+## Release names
+
+Verified 2026-10-13 against SAP Help, Upgrade: SAP Access Control 10.0/10.1 to 12.0, document version 12.0.32.
+
+The product name is SAP Access Control. The documented releases in that guide are 10.0, 10.1, and 12.0. There is not a separate product called GRC 12.x. Access Control 12.0 installs add-on GRCFND_A V1200 on the GRC system and NetWeaver plug-in GRCPINW V1200_750 on the plug-in system. The same guide names 10.1 plug-ins GRCPIERP V1100_700 and GRCPINW V1100_710. It does not state a foundation add-on name for 10.1 in the pages checked. The supported upgrade is 10.0 or 10.1 to 12.0. Do not apply that guide to any other product version.
+
+Access Control 12.0 still uses NWBC roles after upgrade. SAP Fiori apps for Access Control are an optional front end, SAP Fiori for SAP AC 1.0, add-on UIGRAC01. They do not replace MSMP, BRFplus, or the target-system plug-in. ARA, ARM, BRM, and EAM remain the four Access Control components in both 10.1 and 12.0. Do not invent a functional rename between those releases. A support-package prerequisite can block the upgrade: the 12.0.32 guide says a 10.1 system on SP24 must move to 12.0 SP05 or higher. Confirm the system's actual support package before describing an upgrade.
+
+SAP Note 2612335 is titled for add-on GRCFND_A V8100. The SAP Process Control 12.0 installation guide, document 12.0.13, cites that note for V8100 and separately cites Note 2602131 for GRCFND_A V1200. The same guide's component table lists GRCFND_A V1100 as N/A. The guide does not define how those three add-on names relate. The note body was not opened. Do not treat V8100 as Access Control 10.1 or as Access Control 12.0. GRFNMW_DEV_MAP was not confirmed in SAP Help. A third-party object list is not evidence for a different transaction name. Leave GRFNMW_DEV_MAP unresolved.
 
 ## Keywords
 

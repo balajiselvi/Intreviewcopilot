@@ -1,4 +1,5 @@
 const { getApplicationContainer } = require("../lib/container");
+const { headingAlignment, namedSourceAdjustment, deliveryProcedureAdjustment } = require("./sectionHeading");
 
 const DOMAIN_BOOST_MAP = Object.freeze({
   "SAP Security": ["pfcg", "su24", "su25", "su53", "st01", "stauthtrace", "authorization", "role", "usobt_c", "usobx_c"],
@@ -106,14 +107,14 @@ const RELATED_DOMAINS = Object.freeze({
   "SAC": ["SAP Cloud Identity / BTP"]
 });
 
-function computeDomainBoost(domain, contentNorm) {
-  if (!domain || !contentNorm) return 0;
+function computeDomainBoost(domain, contentNorm, queryNorm = "") {
+  if (!domain || !contentNorm || !queryNorm) return 0;
 
   const directKeywords = DOMAIN_BOOST_MAP[domain];
   let directHits = 0;
   if (directKeywords) {
     for (let i = 0; i < directKeywords.length; i++) {
-      if (contentNorm.includes(directKeywords[i])) directHits++;
+      if (queryNorm.includes(directKeywords[i]) && contentNorm.includes(directKeywords[i])) directHits++;
     }
   }
   const directBoost = Math.min(0.15, directHits * 0.03);
@@ -124,7 +125,7 @@ function computeDomainBoost(domain, contentNorm) {
     const relatedKeywords = DOMAIN_BOOST_MAP[relatedDomain];
     if (!relatedKeywords) continue;
     for (let i = 0; i < relatedKeywords.length; i++) {
-      if (contentNorm.includes(relatedKeywords[i])) relatedHits++;
+      if (queryNorm.includes(relatedKeywords[i]) && contentNorm.includes(relatedKeywords[i])) relatedHits++;
     }
   }
   const relatedBoost = Math.min(0.06, relatedHits * 0.015);
@@ -132,18 +133,23 @@ function computeDomainBoost(domain, contentNorm) {
   return Math.min(0.18, directBoost + relatedBoost);
 }
 
-function computeArtifactBoost(content, category, secondaryCategories = []) {
+function computeArtifactBoost(content, category, secondaryCategories = [], question = "") {
   if (!content || typeof content !== "string") return 0;
 
   const secondaries = Array.isArray(secondaryCategories) ? secondaryCategories : [];
   const hasCloudProductContext = CLOUD_ONLY_CATEGORIES.has(category) || secondaries.some((c) => CLOUD_ONLY_CATEGORIES.has(c));
   if (hasCloudProductContext) return 0;
 
+  const asked = String(question || "");
+  const asksPublicCloud = /public edition|public cloud/i.test(asked);
+  const contentIsPublicCloud = /public edition|public cloud/i.test(content);
+  const asksConnector = /\b(connect|connector|sm59|rfc)\b/i.test(asked) && !GRC_ARTIFACT_REGEX.test(asked);
+
   let boost = 0;
   if (ABAP_ARTIFACT_REGEX.test(content) && ABAP_ARTIFACT_ELIGIBLE_CATEGORIES.has(category)) {
-    boost = Math.max(boost, 0.08);
+    if (!(asksPublicCloud && !contentIsPublicCloud)) boost = Math.max(boost, 0.08);
   }
-  if (GRC_ARTIFACT_REGEX.test(content) && GRC_ARTIFACT_ELIGIBLE_CATEGORIES.has(category)) {
+  if (GRC_ARTIFACT_REGEX.test(content) && GRC_ARTIFACT_ELIGIBLE_CATEGORIES.has(category) && !asksConnector) {
     boost = Math.max(boost, 0.08);
   }
   return boost;
@@ -282,8 +288,11 @@ async function searchKnowledge(question, analysis = {}, topK = 8, options = {}) 
           : (typeof chunk.score === "number" ? chunk.score : 0.5);
 
         const keywordScore = computeKeywordOverlap(queryNorm, contentNorm);
-        const domainBoost = computeDomainBoost(domain, contentNorm);
-        const artifactBoost = computeArtifactBoost(content, category, secondaryCategories);
+        const domainBoost = computeDomainBoost(domain, contentNorm, queryNorm);
+        const headingBoost = headingAlignment(question, chunk.heading || chunk.section) * 0.12;
+        const sourceAdjustment = namedSourceAdjustment(question, chunk);
+        const deliveryAdjustment = deliveryProcedureAdjustment(question, chunk, analysis);
+        const artifactBoost = computeArtifactBoost(content, category, secondaryCategories, question);
         const intentBoost = computeIntentBoost(intent, contentNorm);
 
         const folderPenalty = adjacentProductPenalty(category, chunk, question);
@@ -295,7 +304,10 @@ async function searchKnowledge(question, analysis = {}, topK = 8, options = {}) 
             keywordScore * 0.20 +
             domainBoost +
             artifactBoost +
-            intentBoost -
+            intentBoost +
+            headingBoost +
+            sourceAdjustment +
+            deliveryAdjustment -
             folderPenalty
           )
         );

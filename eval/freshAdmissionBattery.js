@@ -33,6 +33,10 @@ const VALID = [
   ["What does a controller review on a firefighter log?", {}],
   ["How should hypercare hand back to the run team?", {}],
   ["Give me the decision you would take if UAT is red."],
+  ["A Public Edition user cannot see a Fiori app.", {}],
+  ["Connect ECC for Access Control risk analysis.", {}],
+  ["SM59 succeeds but Access Control risk analysis returns nothing.", {}],
+  ["Who operates the infrastructure of SAP S/4HANA Cloud Private Edition compared with Public Edition?", {}],
 ];
 
 const CHATTER = [

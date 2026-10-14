@@ -84,6 +84,12 @@ An average answer lists the five privilege types. A strong answer explains why a
 
 SAP HANA, system privileges, object privileges, SQL privileges, analytic privileges, package privileges, application privileges, catalog role, repository role, design-time role, _SYS_REPO, HDI container, row-level security, HANA authorization
 
+## Troubleshooting: SAP HANA insufficient privilege error
+
+Capture the complete error and GUID from the affected user's failed operation. On SAP HANA Platform 2.0 SPS 08, an administrator with EXECUTE on the diagnostic procedure can run `CALL SYS.GET_INSUFFICIENT_PRIVILEGE_ERROR_DETAILS('<error-guid>', ?)` or enter the GUID in SAP HANA Cockpit's Insufficient Privilege Details. Review the checked user, object, schema, object type, and missing privilege before changing access. The procedure may reveal one missing privilege at a time; after a justified grant, reproduce the operation and inspect the next GUID rather than adding a broad role. If the error has no GUID, the details have expired, or the procedure is disabled, follow the release-specific SAP HANA authorization-trace guidance. Some operations are intentionally restricted to SYS or the system database and are not fixed by granting a normal user privilege.
+
+Source checked 2026-10-14: [SAP Help, Resolve Insufficient Privilege Errors, SAP HANA Platform 2.0 SPS 08](https://help.sap.com/docs/SAP_HANA_PLATFORM/6b94445c94ae495c83a19646e7c3fd56/d26bddb8bba54e2eac09d85c93aa8d1c.html).
+
 ## Sources
 
 Content verified against the following live sources (accessed 2026-08-06); paraphrased and synthesized, not reproduced verbatim:

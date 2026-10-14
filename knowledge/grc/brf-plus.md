@@ -136,7 +136,7 @@ Resolution: validate and align decision table content across environments, or te
 
 ## SAP Transactions
 
-BRF+, BRFPLUS, GRFNMW_DEV_MAP
+The BRFplus workbench is opened with transaction BRFplus. The exact transaction name on a system may be BRF+ or BRFPLUS. GRFNMW_DEV_MAP was not confirmed against SAP Help in this audit. Do not present it as a required configuration step.
 
 ## SAP Tables
 

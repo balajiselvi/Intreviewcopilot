@@ -2,7 +2,7 @@
 
 ## Overview
 
-On-premise and private-cloud S/4HANA business roles are PFCG roles. You start from the job, assign the Fiori catalog and the space, and the backend objects still come through SU24 and role generation. Public Cloud is a different product procedure: Maintain Business Roles, business catalogs, and restrictions. There is no customer PFCG, SU24, or profile generation. Do not answer a Public Cloud question with a PFCG sequence.
+On-premise and private-cloud S/4HANA business roles are PFCG roles. You start from the job, assign the Fiori catalog and the space, and the backend objects still come through SU24 and role generation. On those deployments, transaction /UI2/FLPCM_CONF maintains cross-client launchpad content and transaction /UI2/FLPCM_CUST maintains client-specific content. Those are transactions, not tables. Spaces and pages are maintained in Manage Launchpad Spaces and Manage Launchpad Pages, then the space is added to the PFCG role. Public Cloud is a different product procedure: Maintain Business Roles, business catalogs, restrictions, Manage Launchpad Spaces, and Manage Launchpad Pages. There is no customer PFCG, SU24, /UI2/FLPCM_CUST, or profile generation. Do not answer a Public Cloud question with a PFCG sequence. Verified 2026-10-13 against SAP Learning for Private Edition and Public Edition, and SAP Note 3401525 for public-cloud spaces mode.
 
 ## Interview Summary
 

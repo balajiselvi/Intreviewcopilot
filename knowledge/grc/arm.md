@@ -84,6 +84,18 @@ Common issue: a request is stuck at an approval stage with no approver notified.
 Root cause: the BRF+ agent determination rule didn't resolve a valid approver for that stage.
 Resolution: review the BRF+ rule execution log, identify the missing or incorrect rule data, and correct it.
 
+### No Approver MSMP BRFplus
+
+Verified diagnostic sequence for SAP Access Control ARM (12.0 documentation):
+1. In Request Status, select the request and open Instance Status. Inspect Path Status, Approvers of Selected Path, and the Audit Log to establish whether MSMP selected a path and where processing stopped. The same request screen provides View Provisioning Logs; use those only when the request is already approved and target provisioning is the failure.
+2. If the path is absent or wrong, inspect the request type's process and initiator/path mapping in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. Check the selected process, configured paths and stages, and route mapping; regenerate the workflow after an applicable configuration change.
+3. If MSMP selected the expected path but no approver appears, inspect that stage's BRF+ agent-determination rule against the request's actual attributes. Verify that the rule result maps to the intended MSMP route and that the resulting agent is valid for that stage. Do not infer a particular BRF+ application, rule ID, or transaction from the symptom; these are configuration-specific.
+4. Re-test with a request matching the affected attributes, then verify the selected path and approver in Instance Status and the audit log. If approval completes but the target assignment fails, follow the provisioning log and connector path separately.
+
+This is SAP Access Control MSMP/BRF+ troubleshooting. Do not apply IAG's IAS group IAG_WF_MANAGER or SCI User Group Sync Job to an Access Control ARM request.
+
+Sources checked 2026-10-14: SAP Access Control 12.0 SP31, Viewing Your Request Status (Instance Status fields and provisioning logs), https://help.sap.com/docs/SAP_ACCESS_CONTROL/5cae1bc9a72348389e91183714220e30/89f1e44fc5c54a59e10000000a445394.html; SAP Help, Maintaining Tasks and Authorizations for Request Approvers (Maintain MSMP Workflows and process/path/stage navigation), https://help.sap.com/docs/SAP_GRC_ACCESS_CONTROL_FOR_SAP_HANA/089bf50e6c264e93830372ea870f0681/c6e9e44fc5c54a59e10000000a445394.html; SAP Support Content, BRF plus Flat Rule - SAP Access Control Integration (BRF+ results mapped to MSMP paths), https://help.sap.com/docs/SUPPORT_CONTENT/grc/3362386908.html.
+
 Common issue: a request was approved but the role never appeared in the target system.
 Root cause: a connector or provisioning framework failure after approval.
 Resolution: check connector status and background job logs, then manually reprocess or re-trigger provisioning.
@@ -144,7 +156,7 @@ NWBC, GRAC_SPM, GRFNMW_DEV_MAP, GRFNMW_CONFIG
 
 ## SAP Tables
 
-GRACREQUEST, GRACUSER, GRACROLE, GRFNMWWFCONF
+GRACREQUEST, GRACUSER, GRACROLE
 
 ## Best Practices
 

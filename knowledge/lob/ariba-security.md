@@ -20,6 +20,12 @@ Ariba is realm-based. Authentication is usually SAML/OIDC through the corporate 
 4. SSO only proves identity. It does not add the group.
 5. Sign in as that user and confirm the allowed task works and the separated task, such as create versus approve, does not.
 
+### Troubleshooting: a user can sign in but cannot perform a procurement action
+
+Separate sign-in, missing solution/action, and an error after starting the action; SSO authenticates the user but does not grant an Ariba permission. In SAP Ariba Procurement, verify that the user exists in the correct realm and inspect the profile's User Groups view or Ariba Administrator > User Manager. Confirm the group is for the relevant solution and permits this action. The version 2605 Group Descriptions table lists Purchasing User / PUR001 for Create requisitions; that does not prove approval rights or every site's purchasing-unit and custom-group rules. If the group is missing, fix its assignment through the approved realm or identity-provisioning path and retest. If it is present, capture the solution, action, document, time, and exact error, then inspect the corresponding realm or workflow configuration.
+
+Sources checked 2026-10-14: SAP Help, *SAP Ariba Procurement Solutions Group Descriptions*, version 2605 (Purchasing User / PUR001); SAP Help, *Managing Your User Information*, version 2605 (profile group memberships and applicable solutions). A group description identifies allowed actions, not the site's full workflow configuration.
+
 ## Architecture Notes
 
 - Authentication: SAML/OIDC federation, commonly IAS as SAP-facing IdP (not Ariba-as-IdP)

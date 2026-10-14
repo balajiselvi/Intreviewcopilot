@@ -2,7 +2,9 @@
 
 ## Overview
 
-Connectors are the integration layer linking GRC to every target system it governs — SAP and non-SAP alike. They're what let ARM actually provision a role after approval, what let ARA pull authorization data for risk analysis, and what determine whether a target system can be governed by GRC at all.
+An ECC system is connected to SAP Access Control by an ABAP RFC destination, then registered in the Integration Framework so Access Risk Analysis can read it. Verified 2026-10-13 from SAP Help, Integration: SAP Access Control, document 12.0.31. In Customizing, transaction SPRO, the path is Governance, Risk and Compliance, Common Components, Integration Framework. Create Connectors creates the destination. Maintain Connectors and Connection Types defines the connector, the connector group, and the assignment of the connector to that group. Maintain Connection Settings links the connector to an integration scenario. The worked example in that chapter is a SuccessFactors connector, with scenarios PROV, AUTH, and ROLMG. Do not copy the SuccessFactors connection type or application type onto ECC. For an ABAP system the destination is an SM59 type 3 connection. Confirm the connection type on the system.
+
+The same guide then uses Access Control customizing: Maintain Connector Settings, and Maintain Mapping for Actions and Connector Groups. The SuccessFactors example assigns action 0002 Role Risk Analysis and sets the connector group status to Active. An inactive group is not used. SAP Knowledge Base Article 2907683, for Access Control 10.0, 10.1, and 12.0, names the risk-analysis failure "Connector not defined in grfncciconnector table". The article body was not opened. There is no verified transaction named GRACCONNECTORS. GRFNMW_CONFIG and GRAC_SPM are not connector setup.
 
 ## Interview Summary
 
@@ -10,7 +12,7 @@ A connector is a configured RFC or web-service connection between GRC and a targ
 
 ## 30 Second Interview Answer
 
-A connector is the technical link between GRC and a system it governs — typically an RFC connection for SAP systems, or a web-service integration for non-SAP targets. Every piece of GRC functionality that touches a real system depends on it — provisioning after an ARM approval, pulling authorization data for ARA risk analysis, checking Firefighter session activity. If a connector is down, GRC can still approve requests, it just can't act on them.
+To let Access Control risk analysis read an ECC system, create the ABAP RFC destination and register it in the Integration Framework. The 12.0.31 SAP Help integration guide names Create Connectors, Maintain Connectors and Connection Types, and Maintain Connection Settings. SM59 is where the type 3 RFC destination is maintained. If SM59 connects and risk analysis still returns nothing, the connector is not yet a registered, active connector for the authorization scenario. KBA 2907683 names table GRFNCCICONNECTOR for that failure on Access Control 10.0, 10.1, and 12.0. Do not answer this with GRFNMW_CONFIG, GRAC_SPM, or GRACCONNECTORS.
 
 ## 60 Second Interview Answer
 
@@ -134,13 +136,19 @@ Resolution: reset credentials or restore the technical user's required authoriza
 19. What's your approach to connector security review as part of a broader GRC security assessment?
 20. How do you handle connectors when a target system is being decommissioned but still has active role assignments through GRC?
 
+## Configuration that is corroborated
+
+Create the RFC destination in transaction SM59. The destination is system-specific and is not transported. Register that destination in the Access Control Integration Framework: SPRO, Governance, Risk and Compliance, Common Component Settings, Integration Framework, Maintain Connectors and Connection Types, then assign it in Maintain Connection Settings for the integration scenarios the process uses. Community guidance for Access Control 10.0, 10.1, and 12.0 names the scenario links AUTH, PROV, ROLEMG, and SUPMG, and points to SAP Note 1562760 for the scenario-connector link. That note was not opened in this audit. Confirm the IMG node names and scenario IDs on the system before treating them as a runbook.
+
+There is no verified transaction named GRACCONNECTORS. Do not cite that name.
+
 ## SAP Transactions
 
-SM59, SPRO, GRACCONNECTORS
+SM59 for the RFC destination. Connector registration is an IMG activity under Integration Framework, not a separate verified transaction code.
 
 ## SAP Tables
 
-GRACCONNECTOR, GRACCONNGRP
+Do not cite connector table names unless they are confirmed in the system or in SAP Help for the installed release.
 
 ## Best Practices
 

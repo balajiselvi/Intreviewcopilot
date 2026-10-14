@@ -158,9 +158,10 @@ cases.push("two named programmes are not merged");
   assert.ok(text.indexOf("Dover") < text.indexOf("Eminnov") || text.indexOf("Eminnov") < text.indexOf("Dover"));
 }
 
-cases.push("technical question keeps the full background");
+cases.push("technical how-to does not attach the full CV");
 {
-  expectMode("How do you design a PFCG role from SU24?", "", "full", null);
+  const text = expectMode("How do you design a PFCG role from SU24?", "", "technical", null);
+  assert.doesNotMatch(text, /CAREER TIMELINE|8,700|Dover Corporation/);
 }
 
 cases.push("role follow-up inherits the named engagement");

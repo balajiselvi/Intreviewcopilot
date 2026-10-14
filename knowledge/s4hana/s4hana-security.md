@@ -74,17 +74,22 @@ A user opens their Fiori launchpad, and the tiles they see are determined by the
 
 ## Troubleshooting
 
-Common issue: a user can see a Fiori tile but the app fails with an authorization error when opened.
-Root cause: Fiori catalog/group access was granted, but the backend authorization objects the app needs weren't included in the role.
-Resolution: identify the missing backend authorization object, typically via trace, and add it to the role.
+Common issue: a user can see a Fiori tile but the app fails after it opens.
+On Public Edition, activate Display Authorization Trace for that business user and read Successful, Failed, or Filtered. The restriction is on the business role. On an ABAP Gateway system the customer administers, read /IWFND/ERROR_LOG on the hub and /IWBEP/ERROR_LOG on the backend first. An authorization message in that log is the point to use STAUTHTRACE or SU53. Do not name an authorization object unless the trace shows it.
 
 Common issue: a segregation of duties conflict wasn't caught that should have been, based on the ECC ruleset.
 Root cause: the S/4HANA transaction or app consolidates functionality differently than its ECC equivalent, and the ruleset wasn't updated to reflect that.
 Resolution: re-evaluate the ruleset's function definitions against actual S/4HANA transaction behavior.
 
-Common issue: a Fiori app doesn't appear on the launchpad even though the role seems correctly assigned.
-Root cause: the Fiori catalog or group assignment is missing or misconfigured, separate from the backend authorization content.
-Resolution: verify catalog and group assignment specifically, independent of backend authorization checks.
+### Public Edition: user cannot see a Fiori app
+
+Common issue: a user on SAP S/4HANA Cloud Public Edition cannot see a Fiori app.
+Root cause: the business role is missing the catalog, the IAM app is inactive, or the launchpad space is not assigned. KBA 3499342 also covers an application that is only a navigation target and therefore has no tile.
+Resolution — Public Edition only: open Maintain Business Users to confirm assigned business roles. In Maintain Business Roles, verify the business catalog, IAM app, and Active flag. In Manage Launchpad Spaces and Manage Launchpad Pages, verify the assigned space and page content. These are Fiori apps, not transaction codes. Display Authorization Trace applies only after the app opens and a runtime authorization check fails.
+
+### Private Edition: user cannot see a Fiori app
+
+For the same missing-app symptom on Private Edition or on-premise, use the ABAP launchpad path instead: inspect the user's PFCG role for the relevant catalog and target mapping, then confirm the applicable space/page or classic group configuration for that release. Use /UI2/FLPCM_CUST or /UI2/FLPCM_CONF only where those transactions are available in that system. Do not apply Public Edition IAM app checks to this deployment.
 
 ## Common Interview Questions
 

@@ -184,12 +184,15 @@ for (const [domain, minimum] of Object.entries(minimums)) {
 assert.ok(heldOut / cases.length >= 0.6, "held-out share");
 
 const routing = [
-  ["How do you upload or update a ruleset in IAG?", "iag-analysis-ruleset", /Rule Setup[\s\S]*no IAG screen called Ruleset Management/, /RequestTypeRule|open Ruleset Management|click Upload Ruleset/, false],
+  ["How do you upload or update a ruleset in IAG?", "iag-analysis-ruleset", /Rule Setup[\s\S]*Upload & Process[\s\S]*Processing Log and Validation Log/, /Which of those do you want\?|open Ruleset Management|click Upload Ruleset/, false],
   ["How does the standard cloud risk content get into IAG Access Analysis?", "iag-analysis-ruleset", /GRC-IAG-AA/, /RequestTypeRule/, true],
   ["Where do you maintain a custom IAG analysis ruleset?", "iag-analysis-ruleset", /Rule Setup/, /RequestTypeRule/, true],
   ["How do you configure the IAG workflow?", "iag-workflow-determination", /RequestTypeRule/, /Ruleset Management/, false],
   ["Walk me through the business rules that pick an IAG workflow path.", "iag-workflow-determination", /IAGWorkflowBusinessRule/, /Ruleset Management/, true],
-  ["What is a workflow template in IAG?", "iag-workflow-determination", /pre-delivered path/, /Ruleset Management/, true],
+  ["What is a workflow template in IAG?", "iag-workflow-determination", /Maintain Workflow Template[\s\S]*stage/, /Ruleset Management|IAG_WF_MANAGER|SCI User Group Sync Job/, true],
+  ["What is the difference between an Access Analysis risk ruleset and a workflow-determination ruleset?", "iag-analysis-ruleset", /Rule Setup[\s\S]*RequestTypeRule/, /open Ruleset Management|click Upload Ruleset/, true],
+  ["How is that policy different from the IAG workflow-determination rule?", "iag-request-policy", /search[\s\S]*RequestTypeRule/, /open Ruleset Management/, true],
+  ["Who are the owners, approvers, and reviewers for IAG privileged access?", "iag-owners", /approvers and reviewers/, /Ruleset Management/, true],
   ["What does authorization policy mean in IAG Access Request?", "iag-request-policy", /search/, /RequestTypeRule/, false],
   ["What limits the systems a requestor can search in IAG?", "iag-request-policy", /search/, /RequestTypeRule/, true],
   ["Explain search and trigger in IAG.", "iag-search-trigger", /lookup/, /RequestTypeRule/, false],
@@ -207,7 +210,12 @@ const routing = [
   ["How do you grant SuccessFactors permissions?", "sf-rbp", /Manage Permission Roles/, /PFCG/, true],
   ["How do you assign a BTP role collection?", "btp-role-collection", /role collection/, /PFCG/, true],
   ["How does a user start a firefighter session?", "grc-firefighter", /GRAC_SPM/, /Rule Setup/, true],
-  ["Have you configured an IAG ruleset yourself?", "iag-analysis-ruleset", /Rule Setup/, /RequestTypeRule/, true]
+  ["Have you configured an IAG ruleset yourself?", "iag-analysis-ruleset", /Rule Setup/, /RequestTypeRule/, true],
+  ["How would you design identity for a hybrid RISE landscape?", "rise-hybrid-identity", /PFCG maintains the role[\s\S]*Maintain Business Roles/, /PLOG|SM18/, true],
+  ["Does the customer manage the servers in RISE Private Edition?", null, null, null, true],
+  ["Who operates the infrastructure of SAP S/4HANA Cloud Private Edition compared with Public Edition?", null, null, null, true],
+  ["What is the difference between SAP Access Control 10.1 and Access Control 12.0?", "ac-release-boundary", /GRCFND_A V1200/, /enhanced user experience|role collections/, true],
+  ["How is a Fiori space assigned on S/4HANA Cloud Public Edition, and how is that different from Private Edition?", "fiori-space-by-edition", /\/UI2\/FLPCM_CUST/, /Maintain Business Roles transaction/, true]
 ];
 
 let routingHeldOut = 0;
@@ -223,6 +231,16 @@ for (const [question, workflowId, mustHave, mustNot, heldOutFlag] of routing) {
     assert.strictEqual(selected.route, "VERIFIED_WORKFLOW");
   }
   if (heldOutFlag) routingHeldOut += 1;
+}
+
+// Product-scope regression: shared workflow language must not route an SAP
+// Access Control/MSMP question to an IAG approver procedure.
+for (const question of [
+  "A SAP Access Control ARM request remains submitted and no approver receives it. How would you trace the MSMP and BRFplus routing path?",
+  "In GRC Access Control, an ARM request has no approver. How do you investigate the workflow?"
+]) {
+  const selected = selectVerifiedWorkflow(question);
+  assert.ok(!selected || selected.workflowId.startsWith("grc-"), `${question} -> ${selected && selected.workflowId}`);
 }
 assert.ok(routingHeldOut / routing.length >= 0.6, "routing held-out share");
 

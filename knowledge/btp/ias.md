@@ -126,6 +126,12 @@ Session management includes single sign-on (user logs in once, is recognized by 
 - Periodically audit application registrations and credentials
 - Plan and execute MFA and password policy updates
 
+## Troubleshooting: IAS sign-in succeeds but a BTP app denies access
+
+Treat successful IAS authentication and BTP authorization as separate checks. For a 403 or access_denied after sign-in, identify the app's required role template and scopes, then in the target subaccount check Security > Role Collections for the role that supplies those scopes and the assignment to the exact user or IdP group. If access comes through a custom identity provider, confirm the BTP trust origin and that its Groups assertion attribute maps to the same group assigned to the collection. After correcting an assignment, have the user end the session and sign in again because role-collection changes are not applied to an existing session. If the correct collection is present, inspect the app's instance-based attributes and app-side authorization for the denied endpoint before changing the IAS authentication policy.
+
+Sources checked 2026-10-14: SAP Help, *Access Is Denied or Forbidden* (Authorization and Trust Management service); *Assigning Role Collections to Users or User Groups*; *Security Administration: Managing Authentication and Authorization*. The flow applies to SAP BTP Cloud Foundry authorization; app-specific role names and attribute requirements come from that app's security descriptor.
+
 ## Troubleshooting
 
 **Common issue:** User can't log in; gets "Invalid credentials" even though password is correct.

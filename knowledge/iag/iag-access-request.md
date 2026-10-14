@@ -6,11 +6,11 @@ SAP Cloud Identity Access Governance, Access Request service, on SAP BTP. Curren
 
 ## Configure the workflow
 
-Workflow templates, paths, and stages are delivered with IAG. You do not create a workflow from a blank screen.
+The Access Request service integrates with SAP Workflow service and SAP Business Rules service on SAP BTP. Workflow templates define approval stages; business rules select which path is used for a request type. Begin with the delivered workflow templates and rules rather than assuming a blank workflow design.
 
-Open the IAG launchpad, Administration, Configuration, Business Rule, and choose Launch. Open the project IAGWorkflowBusinessRule. The decision table on RequestTypeRule maps a request type to one of the pre-delivered workflow paths. Add a row when a request type needs a different path. Activate the rules and deploy the workflow version.
+If templates are not available, use Administration > Template Upload to make the delivered workflow templates available; the upload action rolls them out. Maintain or tailor a stage sequence in Maintain Workflow Template only when the delivered template does not satisfy the policy. Stages can include Manager, Role owner, and Security. Configure mandatory risk analysis or remediation only when governance policy requires it.
 
-Interviewers sometimes call this Maintain Business Rules or a Workflow Rules ruleset. That is this Business Rule project, not a different product and not an MSMP process. There is no IAG screen called Workflow Configuration and no Create New Workflow action.
+For request-type routing, open Administration > Configuration > Business Rule > Launch. In project IAGWorkflowBusinessRule, inspect the RequestTypeRule decision table and map each request type to its intended workflow path/template. Activate the business rule and deploy the workflow version. Do not confuse the routing rule with an Authorization Policy, which limits what requestors can search for, or with Access Analysis rulesets.
 
 Pre-delivered business rules can be requested from SAP under component GRC-IAG. That component is for the workflow rules. It is not the Access Analysis ruleset component.
 
@@ -22,7 +22,7 @@ Privileged Access uses its own path. The default PAM request-type mapping in the
 
 ## Authorization policy
 
-In Access Request, the policy limits what a requestor can search and request: which systems, roles, users, or other entities. It is not a PFCG authorization object and not an SU53 trace. Do not invent a PFCG object because the question said authorization.
+In Access Request, the policy limits what a requestor can search and request: which systems, roles, users, or other entities. Activating it filters the access-search results. The requestor finds only the objects the policy allows. It is not a PFCG authorization object and not an SU53 trace. Do not invent a PFCG object because the question said authorization.
 
 The configuration app is Authorization Policy. Create a policy set for the policy type, which is Access, Business Role, or Application/System. Add a policy, set the Request Access action, and restrict the objects by attribute. Access attributes are name, application, application type, access type, business process, and business subprocess. Business-role attributes are name, business process, business subprocess, and criticality. Application attributes are application and application type. Assign the policy set from user attributes, then activate the policy. After activation, Access Request search returns only those objects. This is not RequestTypeRule. KBA 3300664 and KBA 3195906, component GRC-IAG-AR, IAG 2.0.
 
@@ -42,7 +42,7 @@ Then confirm the user can open Access Request, search within policy, and submit.
 
 ## Verification
 
-Submit one request type and confirm the path on RequestTypeRule is the path that opens. Submit a different request type and confirm the other path. A user missing the Access Request role collection, or a manager missing IAG_WF_MANAGER after sync, fails the corresponding check.
+Submit representative request types and verify the selected path, stage sequence, approver determination, and any mandatory risk-analysis or remediation task. Check final request status. Confirm provisioning as a separate downstream operation after approval; a successful workflow route does not prove that provisioning completed.
 
 ## Do not confuse
 
@@ -53,4 +53,4 @@ Submit one request type and confirm the path on RequestTypeRule is the path that
 
 ## Sources
 
-SAP Learning, Setting Up Workflow and Business Rules. SAP Help, Configure Business Rules, document fe36875e47dc48a292ec08eff5ebaafa. KBA 2924629. SAP Learning, Synchronize User Group Data. Authorization Policy app: SAP Community, Identity Access Governance - Understanding Authorization Policies, 15 November 2025, plus KBA 3300664 and KBA 3195906 for IAG 2.0. Verified 2026-10-11. Do not recite these titles in the spoken answer.
+SAP Learning, Setting Up Workflow and Business Rules and Preparing the Setup of Access Request Service. SAP Help, Configure Business Rules, document fe36875e47dc48a292ec08eff5ebaafa. Checked 2026-10-14. Do not recite these titles in the spoken answer.

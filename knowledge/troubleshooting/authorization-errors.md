@@ -27,8 +27,8 @@ Remediation is the smallest change that is still correct — not SAP_ALL, not co
 ## Diagnostic Split
 
 - Cannot log on: IAS, IdP, user lock, password, SSO certificate
-- No Fiori tile: catalog/space assignment
-- Tile opens, error: OData/object
+- No Fiori tile/app: launchpad resolution for that deployment. Public Edition: check the assigned business user and role, catalog/app and applicable IAM app activation/restrictions, then space/page content and visibility. Use Maintain Business Users, Maintain Business Roles, Manage Launchpad Spaces, Manage Launchpad Pages, and IAM Information System. Do not use authorization traces or ABAP transactions for an app that never appears.
+- Tile opens, request fails: classify by deployment. Public Edition: reproduce and use Display Authorization Trace for authorization evidence; if the trace does not identify an authorization failure, use tenant-available application logs or escalate service/activation issues to SAP. Private Edition/on-premise ABAP Gateway: use /IWFND/ERROR_LOG on the hub and /IWBEP/ERROR_LOG on the backend; use the HTTP status and error text to distinguish authorization from provider/service failure. Then use an ABAP authorization trace only when the evidence indicates an authorization check. /IWFND/MAINT_SERVICE is registration/activation, not an error log. Do not name an authorization object the trace did not return.
 - GUI “you are not authorized”: object/field/org
 - Query runs, no rows in BW: analysis authorization or data
 - Access request approved, still no access: provisioning connector or user mapping

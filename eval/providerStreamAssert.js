@@ -14,7 +14,7 @@ function harness(events, { failAfter = false, failFirst = false } = {}) {
   class OpenAI { constructor(opts) { options.push(opts); this.chat = { completions: { create } }; } }
   class Anthropic { constructor(opts) { options.push(opts); this.messages = { create }; } }
   class GoogleGenerativeAI { getGenerativeModel() { return { startChat() { return { async sendMessageStream() { return { stream: await create() }; } }; } }; } }
-  const api = new Function("OpenAI", "Anthropic", "GoogleGenerativeAI", "publicLlmError", "stripStreamMarkdown", "writeSSEChunk", `${functions}; return { streamOpenAIResponse, streamOpenRouterResponse, streamGroqResponse, streamClaudeResponse, streamGeminiResponse };`)(
+  const api = new Function("OpenAI", "Anthropic", "GoogleGenerativeAI", "publicLlmError", "stripStreamMarkdown", "writeSSEChunk", `${functions}; return { runProviderStreamWithRetry, streamOpenAIResponse, streamOpenRouterResponse, streamGroqResponse, streamClaudeResponse, streamGeminiResponse };`)(
     OpenAI, Anthropic, GoogleGenerativeAI, publicLlmError, t => String(t || "").replace(/\*/g, ""), (res, t) => res.chunks.push(t)
   );
   return { api, options, calls: () => calls };
@@ -61,8 +61,24 @@ async function main() {
     checks += 3;
   }
   const retry = harness(openai, { failFirst: true });
-  await retry.api.streamOpenAIResponse(args().input);
-  assert.equal(retry.calls(), 2, "one application retry, SDK retries disabled");
+  const retryInput = args();
+  let retryOutputStarted = false;
+  retryInput.input.onChunk = () => { retryOutputStarted = true; };
+  await retry.api.runProviderStreamWithRetry(
+    () => retry.api.streamOpenAIResponse(retryInput.input),
+    { signal: retryInput.input.signal, hasOutput: () => retryOutputStarted }
+  );
+  assert.equal(retry.calls(), 2, "one route-level retry for a transient failure before output");
+
+  const partialFailure = harness(openai.slice(0, 1), { failAfter: true });
+  const partialInput = args();
+  let partialOutputStarted = false;
+  partialInput.input.onChunk = () => { partialOutputStarted = true; };
+  await assert.rejects(partialFailure.api.runProviderStreamWithRetry(
+    () => partialFailure.api.streamOpenAIResponse(partialInput.input),
+    { signal: partialInput.input.signal, hasOutput: () => partialOutputStarted }
+  ), /network failure/);
+  assert.equal(partialFailure.calls(), 1, "a partial answer is not replayed or duplicated");
   console.log(`providerStreamAssert: PASS (${checks} provider controls plus bounded retry; no API calls)`);
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

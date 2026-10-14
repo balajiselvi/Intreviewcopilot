@@ -9,10 +9,12 @@ const {
   rotateLiveSessionId,
   canStartTurn,
   shouldReuseQuestionRow,
+  findRetryTarget,
+  historyBeforeQuestion,
   historyForGeneration,
   deriveOperatorState,
   nextResetSnapshot,
-  enqueueLatestSpeechTurn,
+  enqueueSpeechTurn,
   armGenerationTimeout,
   CLIENT_GENERATION_TIMEOUT_MS,
   MAX_QUEUED_SPEECH_TURNS,
@@ -68,6 +70,22 @@ assert.strictEqual(shouldReuseQuestionRow({
 }), false);
 assert.strictEqual(shouldReuseQuestionRow({ retry: false, continuing: false, lastQuestionId: "q_1" }), false);
 
+const failedTurns = [
+  { type: "question", text: "How do I configure MSMP?", questionId: "q_old", source: "system", utteranceId: "u_old" },
+  { type: "response", text: "Service unavailable.", status: "error", questionId: "q_old", retryCount: 1 },
+  { type: "question", text: "How do I troubleshoot IPS?", questionId: "q_new", source: "microphone", utteranceId: "u_new" },
+  { type: "response", text: "Timed out.", status: "error", questionId: "q_new", retryCount: 0 }
+];
+assert.deepStrictEqual(findRetryTarget(failedTurns, failedTurns[1]), {
+  text: "How do I configure MSMP?",
+  source: "system",
+  questionId: "q_old",
+  utteranceId: "u_old",
+  retryCount: 1
+}, "Retry from an older error card must target that card's question, not the latest question");
+assert.deepStrictEqual(historyBeforeQuestion(failedTurns, "q_new").map((item) => item.questionId), ["q_old", "q_old"]);
+assert.deepStrictEqual(historyBeforeQuestion(failedTurns, "q_old"), []);
+
 const mixed = [
   { type: "question", text: "What is IAG?", status: "completed", questionId: "q1" },
   { type: "response", text: "Could not generate an answer.", status: "error" },
@@ -91,15 +109,21 @@ assert.strictEqual(deriveOperatorState({ isSystemAudioActive: true }).id, OPERAT
 assert.strictEqual(deriveOperatorState({}).id, OPERATOR_STATES.READY);
 
 assert.ok(CLIENT_GENERATION_TIMEOUT_MS > 25000);
-assert.strictEqual(MAX_QUEUED_SPEECH_TURNS, 1);
-assert.deepStrictEqual(
-  enqueueLatestSpeechTurn([{ text: "old", utteranceId: "u1" }], { text: "new", utteranceId: "u2" }).map((i) => i.text),
-  ["new"]
-);
-assert.deepStrictEqual(
-  enqueueLatestSpeechTurn([{ text: "same", utteranceId: "u1" }], { text: "same-updated", utteranceId: "u1" }).map((i) => i.text),
-  ["same-updated"]
-);
+assert.strictEqual(MAX_QUEUED_SPEECH_TURNS, 4);
+const firstPark = enqueueSpeechTurn([], { text: "How do you configure MSMP?", utteranceId: "u1" });
+const secondPark = enqueueSpeechTurn(firstPark.queue, { text: "What about BRFplus?", utteranceId: "u2" });
+assert.deepStrictEqual(secondPark.queue.map((item) => item.text), [
+  "How do you configure MSMP?",
+  "What about BRFplus?"
+]);
+assert.deepStrictEqual(secondPark.overflow, []);
+const updated = enqueueSpeechTurn(secondPark.queue, { text: "What about BRFplus agent rules?", utteranceId: "u2" });
+assert.deepStrictEqual(updated.queue.map((item) => item.utteranceId), ["u1", "u2"]);
+assert.strictEqual(updated.queue[1].text, "What about BRFplus agent rules?");
+const packed = ["a", "b", "c", "d"].map((text, index) => ({ text, utteranceId: `u${index}` }));
+const overflowed = enqueueSpeechTurn(packed, { text: "e", utteranceId: "u4" });
+assert.deepStrictEqual(overflowed.queue.map((item) => item.text), ["b", "c", "d", "e"]);
+assert.deepStrictEqual(overflowed.overflow.map((item) => item.text), ["a"]);
 let aborted = false;
 const fake = { abort() { aborted = true; } };
 const disarm = armGenerationTimeout(fake, 20);
@@ -119,6 +143,9 @@ const chatSrc = fs.readFileSync(path.join(__dirname, "../pages/api/chat.js"), "u
 assert.match(interview, /liveSessionOperator/);
 assert.match(interview, /historyForGeneration/);
 assert.match(interview, /shouldReuseQuestionRow/);
+assert.match(interview, /findRetryTarget/);
+assert.match(interview, /historyBeforeQuestion/);
+assert.match(interview, /onClick=\{\(\) => retryQuestionFromResponse\(item\)\}/);
 assert.match(interview, /rotateLiveSessionId/);
 assert.match(interview, /canStartTurn/);
 assert.match(interview, /deriveOperatorState/);
@@ -127,9 +154,13 @@ assert.match(interview, /sessionEpochRef/);
 assert.match(interview, /queuedTurnCount/);
 assert.match(interview, /retry:\s*true/);
 assert.match(interview, /armGenerationTimeout/);
-assert.match(interview, /enqueueLatestSpeechTurn/);
+assert.match(interview, /enqueueSpeechTurn/);
+assert.match(interview, /UNANSWERED/);
+assert.match(interview, /sessionPreparation/);
+assert.match(interview, /activeRequestRef.current !== requestController/);
 assert.match(interview, /stopInFlightGeneration/);
-assert.match(interview, /shouldSkipAutoSubmit/);
+assert.match(interview, /acceptCapturedTurn/);
+assert.match(interview, /shouldAutoSubmitSource/);
 assert.match(interview, /CLIENT_GENERATION_TIMEOUT_MS/);
 assert.match(interview, /current_streaming/);
 assert.match(interview, /The answer may be incomplete/);
@@ -138,5 +169,14 @@ assert.doesNotMatch(chatSrc, /else if \(!streamStarted\)/);
 assert.match(historySlice, /clearHistory/);
 assert.match(interview, /if \(!canStartTurn\(\{ isProcessing: isProcessingRef\.current \}\)\)/);
 assert.match(interview, /if \(isProcessingRef\.current\) setSelectedQuestions\(\[\]\)/);
+
+const prep = require("../lib/sessionPreparation");
+const prepStore = memoryStorage();
+prep.writeSessionPreparation(prepStore, "live_a_1", { role: "IAM architect", round: "technical", focus: "IAG and GRC" });
+prep.writeSessionPreparation(prepStore, "live_b_2", { role: "Other role" });
+assert.strictEqual(prep.readSessionPreparation(prepStore, "live_a_1").role, "IAM architect");
+assert.strictEqual(prep.readSessionPreparation(prepStore, "live_b_2").role, "Other role");
+assert.match(prep.formatSessionPreparation({ role: "IAM architect", focus: "Fiori" }), /not candidate experience/);
+assert.strictEqual(prep.formatSessionPreparation({}), "");
 
 console.log("liveSessionOperatorAssert: PASS");

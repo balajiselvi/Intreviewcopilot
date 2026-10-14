@@ -5,6 +5,14 @@ const {
   isPlaneFoil,
   isTopicContinuation
 } = require("../lib/contextInheritance.js");
+const { historyForCurrentTurn } = require("../lib/currentTurnHistory.js");
+
+const priorIagExchange = [
+  { role: "user", content: "How do IAG workflow approvers get synchronized?" },
+  { role: "assistant", content: "Use IAG_WF_MANAGER and run SCI User Group Sync Job." }
+];
+assert.deepStrictEqual(historyForCurrentTurn(priorIagExchange, false), [], "a standalone question must not inherit unrelated answer content");
+assert.deepStrictEqual(historyForCurrentTurn(priorIagExchange, true), priorIagExchange, "a genuine follow-up keeps its conversational context");
 
 assert.strictEqual(isPlaneFoil("Login works. Can the user still be blocked from the story?"), true);
 assert.strictEqual(isTopicContinuation("Login works. Can the user still be blocked from the story?"), true);

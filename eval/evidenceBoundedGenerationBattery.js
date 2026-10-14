@@ -176,7 +176,8 @@ const methodology = [
 ];
 for (const question of methodology) {
   const result = channel(question);
-  assert.strictEqual(result.evidence.mode, "full", question);
+  assert.ok(result.evidence.mode === "methodology" || result.evidence.mode === "technical", `${question} -> ${result.evidence.mode}`);
+  assert.doesNotMatch(result.evidence.text, /CAREER TIMELINE|8,700|Dover Corporation/, question);
 }
 
 const comparisons = [
@@ -215,8 +216,8 @@ assert.strictEqual(durationEvidence.programmeId, "fabtech");
 assert.doesNotMatch(durationEvidence.text, /18 months|team of 6|HCM/);
 
 const technical = channel("What exactly is PFCG?");
-assert.strictEqual(technical.evidence.mode, "full");
-assert.ok(technical.evidence.text.includes("Dover") && technical.evidence.text.includes("Fabtech"));
+assert.strictEqual(technical.evidence.mode, "technical");
+assert.doesNotMatch(technical.evidence.text, /Dover|Fabtech|8,700/);
 
 const iagCard = recallGroundedExperience("How do you configure SAP IAG with IAS and IPS for S/4HANA and BTP?");
 assert.ok(iagCard, "an IAG question still has a grounded card");
@@ -226,3 +227,35 @@ const rawIag = recallExperience("How do you configure SAP IAG with IAS and IPS f
 assert.strictEqual(rawIag.id, "iag-ias-ips-sf");
 
 console.log(`evidence boundary: fabtech ${fabtech.length}, dover ${dover.length}, eminnov ${eminnov.length}, generic ${generic.length}, adversarial ${adversarial.length}, metrics ${metrics.length}, drift ${driftContext.length}, methodology ${methodology.length}, comparisons ${comparisons.length}`);
+
+const evidenceCases = [
+  ["What is PFCG?", "technical", /technical knowledge/],
+  ["What exactly is PFCG?", "technical", /Personal history is not required/],
+  ["How do you configure IAG PAM?", "technical", /Personal history is not required/],
+  ["How would you troubleshoot a failed IPS synchronization?", "methodology", /Do not convert the method/],
+  ["Design a hybrid RISE security architecture.", "methodology", /Do not convert the method/],
+  ["Have you implemented SAP GRC EAM?", "domain", /GRC AC/],
+  ["What was your role at Dover?", "programme", /Dover Corporation/],
+  ["How did you resolve an SoD conflict?", "domain", /GRC AC/],
+  ["How would you approach an SoD conflict?", "methodology", /Do not convert the method/],
+  ["Compare your experience with IAG and classic GRC.", "domain", /Keep GRC EAM/],
+  ["How do you upload a ruleset in IAG?", "technical", /Personal history is not required/],
+  ["What is the difference between IAS and IPS?", "technical", /Personal history is not required/],
+  ["Where do you maintain a business role in S/4HANA Public Cloud?", "technical", /Personal history is not required/],
+  ["Troubleshoot a missing Fiori catalog.", "technical", /Personal history is not required/],
+  ["What is SU53?", "technical", /Personal history is not required/],
+  ["Tell me about your Fabtech experience.", "programme", /Fabtech/],
+  ["How many users were at Dover?", "programme", /8,700/],
+  ["What would you check first in SU53?", "methodology", /Do not convert the method/],
+  ["Have you configured IAG PAM in production?", "domain", /Keep GRC EAM/],
+  ["Explain PFCG derived roles.", "technical", /Personal history is not required/]
+];
+for (const [question, mode, textPattern] of evidenceCases) {
+  const evidence = scopeCareerEvidence(question, "");
+  assert.strictEqual(evidence.mode, mode, `${question} -> ${evidence.mode}`);
+  assert.match(evidence.text, textPattern, question);
+  if (mode === "technical" || mode === "methodology") {
+    assert.doesNotMatch(evidence.text, /8,700|CAREER TIMELINE/, question);
+  }
+}
+console.log(`evidence selection cases: ${evidenceCases.length}`);

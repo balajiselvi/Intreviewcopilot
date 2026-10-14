@@ -26,7 +26,7 @@ const cases = [
   {
     id: "workflow",
     source: access,
-    present: [/IAGWorkflowBusinessRule/, /RequestTypeRule/, /no IAG screen called Workflow Configuration/]
+    present: [/IAGWorkflowBusinessRule/, /RequestTypeRule/, /Administration > Configuration > Business Rule > Launch/]
   },
   {
     id: "template",

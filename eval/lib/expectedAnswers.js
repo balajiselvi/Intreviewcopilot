@@ -292,6 +292,7 @@ function recallExpectedAnswer(question = "") {
   if (!text.trim()) return null;
   for (const entry of EXPECTED_ANSWERS) {
     try {
+      if (entry.id === "troubleshoot-auth" && /\b(fiori|odata|gateway|launchpad|iwfnd|iwbep)\b/i.test(text)) continue;
       if (entry.re.test(text)) return { id: entry.id, answer: entry.answer };
     } catch (error) {
       // one bad pattern must not break generation

@@ -2,23 +2,23 @@
 
 ## Overview
 
-RISE with SAP (Rapid Innovation and Speed to Execution) is SAP's cloud-first, enterprise transformation program that moves organizations from on-premise ECC to cloud-native S/4HANA while simultaneously modernizing underlying infrastructure, business processes, and technology capabilities. RISE is not just a product; it's an end-to-end delivery methodology, infrastructure-as-a-service offering, and business transformation approach. It combines S/4HANA Cloud, cloud infrastructure (AWS/Azure/GCP), professional services, implementation methodology, governance frameworks, and continuous innovation—all bundled as a managed service. For enterprises, RISE represents a departure from traditional "build once, run forever" ECC mindsets toward "continuous innovation" cloud consumption models where SAP regularly pushes updates, new capabilities, and industry innovations to customers without major upgrade projects.
+RISE with SAP is SAP's commercial offering for moving to SAP S/4HANA Cloud. It is not an acronym that this audit could verify, so do not expand the name. Public Edition is multi-tenant software as a service operated by SAP. Private Edition is a single-tenant private-cloud system SAP operates. The offering bundles the S/4HANA Cloud edition, SAP-operated platform services, and implementation scope. It is not customer-owned infrastructure on AWS, Azure, or Google Cloud.
 
 ## Interview Summary
 
-RISE with SAP is SAP's cloud-first transformation program: move from ECC to S/4HANA Cloud, modernize infrastructure, adopt cloud operations, and shift to continuous innovation. It's a significant strategic shift from on-premise ownership to cloud subscription consumption. RISE projects require architectural thinking about cloud-first design, security posture transformation, operational handoff to managed services, and business process redesign.
+RISE with SAP moves the customer to an SAP-operated S/4HANA Cloud edition. Public Edition is multi-tenant software as a service. Private Edition is a single-tenant system. In both editions SAP operates the infrastructure. The customer does not manage the servers, the database, or a hyperscaler account. The customer remains responsible for application configuration, business roles, and integrations.
 
 ## 30 Second Interview Answer
 
-RISE with SAP moves enterprises from on-premise ECC to cloud-native S/4HANA while modernizing infrastructure and operations. Instead of owning and maintaining systems, organizations consume S/4HANA as a service on cloud infrastructure (AWS, Azure, or GCP) with SAP managing the platform, infrastructure, patches, and upgrades. RISE includes professional services to redesign business processes for cloud, Cloud ALM for lifecycle management, and a shift to continuous quarterly innovation instead of major upgrade projects. It's a strategic transformation, not just a technical upgrade.
+RISE with SAP is SAP's commercial transformation offering around SAP S/4HANA Cloud. Public Edition is multi-tenant software as a service operated by SAP. Private Edition is a single-tenant system SAP operates. The customer does not describe either edition as virtual machines they own on AWS, Azure, or Google Cloud. RISE includes implementation services and a shift from customer-operated infrastructure to an SAP-operated platform. Confirm which edition the question means before describing upgrades or extensibility.
 
 ## 60 Second Interview Answer
 
-RISE with SAP is an end-to-end transformation program combining S/4HANA Cloud (the product), managed infrastructure (cloud IaaS), professional services, and SAP's implementation methodology. The business model is fundamentally different from traditional ECC: instead of owning perpetual licenses and infrastructure, enterprises subscribe to RISE and consume S/4HANA as a managed service. SAP handles platform updates, security patches, infrastructure scaling, and backup/recovery—operations responsibilities shift from customer IT to SAP.
+RISE with SAP is a commercial offering that combines an S/4HANA Cloud edition, SAP-operated platform services, and implementation scope. Public Edition and Private Edition are different products. Public Edition is multi-tenant SaaS. Private Edition is single-tenant and keeps broader extensibility. SAP operates the platform in both cases. The customer does not select EC2, Azure virtual machines, or Google Compute as the product architecture.
 
 The implementation approach is also different. Instead of the traditional "run as is vs customize" analysis, RISE customers follow "clean core" methodology: adopt SAP's standard processes, minimize customization, and use extensions for differentiating business logic. This keeps the system closer to SAP's delivered code, making quarterly updates lower-risk.
 
-Architecture-wise, RISE customers deploy S/4HANA on cloud infrastructure (AWS EC2, Azure VMs, GCP Compute), not on-premise. This means network architecture, disaster recovery, backup strategies, and scaling models are fundamentally cloud-first. The security posture also changes: identity management is cloud-native (IAS/Okta rather than on-premise AD), data residency considerations become critical for compliance, and the perimeter security model shifts from "corporate network" to "cloud account and application-level controls."
+Architecture-wise, RISE has two different operating models. SAP S/4HANA Cloud Public Edition is multi-tenant software as a service operated by SAP. The customer does not choose a hyperscaler and does not run virtual machines. SAP S/4HANA Cloud Private Edition is a single-tenant system SAP operates, with a broader extensibility model. Do not describe either edition as customer virtual machines on AWS EC2. Identity is a separate design: IAS, a corporate identity provider, or both. See public-cloud.md and private-cloud.md for the sourced distinction.
 
 The transformation isn't just technical; it's operational. Customer teams shift from infrastructure ops (patching, backup, capacity planning) to business operations and innovation. SAP provides Cloud ALM (application lifecycle management) to orchestrate implementation, Cloud Integration for connecting SAP to non-SAP systems, and continuous delivery pipelines for extensions.
 
@@ -160,7 +160,7 @@ Resolution: Review scaling policies and adjust thresholds, right-size non-prod e
    Clean core means minimal customization; adopt SAP's standard business processes. Matters because: quarterly updates are safer (less custom code to test), SAP can optimize performance (cleaner code), future innovations easy to adopt. Classic ECC with 80% customization makes updates risky and slow.
 
 3. **How does the operational model change in RISE?**
-   SAP manages infrastructure ops (patching, backup, scaling). Customer IT shifts from "ops engineers maintaining servers" to "business analysts optimizing processes and developers building extensions." Different skill sets needed; different career paths.
+   SAP operates the platform in both Public Edition and Private Edition. The customer does not manage that infrastructure. Customer work moves to application configuration, business roles, integrations, and extensions.
 
 4. **What are the identity architecture implications of RISE?**
    On-premise AD becomes secondary. Primary identity is cloud (IAS, Okta, Entra ID). Users authenticate via cloud provider, get JWT/SAML token, access cloud S/4HANA. On-premise users federate through the cloud provider. Security perimeter shifts from "corporate firewall" to "cloud identity + API authentication."
@@ -175,7 +175,7 @@ Resolution: Review scaling policies and adjust thresholds, right-size non-prod e
    Cloud ALM is SAP's implementation orchestration platform. It manages: project planning, testing waves, deployment pipeline, change management, impact analysis. It's the control center for the entire RISE program and ongoing operations.
 
 8. **How does disaster recovery work in RISE?**
-   SAP manages backup/recovery in cloud infrastructure. Backed up by cloud provider (redundancy across availability zones). Disaster recovery is cloud provider's responsibility (RPO/RTO usually <1 hour). Customer responsibility: backup on-premise systems, test DR for integrations.
+   SAP operates the S/4HANA Cloud platform, including its infrastructure recovery. The customer does not run the Private Edition servers. Customer responsibility is the application data they control, integrations, and testing recovery of those integrations. Do not quote an RPO or name a hyperscaler recovery product.
 
 9. **What happens when SAP releases a quarterly innovation?**
    SAP deploys to your test environment first. Customer tests: do new features break custom extensions? Can we adopt it? Accept (move to prod) or defer (stay on previous version). Eventually, deferring becomes unsustainable; customers must upgrade. Continuous update pressure; different from traditional 3-5 year upgrade cycles.
@@ -184,7 +184,7 @@ Resolution: Review scaling policies and adjust thresholds, right-size non-prod e
     Phased transition. Initially, sync on-premise AD to cloud identity provider for dual authentication. Eventually, on-premise AD is secondary (legacy systems only). Cloud identity becomes source of truth. Users authenticate via cloud provider for all cloud systems (S/4HANA, SuccessFactors, Analytics Cloud).
 
 11. **What are the security considerations unique to RISE?**
-    Shared responsibility model: SAP owns platform security, customer owns application security and data governance. Network isolation: cloud security groups, not corporate firewall. Data residency: which cloud region, which country (GDPR, China, etc.). Encryption: at-rest (cloud provider keys or customer-managed), in-transit (TLS). Audit: cloud-native logging, compliance certifications.
+    SAP operates the infrastructure of both editions. The customer does not manage Private Edition or Public Edition infrastructure. The customer owns application security, business roles, and data governance. Do not describe this as customer-managed cloud security groups or as the customer choosing a hyperscaler.
 
 12. **How do you manage custom extensions in a RISE environment?**
     Use SAP's extension framework (not classic modifications). Version control, test against each SAP release. Deploy via Cloud ALM continuous delivery pipeline. Ownership: developer owns extension code, SAP owns platform. Clear separation.

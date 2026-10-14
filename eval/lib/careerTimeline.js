@@ -107,6 +107,17 @@ Documented employers, without metrics: Dover Corporation, Eminnov Technologies, 
 A user count, country list, duration, team size, or total years of experience is not identified for an unnamed engagement.
 Use methodology: the figure depends on which engagement is being discussed.`;
 
+const DEFAULT_STATED_PROFILE = `Use candidate-specific facts only when they are supplied in the current interview profile or CV. Technical knowledge is not evidence of personal experience. Do not deny an explicitly supplied candidate fact because a CV summary is incomplete. Do not invent employers, project names, metrics, budgets, or outcomes.`;
+const STATED_PROFILE = String(process.env.CANDIDATE_PROFILE_NOTES || DEFAULT_STATED_PROFILE).trim();
+
+const TECHNICAL_EVIDENCE = `Answer from the technical knowledge for this question.
+Do not recite employers, dates, geographies, team sizes, user counts, or project outcomes.
+Personal history is not required for this question.`;
+
+const APPROACH_EVIDENCE = `Answer as a method: what you would examine, decide, and verify.
+Do not convert the method into a claim that a named engagement already completed it.
+Do not attach dates, team sizes, user counts, or another programme's results.`;
+
 function namedProgrammes(question = "") {
   const text = String(question || "").toLowerCase();
   return PROGRAMMES.filter((programme) => programme.aliases.some((alias) => text.includes(alias)));
@@ -132,22 +143,39 @@ function renderProgramme(programme) {
   return `${programme.label}. ${programme.facts}`;
 }
 
-function technicalHowTo(question = "") {
-  return /\b(how (?:do|would|should|can)|design an?|debug|trace|troubleshoot)\b/i.test(question);
+function explicitApproach(question = "") {
+  if (/\bhow (?:do|does|can|to)\b/i.test(question)) return false;
+  return /\b(how would|what would you|how should|if you were|your approach|your method|design an?)\b/i.test(question);
+}
+
+function handsOnTechnical(question = "") {
+  return /\b(how (?:do|does|can|to)|troubleshoot|debug|trace)\b/i.test(question);
+}
+
+function personalCue(question = "") {
+  const text = String(question || "");
+  if (/\b(have you|did you|how did you|what did you|do you have)\b/i.test(text)) return true;
+  if (/\b(tell me about (?:your|a time)|walk me through (?:your|a time))\b/i.test(text)) return true;
+  if (/\byour\b/i.test(text)) return true;
+  return /\bexperience\b/i.test(text) && /\byou\b/i.test(text);
 }
 
 function personalHistory(question = "") {
-  return /\b(your|you)\b/i.test(question) && /\b(experience|background|career|worked|project|programme|program|role)\b/i.test(question);
+  return personalCue(question);
 }
 
-function domainOf(question = "") {
+function matchingDomains(question = "") {
   const domains = [
     ["grc", /\b(grc|sod|segregation|access control|access[- ]risk|business role|firefighter|ara|arm|eam|brm)\b/i],
     ["security", /\b(security|authorization|authorisation|pfcg|role design)\b/i],
     ["presales", /\bpre[-\s]?sales\b/i],
     ["identity", /\b(\bias\b|\bips\b|\biag\b|\biam\b|sso|mfa)\b/i]
   ];
-  return domains.find(([, pattern]) => pattern.test(question))?.[0] || "";
+  return domains.filter(([, pattern]) => pattern.test(question)).map(([name]) => name);
+}
+
+function domainOf(question = "") {
+  return matchingDomains(question)[0] || "";
 }
 
 function renderAttributed(programmes, lineFor) {
@@ -187,15 +215,27 @@ function scopeCareerEvidence(question = "", priorQuestion = "") {
   if (asksPortfolio(question) || asksPortfolio(priorQuestion)) {
     return { mode: "portfolio", programmeId: null, text: PORTFOLIO_EVIDENCE };
   }
-  if (technicalHowTo(question)) {
-    return { mode: "full", programmeId: null, text: DEFAULT_CAREER_BACKGROUND };
+  if (explicitApproach(question)) {
+    return { mode: "methodology", programmeId: null, text: APPROACH_EVIDENCE };
   }
-  const domain = domainOf(question) || (personalHistory(priorQuestion) ? domainOf(priorQuestion) : "");
-  if (domain && (personalHistory(question) || /\b(you|your|experience|background|worked)\b/i.test(question))) {
-    return { mode: "domain", programmeId: null, domain, text: renderDomain(domain) };
+  if (handsOnTechnical(question)) {
+    return { mode: "technical", programmeId: null, text: TECHNICAL_EVIDENCE };
   }
-  if (personalHistory(question)) {
+  const domains = matchingDomains(question);
+  const priorDomains = domains.length || !personalCue(priorQuestion) ? [] : matchingDomains(priorQuestion);
+  const selectedDomains = domains.length ? domains : priorDomains;
+  if (personalCue(question) && selectedDomains.length) {
+    const blocks = selectedDomains.map(renderDomain).filter(Boolean);
+    if (/\biag\b/i.test(question) && !blocks.some((block) => /\bIAG\b/.test(block))) {
+      blocks.push("No documented engagement lists IAG as the delivered product. Keep GRC EAM and firefighter work on the GRC engagement. Do not answer that the candidate has no IAG experience, and do not invent an IAG project.");
+    }
+    return { mode: "domain", programmeId: null, domain: selectedDomains[0], text: blocks.join("\n") };
+  }
+  if (personalCue(question)) {
     return { mode: "profile", programmeId: null, text: renderProfile() };
+  }
+  if (selectedDomains.length || /\bwhat(?:'s| is| are)\b|\b(which|where)\b/i.test(question)) {
+    return { mode: "technical", programmeId: null, text: TECHNICAL_EVIDENCE };
   }
   return { mode: "full", programmeId: null, text: DEFAULT_CAREER_BACKGROUND };
 }
@@ -236,6 +276,7 @@ function auditHistoricalClaims(answer = "", evidenceText = "") {
 
 module.exports = {
   DEFAULT_CAREER_BACKGROUND,
+  STATED_PROFILE,
   PROGRAMMES,
   namedProgrammes,
   namedProgrammeIds,

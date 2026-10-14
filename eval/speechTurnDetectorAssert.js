@@ -632,6 +632,107 @@ for (const events of pauseOnly) {
   assert.strictEqual(submissions[1], "What about IPS?");
 }
 
+// Spoken capture policy. Fake clock and the same queue the page uses.
+// This does not open a microphone or call Azure Speech.
+{
+  const { acceptCapturedTurn, shouldAutoSubmitSource, streamChunkBelongsToTurn, enqueueSpeechTurn } = require("../lib/liveSessionOperator");
+  const { classifyGenerationFailure } = require("../lib/generationGuard");
+
+  const clock = createClock();
+  const finalized = [];
+  const detector = createSpeechTurnDetector({
+    now: clock.now,
+    schedule: clock.schedule,
+    cancel: clock.cancel,
+    baseSilenceMs: 1200,
+    onFinalize(payload) { finalized.push(payload); }
+  });
+  detector.noteFinal("How do you configure");
+  clock.advance(900);
+  assert.strictEqual(finalized.length, 0, "a pause inside the grace window must not end the turn");
+  detector.noteFinal("MSMP in Access Control");
+  clock.advance(2200);
+  assert.strictEqual(finalized.length, 1);
+  assert.match(finalized[0].text, /configure MSMP/);
+
+  let queue = [];
+  let visible = [];
+  let processing = true;
+  function take(text, utteranceId) {
+    const planned = acceptCapturedTurn({ text, utteranceId, source: "system", isProcessing: processing, queue });
+    if (planned.action === "ignore") {
+      visible.push({ text, disposition: "IGNORE", reason: planned.reason });
+      return;
+    }
+    if (planned.action === "queue") {
+      queue = planned.queue;
+      planned.overflow.forEach((row) => visible.push({ text: row.text, disposition: "UNANSWERED", reason: "queue-overflow" }));
+      return;
+    }
+    visible.push({ text, disposition: "ANSWER", reason: planned.reason });
+  }
+  take("What is SU53?", "q1");
+  take("How do you trace a Fiori authorization failure?", "q2");
+  assert.deepStrictEqual(queue.map((row) => row.utteranceId), ["q1", "q2"]);
+  take("okay", "filler");
+  assert.strictEqual(visible.some((row) => row.reason === "not-a-question"), true);
+  take("", "empty");
+  ["a", "b", "c"].forEach((id) => { take(`Question ${id}`, id); });
+  assert.strictEqual(visible.filter((row) => row.reason === "queue-overflow").length, 1);
+  assert.strictEqual(queue.length, 4);
+  processing = false;
+  const drained = [];
+  while (queue.length) {
+    const next = queue[0];
+    const planned = acceptCapturedTurn({ text: next.text, utteranceId: next.utteranceId, source: "system", isProcessing: false, queue });
+    assert.strictEqual(planned.action, "answer");
+    drained.push(next.text);
+    queue = queue.slice(1);
+  }
+  assert.strictEqual(drained[0], "How do you trace a Fiori authorization failure?");
+  assert.strictEqual(shouldAutoSubmitSource({ source: "microphone", systemAudioActive: true, manualMode: false }), false);
+  assert.strictEqual(shouldAutoSubmitSource({ source: "system", systemAutoMode: true, systemAudioActive: true }), true);
+  assert.strictEqual(shouldAutoSubmitSource({ source: "microphone", systemAudioActive: false, manualMode: false }), true);
+  assert.strictEqual(streamChunkBelongsToTurn("req-new", "req-old"), false);
+  assert.strictEqual(streamChunkBelongsToTurn("req-new", "req-new"), true);
+  const network = classifyGenerationFailure({ message: "Failed to fetch" });
+  assert.strictEqual(network.retryable, true);
+  assert.match(network.userMessage, /Retry/);
+  const same = enqueueSpeechTurn([{ text: "partial", utteranceId: "utt" }], { text: "partial question completed", utteranceId: "utt" });
+  assert.strictEqual(same.queue.length, 1);
+  assert.match(same.queue[0].text, /completed/);
+}
+
+{
+  const { applyRecognitionEvent } = require("../lib/speechRecognitionAdapter");
+  const clock = createClock();
+  const finalized = [];
+  const detector = createSpeechTurnDetector({
+    now: clock.now,
+    schedule: clock.schedule,
+    cancel: clock.cancel,
+    baseSilenceMs: 1200,
+    onFinalize(payload) { finalized.push(payload.text); }
+  });
+  applyRecognitionEvent(detector, "interim", "How do you");
+  clock.advance(2000);
+  assert.strictEqual(finalized.length, 0, "interim speech is not a turn");
+  applyRecognitionEvent(detector, "final", "How do you trace a missing Fiori app");
+  applyRecognitionEvent(detector, "final", "");
+  applyRecognitionEvent(detector, "error", "network dropped");
+  clock.advance(400);
+  applyRecognitionEvent(detector, "final", "on Public Edition");
+  clock.advance(2200);
+  assert.strictEqual(finalized.length, 1);
+  assert.match(finalized[0], /Public Edition/);
+  clock.advance(2000);
+  applyRecognitionEvent(detector, "start", "");
+  applyRecognitionEvent(detector, "final", "What about the connector?");
+  clock.advance(2200);
+  assert.strictEqual(finalized.length, 2);
+  assert.match(finalized[1], /connector/);
+}
+
 console.log("speechTurnDetectorAssert: PASS");
 console.log(JSON.stringify({
   pauseLegacyPremature,

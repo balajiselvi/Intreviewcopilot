@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { classifyGenerationFailure } from '../lib/generationGuard';
+import { applyRecognitionEvent } from '../lib/speechRecognitionAdapter';
 import { consumeChatStream } from '../lib/chatStream';
 import { buildBoundedHistory, isClearlyIncompleteFragment, isTruncatedScenarioSetup, removeSubmittedSnapshot } from '../lib/interviewContext';
 import {
@@ -7,14 +8,18 @@ import {
   canStartTurn,
   CLIENT_GENERATION_TIMEOUT_MS,
   deriveOperatorState,
-  enqueueLatestSpeechTurn,
+  enqueueSpeechTurn,
+  acceptCapturedTurn,
+  findRetryTarget,
+  historyBeforeQuestion,
+  shouldAutoSubmitSource,
+  streamChunkBelongsToTurn,
   GENERATION_WATCHDOG_GRACE_MS,
   getOrCreateLiveSessionId,
   historyForGeneration,
   nextResetSnapshot,
   rotateLiveSessionId,
-  shouldReuseQuestionRow,
-  shouldSkipAutoSubmit
+  shouldReuseQuestionRow
 } from '../lib/liveSessionOperator';
 import {
   attachLiveSessionErrorShield,
@@ -26,6 +31,11 @@ import {
 import { createSpeechTurnDetector, looksLikeContinuationShape } from '../lib/speechTurnDetector';
 import { decideInterviewTurn } from '../lib/turnDecision';
 import { takeUtterance } from '../lib/deferredContinuation';
+import {
+  formatSessionPreparation,
+  readSessionPreparation,
+  writeSessionPreparation
+} from '../lib/sessionPreparation';
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -173,6 +183,10 @@ export default function InterviewPage() {
   const [isPipWindowActive, setIsPipWindowActive] = useState(false);
   const [debugEnabled, setDebugEnabled] = useState(false);
   const [debugContext, setDebugContext] = useState(null);
+  const [sessionPrep, setSessionPrep] = useState(() => readSessionPreparation(
+    typeof sessionStorage !== "undefined" ? sessionStorage : null,
+    getLiveInterviewSessionId()
+  ));
 
   const pipWindowRef = useRef(null);
   const documentPipWindowRef = useRef(null);
@@ -182,6 +196,7 @@ export default function InterviewPage() {
   const finalTranscript = useRef({ system: '', microphone: '' });
   const isManualModeRef = useRef(isManualMode);
   const systemAutoModeRef = useRef(systemAutoMode);
+  const systemAudioActiveRef = useRef(false);
   const throttledDispatchSetAIResponseRef = useRef(null);
   const activeRequestRef = useRef(null);
   const isProcessingRef = useRef(false);
@@ -195,6 +210,7 @@ export default function InterviewPage() {
   const sessionEpochRef = useRef(0);
   const speechTurnsRef = useRef({ system: null, microphone: null });
   const pendingSpeechQueueRef = useRef([]);
+  const surfaceTurnRef = useRef(() => {});
   const drainQueuedSpeechTurnRef = useRef(() => {});
   const askOpenAIRef = useRef(null);
   const ingestSpeechRef = useRef(null);
@@ -214,6 +230,7 @@ export default function InterviewPage() {
   };
 
   useEffect(() => { isManualModeRef.current = isManualMode; }, [isManualMode]);
+  useEffect(() => { systemAudioActiveRef.current = isSystemAudioActive; }, [isSystemAudioActive]);
   useEffect(() => { systemAutoModeRef.current = systemAutoMode; }, [systemAutoMode]);
   useEffect(() => { historyRef.current = history; }, [history]);
   useEffect(() => {
@@ -396,17 +413,37 @@ export default function InterviewPage() {
         syncTranscriptDisplay(source, text, detector.getFinalText());
       },
       onFinalize({ text, utteranceId }) {
-        if (shouldSkipAutoSubmit(text)) {
+        const planned = acceptCapturedTurn({
+          text,
+          utteranceId,
+          source,
+          isProcessing: isProcessingRef.current,
+          queue: pendingSpeechQueueRef.current
+        });
+        if (planned.action === "ignore") {
+          surfaceTurnRef.current({
+            text,
+            utteranceId,
+            source,
+            disposition: "IGNORE",
+            reason: planned.reason
+          });
           detector.reset();
           return;
         }
-        if (isProcessingRef.current) {
-          pendingSpeechQueueRef.current = enqueueLatestSpeechTurn(
-            pendingSpeechQueueRef.current,
-            { text, utteranceId, source }
-          );
+        if (planned.action === "queue") {
+          pendingSpeechQueueRef.current = planned.queue;
           setQueuedTurnCount(pendingSpeechQueueRef.current.length);
-          pushSpeechLog({ type: "queue-while-busy", utteranceId, text, source });
+          pushSpeechLog({ type: "queue-while-busy", utteranceId, text, source, kept: planned.queue.length });
+          planned.overflow.forEach((dropped) => {
+            surfaceTurnRef.current({
+              text: dropped.text,
+              utteranceId: dropped.utteranceId,
+              source: dropped.source || source,
+              disposition: "UNANSWERED",
+              reason: "queue-overflow"
+            });
+          });
           return;
         }
         lastAskRef.current = { ...(lastAskRef.current || {}), utteranceId, text, source };
@@ -445,23 +482,26 @@ export default function InterviewPage() {
   const ingestSpeech = (kind, text, source) => {
     const detector = getTurnDetector(source);
     detector.setBaseSilenceMs((Number(getConfig().silenceTimerDuration) || 1.2) * 1000);
-    const auto = (source === 'system' && systemAutoModeRef.current)
-      || (source === 'microphone' && !isManualModeRef.current);
+    const auto = shouldAutoSubmitSource({
+      source,
+      systemAutoMode: systemAutoModeRef.current,
+      manualMode: isManualModeRef.current,
+      systemAudioActive: systemAudioActiveRef.current
+    });
     detector.setAutoSubmit(auto);
-    if (kind === 'interim') detector.noteInterim(text);
-    else if (kind === 'final') detector.noteFinal(text);
-    else if (kind === 'start') detector.noteSpeechStart();
-    else if (kind === 'end') detector.noteSpeechEnd();
+    applyRecognitionEvent(detector, kind, text);
   };
   ingestSpeechRef.current = ingestSpeech;
 
   const drainQueuedSpeechTurn = () => {
-    const queued = pendingSpeechQueueRef.current.shift();
-    setQueuedTurnCount(pendingSpeechQueueRef.current.length);
+    const queued = pendingSpeechQueueRef.current[0];
     if (!queued?.text) return;
     pushSpeechLog({ type: "drain-queued-turn", utteranceId: queued.utteranceId, text: queued.text, source: queued.source });
     queueMicrotask(() => {
       if (isProcessingRef.current) return;
+      if (pendingSpeechQueueRef.current[0]?.utteranceId !== queued.utteranceId) return;
+      pendingSpeechQueueRef.current.shift();
+      setQueuedTurnCount(pendingSpeechQueueRef.current.length);
       askOpenAIRef.current?.(queued.text, queued.source, { utteranceId: queued.utteranceId });
     });
   };
@@ -478,11 +518,31 @@ export default function InterviewPage() {
   };
 
   const handleManualSubmit = (source) => {
-    if (!canStartTurn({ isProcessing: isProcessingRef.current })) {
-      showSnackbar('Please wait for the current response to finish.', 'info');
+    const textToSubmit = source === 'system' ? transcriptionFromStore : micTranscription;
+    if (!textToSubmit.trim()) {
+      showSnackbar('Input is empty.', 'warning');
       return;
     }
-    const textToSubmit = source === 'system' ? transcriptionFromStore : micTranscription;
+    if (!canStartTurn({ isProcessing: isProcessingRef.current })) {
+      const parked = enqueueSpeechTurn(pendingSpeechQueueRef.current, {
+        text: textToSubmit.trim(),
+        utteranceId: `manual_${Date.now().toString(36)}`,
+        source
+      });
+      pendingSpeechQueueRef.current = parked.queue;
+      setQueuedTurnCount(pendingSpeechQueueRef.current.length);
+      parked.overflow.forEach((dropped) => {
+        surfaceTurnRef.current({
+          text: dropped.text,
+          utteranceId: dropped.utteranceId,
+          source: dropped.source || source,
+          disposition: "UNANSWERED",
+          reason: "queue-overflow"
+        });
+      });
+      showSnackbar('Queued. It will be answered when the current response finishes.', 'info');
+      return;
+    }
     if (textToSubmit.trim()) {
       const detector = speechTurnsRef.current[source];
       if (detector) {
@@ -815,6 +875,28 @@ export default function InterviewPage() {
     historyRef.current = [...historyRef.current, item];
   };
 
+  const surfaceTurn = (row) => {
+    const text = String(row?.text || "").trim();
+    if (!text) return;
+    commitHistory({
+      type: "question",
+      text,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      source: row.source || "system",
+      questionId: `q_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      utteranceId: row.utteranceId || null,
+      status: "completed",
+      disposition: row.disposition || "IGNORE",
+      admissionReason: row.reason || ""
+    });
+    setTurnDisposition({ decision: row.disposition || "IGNORE", route: "NONE", reason: row.reason || "" });
+    recordAdmissionTurn(text, row.disposition || "IGNORE", row.reason || "");
+    if (row.disposition === "UNANSWERED") {
+      showSnackbar("A waiting question could not stay queued. It is in the log — use Answer this.", "warning");
+    }
+  };
+  surfaceTurnRef.current = surfaceTurn;
+
   const askOpenAI = async (text, source, meta = {}) => {
     if (!text.trim()) {
       showSnackbar('No input text to process.', 'warning');
@@ -865,9 +947,13 @@ export default function InterviewPage() {
       if (assembly.text) text = assembly.text;
     }
 
+    const retryContextQuestionId = meta.retryTarget?.questionId || "";
+    const turnHistory = retryContextQuestionId
+      ? historyBeforeQuestion(historyRef.current, retryContextQuestionId)
+      : historyRef.current;
     let turn = { decision: "ANSWER", route: "GENERATION", reason: "admission-failed-open" };
     try {
-      turn = decideInterviewTurn({ question: text, history: historyRef.current });
+      turn = decideInterviewTurn({ question: text, history: turnHistory });
     } catch (gateError) {
       console.error("Question admission failed:", gateError);
     }
@@ -900,21 +986,18 @@ export default function InterviewPage() {
     const currentConfig = getConfig();
     const isGeminiModel = currentConfig.aiModel?.toLowerCase().startsWith('gemini');
     const apiKey = isGeminiModel ? currentConfig.geminiKey : currentConfig.openaiKey;
-    if (!apiKey && turn.route !== "PREPARED_SCRIPT") {
-      showSnackbar(`${isGeminiModel ? 'Gemini' : 'OpenAI'} API key required. Please set it in Settings.`, 'error');
-      speechTurnsRef.current[source]?.releaseFinalize();
-      return;
-    }
 
     const previousAsk = lastAskRef.current || {};
-    const utteranceId = meta.utteranceId || previousAsk.utteranceId || null;
+    const retryTarget = meta.retryTarget || (meta.retry ? previousAsk : null);
+    const retryQuestionId = retryTarget?.questionId || previousAsk.questionId;
+    const utteranceId = meta.utteranceId || retryTarget?.utteranceId || previousAsk.utteranceId || null;
     const continuing = Boolean(utteranceId && previousAsk.utteranceId === utteranceId && previousAsk.revoked);
     const reuseQuestion = shouldReuseQuestionRow({
       retry: Boolean(meta.retry),
       continuing,
       utteranceId,
       lastUtteranceId: previousAsk.utteranceId,
-      lastQuestionId: previousAsk.questionId
+      lastQuestionId: retryQuestionId
     });
     if (!meta.manual && (source === 'system' || source === 'microphone')) {
       const detector = speechTurnsRef.current[source];
@@ -927,10 +1010,10 @@ export default function InterviewPage() {
     setIsProcessing(true);
     setGenerationError(null);
     const retryCount = meta.retry
-      ? (Number(previousAsk.retryCount) || 0) + 1
+      ? (Number(retryTarget?.retryCount ?? (retryQuestionId === previousAsk.questionId ? previousAsk.retryCount : 0)) || 0) + 1
       : (continuing ? (Number(previousAsk.retryCount) || 0) : 0);
-    const questionId = reuseQuestion && previousAsk.questionId
-      ? previousAsk.questionId
+    const questionId = reuseQuestion && retryQuestionId
+      ? retryQuestionId
       : `q_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     lastAskRef.current = {
       text,
@@ -967,7 +1050,8 @@ export default function InterviewPage() {
     let requestController;
     let disarmTimeout = () => {};
     try {
-      const conversationHistoryForAPI = buildBoundedHistory(historyForGeneration(historyRef.current));
+      const conversationEvents = historyBeforeQuestion(historyRef.current, questionId);
+      const conversationHistoryForAPI = buildBoundedHistory(historyForGeneration(conversationEvents));
       activeRequestRef.current?.abort();
       requestController = new AbortController();
       activeRequestRef.current = requestController;
@@ -981,6 +1065,7 @@ export default function InterviewPage() {
         customInstructions: currentConfig.gptSystemPrompt,
         candidateResume: currentConfig.candidateResume,
         jobDescription: currentConfig.jobDescription,
+        sessionPreparation: formatSessionPreparation(sessionPrep),
         company: currentConfig.company,
         interviewSessionId: getLiveInterviewSessionId(),
         source,
@@ -1015,11 +1100,15 @@ export default function InterviewPage() {
       }
       await consumeChatStream(response, {
         onText(chunkText) {
+          if (sessionEpochRef.current !== requestEpoch) return;
+          if (!streamChunkBelongsToTurn(activeRequestRef.current, requestController)) return;
           if (firstTextMs === null) firstTextMs = Math.round(performance.now() - requestStartedAt);
           streamedResponse += chunkText;
           throttledDispatchSetAIResponseRef.current?.(streamedResponse);
         },
         onEvent(name, payload) {
+          if (sessionEpochRef.current !== requestEpoch) return;
+          if (!streamChunkBelongsToTurn(activeRequestRef.current, requestController)) return;
           if (name === "admission") {
             pendingAdmissionRef.current = payload;
             setTurnDisposition({
@@ -1042,6 +1131,23 @@ export default function InterviewPage() {
         const withheld = pendingAdmissionRef.current;
         if (withheld && withheld.decision && withheld.decision !== "ANSWER") {
           pendingAdmissionRef.current = null;
+          const reason = withheld.reason || withheld.decision;
+          commitHistory({
+            type: "response",
+            text: `Not answered (${reason}). The captured question is in the log. Correct the transcript or use Answer this.`,
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            answerId: `a_${Date.now()}`,
+            questionId,
+            source: "copilot",
+            status: "error"
+          });
+          setGenerationError({
+            retryable: true,
+            userMessage: "The question was captured but not answered. Correct it or retry.",
+            question: text,
+            source
+          });
+          showSnackbar("Question kept. It was not answered because it was incomplete or not a question.", "warning");
           return;
         }
         throw Object.assign(new Error("Could not generate an answer."), {
@@ -1088,6 +1194,7 @@ export default function InterviewPage() {
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           answerId: `a_${Date.now()}`,
           questionId,
+          retryCount,
           source: "copilot",
           status: "interrupted",
           metrics: responseMetrics(),
@@ -1115,7 +1222,8 @@ export default function InterviewPage() {
         text: classified.userMessage,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         status: "error",
-        questionId
+        questionId,
+        retryCount
       });
     } finally {
       disarmTimeout();
@@ -1127,7 +1235,13 @@ export default function InterviewPage() {
         if (activeRequestRef.current === requestController) {
           activeRequestRef.current = null;
         }
-        if ((source === 'system' && systemAutoModeRef.current) || (source === 'microphone' && !isManualModeRef.current)) {
+        const sourceAutoSubmits = shouldAutoSubmitSource({
+          source,
+          systemAutoMode: systemAutoModeRef.current,
+          manualMode: isManualModeRef.current,
+          systemAudioActive: systemAudioActiveRef.current
+        });
+        if (sourceAutoSubmits) {
           if (speechTurnsRef.current[source]) {
             speechTurnsRef.current[source].notifyGenerationSettled(utteranceId);
           } else {
@@ -1188,14 +1302,27 @@ export default function InterviewPage() {
     } catch (rotateError) {
       console.error("Failed to rotate live session id:", rotateError);
     }
+    setSessionPrep(readSessionPreparation(
+      typeof sessionStorage !== "undefined" ? sessionStorage : null,
+      getLiveInterviewSessionId()
+    ));
     showSnackbar("New interview session started.", "success");
+  };
+
+  const retryQuestionFromResponse = (failedResponse) => {
+    const target = findRetryTarget(historyRef.current, failedResponse);
+    if (!target) {
+      showSnackbar("The original question is no longer available in this session.", "error");
+      return;
+    }
+    askOpenAI(target.text, target.source, { retry: true, retryTarget: target, utteranceId: target.utteranceId });
   };
 
   const retryLastAsk = () => {
     const q = lastAskRef.current?.text;
     const src = lastAskRef.current?.source || "microphone";
     if (!q) return;
-    askOpenAI(q, src, { retry: true });
+    askOpenAI(q, src, { retry: true, retryTarget: lastAskRef.current });
   };
 
   const stopInFlightGeneration = () => {
@@ -1303,12 +1430,12 @@ export default function InterviewPage() {
               Incomplete answer — excluded from follow-up context.
             </Typography>
           )}
-          {item.status === 'error' && (
+          {(item.status === 'error' || item.status === 'interrupted') && (
             <Button
               size="small"
               sx={{ mt: 1 }}
               disabled={isProcessing}
-              onClick={retryLastAsk}
+              onClick={() => retryQuestionFromResponse(item)}
             >
               Retry
             </Button>
@@ -1352,7 +1479,21 @@ export default function InterviewPage() {
               {item.text}
             </Typography>
           }
-          secondary={`${title} - ${item.timestamp}${item.disposition === "IGNORE" ? " — ignored" : item.disposition === "DEFER" ? " — waiting" : ""}`}
+          secondary={
+            <>
+              {`${title} - ${item.timestamp}${item.disposition === "IGNORE" ? " — ignored" : item.disposition === "DEFER" ? " — waiting" : item.disposition === "UNANSWERED" ? " — not answered" : ""}`}
+              {item.disposition === "UNANSWERED" && (
+                <Button
+                  size="small"
+                  sx={{ ml: 1 }}
+                  disabled={isProcessing}
+                  onClick={() => askOpenAI(item.text, item.source || "system", { manual: true })}
+                >
+                  Answer this
+                </Button>
+              )}
+            </>
+          }
         />
       </ListItem>
     );
@@ -1596,6 +1737,33 @@ export default function InterviewPage() {
             {/* Left Panel */}
             <Grid item xs={12} md={3} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Card>
+                <CardHeader title="This interview" sx={{ pb: 0 }} />
+                <CardContent>
+                  <TextField size="small" fullWidth margin="dense" label="Target role" value={sessionPrep.role}
+                    onChange={(e) => setSessionPrep((prev) => ({ ...prev, role: e.target.value }))} />
+                  <TextField size="small" fullWidth margin="dense" label="Seniority" value={sessionPrep.seniority}
+                    onChange={(e) => setSessionPrep((prev) => ({ ...prev, seniority: e.target.value }))} />
+                  <TextField size="small" fullWidth margin="dense" label="Round" value={sessionPrep.round}
+                    onChange={(e) => setSessionPrep((prev) => ({ ...prev, round: e.target.value }))} />
+                  <TextField size="small" fullWidth margin="dense" label="Focus" value={sessionPrep.focus} multiline rows={2}
+                    onChange={(e) => setSessionPrep((prev) => ({ ...prev, focus: e.target.value }))} />
+                  <TextField size="small" fullWidth margin="dense" label="Answer style" value={sessionPrep.style}
+                    onChange={(e) => setSessionPrep((prev) => ({ ...prev, style: e.target.value }))} />
+                  <Button size="small" sx={{ mt: 1 }} variant="outlined" onClick={() => {
+                    const saved = writeSessionPreparation(sessionStorage, getLiveInterviewSessionId(), sessionPrep);
+                    setSessionPrep(saved);
+                    showSnackbar("Preparation saved for this session only.", "success");
+                  }}>
+                    Save preparation
+                  </Button>
+                  <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                    {formatSessionPreparation(sessionPrep)
+                      ? "Saved emphasis applies to this session. A CV is optional and is not required for a technical answer."
+                      : "Optional. Role, round, and focus change emphasis only. They are cleared when you start a new session."}
+                  </Typography>
+                </CardContent>
+              </Card>
+              <Card>
                 <CardHeader title="System Audio (Interviewer)" avatar={<HearingIcon />} sx={{ pb: 1 }} />
                 <CardContent>
                   <FormControlLabel
@@ -1636,7 +1804,7 @@ export default function InterviewPage() {
                         variant="outlined"
                         color="primary"
                         startIcon={<SendIcon />}
-                        disabled={isProcessing || !transcriptionFromStore.trim()}
+                        disabled={!transcriptionFromStore.trim()}
                       >
                         Submit
                       </Button>
@@ -1787,7 +1955,7 @@ export default function InterviewPage() {
                         variant="outlined"
                         color="primary"
                         startIcon={<SendIcon />}
-                        disabled={isProcessing || !micTranscription.trim()}
+                        disabled={!micTranscription.trim()}
                       >
                         Submit
                       </Button>

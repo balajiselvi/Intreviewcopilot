@@ -8,6 +8,8 @@ assert.strictEqual(classifyGenerationFailure({ message: "insufficient_quota" }).
 assert.strictEqual(classifyGenerationFailure({ message: "exceeded your current quota" }).retryable, false);
 assert.doesNotMatch(classifyGenerationFailure({ message: "ECONNRESET socket" }).userMessage, /ECONNRESET|stack|at Object/);
 assert.doesNotMatch(publicLlmError({ status: 500, message: "Internal at foo.js:12" }).userMessage, /foo\.js/);
+assert.equal(publicLlmError({ name: "APIConnectionError", message: "Connection error." }).code, "transient");
+assert.equal(publicLlmError({ name: "APIConnectionTimeoutError", message: "Request timed out" }).code, "timeout");
 assert.strictEqual(classifyGenerationFailure({ message: "Failed to fetch" }).code, "transient");
 assert.strictEqual(classifyGenerationFailure({ message: "empty generation" }).code, "empty");
 assert.match(classifyGenerationFailure({ message: "empty generation" }).userMessage, /Retry/);

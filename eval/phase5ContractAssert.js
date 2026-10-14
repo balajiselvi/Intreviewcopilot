@@ -86,13 +86,26 @@ if (grounded) {
 const ruleset = selectVerifiedWorkflow("How do you upload or update a ruleset in IAG?");
 assert.strictEqual(ruleset.workflowId, "iag-analysis-ruleset");
 assert.match(ruleset.answer, /Rule Setup/);
-assert.match(ruleset.answer, /no IAG screen called Ruleset Management/);
-assert.doesNotMatch(ruleset.answer, /RequestTypeRule|open Ruleset Management|click Upload Ruleset/);
+assert.match(ruleset.answer, /Upload & Process/);
+assert.match(ruleset.answer, /Processing Log and Validation Log/);
+assert.doesNotMatch(ruleset.answer, /Which of those do you want\?|open Ruleset Management|click Upload Ruleset/);
+const spacedRuleset = selectVerifiedWorkflow("How do we upload the rule set in IAG?");
+assert.strictEqual(spacedRuleset.workflowId, "iag-analysis-ruleset");
+assert.match(spacedRuleset.answer, /Upload & Process/);
 
 const policy = selectVerifiedWorkflow("What does authorization policy mean in IAG Access Request?");
 assert.strictEqual(policy.workflowId, "iag-request-policy");
 assert.match(policy.answer, /search/);
 assert.doesNotMatch(policy.answer, /RequestTypeRule/);
+
+const iagWorkflow = selectVerifiedWorkflow("How do we configure the workflow in IAG Access Request?");
+assert.strictEqual(iagWorkflow.workflowId, "iag-workflow-determination");
+assert.match(iagWorkflow.answer, /Template Upload/);
+assert.match(iagWorkflow.answer, /Maintain Workflow Template/);
+assert.match(iagWorkflow.answer, /IAGWorkflowBusinessRule/);
+assert.match(iagWorkflow.answer, /RequestTypeRule/);
+assert.match(iagWorkflow.answer, /provisioning separately/);
+assert.doesNotMatch(iagWorkflow.answer, /IAG_WF_MANAGER|SCI User Group Sync Job|managerrolesecuritypath/);
 
 const experienceProcedure = selectVerifiedWorkflow("Have you set up privileged access in IAG?");
 assert.strictEqual(experienceProcedure.experienceAsk, true);

@@ -6,17 +6,47 @@ Fiori security in S/4HANA covers the launchpad-facing layer — catalogs, groups
 
 ## Interview Summary
 
-A Fiori app's security has two layers: the launchpad layer, controlled by catalogs, groups, or spaces and pages, which determines whether a user sees and can launch the app; and the backend layer, controlled by OData service authorization and the same classic authorization objects, which determines whether the app actually functions once opened. Missing either layer breaks the user experience differently — no tile, or a tile that errors when opened.
+A missing app is launchpad resolution. Do not start with an authorization trace. If the deployment is not named, separate the paths.
+
+Public Edition: Maintain Business Users proves which business roles are assigned. Maintain Business Roles proves the catalog, the IAM app, and the Active flag. KBA 3499342: a navigation target has no tile, and an inactive IAM app is not exposed. Manage Launchpad Spaces and Manage Launchpad Pages prove the space and page contain the app. These are apps, not transactions. Do not start with PFCG or a cache clear.
+
+Private Edition or on-premise: the PFCG role must contain the catalog and the space, or the group if the classic homepage is still active. /UI2/FLPCM_CUST is client-specific. /UI2/FLPCM_CONF is cross-client. Confirm the tile and the target mapping. Note 3401525: SPACES and SPACES_ENABLE_USER. Cache only after the assignment is correct and the symptom is stale: /UI2/INVALIDATE_CLIENT_CACHES from SE38.
+
+## Failing authorization: on-premise and Private Edition Gateway
+
+The app opened, then a request failed.
+
+On-premise or Private Edition Gateway, KBA 3013836. Read /IWFND/ERROR_LOG on the hub and /IWBEP/ERROR_LOG on the backend. Embedded: both logs record different errors. An authorization message means the call reached the service, so the next step is the trace. An unknown, inactive, or runtime message is a service failure. Do not name an object the trace did not show.
+
+/IWFND/MAINT_SERVICE checks registration and activation only, not the error log. SICF only when that ICF node is inactive. From SAP_GWFND 7.58 a service-specific node is optional.
+
+SU53, NetWeaver 7.4, shows only the last failed check. STAUTHTRACE, NetWeaver 7.31: activate, reproduce on the same application server, deactivate, evaluate. Use it when SU53 does not show the failure.
+
+## Public Edition app opens but authorization fails
+
+On S/4HANA Cloud Public Edition, have the user reproduce the failure and inspect it in Display Authorization Trace. Review the Failed entries and the affected business role or restriction. Successful and Filtered entries are evidence, not failed grants. Gateway transactions, SU53, and STAUTHTRACE are not the Public Edition diagnostic path. Repeat the app action after correcting only the role or restriction supported by the trace.
+
+## Private Edition launchpad
+
+On SAP S/4HANA Cloud Private Edition, a user who cannot see a Fiori app is not diagnosed with Maintain Business Users, Maintain Business Roles, or an IAM app Active flag. Those checks are Public Edition only. Check the PFCG role for the business catalog and the launchpad space, or the group if the classic homepage is still active. In /UI2/FLPCM_CUST (client-specific) or /UI2/FLPCM_CONF (cross-client), confirm the catalog contains the tile and the target mapping. Note 3401525 parameters SPACES and SPACES_ENABLE_USER. Do not clear the cache first. /UI2/INVALIDATE_CLIENT_CACHES from SE38 applies only after the assignment is correct and the symptom is a stale client cache. Do not start with an authorization trace.
+
+## Service not active
+
+The app can open while the OData service is not registered or not active. On an on-premise or Private Edition Gateway system, open /IWFND/MAINT_SERVICE and check registration and activation. That transaction is not /IWFND/ERROR_LOG. Do not open SICF unless that screen shows the ICF node is inactive. Do not start with SU53, STAUTHTRACE, or a launchpad catalog check. From SAP_GWFND 7.58 a service-specific ICF node is optional.
 
 ## 30 Second Interview Answer
 
-Fiori security has two layers you have to get right together. The launchpad layer — catalogs and groups, or spaces and pages in the newer model — controls whether a user sees an app tile at all. The backend layer — OData service authorization plus classic authorization objects — controls whether the app actually works once opened. Missing the launchpad layer means no tile shows up; missing the backend layer means the tile shows up but the app fails or shows an error.
+On SAP S/4HANA Cloud Public Edition, a user who cannot see an app is not a Launchpad Designer or PFCG problem. Open Maintain Business Roles and check the business catalog, the IAM Apps tab, and the assigned launchpad space. SAP Knowledge Base Article 3499342, for Public Edition, says an app can stay invisible when its application category is a navigation target rather than a standard application, or when the IAM app is not active on the business role. Manage Launchpad Spaces and Manage Launchpad Pages maintain the space. Do not start with an authorization trace: the user has not opened the app.
+
+Display Authorization Trace is the Public Edition tool for an app that opens and then fails a check. SAP Learning, Creating an Authorization Trace, says you activate the trace for the business user, the user runs the app, and the result is Successful, Failed, or Filtered. SU53, STAUTHTRACE, and /UI2/FLPCM_CUST are not the Public Edition path.
+
+On Private Edition and on-premise, the same missing tile can be a catalog or space missing from the PFCG role, maintained in /UI2/FLPCM_CUST or /UI2/FLPCM_CONF. Groups are the classic homepage. SAP Note 3401525 still describes Manage Launchpad Settings parameters SPACES and SPACES_ENABLE_USER, and says the classic homepage is not fully removed yet. Confirm those parameters on the tenant before telling the user to look for a group.
 
 ## 60 Second Interview Answer
 
 Fiori security operates on two distinct layers, and understanding both is essential, because they fail differently and get diagnosed differently.
 
-The launchpad layer determines app visibility — in the classic model this is catalogs and groups, where catalogs grant access to a set of apps and groups organize how those apps appear on the launchpad. Newer S/4HANA versions use spaces and pages instead, a more flexible model, but the underlying security concept is the same: this layer controls whether the tile even exists for the user.
+The launchpad layer determines app visibility. Catalogs grant access to a set of apps. Groups or spaces and pages organize how those apps appear. Which layout tool applies depends on the release and the deployment: on-premise and Private Edition can still have groups, while spaces and pages are maintained in Manage Launchpad Spaces and Manage Launchpad Pages and, on an ABAP system, in /UI2/FLPCM_CONF or /UI2/FLPCM_CUST. Public Cloud uses the Fiori apps and the business role, not those transactions. This layer controls whether the tile exists for the user.
 
 The backend layer is what makes the app actually function. Fiori apps are built on OData services, which need their own authorization, in addition to the classic authorization objects the underlying business logic checks — the same AUTHORITY-CHECK mechanism that's always existed. CDS views that expose data can additionally be protected by CDS access control (often called DCL): it restricts rows/fields in the view. DCL is not a separate product and must not be expanded into a made-up name such as "Dynamic Authorization Control Language." A user can have full launchpad access to an app and still hit an authorization error or empty data the moment they try to actually use it, because the backend and CDS layers are separate authorization surfaces.
 
@@ -24,11 +54,11 @@ Troubleshooting Fiori access issues means figuring out which layer is actually b
 
 ## 90 Second Interview Answer
 
-Fiori security is genuinely two-layered, and the distinction matters both for design and for troubleshooting. The launchpad layer determines whether a user sees and can launch an app at all. In the classic Fiori launchpad model, this is catalogs, which grant access to a defined set of apps, and groups, which organize how those apps are tiled and arranged for the user. Newer S/4HANA releases have moved toward a spaces and pages model instead — a more flexible, more business-role-aligned way of organizing the launchpad — but conceptually it serves the same purpose: controlling app visibility and launch access.
+Fiori security is genuinely two-layered, and the distinction matters both for design and for troubleshooting. The launchpad layer determines whether a user sees and can launch an app at all. Catalogs grant access to a defined set of apps. Groups, or spaces and pages, organize the layout. Spaces and pages are not a universal replacement on every release: confirm whether the system is on-premise, Private Edition, or Public Cloud before naming the tool. On Public Cloud, new tenants use spaces, and /UI2/FLPCM_CUST is not available.
 
 The backend layer is what actually determines whether the app functions once launched. Fiori apps are built on OData services that expose backend data and functionality to the front-end UI, and these services require their own authorization — a user needs to be authorized to call the specific OData service the app depends on, independent of launchpad visibility. Beyond the OData layer, the underlying business logic still runs the same classic AUTHORITY-CHECK statements against authorization objects that any SAP transaction always has, whether it's being invoked through Fiori or the traditional SAP GUI.
 
-This two-layer structure is exactly why Fiori troubleshooting requires knowing which layer to investigate. If a user reports they can't find an app at all, that's almost always a launchpad-layer issue — missing catalog or group assignment, or in the newer model, missing space or page assignment. If a user reports the tile is there but the app throws an authorization error or behaves incorrectly once opened, that's a backend-layer issue — either the OData service authorization is missing, or the underlying authorization objects the business logic requires aren't in the role. Treating these as the same problem, or investigating the wrong layer first, is a common and avoidable source of wasted troubleshooting time.
+This two-layer structure is exactly why Fiori troubleshooting requires knowing which layer to investigate. If a user on Public Edition cannot see an app, open the Maintain Business Roles app and the Manage Launchpad Spaces app. Those names are applications, not transaction codes. If the tile is visible and the app then fails, that is the separate Display Authorization Trace procedure. On an on-premise system a missing tile can be a catalog, space, or older group assignment. If a user reports the tile is there but the app throws an authorization error or behaves incorrectly once opened, that's a backend-layer issue — either the OData service authorization is missing, or the underlying authorization objects the business logic requires aren't in the role. Treating these as the same problem, or investigating the wrong layer first, is a common and avoidable source of wasted troubleshooting time.
 
 Role design for Fiori has to account for both layers deliberately. A role built only with launchpad access and no thought given to the OData and backend authorization requirements will produce exactly the "tile shows up, app fails" experience that erodes user trust in a Fiori rollout even when the underlying security design intent was sound.
 
@@ -78,13 +108,14 @@ When a user opens their Fiori launchpad, the system determines which app tiles t
 
 ## Troubleshooting
 
-Common issue: a user can't find an expected app on their launchpad.
-Root cause: missing Fiori catalog/group or space/page assignment — a launchpad-layer issue.
-Resolution: verify and correct the launchpad-layer assignment; this is unrelated to backend authorization.
+Common issue: the app is missing from the launchpad.
+This is launchpad resolution. Do not start with a backend authorization trace. On Public Edition, Maintain Business Users proves which business roles are assigned, Maintain Business Roles proves the catalog, the IAM app, and the Active flag, and Manage Launchpad Spaces proves the space contains the app. On Private Edition or on-premise, check the PFCG role, the catalog, the target mapping, and /UI2/FLPCM_CUST or /UI2/FLPCM_CONF. Clear a cache only after that assignment is correct and the symptom is stale content.
 
-Common issue: an app tile is visible but throws an authorization error when opened.
-Root cause: missing OData service authorization or missing backend authorization objects — a backend-layer issue.
-Resolution: trace the specific failing authorization object or OData service call and add it to the role.
+Common issue: the app opens and an OData request or an authorization check fails.
+On an ABAP Gateway system, read /IWFND/ERROR_LOG on the hub and /IWBEP/ERROR_LOG on the backend. The HTTP status and the error text decide the next step. An authorization message goes to STAUTHTRACE or SU53 on that system. A runtime or unknown-service message does not. On Public Edition, use Display Authorization Trace and the restriction on the business role. Do not name an authorization object the trace did not return.
+
+Common issue: the OData service is not registered or not active.
+Open /IWFND/MAINT_SERVICE and check registration and activation. That transaction is not an error log. Mention SICF only when the ICF node for that service is inactive. Do not start this symptom in SU53.
 
 Common issue: an app worked before an upgrade but now fails.
 Root cause: the upgrade changed OData service structure or authorization requirements without a corresponding SU24/role update.

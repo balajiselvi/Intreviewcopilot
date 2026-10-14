@@ -31,6 +31,14 @@ Joule for IAG, where licensed, is an assistant on top of this model. It does not
 5. Embed simulation in Access Request
 6. Define mitigation workflow and certification use of the same risk content
 
+## Upload or Update an Access Analysis Ruleset
+
+For bulk ruleset maintenance, open Administration > Rule Setup in the IAG launchpad. Select the Business Function Group to export, or select ALL for the complete ruleset, then choose Download File. Edit the downloaded ZIP contents according to its Readme.txt structure. In Rule Setup, browse to the edited rules ZIP, select its Business Function Group, and choose Upload & Process. Monitor Processing Status and inspect both the Processing Log and Validation Log; resolve validation errors before using the updated rules. Associate connected target systems with the applicable Business Function Group, then run Access Analysis from Job Scheduler and verify the expected risk results.
+
+SAP-delivered standard rulesets are requested from SAP Support under component GRC-IAG-AA. In a hybrid bridge landscape, on-premise GRC risk definitions are synchronized with the Risk Definition Sync job; cloud rulesets are requested separately. Access Analysis rules are distinct from Access Request workflow business rules and GRC MSMP.
+
+Source checked 2026-10-14: SAP Learning, Working with Access Analysis Service (download/upload steps and logs); SAP Learning, Setting Up the Access Analysis Service (business-function-group and target-system assignment); SAP Help, Integration Guide: SAP Access Analysis Service to Target Applications (standard ruleset request and hybrid setup).
+
 ## Related Topics
 
 - knowledge/iag/iag-overview.md

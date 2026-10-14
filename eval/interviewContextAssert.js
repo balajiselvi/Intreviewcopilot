@@ -2,9 +2,11 @@ const assert = require("assert");
 const {
   QUESTION_INTENTS,
   buildBoundedHistory,
+  explicitProductTopic,
   isClearlyIncompleteFragment,
   removeSubmittedSnapshot,
   resolveInterviewContext,
+  resolveProductScope,
   sanitizeDebugContext,
   toHistoryContext
 } = require("../lib/interviewContext");
@@ -85,6 +87,8 @@ const fiori = resolveInterviewContext({
   history: []
 });
 assert.strictEqual(fiori.questionTopic, "Fiori");
+assert.strictEqual(explicitProductTopic("In S/4HANA Cloud Public Edition, how do you troubleshoot a user who cannot see an app?"), "Fiori");
+assert.deepStrictEqual(resolveProductScope("Fiori"), { category: "Fiori", domain: "SAP Fiori Security" });
 assert.match(fiori.interviewerObjective, /display-only/i);
 
 const ruleset = resolveInterviewContext({
@@ -646,6 +650,18 @@ for (const [questionRaw, expectedScope] of notImplementation) {
 // reported failure still does, even when the interviewer also asks how to configure the fix.
 const procedureNoScenario = resolveInterviewContext({ questionRaw: "Walk me through configuring a new tile." });
 assert.notStrictEqual(procedureNoScenario.scenarioMode, "ACTIVE");
+
+const publicEditionMissingApp = resolveInterviewContext({
+  questionRaw: "In S/4HANA Cloud Public Edition, how would you troubleshoot a user who cannot see an app?"
+});
+assert.strictEqual(publicEditionMissingApp.questionTopic, "Fiori");
+assert.strictEqual(publicEditionMissingApp.answerScope, "STAGE_INVESTIGATION");
+
+const ipsTriage = resolveInterviewContext({
+  questionRaw: "An IPS job ended with failed entities and target accounts are missing. How would you technically triage it?"
+});
+assert.strictEqual(ipsTriage.questionTopic, "IPS");
+assert.strictEqual(ipsTriage.answerScope, "STAGE_INVESTIGATION");
 const symptomPlusProcedure = resolveInterviewContext({
   questionRaw: "The purchasing app will not start for the user. How do you set the catalog up correctly?"
 });

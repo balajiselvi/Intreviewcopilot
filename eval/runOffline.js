@@ -5,6 +5,11 @@ const path = require("node:path");
 const scripts = [
   "chatStreamAssert.js", "providerStreamAssert.js", "practiceFeedbackAssert.js", "generationGuardAssert.js",
   "liveSessionOperatorAssert.js", "speechSessionGuardAssert.js", "speechTurnDetectorAssert.js",
+  "retrievalScoreAssert.js",
+  "productBoundaryAssert.js",
+  "iagInterviewAccuracyBattery.js",
+  "procedureRetentionAssert.js",
+  "knowledgeContentGuardAssert.js",
   "contextInheritanceAssert.js", "convergenceRoutingAssert.js", "freshAdmissionBattery.js",
   "experienceGroundingBattery.js", "deferredContinuationBattery.js", "responseModeCollisionMatrix.js",
   "phase5ContractAssert.js"

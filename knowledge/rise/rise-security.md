@@ -4,13 +4,33 @@
 
 RISE security differs fundamentally from on-premise SAP implementations. In a cloud environment, organizations no longer control infrastructure; they rely on SAP Cloud Infrastructure (SCI) or BTP to provide foundational security, compliance controls, and audit capabilities. RISE security strategy spans three layers: infrastructure security (SAP's responsibility via SCI/BTP), data security (encryption, masking, access controls), and application security (authorization, audit logging, secure coding). Understanding cloud security shared responsibility models, data residency requirements, compliance frameworks (SOX, GDPR, industry-specific regulations), and RISE-specific authorization architecture is critical for anyone implementing or governing RISE deployments at enterprise scale.
 
+## Hybrid identity
+
+Verified 2026-10-13. Keep the planes separate. Do not describe one transaction as the design for every RISE edition.
+
+SAP operates the infrastructure and the privileged access of SAP administrators. The customer owns business-user identity, authentication choices, application authorization, and audit evidence for business users. Source: SAP Community, Securing RISE with SAP S/4HANA Cloud, private edition, customer data center option.
+
+Identity authentication. SAP Cloud Identity Services, Identity Authentication, is the authentication service. A corporate identity provider such as Microsoft Entra ID federates through Identity Authentication as the proxy. Cloud applications in the landscape authenticate through that service. A direct corporate single sign-on to one Private Edition system can exist, and it is a different pattern from a landscape that also includes Public Cloud, SuccessFactors, or other SAP cloud applications. Source: SAP Community, SAP Cloud Identity now available for all RISE with SAP customers.
+
+Identity provisioning. Identity Provisioning synchronizes users and groups. It does not decide S/4 authorization and it does not replace the target's role model.
+
+Private Edition authorization. On SAP S/4HANA Cloud, private edition, the customer maintains roles in PFCG. PFCG holds the authorization objects, field values, and the generated profile. SU01 is the ABAP user master: it assigns an existing role to a user. SU01 does not define authorization objects. SUIM reports users, roles, profiles, and authorizations on that ABAP system. SUIM does not validate Identity Authentication, Identity Provisioning, or a BTP role collection. Source: SAP Learning, Assigning Permissions to Users, Implementing SAP S/4HANA Cloud Private Edition.
+
+Public Cloud authorization. SAP S/4HANA Cloud Public Edition uses Identity Authentication for every tenant. Business roles, business catalogs, and restrictions are maintained in Maintain Business Roles. Business users are maintained in Maintain Business Users. A missing authorization is inspected with Display Authorization Trace. Customers do not design this model in PFCG or SU01. Activating a business role can generate a technical PFCG role in the background, and that generation is not a customer maintenance path. Source: SAP Learning, Introducing Identity and Access Management; SAP Help, SAP S/4HANA Cloud Public Edition 2602 feature scope, Maintain Business Roles and Display Authorization Trace.
+
+BTP and hybrid connectivity. Extensions use the subaccount trust to the identity provider and role collections. Cloud Connector is the connectivity path for a private on-premise or Private Edition call, including principal propagation where that landscape uses it. Validate BTP by the trust and the assigned role collection, not by SUIM.
+
+End-to-end check. Sign in through the identity provider that the application trusts. Confirm the provisioning job created or updated the user. Confirm the target authorization in the tool that owns that edition: PFCG and SUIM on Private Edition, Maintain Business Roles and Display Authorization Trace on Public Cloud, role-collection assignment on BTP. A failure in one plane does not get fixed by a transaction from another plane.
+
+Tenant-specific items stay assumptions until the landscape is known: whether the corporate identity provider is proxied, which Identity Provisioning target systems exist, whether GRC or IAG is the governance layer, and whether emergency ABAP users exist in the Private Edition user master. Do not invent those choices.
+
 ## Interview Summary
 
 RISE operates a shared responsibility model: SAP runs infrastructure and the private-cloud operations boundary; the customer still owns identity design, role catalog, SoD, and audit evidence. Typical customer stack: corporate IdP → IAS (authentication), IPS (provisioning), IAG and/or GRC (governance), S/4 PFCG (enforcement), BTP XSUAA for extensions, Cloud Connector for hybrid principal propagation. SU01 remains the S/4 user master; it is not a substitute for IAS.
 
 ## 30 Second Interview Answer
 
-Under RISE with S/4HANA Cloud Private Edition I would draw four boundaries: SAP operates the infrastructure; we still design PFCG and Fiori business roles; IAS/IPS handle cloud identity and lifecycle; IAG/GRC govern SoD and requests to the extent connectors exist. IAS authenticates; it does not replace S/4 authorization. Hypercare still needs Firefighter/PAM, SUIM validation, and a rollback, not a shared-responsibility shrug.
+Under RISE I separate the planes. Identity Authentication authenticates, with a corporate identity provider proxied through it when that is the landscape. Identity Provisioning synchronizes users. Private Edition authorization is designed in PFCG and assigned on the ABAP user in SU01. Public Cloud authorization is Maintain Business Roles and Maintain Business Users. BTP authorization is the role collection on the trusted subaccount. I validate each plane in its own tool. SUIM reports ABAP users and roles on Private Edition. It is not the check for Identity Authentication, Identity Provisioning, or BTP.
 
 ## 60 Second Interview Answer
 
@@ -31,17 +51,15 @@ RISE security architecture operates across multiple layers:
    - Regular security patches and updates
    - Compliance certifications (SOC 2, ISO 27001, GDPR-ready)
 
-2. **Authentication & Identity Management**
-   - User master records (SU01) with password policies
-   - Optional: Integration with corporate identity provider (Active Directory, Azure AD, LDAP via SAML/OIDC)
-   - Multi-factor authentication (MFA) optional but recommended
-   - Session timeout policies (auto-logout after inactivity)
+2. **Authentication and identity**
+   - Identity Authentication for sign-in, with the corporate identity provider as a proxy when the landscape uses one
+   - Identity Provisioning for user and group synchronization
+   - Private Edition still has an ABAP user master in SU01. That master receives role assignments. It is not the identity provider for the cloud landscape
 
-3. **Authorization Architecture**
-   - Roles (PFCG) — bundle of authorization objects
-   - Authorization objects — define what transaction/data can be accessed
-   - User-role assignment — which users have which roles
-   - Segregation of duties (SoD) — organizational controls to prevent conflicting duties
+3. **Authorization**
+   - Private Edition: PFCG maintains the role, authorization objects, and generated profile. SU01 assigns the role to the user
+   - Public Cloud: Maintain Business Roles, business catalogs, and restrictions. Maintain Business Users assigns the business role
+   - BTP: role collections after the subaccount trusts the identity provider
 
 4. **Data Security**
    - Field-level encryption — sensitive fields (salary, bank account) encrypted at HANA level
@@ -74,8 +92,9 @@ RISE security architecture operates across multiple layers:
 3. **Configuration Phase (Execute)**
    - Configure roles in PFCG (transaction, authorization objects)
    - Customize pre-built roles (add, remove, modify authorizations)
-   - Create user master records (SU01) with password policy
-   - Assign roles to users (one user can have multiple roles)
+   - Private Edition: maintain the role in PFCG, then assign it to the ABAP user
+   - Public Cloud: maintain the business role and restrictions, then assign the business user
+   - Do not use SU01 to define authorization objects
    - Configure audit logging (enable for sensitive transactions, set retention)
    - Configure MFA if organizational requirement
 
@@ -106,11 +125,10 @@ RISE security configuration includes:
    - Role assignment (user assigned to role via SU01)
    - Example: Finance Manager role includes authorization to post GL entries (transaction FB01), view AR (FBL5N), but NOT delete GL entries or modify customer credit limits
 
-2. **Authorization Objects**
-   - PLOG (logistics purchase order) — create, change, display PO
-   - FIKS (invoice) — create, change, post, display
-   - PFCG (authorization assignment) — assign roles to users
-   - Authorization level (can be set to plant-level, company code-level, etc.)
+2. **Authorization ownership**
+   - Private Edition: authorization objects and values are maintained on the PFCG role. SU01 only assigns that role to a user
+   - Public Cloud: restrictions are maintained on the business role. There is no customer PFCG design step
+   - Do not name an authorization object that the landscape has not specified
 
 3. **Segregation of Duties (SoD)**
    - Procurement SoD: Requester can't approve requisitions they create; Buyer can't be Vendor; Approver can't be Requestor
@@ -364,8 +382,8 @@ RISE security configuration includes:
 4. **What if audit discovers user had overly broad access for 6 months before termination?**
    Investigate (what did user do with access? any suspicious transactions?). Audit logs (review all user activity during period). If suspicious activity: escalate (potential fraud/theft). If no suspicious activity: remove access, remediate root cause (authorization misconfiguration). Lessons learned: improve access review process.
 
-5. **If authenticating users via corporate Active Directory fails during go-live, how do you handle?**
-   Fallback: use local RISE user master (SU01) for authentication (pre-established backup users). Resolve AD issue (network problem, certificate issue?). Once AD restored, switch back to AD authentication. Analyze failure (why did AD connectivity break?). Implement redundancy (backup auth method, network monitoring).
+5. **If sign-in through the corporate identity provider fails, how do you handle it?**
+   Separate the failed plane from authorization. Check the corporate identity provider and the Identity Authentication proxy or trust. A Private Edition emergency user in the ABAP user master is a break-glass user for that ABAP system, and only if the landscape already has one. It does not restore cloud sign-in. Do not switch the cloud applications over to SU01.
 
 6. **How do you handle a custom development that bypasses authorization controls?**
    Immediately stop use of custom development (security vulnerability). Code review (how does it bypass controls?). Remediation: rebuild custom code to respect authorization. If rebuild not feasible short-term: disable feature, users use standard RISE transaction instead. Escalate: custom development security review process needed.
@@ -373,30 +391,16 @@ RISE security configuration includes:
 7. **If organization wants to log every transaction for compliance, but logs are consuming all storage, what do you recommend?**
    Distinguish: what must be logged for compliance (sensitive transactions), what is nice-to-have (routine transactions). Prioritize compliance requirements (log those, live with storage cost). Optimize non-compliance logging (reduce verbosity, archive regularly). Negotiate storage investment with business (compliance cost).
 
-## SAP Transactions
+## Tools by plane
 
-- SU01: User maintenance (create/modify users)
-- PFCG: Role maintenance (define roles, assign permissions)
-- SUIM: User information system (query user access, role assignments)
-- SM18: ALE distribution (if integrating with non-SAP systems, secure APIs)
-- SMLT: Load testing tool (test performance under high audit log volume)
-- GRAC: Governance risk and compliance (analyze segregation of duties)
-- SLG1: Application log (application-specific logging)
-- ST03: Workload analysis (monitor performance, unusual patterns)
-- SUTE: System trace (detailed tracing for debugging, not for routine use)
-- AL08: Logged-on users (monitor who's logged in)
-
-## SAP Tables
-
-- USR01: User master
-- USR02: Logon data (password, failed attempts)
-- USR03: User profile (defaults, settings)
-- PFCG: Roles
-- AGR_1249: User-role assignment
-- USOBX: Authorization value (segregation of duties data)
-- CDPOS: Change document position (audit trail of configuration changes)
-- ADM_LOG: Application log
-- TLOG: Transaction log (not directly used but related to audit logging)
+- Identity Authentication: sign-in, federation, and multifactor authentication
+- Identity Provisioning: user and group synchronization, and the provisioning job log
+- PFCG: Private Edition role maintenance, including authorization objects and the generated profile
+- SU01: Private Edition user master and role assignment. It does not define authorization objects
+- SUIM: Private Edition reports of users, roles, profiles, and authorizations. It does not validate the identity provider or BTP
+- Maintain Business Roles and Maintain Business Users: Public Cloud business-role design and assignment
+- Display Authorization Trace: Public Cloud authorization result for a business user
+- BTP role collection: extension authorization after the subaccount trusts the identity provider
 
 ## Best Practices
 

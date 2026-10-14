@@ -12,6 +12,7 @@ RetrievedChunkSchema
 } = require("../models/contracts");
 const appConfig = require("../config/appConfig");
 const { logger: defaultLogger } = require("../lib/logger");
+const { headingAlignment, namedSourceAdjustment, deliveryProcedureAdjustment } = require("./sectionHeading");
 
 const RETRIEVAL_PROVIDER_TYPES = Object.freeze({
 LOCAL_KNOWLEDGE_INDEX: "local-knowledge-index",
@@ -142,16 +143,19 @@ score += 3;
 return score;
 }
 
-function componentScore(analysis, content) {
+function componentScore(analysis, content, question = "") {
 const text = normalize(content);
 if (!text) return 0;
 
 const domain = analysis?.domain || "";
 const expected = COMPONENT_KEYWORDS[domain] || [];
+const asked = normalize(question);
 let score = 0;
 
+// Domain keywords count only when the question itself uses them. A chunk that
+// mentions every IAS/IPS/SAML term must not outrank the section the question named.
 for (let i = 0; i < expected.length; i++) {
-if (text.includes(expected[i])) {
+if (asked.includes(expected[i]) && text.includes(expected[i])) {
 score += 8;
 }
 }
@@ -270,7 +274,11 @@ queries: queries.slice(0, maxExpansion)
 async function retrieveCandidatesStage({ provider, query, metadataFilters }) {
 const candidates = await provider.getCandidates({ query, metadataFilters });
 if (!Array.isArray(candidates)) return [];
-return candidates.map((candidate) => RetrievedChunkSchema.parse(candidate));
+const normalized = candidates.map((candidate) => RetrievedChunkSchema.parse(candidate));
+const sourceFolders = metadataFilters?.sourceFolders;
+if (!Array.isArray(sourceFolders) || sourceFolders.length === 0) return normalized;
+const allowedFolders = new Set(sourceFolders.map((folder) => String(folder).toLowerCase()));
+return normalized.filter((candidate) => allowedFolders.has(String(candidate.sourceFolder || "").toLowerCase()));
 }
 
 // Controlled experiment (measured against the real 2595-chunk index, real production
@@ -323,8 +331,11 @@ if (Array.isArray(embeddings) && Array.isArray(chunk.embedding)) {
 }
 
 const lexical = lexicalScore(expandedQuery.queries, chunk.content);
-const component = componentScore(analysis, chunk.content);
+const component = componentScore(analysis, chunk.content, question);
 const intent = intentScore(question, analysis, chunk.content);
+const heading = headingAlignment(question, chunk.heading || chunk.section);
+const sourceAdjustment = namedSourceAdjustment(question, chunk);
+const deliveryAdjustment = deliveryProcedureAdjustment(question, chunk, analysis);
 
 const lexicalNorm = Math.min(1, lexical / lexicalCeiling);
 const componentNorm = Math.min(1, component / componentCeiling);
@@ -334,7 +345,10 @@ const totalScore =
   semanticScore * activeWeights.semantic +
   lexicalNorm * activeWeights.lexical +
   componentNorm * activeWeights.component +
-  intentNorm * activeWeights.intent;
+  intentNorm * activeWeights.intent +
+  heading * 0.12 +
+  sourceAdjustment +
+  deliveryAdjustment;
 
 return RankedChunkSchema.parse({
   ...chunk,
@@ -342,7 +356,7 @@ return RankedChunkSchema.parse({
   lexicalScore: lexical,
   componentScore: component,
   intentScore: intent,
-  score: totalScore
+  score: Math.min(1, Math.max(0, totalScore))
 });
 });
 }

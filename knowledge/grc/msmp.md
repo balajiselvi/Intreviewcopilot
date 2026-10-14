@@ -137,11 +137,11 @@ Resolution: verify escalation configuration and confirm the relevant background 
 
 ## SAP Transactions
 
-GRFNMW_DEV_MAP, GRFNMW_CONFIGURE_WORKFLOW, SWDD, SWI1
+The documented expert transaction is GRFNMW_CONFIGURE, MSMP Workflow Configuration (Expert). SAP Knowledge Base Article 2050802 lists that transaction for SAP Access Control 10.0, 10.1, and 12.0. The maintenance activity used for an Access Control 12.0 workflow is Maintain MSMP Workflows, under Access Control, Workflow for Access Control, in SPRO. NWBC is the work-center shell that can open that activity. It is not itself the configuration transaction. Do not append an extra word to the expert transaction and treat that string as a transaction code.
 
 ## SAP Tables
 
-GRFNMWWFCONF, GRFNMWSTAGE, GRFNMWPROCESS
+Do not recite MSMP table names unless the active system or the expert transaction shows them. This file previously named configuration tables that were not verified against SAP Help, and those names were removed on 2026-10-13.
 
 ## Best Practices
 

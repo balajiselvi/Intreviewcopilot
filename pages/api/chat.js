@@ -18,14 +18,17 @@ import APP_CONFIG from "../../config/appConfig";
 const require = createRequire(import.meta.url);
 const { recallGroundedExperience, formatMemoryCard, fieldConflictsWithCv } = require("../../eval/lib/expertiseCards.js");
 const { recallExpectedAnswer } = require("../../eval/lib/expectedAnswers.js");
-const { DEFAULT_CAREER_BACKGROUND, scopeCareerEvidence, scopedHistoryOnly } = require("../../eval/lib/careerTimeline.js");
+const { DEFAULT_CAREER_BACKGROUND, STATED_PROFILE, scopeCareerEvidence, scopedHistoryOnly } = require("../../eval/lib/careerTimeline.js");
 const { shouldInheritPriorDomain, hasStrongTechnicalEvidence, isPlaneFoil, isTopicContinuation } = require("../../lib/contextInheritance.js");
 const { publicLlmError, isIncompleteGeneration } = require("../../lib/generationGuard.js");
 const { appendQa } = require("../../lib/interviewSessionStore.js");
 const { decideInterviewTurn } = require("../../lib/turnDecision.js");
 const { selectVerifiedWorkflow } = require("../../lib/verifiedWorkflow.js");
+const { historyForCurrentTurn } = require("../../lib/currentTurnHistory.js");
 const { priorAnchor } = require("../../lib/questionAdmission.js");
-const { resolveInterviewContext, sanitizeDebugContext, toHistoryContext, QUESTION_INTENTS } = require("../../lib/interviewContext.js");
+const { resolveInterviewContext, sanitizeDebugContext, toHistoryContext, QUESTION_INTENTS, explicitProductTopic, resolveProductScope } = require("../../lib/interviewContext.js");
+const { productKnowledgeFolders, selectProductScopedChunks } = require("../../lib/productKnowledgeScope.js");
+import { authoritativeProcedure, renderSpokenProcedure } from "../../lib/procedureRetention.js";
 
 const MAX_HISTORY_ITEMS = 6;
 const DEFAULT_TIMEOUT_MS = 25000;
@@ -121,7 +124,7 @@ const TOP_K_BY_CATEGORY = Object.freeze({
 });
 
 const CATEGORY_RULES = Object.freeze([
-  { category: "Troubleshooting", keywords: ["troubleshoot", "error", "dump", "st22", "su53", "bug", "fix", "issue", "fail", "exception"], weight: 3 },
+  { category: "Troubleshooting", keywords: ["troubleshoot", "error", "dump", "st22", "su53", "bug", "fix", "issue", "fail", "exception", "returns nothing", "returns no", "no data", "what do you check"], weight: 3 },
   { category: "Production Support", keywords: ["production support", "ticket", "incident", "p1", "sla", "support"], weight: 3 },
   // CATEGORY_TEMPLATES.Behavioral/Leadership/Hypercare/Transports/Audit/Cutover (interviewPrompt.js)
   // all existed with zero rule here ever producing their exact category string -- same dead-code
@@ -524,12 +527,14 @@ function hasPeopleSignal(category, question) {
 function resolveContext(question, history) {
   const currentClassification = classifyWeightedIntents(question);
   const currentAnalysis = analyzeInterviewQuestion(question);
-  const currentCategory = currentClassification.primaryCategory;
+  const productScope = resolveProductScope(explicitProductTopic(question));
+  if (productScope) currentAnalysis.domain = productScope.domain;
+  const currentCategory = productScope?.category || currentClassification.primaryCategory;
 
   const asCurrent = (contextSource) => ({
     currentAnalysis,
     resolvedCategory: currentCategory,
-    resolvedSecondaryCategories: currentClassification.secondaryCategories,
+    resolvedSecondaryCategories: currentClassification.secondaryCategories.filter((category) => category !== currentCategory),
     resolvedDomain: currentAnalysis.domain,
     resolvedPrimaryIntent: currentAnalysis.primaryIntent,
     contextSource
@@ -606,7 +611,12 @@ function extractConversationTopic(history = []) {
   return Array.from(topicTokens).slice(0, 16).join(" ");
 }
 
-function synthesizeRetrievalQuery(question, history) {
+function synthesizeRetrievalQuery(question, history, allowPriorTopic = false) {
+  // A clearly named new topic must not inherit vocabulary from earlier interview turns.
+  // The old unconditional merge made an IPS question retrieve Fiori/Gateway material after
+  // the interviewer had changed subjects. Context tokens are only valid on an inherited
+  // follow-up.
+  if (!allowPriorTopic) return question;
   const conversationTopic = extractConversationTopic(history);
   if (!conversationTopic) return question;
 
@@ -619,7 +629,7 @@ function synthesizeRetrievalQuery(question, history) {
   return `${question} ${newTopicTokens.join(" ")}`.trim();
 }
 
-async function fetchKnowledgeContext(question, primaryCategory, secondaryCategories, history, analysis) {
+async function fetchKnowledgeContext(question, primaryCategory, secondaryCategories, history, analysis, answerScope, allowPriorTopic) {
   let topK = TOP_K_BY_CATEGORY[primaryCategory] || TOP_K_BY_CATEGORY.General;
   if (secondaryCategories && secondaryCategories.length > 0) {
     const maxSecondaryK = Math.max(
@@ -628,50 +638,85 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
     topK = Math.max(topK, maxSecondaryK);
   }
 
-  const retrievalQuery = synthesizeRetrievalQuery(question, history);
+  // Investigations need a small set of high-confidence diagnostic sources. Pulling a broad
+  // topic pack adds adjacent scenarios that the model can mistake for the reported symptom.
+  if (answerScope === "STAGE_INVESTIGATION") topK = Math.min(topK, 4);
+
+  const retrievalQuery = synthesizeRetrievalQuery(question, history, allowPriorTopic);
   // searchKnowledge's real signature is (question, analysis, topK, options) -- passing topK
   // as the second positional argument here previously landed it in the `analysis` slot,
   // silently zeroing out domain/intent boost scoring and discarding this topK entirely in
   // favor of the function's own internal default.
-  const chunks = await searchKnowledge(retrievalQuery, analysis, topK);
+  // The scorer may rank a semantically adjacent product procedure above the
+  // named product's own source (for example Public Edition launchpad steps for
+  // an Ariba or SAC failure). Retrieve a wider candidate set, then enforce the
+  // explicit product lane before selecting the normal answer budget.
+  const sourceFolders = productKnowledgeFolders(retrievalQuery);
+  const searchK = sourceFolders.length ? Math.max(topK, 12) : topK;
+  const candidates = (await searchKnowledge(
+    retrievalQuery,
+    analysis,
+    searchK,
+    sourceFolders.length ? { metadataFilters: { sourceFolders } } : {}
+  )) || [];
+  const productScoped = selectProductScopedChunks(retrievalQuery, candidates);
+  const rankedChunks = productScoped.slice(0, topK);
+  const diagnosticSections = new Set(["STAGE_INVESTIGATION"]);
+  // Keep symptom-specific sections even when their headings use "troubleshooting"
+  // or "triage" rather than the bare stems. The old word-boundary regex silently
+  // discarded "Public Edition troubleshooting" and "IPS evidence-led triage",
+  // then kept generic Production Support Activities chunks instead.
+  const diagnosticChunkHeading = /\b(?:troubleshoot\w*|diagnos\w*|investigat\w*|triag\w*|production support|failing authorization|service not active|incident|symptom|failed entities|missing app|odata.*(?:fail|error|403))\b/i;
+  const diagnosticChunks = rankedChunks.filter((chunk) => diagnosticChunkHeading.test(String(chunk.heading || chunk.section || "")));
+  // Keep the ranked diagnostic set together: a query may need both the symptom procedure
+  // and its conditional follow-up (for example, an OData authorization failure versus an
+  // inactive service). Drop only generic production-support summaries when a real procedure
+  // section is available; selecting one precise-sounding heading alone can choose the wrong
+  // branch merely because it resembles one word in the symptom.
+  const scopedDiagnosticChunks = diagnosticChunks.filter((chunk) => !/\bproduction support\b/i.test(String(chunk.heading || chunk.section || "")));
+  const chunks = diagnosticSections.has(answerScope) && scopedDiagnosticChunks.length ? scopedDiagnosticChunks : rankedChunks;
   if (!chunks || chunks.length === 0) return { text: "", evidence: [] };
 
   const maxChars = APP_CONFIG?.maxContextCharacters || 3000;
-  const seenParagraphs = new Set();
-  const cleanParagraphs = [];
+  const seenChunks = new Set();
+  const sourceBlocks = [];
   let currentLength = 0;
 
   for (const chunk of chunks) {
     if (!chunk?.content) continue;
+    const body = String(chunk.content).trim();
+    const source = String(chunk.sourceFile || chunk.documentId || "knowledge").slice(0, 120);
+    const heading = String(chunk.heading || chunk.section || "").slice(0, 160);
+    const identity = String(chunk.id || chunk.chunkId || `${source}:${heading}:${body.slice(0, 100)}`);
+    if (!body || seenChunks.has(identity)) continue;
+    seenChunks.add(identity);
 
-    const paragraphs = chunk.content.split(/\n+/);
-    for (const rawPara of paragraphs) {
-      const para = rawPara.trim();
-      if (!para || seenParagraphs.has(para)) continue;
-
-      seenParagraphs.add(para);
-
-      if (currentLength + para.length > maxChars) {
-        const remainingChars = maxChars - currentLength;
-        if (remainingChars > 100) {
-          const sentenceEnd = para.lastIndexOf(".", remainingChars);
-          const truncated = sentenceEnd > 0 ? para.slice(0, sentenceEnd + 1) : para.slice(0, remainingChars);
-          cleanParagraphs.push(truncated);
-        }
-        currentLength = maxChars;
-        break;
+    // Keep provenance and section boundaries intact. Flattening chunks into anonymous
+    // paragraphs let the model splice a Public Edition navigation check, an ABAP Gateway
+    // log, and an unrelated role procedure into one confident answer.
+    const label = `### SOURCE: ${source}${heading ? ` | SECTION: ${heading}` : ""}`;
+    const block = `${label}\n${body}`;
+    const remaining = maxChars - currentLength;
+    if (block.length > remaining) {
+      const availableBody = remaining - label.length - 1;
+      if (availableBody > 120) {
+        const prefix = body.slice(0, availableBody);
+        const sentenceEnd = Math.max(prefix.lastIndexOf(". "), prefix.lastIndexOf(".\n"), prefix.lastIndexOf("."));
+        const truncated = sentenceEnd > 80 ? prefix.slice(0, sentenceEnd + 1) : "";
+        if (truncated) sourceBlocks.push(`${label}\n${truncated}`);
       }
-
-      cleanParagraphs.push(para);
-      currentLength += para.length;
+      break;
     }
-
-    if (currentLength >= maxChars) break;
+    sourceBlocks.push(block);
+    currentLength += block.length + 2;
   }
 
   return {
-    text: cleanParagraphs.join("\n\n"),
-    evidence: chunks.slice(0, 6).map((chunk) => ({
+    text: sourceBlocks.join("\n\n"),
+    evidence: [...new Map(chunks.map((chunk) => [
+      String(chunk.heading || chunk.section || chunk.sourceFile || chunk.documentId || "knowledge").slice(0, 160),
+      chunk
+    ])).values()].slice(0, 6).map((chunk) => ({
       id: String(chunk.id || chunk.chunkId || chunk.documentId || "").slice(0, 100),
       label: String(chunk.heading || chunk.section || chunk.sourceFile || chunk.documentId || "knowledge").slice(0, 160)
     }))
@@ -756,24 +801,25 @@ function isTransientLlmError(error) {
   return classified.autoRetry === true;
 }
 
+// A provider stream may fail after the HTTP request was accepted but before it yields
+// its first answer token. Retry that case once at the route boundary for every provider.
+// Retrying after a token was written could duplicate or contradict text already shown.
+async function runProviderStreamWithRetry(run, { signal, hasOutput } = {}) {
+  try {
+    return await run();
+  } catch (error) {
+    if (signal?.aborted || hasOutput?.() || !isTransientLlmError(error)) {
+      throw error;
+    }
+    return run();
+  }
+}
+
 async function streamOpenAIResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens, onUsage, onChunk }) {
-  // One retry is owned here; disable the SDK's nested retries within the 25s budget.
+  // The route owns the single safe retry; disable nested SDK retries within the 25s budget.
   const client = new OpenAI({ apiKey, maxRetries: 0 });
   const args = { model, systemPrompt, recentHistory, question, maxTokens, signal };
-  let stream;
-  try {
-    stream = await createOpenAiChatStream(client, args);
-  } catch (error) {
-    if (signal?.aborted) throw error;
-    if (isTransientLlmError(error)) {
-      stream = await createOpenAiChatStream(client, args);
-    } else {
-      const safe = publicLlmError(error);
-      const wrapped = new Error(safe.userMessage);
-      wrapped.status = error?.status;
-      throw wrapped;
-    }
-  }
+  const stream = await createOpenAiChatStream(client, args);
 
   let fullText = "";
   let usage = null;
@@ -961,6 +1007,7 @@ export default async function handler(req, res) {
     candidateResume,
     jobDescription,
     company,
+    sessionPreparation,
     interviewSessionId,
     debug: requestDebug,
     retryCount: clientRetryCount
@@ -1311,7 +1358,15 @@ export default async function handler(req, res) {
       let onAbort = null;
       try {
         knowledgeResult = await Promise.race([
-          fetchKnowledgeContext(interviewContext.retrievalQuery || effectiveQuestion, primaryCategory, secondaryCategories, history, analysis),
+          fetchKnowledgeContext(
+            interviewContext.retrievalQuery || effectiveQuestion,
+            primaryCategory,
+            secondaryCategories,
+            history,
+            analysis,
+            interviewContext.answerScope,
+            resolved.contextSource === "inherited" && isFollowUp
+          ),
           new Promise((_, reject) => {
             const fail = () => reject(Object.assign(new Error("Request timed out while generating response."), { name: "AbortError" }));
             if (controller.signal.aborted) {
@@ -1378,13 +1433,14 @@ export default async function handler(req, res) {
       const extra = candidateResume?.trim();
       const evidence = scopeCareerEvidence(effectiveQuestion, priorAnchor(history));
       promptPayload.evidenceMode = evidence.mode;
-      if (evidence.mode === "full") {
-        promptPayload.candidateResume = extra
+      const scopedBody = evidence.mode === "full"
+        ? (extra
           ? `${DEFAULT_CAREER_BACKGROUND}\n\nADDITIONAL BACKGROUND FROM SETTINGS:\n${extra}`
-          : DEFAULT_CAREER_BACKGROUND;
-      } else {
-        promptPayload.candidateResume = evidence.text;
-      }
+          : DEFAULT_CAREER_BACKGROUND)
+        : (evidence.text || "");
+      promptPayload.candidateResume = scopedBody
+        ? `${STATED_PROFILE}\n\n${scopedBody}`
+        : STATED_PROFILE;
     } catch (error) {
       logger?.error?.("Career timeline inject failed:", error);
       if (candidateResume?.trim()) promptPayload.candidateResume = candidateResume.trim();
@@ -1408,7 +1464,24 @@ export default async function handler(req, res) {
     } catch (error) {
       logger?.error?.("Experience recall failed:", error);
     }
+
+    // The source procedure must survive the final LLM paraphrase. When retrieval supplied
+    // one coherent, ordered procedure block, make that block the answer anchor. This is a
+    // single-pass generation still: it adds no model call and does not apply to personal-
+    // experience questions, which remain governed by the candidate-evidence rules above.
+    if (!promptPayload.expectedSpokenAnswer
+      && !/\b(?:have you|did you|your experience|tell me about a time|walk me through a time)\b/i.test(effectiveQuestion)) {
+      try {
+        const steps = authoritativeProcedure(effectiveQuestion, knowledgeContext, interviewContext.answerScope);
+        if (steps.length >= 3) {
+          promptPayload.expectedSpokenAnswer = renderSpokenProcedure(effectiveQuestion, steps);
+        }
+      } catch (error) {
+        logger?.error?.("Retrieved procedure retention failed (non-fatal):", error);
+      }
+    }
     if (jobDescription?.trim()) promptPayload.jobDescription = jobDescription.trim();
+    if (sessionPreparation?.trim()) promptPayload.sessionPreparation = sessionPreparation.trim();
     if (company?.trim()) promptPayload.company = company.trim();
 
     const systemPrompt = buildSapInterviewPrompt(promptPayload);
@@ -1419,12 +1492,15 @@ export default async function handler(req, res) {
     if (process.env.DEBUG_DUMP_PROMPT) {
       require("fs").writeFileSync(process.env.DEBUG_DUMP_PROMPT, systemPrompt, "utf-8");
     }
-    const recentHistory = prepareConversationHistory(history);
+    // Keep conversation memory for continuations only. Passing the previous
+    // unrelated interview exchange to the model let IAG configuration leak
+    // into a fresh GRC question even though retrieval had selected GRC sources.
+    const recentHistory = prepareConversationHistory(historyForCurrentTurn(history, isFollowUp));
 
     // Ceiling is sized to the question's length tier (see lib/prompt/interviewPrompt.js) —
     // the main lever for keeping generation under the ~5-6s target in a single-pass
     // architecture, since streaming wall-clock time scales with tokens produced.
-    const maxTokens = getMaxTokensForCategory(analysis.category, analysis.secondaryCategories, effectiveQuestion, analysis.isDeepenFollowUp, reasoningContract.reasoningMode, interviewContext.depth, interviewContext.answerScope);
+    const maxTokens = getMaxTokensForCategory(analysis.category, analysis.secondaryCategories, effectiveQuestion, analysis.isDeepenFollowUp, reasoningContract.reasoningMode, interviewContext.depth, interviewContext.answerScope, knowledgeContext);
 
     if (debugEnabled) {
       writeSSEEvent(res, "context", sanitizeDebugContext(interviewContext, {
@@ -1526,19 +1602,18 @@ export default async function handler(req, res) {
 
       let fullAnswerText = "";
 
-      if (isClaudeModel(model)) {
-        fullAnswerText = await streamClaudeResponse(streamOptions);
-      } else if (isGeminiModel(model)) {
-        fullAnswerText = await streamGeminiResponse(streamOptions);
-      } else if (isGroqModel(model)) {
-        fullAnswerText = await streamGroqResponse(streamOptions);
-      } else if (APP_CONFIG?.llm?.apiKeys?.openai) {
-        fullAnswerText = await streamOpenAIResponse(streamOptions);
-      } else if (APP_CONFIG?.llm?.apiKeys?.openrouter) {
-        fullAnswerText = await streamOpenRouterResponse(streamOptions);
-      } else {
-        fullAnswerText = await streamOpenAIResponse(streamOptions);
-      }
+      const generateWithSelectedProvider = () => {
+        if (isClaudeModel(model)) return streamClaudeResponse(streamOptions);
+        if (isGeminiModel(model)) return streamGeminiResponse(streamOptions);
+        if (isGroqModel(model)) return streamGroqResponse(streamOptions);
+        if (APP_CONFIG?.llm?.apiKeys?.openai) return streamOpenAIResponse(streamOptions);
+        if (APP_CONFIG?.llm?.apiKeys?.openrouter) return streamOpenRouterResponse(streamOptions);
+        return streamOpenAIResponse(streamOptions);
+      };
+      fullAnswerText = await runProviderStreamWithRetry(generateWithSelectedProvider, {
+        signal: controller.signal,
+        hasOutput: () => recordedAnswer.length > 0
+      });
       recordedAnswer = fullAnswerText || "";
       abortIfTimedOut();
       if (res?.writable) {
@@ -1598,7 +1673,14 @@ export default async function handler(req, res) {
       res.write("data: [DONE]\n\n");
     }
   } catch (error) {
-    logger?.error?.("Interview Copilot Error:", error);
+    logger?.error?.("Interview Copilot Error", {
+      model,
+      provider: isClaudeModel(model) ? "anthropic" : isGeminiModel(model) ? "gemini" : isGroqModel(model) ? "groq" : (APP_CONFIG?.llm?.apiKeys?.openai ? "openai" : "openrouter"),
+      errorName: error?.name || "Error",
+      errorCode: error?.code || error?.error?.code || "",
+      httpStatus: error?.status || error?.statusCode || error?.response?.status || null,
+      errorMessage: String(error?.message || "").slice(0, 240)
+    });
 
     const classified = publicLlmError(error);
     const errorMessage = controller.signal.aborted

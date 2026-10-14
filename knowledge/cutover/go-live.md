@@ -16,5 +16,7 @@ At go-live I would confirm that users can execute the processes we promised, tha
 
 ## Related Topics
 
+Before go-live, freeze the approved access design, confirm IAS trust, smoke-test the critical business roles, confirm the IPS and IAG or GRC jobs, and name the rollback owner. At cutover, follow the rehearsed runbook: the transport or software-collection sequence, user status, and Cloud Connector when the landscape is hybrid. Hypercare is incident triage with a severity and an owner, not a second design phase. Close emergency access, review the Firefighter log daily, and leave hypercare when the open access backlog has an owner and a service level.
+
 - knowledge/cutover/cutover-plan.md
 - knowledge/hypercare/hypercare.md
