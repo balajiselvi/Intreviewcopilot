@@ -13,6 +13,9 @@ assert.ok(privateMissingApp, "Private Edition/on-premise missing-app procedure i
 assert.match(privateMissingApp, /PFCG[\s\S]*\/UI2\/FLPCM/);
 assert.equal(headingAlignment("On SAP S/4HANA Cloud Private Edition, a user cannot see a Fiori app on the launchpad.", "Private Edition: user cannot see a Fiori app"), 1);
 assert.equal(headingAlignment("On SAP S/4HANA Cloud Public Edition, a user cannot see a Fiori app on the launchpad.", "Public Edition: user cannot see a Fiori app"), 1);
+const fioriKnowledge = require("fs").readFileSync(require("path").join(__dirname, "..", "knowledge/s4hana/s4hana-fiori.md"), "utf8");
+assert.match(fioriKnowledge, /App Finder[\s\S]*pages intentionally show only an administrator-selected subset/i);
+assert.match(fioriKnowledge, /If the app is in App Finder[\s\S]*If it is not in App Finder/i);
 
 const cutover = fs.readFileSync(path.join(root, "knowledge/rise/rise-cutover.md"), "utf8");
 assert.match(cutover, /SAP does not prescribe a universal Friday-to-Monday schedule/i);

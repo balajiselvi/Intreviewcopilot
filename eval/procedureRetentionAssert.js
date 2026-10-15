@@ -105,7 +105,7 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Failed entities and missing
   const rulesQuestion = "How do we upload the rule set in IAG?";
   const rulesSteps = authoritativeProcedure(rulesQuestion, rulesContext, "IMPLEMENTATION_WALKTHROUGH");
   assert.ok(rulesSteps.length >= 5, "retain an ordered IAG Access Analysis ruleset upload sequence");
-  assert.match(rulesSteps.join(" "), /Administration > Rule Setup[\s\S]*Business Function Group[\s\S]*Download File[\s\S]*Upload & Process[\s\S]*Processing Log and Validation Log[\s\S]*Job Scheduler/i);
+  assert.match(rulesSteps.join(" "), /Administration > Rule Setup[\s\S]*Business Function Group[\s\S]*Download File[\s\S]*Upload & Process[\s\S]*Processing Log and Validation Log[\s\S]*Manage Jobs[\s\S]*Job Scheduler/i);
   assert.doesNotMatch(rulesSteps.join(" "), /Which of those do you want\?/i);
   const rulesSpoken = renderSpokenProcedure(rulesQuestion, rulesSteps);
   assert.match(rulesSpoken, /Rule Setup[\s\S]*Upload & Process[\s\S]*Processing Log and Validation Log/i);

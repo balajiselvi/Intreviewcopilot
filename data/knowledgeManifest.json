@@ -3,8 +3,8 @@
   "parserVersion": "a5fdef3073fe",
   "chunkVersion": "59c1e5914015",
   "embeddingVersion": "text-embedding-3-small",
-  "buildTimestamp": "2026-10-14T15:17:36.485Z",
+  "buildTimestamp": "2026-10-15T06:06:46.549Z",
   "totalDocuments": 125,
-  "totalChunks": 2740,
+  "totalChunks": 2743,
   "indexVersion": 1
 }
