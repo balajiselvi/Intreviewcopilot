@@ -5,10 +5,32 @@ const { headingAlignment } = require("../services/sectionHeading.js");
 
 const root = path.join(__dirname, "..");
 const fiori = fs.readFileSync(path.join(root, "knowledge/s4hana/s4hana-security.md"), "utf8");
-const publicMissingApp = fiori.match(/Resolution — Public Edition only:[\s\S]*?(?=\n\nFor the same missing-app symptom)/)?.[0];
-const privateMissingApp = fiori.match(/For the same missing-app symptom on Private Edition[\s\S]*?(?=\n\n## |$)/)?.[0];
+const publicMissingApp = fiori.match(/## Troubleshooting: Public Edition app is missing[\s\S]*?(?=\n## Troubleshooting: Fiori app opens)/)?.[0];
+const privateMissingApp = fiori.match(/## Troubleshooting: Private Edition or on-premise app is missing[\s\S]*?(?=\n## |$)/)?.[0];
 assert.ok(publicMissingApp, "Public Edition missing-app procedure is independently retrievable");
 assert.doesNotMatch(publicMissingApp, /\bPFCG\b|\/UI2\/FLPCM/, "Public Edition procedure must not contain ABAP transactions");
+assert.match(publicMissingApp, /App Finder[\s\S]*app is in App Finder[\s\S]*absent from App Finder/i,
+  "Public Edition procedure must branch on App Finder before inspecting role and page configuration");
+assert.match(publicMissingApp, /2608[\s\S]*SAP Help Portal/i, "the release-scoped App Finder behavior must carry current SAP Help provenance");
+assert.doesNotMatch(publicMissingApp, /\/IWFND\/ERROR_LOG|\/IWBEP\/ERROR_LOG|SU53|STAUTHTRACE/,
+  "a missing Public Edition app must not share a chunk with opened-app diagnostics");
+const fioriPublicProcedure = fs.readFileSync(path.join(root, "knowledge/fiori/fiori-security.md"), "utf8")
+  .match(/## Public Edition troubleshooting: app is missing[\s\S]*?(?=\n## |$)/)?.[0];
+const cloudPublicProcedure = fs.readFileSync(path.join(root, "knowledge/rise/public-cloud.md"), "utf8")
+  .match(/## Troubleshooting[\s\S]*?(?=\n## |$)/)?.[0];
+const authorizationDiagnostic = fs.readFileSync(path.join(root, "knowledge/troubleshooting/authorization-errors.md"), "utf8")
+  .match(/## Diagnostic Split[\s\S]*?(?=\n## |$)/)?.[0];
+for (const [source, procedure] of [
+  ["Fiori security", fioriPublicProcedure],
+  ["Public Cloud", cloudPublicProcedure],
+  ["authorization diagnostics", authorizationDiagnostic]
+]) {
+  assert.ok(procedure, `${source} must retain its independently retrievable Public Edition content`);
+  assert.match(procedure, /App Finder[\s\S]*page|page[\s\S]*App Finder/i,
+    `${source} must preserve the App Finder-versus-page diagnostic split`);
+  assert.match(procedure, /2608[\s\S]*SAP Help Portal|SAP Help Portal[\s\S]*2608/i,
+    `${source} must identify the release and current SAP Help source`);
+}
 assert.ok(privateMissingApp, "Private Edition/on-premise missing-app procedure is independently retrievable");
 assert.match(privateMissingApp, /PFCG[\s\S]*\/UI2\/FLPCM/);
 assert.equal(headingAlignment("On SAP S/4HANA Cloud Private Edition, a user cannot see a Fiori app on the launchpad.", "Private Edition: user cannot see a Fiori app"), 1);

@@ -33,6 +33,7 @@ assert.equal(ipsTriage.answerScope, "STAGE_INVESTIGATION");
 assert.deepEqual(resolveProductScope("IPS"), { category: "IPS", domain: "SAP Cloud Identity / BTP" });
 
 for (const [question, topic] of [
+  ["How do I configure the MSMP workflow for an access request in SAP Access Control?", "GRC"],
   ["How do you troubleshoot SuccessFactors employee data access?", "SuccessFactors"],
   ["A SAP Ariba approver cannot approve a requisition.", "Ariba"],
   ["How do you diagnose a BW/4HANA analysis authorization?", "BW"],
@@ -45,6 +46,11 @@ for (const [question, topic] of [
   assert.equal(context.questionTopic, topic, `question topic: ${question}`);
   assert.equal(resolveProductScope(topic).category, topic, `category scope: ${question}`);
 }
+assert.deepEqual(
+  productKnowledgeFolders("How do I configure the MSMP workflow for an access request in SAP Access Control?"),
+  ["grc"],
+  "SAP Access Control questions use the GRC knowledge lane even when the interviewer omits the GRC acronym"
+);
 assert.ok(resolveInterviewContext({
   questionRaw: "How do you troubleshoot a SuccessFactors employee access issue?"
 }).forbiddenProductBoundaries.includes("S/4 Public Edition Display Authorization Trace"));
@@ -98,6 +104,19 @@ assert.deepEqual(
   "SAC diagnosis must not retrieve Public Edition launchpad troubleshooting"
 );
 assert.deepEqual(productKnowledgeFolders("How do you troubleshoot SuccessFactors employee data access?"), ["idm"]);
+const auditEvidenceFolders = productKnowledgeFolders("How do I prepare role and SoD evidence for a SOX ITGC audit?");
+assert.ok(auditEvidenceFolders.includes("grc") && auditEvidenceFolders.includes("audit") && auditEvidenceFolders.includes("compliance"),
+  "SOX/ITGC questions retain both product-risk and audit-evidence sources");
+assert.deepEqual(
+  selectProductScopedChunks("How do I prepare role and SoD evidence for a SOX ITGC audit?", [
+    { sourceFolder: "grc", heading: "SoD analysis" },
+    { sourceFolder: "audit", heading: "SOX evidence" },
+    { sourceFolder: "compliance", heading: "Mitigating controls" },
+    { sourceFolder: "rise", heading: "Troubleshooting" }
+  ]).map((chunk) => chunk.sourceFolder),
+  ["grc", "audit", "compliance"],
+  "audit-focused GRC questions preserve all relevant evidence lanes and exclude unrelated products"
+);
 const publicFioriFolders = productKnowledgeFolders("In S/4HANA Cloud Public Edition, a user cannot see a Fiori app.");
 assert.ok(publicFioriFolders.includes("fiori") && publicFioriFolders.includes("s4hana"));
 assert.ok(!publicFioriFolders.includes("rise") && !publicFioriFolders.includes("security"), "Public Edition retrieval excludes Private Edition and generic ABAP security lanes");
@@ -127,7 +146,7 @@ assert.match(reasoning, /FALLBACK_COMPONENTS_BY_DOMAIN/);
 
 const fiori = read("knowledge/fiori/fiori-security.md");
 assert.match(fiori, /Public Edition troubleshooting: app is missing/);
-assert.match(fiori, /A missing launchpad entry is not an OData authorization trace case/);
+assert.match(fiori, /App Finder[\s\S]*(?:pages|page)[\s\S]*(?:selected subset|subset selected|subset by the administrator)[\s\S]*absent from App Finder/);
 assert.match(fiori, /Display Authorization Trace/);
 const fioriProcedures = read("knowledge/s4hana/s4hana-fiori.md");
 assert.match(fioriProcedures, /Failing authorization: on-premise and Private Edition Gateway/);

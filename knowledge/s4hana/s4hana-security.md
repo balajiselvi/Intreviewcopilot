@@ -72,24 +72,21 @@ A user opens their Fiori launchpad, and the tiles they see are determined by the
 - Maintain SU24 data for custom S/4HANA Fiori apps
 - Support ongoing segregation of duties monitoring as the S/4HANA landscape evolves
 
-## Troubleshooting
+## Troubleshooting: Public Edition app is missing
 
-Common issue: a user can see a Fiori tile but the app fails after it opens.
-On Public Edition, activate Display Authorization Trace for that business user and read Successful, Failed, or Filtered. The restriction is on the business role. On an ABAP Gateway system the customer administers, read /IWFND/ERROR_LOG on the hub and /IWBEP/ERROR_LOG on the backend first. An authorization message in that log is the point to use STAUTHTRACE or SU53. Do not name an authorization object unless the trace shows it.
+In SAP S/4HANA Cloud Public Edition 2608, first ask the user to search App Finder or All My Apps. SAP Help says App Finder lists apps available for the user's role, while a launchpad page shows only the subset selected by the administrator. If the app is in App Finder but absent from the expected page, inspect the user's space assignment and page content in Manage Launchpad Spaces and Manage Launchpad Pages. If it is absent from App Finder, use Maintain Business Users to confirm assigned business roles, then Maintain Business Roles and IAM Information System to verify the business catalog or direct IAM app assignment and activation. Check restrictions or scope only when they explain app eligibility. KBA 3499342 covers a navigation-target application with no tile. These are Fiori apps, not transactions. A missing app is not an OData authorization trace case. Source checked 2026-10-15 against SAP Help Portal, SAP Fiori Launchpad for SAP S/4HANA Cloud Public Edition 2608: App Finder and Spaces and Pages.
 
-Common issue: a segregation of duties conflict wasn't caught that should have been, based on the ECC ruleset.
-Root cause: the S/4HANA transaction or app consolidates functionality differently than its ECC equivalent, and the ruleset wasn't updated to reflect that.
-Resolution: re-evaluate the ruleset's function definitions against actual S/4HANA transaction behavior.
+## Troubleshooting: Fiori app opens but a request fails
 
-### Public Edition: user cannot see a Fiori app
+On Public Edition, reproduce the failure and inspect Display Authorization Trace for the business user; use only the failed entry and the associated business-role restriction as authorization evidence. On an on-premise or Private Edition ABAP Gateway deployment, read /IWFND/ERROR_LOG on the hub and /IWBEP/ERROR_LOG on the backend. Use the HTTP status and message to distinguish an authorization check from an inactive, unknown, or runtime service failure. Only then use SU53 or STAUTHTRACE for an authorization failure. Do not mix these deployment paths or name an authorization object that the trace did not show.
 
-Common issue: a user on SAP S/4HANA Cloud Public Edition cannot see a Fiori app.
-Root cause: the business role is missing the catalog, the IAM app is inactive, or the launchpad space is not assigned. KBA 3499342 also covers an application that is only a navigation target and therefore has no tile.
-Resolution — Public Edition only: open Maintain Business Users to confirm assigned business roles. In Maintain Business Roles, verify the business catalog, IAM app, and Active flag. In Manage Launchpad Spaces and Manage Launchpad Pages, verify the assigned space and page content. These are Fiori apps, not transaction codes. Display Authorization Trace applies only after the app opens and a runtime authorization check fails.
+## Troubleshooting: S/4HANA SoD risk is missed
 
-### Private Edition: user cannot see a Fiori app
+If a segregation-of-duties conflict was not detected after an ECC-to-S/4HANA change, check whether the S/4HANA transaction or app consolidated functionality differently from its ECC equivalent. Re-evaluate the ruleset function definitions against the target transaction behavior rather than assuming the ECC ruleset still covers the process.
 
-For the same missing-app symptom on Private Edition or on-premise, use the ABAP launchpad path instead: inspect the user's PFCG role for the relevant catalog and target mapping, then confirm the applicable space/page or classic group configuration for that release. Use /UI2/FLPCM_CUST or /UI2/FLPCM_CONF only where those transactions are available in that system. Do not apply Public Edition IAM app checks to this deployment.
+## Troubleshooting: Private Edition or on-premise app is missing
+
+Inspect the user's PFCG role for the relevant catalog and target mapping, then confirm the applicable space/page or classic group configuration for that release. Use /UI2/FLPCM_CUST or /UI2/FLPCM_CONF only where those transactions are available. Do not apply Public Edition IAM app checks to this deployment.
 
 ## Common Interview Questions
 
