@@ -4,13 +4,13 @@ const path = require("node:path");
 
 const root = path.join(__dirname, "..");
 const ips = fs.readFileSync(path.join(root, "knowledge/btp/ips.md"), "utf8");
-const heading = "### Failed entities and missing target accounts: evidence-led triage";
+const heading = "## Troubleshooting: failed entities and missing target accounts";
 const start = ips.indexOf(heading);
 assert.notEqual(start, -1, "IPS source procedure must exist");
 const rest = ips.slice(start);
 const nextSection = rest.slice(heading.length).search(/\n## /);
 const sourceSection = nextSection < 0 ? rest : rest.slice(0, heading.length + nextSection);
-const knowledge = `### SOURCE: btp/ips.md | SECTION: Failed entities and missing target accounts: evidence-led triage\n${sourceSection}`;
+const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed entities and missing target accounts\n${sourceSection}`;
 
 (async () => {
   const { authoritativeProcedure, renderSpokenProcedure } = await import("../lib/procedureRetention.js");
@@ -19,17 +19,19 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Failed entities and missing
 
   assert.ok(steps.length >= 5, "keep the ordered, evidence-led IPS triage sequence");
   assert.match(steps[0], /Scope one entity/);
-  assert.ok(steps.some((step) => /Provisioning Logs > Job Logs/.test(step)));
+  assert.ok(steps.some((step) => /Jobs tab, open Job Logs/.test(step)));
   assert.ok(steps.some((step) => /Failed Entities/.test(step)));
   assert.ok(steps.some((step) => /error-log ZIP/.test(step)));
-  assert.ok(steps.some((step) => /source Read and Failed; source Skipped; target Created, Updated, Deleted, Skipped, and Failed/.test(step)));
-  assert.ok(steps.some((step) => /For skipped entities compare transformation conditions/.test(step)));
+  assert.ok(steps.some((step) => /Reconcile source Read, Failed, and Skipped with target Created, Updated, Deleted, Skipped, and Failed/.test(step)));
+  assert.ok(steps.some((step) => /transformation conditions and ignored types for skips/.test(step)));
   assert.ok(steps.some((step) => /target-write failure/.test(step)));
   assert.doesNotMatch(steps.join(" "), /leaver|deprovision|manual deactivat|deduplication|SU01|PFCG/i);
 
   const spoken = renderSpokenProcedure(question, steps);
-  assert.match(spoken, /^I would do it in this order\./);
-  assert.match(spoken, /Missing accounts may be unread or skipped/);
+  assert.match(spoken, /^Direct answer: Scope one entity/);
+  assert.match(spoken, /Technical mechanism and exact artifacts:/);
+  assert.match(spoken, /Validation and operational boundary:/);
+  assert.match(spoken, /Classify each miss as unread, filtered\/transformation-skipped, or target-write failure/);
 
   const bw = fs.readFileSync(path.join(root, "knowledge/bw/bw-security.md"), "utf8");
   const bwHeading = "## Troubleshooting: query runs but returns no data for one user";
@@ -108,8 +110,47 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Failed entities and missing
   assert.match(rulesSteps.join(" "), /Administration > Rule Setup[\s\S]*Business Function Group[\s\S]*Download File[\s\S]*Upload & Process[\s\S]*Processing Log and Validation Log[\s\S]*Manage Jobs[\s\S]*Job Scheduler/i);
   assert.doesNotMatch(rulesSteps.join(" "), /Which of those do you want\?/i);
   const rulesSpoken = renderSpokenProcedure(rulesQuestion, rulesSteps);
-  assert.match(rulesSpoken, /Rule Setup[\s\S]*Upload & Process[\s\S]*Processing Log and Validation Log/i);
+  assert.match(rulesSpoken, /Direct answer:[\s\S]*Rule Setup[\s\S]*Technical mechanism and exact artifacts:[\s\S]*Upload & Process[\s\S]*Processing Log and Validation Log[\s\S]*Validation and operational boundary:/i);
   assert.doesNotMatch(rulesSpoken, /Which of those do you want\?/i);
+
+  const msmp = fs.readFileSync(path.join(root, "knowledge/grc/msmp.md"), "utf8");
+  const msmpHeading = "## Technical Configuration Sequence";
+  const msmpStart = msmp.indexOf(msmpHeading);
+  assert.notEqual(msmpStart, -1, "MSMP technical configuration procedure must exist");
+  const msmpRest = msmp.slice(msmpStart);
+  const msmpEnd = msmpRest.slice(msmpHeading.length).search(/\n## /);
+  const msmpSection = msmpEnd < 0 ? msmpRest : msmpRest.slice(0, msmpHeading.length + msmpEnd);
+  const msmpQuestion = "How do I configure the MSMP workflow for an access request in SAP Access Control?";
+  const msmpContext = `### SOURCE: grc/msmp.md | SECTION: ${msmpHeading}\n${msmpSection}`;
+  const msmpSteps = authoritativeProcedure(msmpQuestion, msmpContext, "IMPLEMENTATION_WALKTHROUGH");
+  assert.ok(msmpSteps.length >= 3, "retain ordered MSMP setup mechanics for a configuration question");
+  assert.match(msmpSteps.join(" "), /SPRO[\s\S]*GRFNMW_CONFIGURE[\s\S]*Access Request Approval[\s\S]*BRF\+[\s\S]*RULE_RESULT[\s\S]*Request Status > Instance Status/i);
+  assert.doesNotMatch(msmpSteps.join(" "), /View Provisioning Logs only/i, "do not promote an unrelated downstream failure branch into setup steps");
+
+  const fioriQuestion = "In S/4HANA Cloud Public Edition, how would you troubleshoot a user who cannot see a Fiori app?";
+  const fioriSource = fs.readFileSync(path.join(root, "knowledge/fiori/fiori-security.md"), "utf8");
+  const fioriHeading = "## Public Edition troubleshooting: app is missing";
+  const fioriStart = fioriSource.indexOf(fioriHeading);
+  assert.notEqual(fioriStart, -1, "Public Edition missing-app procedure must exist");
+  const fioriRest = fioriSource.slice(fioriStart);
+  const fioriEnd = fioriRest.slice(fioriHeading.length).search(/\n## /);
+  const fioriSection = fioriEnd < 0 ? fioriRest : fioriRest.slice(0, fioriHeading.length + fioriEnd);
+  const gateway = fs.readFileSync(path.join(root, "knowledge/s4hana/s4hana-security.md"), "utf8");
+  const gatewayHeading = "## Troubleshooting: Fiori app opens but a request fails";
+  const gatewayStart = gateway.indexOf(gatewayHeading);
+  assert.notEqual(gatewayStart, -1, "opened-app Gateway procedure must exist as the negative control");
+  const gatewayRest = gateway.slice(gatewayStart);
+  const gatewayEnd = gatewayRest.slice(gatewayHeading.length).search(/\n## /);
+  const gatewaySection = gatewayEnd < 0 ? gatewayRest : gatewayRest.slice(0, gatewayHeading.length + gatewayEnd);
+  const mixedFioriContext = [
+    `### SOURCE: s4hana/s4hana-security.md | SECTION: ${gatewayHeading}\n${gatewaySection}`,
+    `### SOURCE: fiori/fiori-security.md | SECTION: ${fioriHeading}\n${fioriSection}`
+  ].join("\n");
+  const fioriSteps = authoritativeProcedure(fioriQuestion, mixedFioriContext, "STAGE_INVESTIGATION");
+  assert.ok(fioriSteps.length >= 3, "select a coherent missing-app procedure from mixed diagnostic evidence");
+  assert.match(fioriSteps.join(" "), /App Finder[\s\S]*Manage Launchpad Spaces[\s\S]*Maintain Business Users/i);
+  assert.doesNotMatch(fioriSteps.join(" "), /\/IWFND\/ERROR_LOG|\/IWBEP\/ERROR_LOG|Gateway deployment/i,
+    "a missing Public Edition app must not be answered with the opened-app Gateway failure procedure");
 
   assert.deepEqual(
     authoritativeProcedure("Have you implemented IPS?", knowledge, "EXPERIENCE_CONFIRMATION"),
@@ -119,11 +160,28 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Failed entities and missing
 
   const chat = fs.readFileSync(path.join(root, "pages/api/chat.js"), "utf8");
   assert.match(chat, /authoritativeProcedure\(effectiveQuestion, knowledgeContext, interviewContext\.answerScope\)/);
-  assert.match(chat, /promptPayload\.expectedSpokenAnswer = renderSpokenProcedure\(effectiveQuestion, steps\)/);
+  assert.match(chat, /retrievedProcedureAnswer = renderSpokenProcedure\(effectiveQuestion, steps\)/);
+  assert.match(chat, /route: "RETRIEVED_PROCEDURE"/);
+  assert.match(chat, /writeSSEChunk\(res, retrievedProcedureAnswer\)/);
   assert.match(chat, /Retrieved procedure retention failed \(non-fatal\)/);
 
   const prompt = fs.readFileSync(path.join(root, "lib/prompt/interviewPrompt.js"), "utf8");
   assert.match(prompt, /For an answerable technical question, do not respond by asking the interviewer to choose between adjacent interpretations/);
+  assert.match(prompt, /Return one coherent spoken interview answer using exactly these three headings in this order/);
+  assert.doesNotMatch(prompt, /No section titles/);
+  assert.match(prompt, /profile confirms IPS implementation but does not identify an employer or metric[\s\S]*do not attribute it to Dover/);
+  const { recallGroundedExperience, formatMemoryCard } = require("./lib/expertiseCards.js");
+  const ipsExperience = recallGroundedExperience("Have you implemented IPS?");
+  assert.ok(ipsExperience, "retain the explicit IPS experience fact");
+  assert.match(formatMemoryCard(ipsExperience), /candidate confirms IPS implementation/i);
+  assert.doesNotMatch(formatMemoryCard(ipsExperience), /At Dover|SuccessFactors|three days|SCIM HTTP payload/i,
+    "an IPS yes/no question must not inherit unsupported employer, source, or incident claims");
+  const { resolvePreparedScript } = require("../lib/scriptMatch.js");
+  const ipsConfirmation = resolvePreparedScript("Have you personally implemented IPS?");
+  assert.equal(ipsConfirmation?.id, "ips-implementation-confirmation");
+  assert.match(ipsConfirmation.answer, /^Direct answer:[\s\S]*Technical mechanism and exact artifacts:[\s\S]*Validation and operational boundary:/);
+  assert.equal(resolvePreparedScript("Have you implemented IPS for SuccessFactors?"), null,
+    "do not affirm an undocumented IPS source-system implementation as a candidate fact");
 
   console.log("procedureRetentionAssert: PASS");
 })().catch((error) => {

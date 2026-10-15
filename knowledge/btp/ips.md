@@ -121,29 +121,41 @@ For IAG, Identity Provisioning is the proxy when IAG provisions to a cloud appli
 - Manage user lifecycle: updates (user changed department, need to update role in targets), deprovisioning (user terminated)
 - Update transformation rules when business logic changes (new team structure, new role definitions)
 
-## Troubleshooting
+## Troubleshooting: failed entities and missing target accounts
 
-### Failed entities and missing target accounts: evidence-led triage
+Scope one entity, a pattern, or most of the job; record the source, target, job type, ID, and time. In the source system's Jobs tab, open Job Logs, inspect status and statistics, select Failed Entities, download the error-log ZIP, and read each entity's exact stage and error. Reconcile source Read, Failed, and Skipped with target Created, Updated, Deleted, Skipped, and Failed. Classify each miss as unread, filtered/transformation-skipped, or target-write failure. Check source access, credentials, filters, and paging for read failures; transformation conditions and ignored types for skips; and the target response, technical-user permissions, endpoint, schema, mandatory fields, and limits for write failures. Change only the evidenced stage, choose Read or Resync deliberately, rerun, then compare counts and verify the target account and mapped attributes.
 
-Scope one entity, a pattern, or most of the job; record source/target, job type, ID, and time. In IPS, open Provisioning Logs > Job Logs, inspect status and statistics, select Failed Entities, download the error-log ZIP, and read each exact stage and error. Reconcile source Read and Failed; source Skipped; target Created, Updated, Deleted, Skipped, and Failed. Missing accounts may be unread or skipped; they are not all failed writes. For read failures check source access, credentials, filters, and paging. For skipped entities compare transformation conditions and ignored types. For target-write failures inspect the target response, technical-user permissions, endpoint, schema, mandatory fields, and limits. Compare the affected payload, read/write transformations, and entity ID; change only the evidenced stage. Use SIMULATE if available. Choose Read or Resync deliberately for full/delta behavior and deletion impact. Rerun; verify final status, counts, account, and mapped attributes.
+### Evidence sources
 
-Sources checked 2026-10-14: SAP Help, Monitor Provisioning Job Logs (statistics and status definitions), Manage Provisioning Job Logs (downloaded error logs), Job and Transformation Issues (read/write/skip distinctions), and Read Provisioning Job (full/delta and deletion behavior).
+SAP Help checked 2026-10-14: Monitor Provisioning Job Logs (statistics and status definitions), Manage Provisioning Job Logs (downloaded error logs), Job and Transformation Issues (read/write/skip distinctions), and Read Provisioning Job (full/delta and deletion behavior).
+
+## Additional troubleshooting examples
+
+### User missing from target after an IPS job
 
 **Common issue:** User created in HR but doesn't appear in BTP target system after provisioning job.
 Root cause: Transformation rule didn't match user (e.g., user is marked inactive, or department doesn't match rule), or target system connector failed, or rate limiting from target.
 Resolution: Check provisioning job logs; see if rule matched. Check target system's SCIM API is reachable and credentials are valid. Check if target system has rate limiting. Re-run job or trigger manually.
 
+### Wrong target role or attributes
+
 **Common issue:** User has wrong role in target system (provisioned with Finance-Analyst but should be Finance-Manager).
 Root cause: Transformation rule logic is incorrect, or source data (salary level, seniority) is wrong, or manual adjustment was made in target system that's now out of sync.
 Resolution: Check transformation rule logic. Verify source data (HR system). Decide: reconcile manually in target, or fix rule and re-run provisioning job to re-sync all users.
+
+### Terminated user remains active
 
 **Common issue:** User was terminated in HR but still has active account in BTP.
 Root cause: Deprovisioning rule didn't match (e.g., user status is "terminated" in HR but rule is checking "active" field), or deprovisioning job failed.
 Resolution: Check deprovisioning rule logic in IPS. Check provisioning job logs for errors. Manually deactivate user in BTP if urgent. Fix rule and re-run.
 
+### Slow provisioning job
+
 **Common issue:** Provisioning job is extremely slow; takes hours to sync 10,000 users.
 Root cause: Target system SCIM API is slow, IPS is waiting for responses, network latency is high, or query is inefficient.
 Resolution: Check target system performance (is it under load?). Check IPS connector logs for timeouts. Increase IPS parallelism (if configurable). Consider batching large provisioning jobs into smaller windows.
+
+### Duplicate target identities
 
 **Common issue:** Multiple target accounts appear to represent the same person.
 Compare source entity IDs, target entity IDs, usernames, and the configured source read and target write mappings. Check whether separate sources are intentionally producing separate target identities or whether the target identifier mapping is inconsistent. Do not delete an account until ownership, lifecycle state, and downstream access are reconciled.

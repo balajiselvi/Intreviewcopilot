@@ -6,6 +6,11 @@
  */
 const EXPECTED_ANSWERS = [
   {
+    id: "ips-implementation-confirmation",
+    re: /^\s*(?:have you|did you|have you ever)\s+(?:personally\s+)?implemented\s+(?:SAP\s+)?(?:Identity Provisioning(?: Service)?|IPS)\s*\??\s*$/i,
+    answer: "Direct answer: Yes, I have implemented SAP Identity Provisioning (IPS). Technical mechanism and exact artifacts: IPS executes source-to-target identity provisioning by reading entities, applying configured transformations, and writing mapped identities to target systems. IAS handles authentication; IAG governs access requests and risk. Validation and operational boundary: I would review the IPS job status and entity-level Job Logs, reconcile read, skipped, failed, and target write counts, then confirm the target identity and mapped attributes. The profile confirms IPS implementation but does not name its employer, source system, target set, or metric."
+  },
+  {
     id: "about-yourself",
     re: /\b(tell me about yourself|introduce yourself|walk me through your (background|career|experience)|who are you)\b/i,
     answer: "I'm an SAP Security and GRC professional. I work across authorizations, GRC Access Control, SoD, role design, and S/4HANA security. My strength is combining the technical security layer with governance and the business requirement. I can sit with a process owner, understand the access risk, translate that into a security architecture, explain the business value, and then make it deliverable with the technical team. That is why a Security/GRC presales role fits: the job is to bridge sales, the customer, and engineering across GRC, IAM, S/4HANA, BTP, and cloud security. In the role I would help the customer see not only what the technology does, but why it reduces access risk and how it can actually be implemented."
@@ -143,7 +148,7 @@ const EXPECTED_ANSWERS = [
   {
     id: "ias-ips",
     re: /\b(ias).{0,25}(ips)\b|\b(ips).{0,25}(ias)\b|\bcloud identity services\b/i,
-    answer: "IAS is the identity provider or proxy IdP: SAML 2.0 or OpenID Connect, SSO, and MFA. It authenticates. It does not provision and it does not run SoD. IPS is the SCIM source-to-target job: read the source, map, write the target. In a hybrid landscape the Cloud Connector is the outbound tunnel to on-premise systems, with no inbound firewall. At Dover, IAG with S/4 and BTP used IPS and Cloud Connector, and BTP role collections sat in the same request and review path as on-premise roles."
+    answer: "IAS is the identity provider or proxy IdP for SAML 2.0 or OpenID Connect SSO and MFA; it authenticates, but does not provision or run SoD. IPS reads identity data from a source, applies transformations, and writes to target systems. In a hybrid landscape, Cloud Connector provides the controlled path to on-premise systems. IAG governs requests and risk, while BTP role collections provide the target authorization assignments."
   },
   {
     id: "authn-authz",

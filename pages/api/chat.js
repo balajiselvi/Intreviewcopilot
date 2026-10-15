@@ -1469,12 +1469,14 @@ export default async function handler(req, res) {
     // one coherent, ordered procedure block, make that block the answer anchor. This is a
     // single-pass generation still: it adds no model call and does not apply to personal-
     // experience questions, which remain governed by the candidate-evidence rules above.
+    let retrievedProcedureAnswer = "";
     if (!promptPayload.expectedSpokenAnswer
       && !/\b(?:have you|did you|your experience|tell me about a time|walk me through a time)\b/i.test(effectiveQuestion)) {
       try {
         const steps = authoritativeProcedure(effectiveQuestion, knowledgeContext, interviewContext.answerScope);
         if (steps.length >= 3) {
-          promptPayload.expectedSpokenAnswer = renderSpokenProcedure(effectiveQuestion, steps);
+          retrievedProcedureAnswer = renderSpokenProcedure(effectiveQuestion, steps);
+          promptPayload.expectedSpokenAnswer = retrievedProcedureAnswer;
         }
       } catch (error) {
         logger?.error?.("Retrieved procedure retention failed (non-fatal):", error);
@@ -1483,6 +1485,44 @@ export default async function handler(req, res) {
     if (jobDescription?.trim()) promptPayload.jobDescription = jobDescription.trim();
     if (sessionPreparation?.trim()) promptPayload.sessionPreparation = sessionPreparation.trim();
     if (company?.trim()) promptPayload.company = company.trim();
+
+    // A model paraphrase is not a safe final authority when the current question has
+    // one coherent, product-scoped procedure in the retrieved evidence. Live checks
+    // showed the model replacing IPS Job Logs and MSMP configuration steps with
+    // neighboring generic advice even though those steps were supplied as its answer
+    // anchor. Speak the verified sequence directly; experience questions and turns
+    // without a coherent procedure continue through the normal single-pass model path.
+    if (retrievedProcedureAnswer) {
+      streamStarted = true;
+      recordedAnswer = retrievedProcedureAnswer;
+      writeSSEEvent(res, "admission", {
+        decision: "ANSWER",
+        route: "RETRIEVED_PROCEDURE",
+        reason: "coherent-source-procedure",
+        confidence: 1,
+        evidenceMode: null
+      });
+      writeSSEChunk(res, retrievedProcedureAnswer);
+      recordLiveQa({
+        question,
+        questionRaw: question,
+        questionResolved: effectiveQuestion,
+        interviewContext,
+        answerShown: retrievedProcedureAnswer,
+        status: "completed",
+        model,
+        source: req.body?.source,
+        route: "RETRIEVED_PROCEDURE",
+        disposition: "ANSWER",
+        evidenceMode: "knowledge-procedure",
+        latencyMs: Date.now() - qaStartedMs
+      });
+      if (res?.writable) {
+        res.write("data: [DONE]\n\n");
+        res.end();
+      }
+      return;
+    }
 
     const systemPrompt = buildSapInterviewPrompt(promptPayload);
     // Opt-in diagnostic (off by default, zero effect unless DEBUG_DUMP_PROMPT is set): dumps

@@ -154,17 +154,17 @@ assert.match(fioriProcedures, /Public Edition app opens but authorization fails/
 assert.doesNotMatch(fioriProcedures.match(/## Failing authorization: on-premise and Private Edition Gateway[\s\S]*?(?=## Public Edition app opens)/)?.[0] || "", /Public Edition: Display Authorization Trace/);
 
 const ips = read("knowledge/btp/ips.md");
-assert.match(ips, /Failed entities and missing target accounts: evidence-led triage/);
-assert.match(ips, /source Read and Failed; source Skipped; target Created, Updated, Deleted, Skipped, and Failed/i);
+assert.match(ips, /Troubleshooting: failed entities and missing target accounts/);
+assert.match(ips, /Reconcile source Read, Failed, and Skipped with target Created, Updated, Deleted, Skipped, and Failed/i);
 assert.match(ips, /download the error-log ZIP/);
 assert.doesNotMatch(ips, /Deduplication rule/i);
 const ipsQuestion = "An IPS job ended with failed entities and target accounts are missing. How would you technically triage it?";
 assert.ok(deliveryProcedureAdjustment(ipsQuestion, {
-  heading: "Failed entities and missing target accounts: evidence-led triage",
+  heading: "Troubleshooting: failed entities and missing target accounts",
   sourceFile: "ips.md"
 }, { domain: "SAP Cloud Identity / BTP", primaryIntent: "troubleshooting" }) > 0);
 assert.equal(deliveryProcedureAdjustment("What is Identity Provisioning?", {
-  heading: "Failed entities and missing target accounts: evidence-led triage",
+  heading: "Troubleshooting: failed entities and missing target accounts",
   sourceFile: "ips.md"
 }, { domain: "SAP Cloud Identity / BTP" }), 0);
 const gatewayQuestion = "On an ABAP Gateway deployment, the Fiori app launches but its OData call returns HTTP 403. What is your technical triage sequence?";

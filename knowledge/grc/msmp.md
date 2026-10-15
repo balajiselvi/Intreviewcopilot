@@ -57,6 +57,14 @@ A request is submitted and matched to the appropriate MSMP process based on its 
 - Coordinate MSMP stage design with BRF+ agent rule design, since they have to align
 - Test the full workflow including escalation and rejection paths before go-live
 
+## Technical Configuration Sequence
+
+For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. GRFNMW_CONFIGURE is the expert transaction documented for Access Control 10.0, 10.1, and 12.0; NWBC is a work-center shell, not that transaction. Select the Access Request Approval process, then configure its initiator, routing, paths, stages, and timeout/escalation behavior. Link each stage to its BRF+ agent-determination rule and map each BRF+ RULE_RESULT to the intended MSMP path. Test a request and verify the selected path, stage, approver, and audit log in Request Status > Instance Status. Use provisioning logs only if an approved request fails during target assignment.
+
+### Source basis
+
+SAP Help: Maintaining Tasks and Authorizations for Request Approvers; SAP KBA 2050802 (expert transaction scope); SAP Support Content: BRF plus Flat Rule - SAP Access Control Integration.
+
 ## Migration Activities
 
 - Validate MSMP process configuration transported correctly to the target system

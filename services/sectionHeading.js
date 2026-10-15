@@ -2,19 +2,36 @@ function normalizeHeadingText(text) {
   return String(text || "").toLowerCase().replace(/[^\w\s/.-]/g, " ").replace(/\s+/g, " ").trim();
 }
 
+function normalizeIssueLanguage(text) {
+  return normalizeHeadingText(text)
+    .replace(/\b(?:can t|cannot|unable to)\s+(?:see|find|locate)\b/g, "missing")
+    .replace(/\bnot visible\b/g, "missing")
+    .replace(/\b(?:tile|app)\s+(?:does not|doesn t)\s+appear\b/g, "missing");
+}
+
 /**
  * 1 when the section heading's content words appear, in order, as whole words
  * in the question. Single-word headings such as "Overview" stay at 0.
  * This is section identity, not a boost for any one product term.
  */
 function headingAlignment(question, heading) {
-  const headingTokens = normalizeHeadingText(heading).split(" ").filter((token) => token.length >= 4);
+  const headingTokens = normalizeIssueLanguage(heading).split(" ").filter((token) => token.length >= 4);
   if (headingTokens.length < 2) return 0;
-  const query = ` ${normalizeHeadingText(question)} `;
+  const query = ` ${normalizeIssueLanguage(question)} `;
   return headingTokens.every((token) => query.includes(` ${token} `)) ? 1 : 0;
 }
 
-const NAMED_SOURCE_TOKENS = ["ips", "ias", "iag", "idm", "ariba", "datasphere", "sac", "cutover", "hypercare"];
+const NAMED_SOURCE_PATTERNS = Object.freeze([
+  ["ips", /\b(?:ips|identity provisioning)\b/i],
+  ["ias", /\b(?:ias|identity authentication)\b/i],
+  ["iag", /\b(?:iag|identity access governance)\b/i],
+  ["idm", /\b(?:idm|identity management)\b/i],
+  ["ariba", /\bariba\b/i],
+  ["datasphere", /\bdatasphere\b/i],
+  ["sac", /\b(?:sac|analytics cloud)\b/i],
+  ["cutover", /\bcutover\b/i],
+  ["hypercare", /\bhypercare\b/i]
+]);
 
 /**
  * Prefer a knowledge file whose name is the product the question actually names.
@@ -22,8 +39,9 @@ const NAMED_SOURCE_TOKENS = ["ips", "ias", "iag", "idm", "ariba", "datasphere", 
  * identity, not a per-question answer.
  */
 function namedSourceAdjustment(question, chunk = {}) {
-  const query = ` ${normalizeHeadingText(question)} `;
-  const asked = NAMED_SOURCE_TOKENS.filter((token) => query.includes(` ${token} `));
+  const asked = NAMED_SOURCE_PATTERNS
+    .filter(([, pattern]) => pattern.test(String(question || "")))
+    .map(([source]) => source);
   if (!asked.length) return 0;
   const file = `${chunk.sourceFolder || ""} ${chunk.sourceFile || ""}`.toLowerCase().replace(/\.md\b/g, " ");
   const fileTokens = new Set(file.split(/[^a-z0-9]+/).filter(Boolean));
@@ -56,6 +74,17 @@ function deliveryProcedureAdjustment(question, chunk = {}, analysis = {}) {
     : /\b(runtime flow|best practices|implementation|cutover|hypercare|go-live|configuration|troubleshoot)\b/i.test(heading);
   const deliveryBody = /\b(runbook|rehearsal|rollback|go\/no-go)\b/i.test(content);
   let delta = 0;
+  // A visibility failure and a request-time failure are different diagnostic stages.
+  // Carry that distinction across products using the question and section language.
+  const normalizedQuestion = normalizeIssueLanguage(q);
+  const asksMissing = /\b(missing|no tile|not found|unavailable)\b/i.test(normalizedQuestion);
+  const asksAfterLaunch = /\b(app opens|opens? but|launches? but|http\s*\d{3}|odata|runtime|authorization fails?|access denied|request fails?)\b/i.test(normalizedQuestion);
+  const sectionEvidence = `${heading} ${content}`;
+  const sectionMissing = /\b(missing|no tile|not found|app is missing|absent from app finder)\b/i.test(sectionEvidence);
+  const sectionAfterLaunch = /\b(app opens|opens?|launches?|http\s*\d{3}|odata|runtime|authorization|request fails?|service not active)\b/i.test(sectionEvidence);
+  if ((asksMissing && sectionAfterLaunch && !sectionMissing)
+    || (asksAfterLaunch && sectionMissing && !sectionAfterLaunch)) delta -= 0.55;
+  if ((asksMissing && sectionMissing) || (asksAfterLaunch && sectionAfterLaunch)) delta += 0.18;
   // A diagnostic query must retrieve the operational procedure ahead of interview
   // summaries and generic support prose. Keep this a shared heading signal across
   // products rather than encoding one keyword recipe per SAP domain.

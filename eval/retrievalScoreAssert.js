@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const { computeArtifactBoost } = require("../services/vectorSearch");
-const { deliveryProcedureAdjustment } = require("../services/sectionHeading.js");
+const { deliveryProcedureAdjustment, namedSourceAdjustment } = require("../services/sectionHeading.js");
 
 const pfcgChunk = "Assign the catalog in PFCG and trace with STAUTHTRACE.";
 const publicChunk = "On SAP S/4HANA Cloud Public Edition, use Maintain Business Roles. PFCG is not this path.";
@@ -46,6 +46,30 @@ assert.ok(
     { category: "Workflow", primaryIntent: "Workflow" }
   ),
   "symptom-and-evidence investigations should rank procedure sections above generic interview-answer prose"
+);
+const missingAppQuestion = "In S/4HANA Cloud Public Edition, how would you troubleshoot a user who cannot see a Fiori app?";
+assert.ok(
+  deliveryProcedureAdjustment(missingAppQuestion, { heading: "Public Edition troubleshooting: app is missing" }, investigation)
+    > deliveryProcedureAdjustment(missingAppQuestion, { heading: "Troubleshooting: Fiori app opens but a request fails" }, investigation),
+  "a missing-app question must rank absence procedures above opened-app runtime failures"
+);
+assert.ok(
+  deliveryProcedureAdjustment("The Fiori app opens but its OData request returns HTTP 403. What should I inspect?", {
+    heading: "Troubleshooting: Fiori app opens but a request fails"
+  }, investigation) > deliveryProcedureAdjustment("The Fiori app opens but its OData request returns HTTP 403. What should I inspect?", {
+    heading: "Public Edition troubleshooting: app is missing"
+  }, investigation),
+  "an opened-app failure must rank runtime diagnostics above missing-app procedures"
+);
+assert.ok(
+  namedSourceAdjustment("An Identity Provisioning job has failed entities and missing target accounts.", {
+    sourceFolder: "btp",
+    sourceFile: "ips.md"
+  }) > namedSourceAdjustment("An Identity Provisioning job has failed entities and missing target accounts.", {
+    sourceFolder: "btp",
+    sourceFile: "cloud-identity.md"
+  }),
+  "the full product name must rank its own IPS procedure above broad identity troubleshooting"
 );
 
 console.log("retrievalScoreAssert: PASS");
