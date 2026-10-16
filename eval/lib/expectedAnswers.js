@@ -8,7 +8,7 @@ const EXPECTED_ANSWERS = [
   {
     id: "ips-implementation-confirmation",
     re: /^\s*(?:have you|did you|have you ever)\s+(?:personally\s+)?implemented\s+(?:SAP\s+)?(?:Identity Provisioning(?: Service)?|IPS)\s*\??\s*$/i,
-    answer: "Direct answer: Yes, I have implemented SAP Identity Provisioning (IPS). Technical mechanism and exact artifacts: IPS executes source-to-target identity provisioning by reading entities, applying configured transformations, and writing mapped identities to target systems. IAS handles authentication; IAG governs access requests and risk. Validation and operational boundary: I would review the IPS job status and entity-level Job Logs, reconcile read, skipped, failed, and target write counts, then confirm the target identity and mapped attributes. The profile confirms IPS implementation but does not name its employer, source system, target set, or metric."
+    answer: "### 1. Direct Answer\nYes, I have implemented SAP Identity Provisioning (IPS).\n\n### 2. Technical Mechanism and Exact Artifacts\nIPS reads source entities, applies configured transformations, and writes mapped identities to target systems. IAS handles authentication; IAG governs access requests and risk.\n\n### 3. Validation and Operational Boundary\nI would review IPS job status and entity-level Job Logs, reconcile read, skipped, failed, and target write counts, then confirm the target identity and mapped attributes. The profile confirms IPS implementation but does not name its employer, source system, target set, or metric."
   },
   {
     id: "about-yourself",
@@ -298,6 +298,7 @@ function recallExpectedAnswer(question = "") {
   for (const entry of EXPECTED_ANSWERS) {
     try {
       if (entry.id === "troubleshoot-auth" && /\b(fiori|odata|gateway|launchpad|iwfnd|iwbep)\b/i.test(text)) continue;
+      if (entry.id === "ias-ips" && /\b(?:design|jml|joiner|mover|leaver)\b/i.test(text)) continue;
       if (entry.re.test(text)) return { id: entry.id, answer: entry.answer };
     } catch (error) {
       // one bad pattern must not break generation

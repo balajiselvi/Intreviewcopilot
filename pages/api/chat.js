@@ -16,7 +16,7 @@ import { runPostAnswerEvaluation } from "../../lib/prompt";
 import APP_CONFIG from "../../config/appConfig";
 
 const require = createRequire(import.meta.url);
-const { recallGroundedExperience, formatMemoryCard, fieldConflictsWithCv } = require("../../eval/lib/expertiseCards.js");
+const { recallGroundedExperience, formatMemoryCard, fieldConflictsWithCv, cardCoversAskedWork } = require("../../eval/lib/expertiseCards.js");
 const { recallExpectedAnswer } = require("../../eval/lib/expectedAnswers.js");
 const { DEFAULT_CAREER_BACKGROUND, STATED_PROFILE, scopeCareerEvidence, scopedHistoryOnly } = require("../../eval/lib/careerTimeline.js");
 const { shouldInheritPriorDomain, hasStrongTechnicalEvidence, isPlaneFoil, isTopicContinuation } = require("../../lib/contextInheritance.js");
@@ -28,7 +28,7 @@ const { historyForCurrentTurn } = require("../../lib/currentTurnHistory.js");
 const { priorAnchor } = require("../../lib/questionAdmission.js");
 const { resolveInterviewContext, sanitizeDebugContext, toHistoryContext, QUESTION_INTENTS, explicitProductTopic, resolveProductScope } = require("../../lib/interviewContext.js");
 const { productKnowledgeFolders, selectProductScopedChunks } = require("../../lib/productKnowledgeScope.js");
-import { authoritativeProcedure, renderSpokenProcedure } from "../../lib/procedureRetention.js";
+import { authoritativeProcedure, renderSpokenProcedure, shapeSpokenContract } from "../../lib/procedureRetention.js";
 
 const MAX_HISTORY_ITEMS = 6;
 const DEFAULT_TIMEOUT_MS = 25000;
@@ -1064,6 +1064,7 @@ export default async function handler(req, res) {
         }
       }
       if (turn.route === "PREPARED_SCRIPT" && turn.scriptAnswer) {
+        turn.scriptAnswer = shapeSpokenContract(turn.scriptAnswer);
         writeSSEChunk(res, turn.scriptAnswer);
         try {
           if (interviewSessionId) {
@@ -1102,18 +1103,18 @@ export default async function handler(req, res) {
   try {
     const verified = selectVerifiedWorkflow(question);
     if (verified?.answer) {
-      let spoken = verified.answer;
+      let spoken = shapeSpokenContract(verified.answer);
       if (verified.experienceAsk) {
         try {
           const card = recallGroundedExperience(question);
-          if (card?.spoken && !fieldConflictsWithCv(card.spoken)) {
+          if (card?.spoken && !fieldConflictsWithCv(card.spoken) && cardCoversAskedWork(card, question)) {
             spoken = card.spoken;
           } else {
-            spoken = `I would not claim that as a completed implementation. ${verified.answer}`;
+            spoken = `I would not claim that as a completed implementation.\n\n${verified.answer}`;
           }
         } catch (recallError) {
           logger?.error?.("Verified workflow experience recall failed:", recallError);
-          spoken = `I would not claim that as a completed implementation. ${verified.answer}`;
+          spoken = `I would not claim that as a completed implementation.\n\n${verified.answer}`;
         }
       }
       if (!setSSEHeaders(res)) {

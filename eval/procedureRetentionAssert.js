@@ -28,9 +28,9 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   assert.doesNotMatch(steps.join(" "), /leaver|deprovision|manual deactivat|deduplication|SU01|PFCG/i);
 
   const spoken = renderSpokenProcedure(question, steps);
-  assert.match(spoken, /^Direct answer: Scope one entity/);
-  assert.match(spoken, /Technical mechanism and exact artifacts:/);
-  assert.match(spoken, /Validation and operational boundary:/);
+  assert.match(spoken, /^### 1\. Direct Answer\nScope one entity/);
+  assert.match(spoken, /### 2\. Technical Mechanism and Exact Artifacts/);
+  assert.match(spoken, /### 3\. Validation and Operational Boundary/);
   assert.match(spoken, /Classify each miss as unread, filtered\/transformation-skipped, or target-write failure/);
 
   const bw = fs.readFileSync(path.join(root, "knowledge/bw/bw-security.md"), "utf8");
@@ -110,7 +110,7 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   assert.match(rulesSteps.join(" "), /Administration > Rule Setup[\s\S]*Business Function Group[\s\S]*Download File[\s\S]*Upload & Process[\s\S]*Processing Log and Validation Log[\s\S]*Manage Jobs[\s\S]*Job Scheduler/i);
   assert.doesNotMatch(rulesSteps.join(" "), /Which of those do you want\?/i);
   const rulesSpoken = renderSpokenProcedure(rulesQuestion, rulesSteps);
-  assert.match(rulesSpoken, /Direct answer:[\s\S]*Rule Setup[\s\S]*Technical mechanism and exact artifacts:[\s\S]*Upload & Process[\s\S]*Processing Log and Validation Log[\s\S]*Validation and operational boundary:/i);
+  assert.match(rulesSpoken, /### 1\. Direct Answer[\s\S]*Rule Setup[\s\S]*### 2\. Technical Mechanism and Exact Artifacts[\s\S]*Upload & Process[\s\S]*Processing Log and Validation Log[\s\S]*### 3\. Validation and Operational Boundary/i);
   assert.doesNotMatch(rulesSpoken, /Which of those do you want\?/i);
 
   const msmp = fs.readFileSync(path.join(root, "knowledge/grc/msmp.md"), "utf8");
@@ -152,6 +152,33 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   assert.doesNotMatch(fioriSteps.join(" "), /\/IWFND\/ERROR_LOG|\/IWBEP\/ERROR_LOG|Gateway deployment/i,
     "a missing Public Edition app must not be answered with the opened-app Gateway failure procedure");
 
+  const customFioriHeading = "## Custom Fiori app: design, build, secure, and deploy";
+  const customFioriStart = fioriSource.indexOf(customFioriHeading);
+  assert.notEqual(customFioriStart, -1, "current custom Fiori build-and-security procedure must exist");
+  const customFioriRest = fioriSource.slice(customFioriStart + customFioriHeading.length).trim();
+  const customFioriParagraph = customFioriRest.split(/\n\s*\n/)[0];
+  const customFioriProcedureParagraph = customFioriParagraph.split(/\s+(?=Do not use PFCG\b)/i)[0];
+  const customFioriBoundary = customFioriParagraph.slice(customFioriProcedureParagraph.length).trim();
+  const customFioriQuestion = "How would you create a custom SAP Fiori app and secure it end to end in S/4HANA Cloud Public Edition?";
+  const customFioriContext = [
+    `### SOURCE: fiori/fiori-security.md | SECTION: Custom Fiori app: design, build, secure, and deploy\n${customFioriProcedureParagraph}`,
+    `### SOURCE: fiori/fiori-security.md | SECTION: Overview\n## Overview\n\nFiori authorization separates launchpad visibility from backend execution.`,
+    `### SOURCE: fiori/fiori-security.md | SECTION: Custom Fiori app: design, build, secure, and deploy\n${customFioriBoundary}`
+  ].join("\n\n");
+  const customFioriSteps = authoritativeProcedure(customFioriQuestion, customFioriContext, "IMPLEMENTATION_WALKTHROUGH");
+  assert.ok(customFioriSteps.length >= 5, "retain a complete custom Fiori implementation sequence");
+  assert.match(customFioriSteps.join(" "), /RAP service[\s\S]*CDS model[\s\S]*service definition and OData service binding[\s\S]*SAP Business Application Studio[\s\S]*SAPUI5 ABAP Repository[\s\S]*IAM app[\s\S]*business catalog[\s\S]*Maintain Business Roles[\s\S]*CDS DCL[\s\S]*Validate service binding preview/i);
+  assert.match(customFioriSteps.join(" "), /three-system landscape[\s\S]*side-by-side BTP extension/i,
+    "scope Public Edition developer extensibility to its supported landscape and extension options");
+  assert.doesNotMatch(customFioriSteps.join(" "), /PFCG role|SEGW service|\/IWFND\/MAINT_SERVICE[^,;]*register|SU53 trace|ST03N/i,
+    "a Public Edition Fiori build answer must not prescribe customer-managed ABAP transactions");
+  const customFioriSpoken = renderSpokenProcedure(customFioriQuestion, customFioriSteps);
+  assert.match(customFioriSpoken, /^### 1\. Direct Answer\nFor a custom SAP Fiori app in S\/4HANA Cloud Public Edition/);
+  assert.match(customFioriSpoken, /### 2\. Technical Mechanism and Exact Artifacts[\s\S]*SAP Business Application Studio[\s\S]*Maintain Business Roles/);
+  assert.match(customFioriSpoken, /### 3\. Validation and Operational Boundary[\s\S]*Validate service binding preview/);
+  assert.doesNotMatch(customFioriSpoken, /\b(?:assign|maintain|configure|use|create)\s+(?:the\s+)?(?:PFCG|SEGW|\/IWFND\/MAINT_SERVICE|SU53|STAUTHTRACE)\b/i,
+    "do not recommend customer-managed ABAP tools for this Public Edition procedure");
+
   assert.deepEqual(
     authoritativeProcedure("Have you implemented IPS?", knowledge, "EXPERIENCE_CONFIRMATION"),
     [],
@@ -167,7 +194,7 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
 
   const prompt = fs.readFileSync(path.join(root, "lib/prompt/interviewPrompt.js"), "utf8");
   assert.match(prompt, /For an answerable technical question, do not respond by asking the interviewer to choose between adjacent interpretations/);
-  assert.match(prompt, /Return one coherent spoken interview answer using exactly these three headings in this order/);
+  assert.match(prompt, /Return one coherent spoken interview answer using exactly these three Markdown headings in this order/);
   assert.doesNotMatch(prompt, /No section titles/);
   assert.match(prompt, /profile confirms IPS implementation but does not identify an employer or metric[\s\S]*do not attribute it to Dover/);
   const { recallGroundedExperience, formatMemoryCard } = require("./lib/expertiseCards.js");
@@ -179,9 +206,124 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   const { resolvePreparedScript } = require("../lib/scriptMatch.js");
   const ipsConfirmation = resolvePreparedScript("Have you personally implemented IPS?");
   assert.equal(ipsConfirmation?.id, "ips-implementation-confirmation");
-  assert.match(ipsConfirmation.answer, /^Direct answer:[\s\S]*Technical mechanism and exact artifacts:[\s\S]*Validation and operational boundary:/);
+  assert.match(ipsConfirmation.answer, /^### 1\. Direct Answer[\s\S]*### 2\. Technical Mechanism and Exact Artifacts[\s\S]*### 3\. Validation and Operational Boundary/);
   assert.equal(resolvePreparedScript("Have you implemented IPS for SuccessFactors?"), null,
     "do not affirm an undocumented IPS source-system implementation as a candidate fact");
+
+  const { register } = require("node:module");
+  const { pathToFileURL } = require("node:url");
+  await register(pathToFileURL(path.join(__dirname, "lib/extlessResolveHook.mjs")).href);
+  const { buildSapInterviewPrompt } = await import("../lib/prompt/interviewPrompt.js");
+  const { buildReasoningContract } = await import("../lib/reasoningPlanner.js");
+  const { resolveInterviewContext } = require("../lib/interviewContext.js");
+  const compose = (question, category, knowledgeContext) => {
+    const interviewContext = resolveInterviewContext({ questionRaw: question, history: [] });
+    const analysis = { category, secondaryCategories: [], domain: "", isFollowUp: false, interviewContext };
+    const reasoningContract = buildReasoningContract(question, analysis);
+    return {
+      reasoningContract,
+      prompt: buildSapInterviewPrompt({
+        question,
+        analysis,
+        reasoningContract,
+        interviewContext,
+        knowledgeContext,
+        technicalReasoning: {},
+        sapComponents: []
+      })
+    };
+  };
+  const recovery = compose(
+    "How would you recover a slipping security workstream without dropping quality?",
+    "Security",
+    "SOURCE: usage.md\nReview ST03N, AGR_USERS, PFCG, and SU24 before changing roles."
+  );
+  assert.equal(recovery.reasoningContract.deliveryQuestion, true);
+  assert.equal(recovery.reasoningContract.requireTechnicalArtifacts, false);
+  assert.match(recovery.prompt, /integrated workplan/);
+  assert.match(recovery.prompt, /critical path/);
+  assert.doesNotMatch(recovery.prompt, /must name only the relevant verified/);
+  assert.doesNotMatch(recovery.prompt, /Name which security plane/);
+  assert.doesNotMatch(recovery.prompt, /rewrite it as the SAP Security\/IAM decision/);
+  assert.doesNotMatch(recovery.prompt, /SUPPORTING KNOWLEDGE/);
+  assert.doesNotMatch(recovery.prompt, /MASTER HANDS-ON BANK/);
+  assert.doesNotMatch(recovery.prompt, /ST03N supplies usage data/);
+  assert.doesNotMatch(recovery.prompt, /use that engagement's tools/);
+  const sponsorDelay = compose(
+    "How would you communicate a role-design delay to business sponsors?",
+    "General",
+    "SOURCE: roles.md\nUse PFCG and SU24."
+  );
+  assert.equal(sponsorDelay.reasoningContract.deliveryQuestion, true);
+  assert.doesNotMatch(sponsorDelay.prompt, /must name only the relevant verified/);
+  assert.doesNotMatch(sponsorDelay.prompt, /SUPPORTING KNOWLEDGE/);
+  const derivedRole = compose(
+    "Take me through creating a derived role for a new company code in PFCG.",
+    "Role Design",
+    "SOURCE: roles.md\nMaintain the derived role in PFCG from SU24 proposals."
+  );
+  assert.equal(derivedRole.reasoningContract.deliveryQuestion, false);
+  assert.match(derivedRole.prompt, /completing the intended business action/);
+  const cutoverProof = compose(
+    "Can you prove cutover succeeded with a clean SU53?",
+    "Cutover",
+    "SOURCE: cutover.md\nPost-cutover verification uses SUIM and the business transaction."
+  );
+  assert.equal(cutoverProof.reasoningContract.deliveryQuestion, false);
+  assert.match(cutoverProof.prompt, /does not report that a check succeeded/);
+  const cutoverPlan = compose(
+    "A vendor delay is affecting the cutover plan. What would you do?",
+    "PMP",
+    "SOURCE: plan.md\nResequence the critical path."
+  );
+  assert.equal(cutoverPlan.reasoningContract.deliveryQuestion, true);
+  assert.equal(derivedRole.reasoningContract.requireTechnicalArtifacts, true);
+  assert.match(derivedRole.prompt, /must name only the relevant verified/);
+  assert.match(derivedRole.prompt, /PFCG/);
+  assert.match(derivedRole.prompt, /SU24/);
+  assert.match(derivedRole.prompt, /transaction ST03N supplies usage data/);
+  assert.match(derivedRole.prompt, /tables AGR_USERS/);
+  assert.match(derivedRole.prompt, /not proof that access succeeded/);
+  assert.match(derivedRole.prompt, /a table is not a transaction/);
+  const authorizationError = compose(
+    "A user gets an authorization error after FB01. How would you investigate?",
+    "Troubleshooting",
+    "SOURCE: auth.md\nStart with SU53."
+  );
+  assert.equal(authorizationError.reasoningContract.deliveryQuestion, false);
+  assert.match(authorizationError.prompt, /must name only the relevant verified/);
+  assert.match(authorizationError.prompt, /SUPPORTING KNOWLEDGE/);
+
+  const syncKnowledge = [
+    "### SOURCE: grc/authorization-sync.md | SECTION: Troubleshooting",
+    "Common issue: a user's access review shows access they no longer have. Root cause: Authorization Sync hasn't run since the access was removed. Resolution: trigger a sync and re-verify the review data before finalizing certification."
+  ].join("\n");
+  assert.deepEqual(
+    authoritativeProcedure("How would you troubleshoot an SoD issue?", syncKnowledge, "STAGE_INVESTIGATION"),
+    [],
+    "a neighboring authorization-sync symptom must not answer a general SoD question"
+  );
+  const userSyncKnowledge = [
+    "### SOURCE: grc/user-sync.md | SECTION: Troubleshooting",
+    "Common issue: a terminated employee still appears as active in GRC. Root cause: User Sync hasn't run since the termination. Resolution: trigger an immediate sync.",
+    "Common issue: a requester can't find a user in the ARM request form search. Root cause: User Sync hasn't captured that user yet. Resolution: trigger a sync or verify the new user was included in sync scope.",
+    "Common issue: reporting shows incorrect department or location groupings. Root cause: stale user attribute data. Resolution: trigger a sync and validate attribute accuracy against the source system."
+  ].join("\n");
+  assert.deepEqual(
+    authoritativeProcedure("How would you troubleshoot an SoD risk that fires on a clean-looking role?", userSyncKnowledge, "STAGE_INVESTIGATION"),
+    [],
+    "a user-sync termination symptom must not answer an SoD risk question"
+  );
+  assert.ok(
+    authoritativeProcedure("The access review shows access they no longer have. How would you troubleshoot it?", syncKnowledge, "STAGE_INVESTIGATION").length >= 3
+  );
+  const spokenCheck = renderSpokenProcedure("missing app", [
+    "If the app is in App Finder but absent from the expected page, inspect the role's space assignment.",
+    "If it is absent from App Finder, confirm the business role and catalog.",
+    "Use Display Authorization Trace only after the app opens and a runtime check fails."
+  ]);
+  assert.match(spokenCheck, /### 2\. Technical Mechanism and Exact Artifacts\nIf it is absent from App Finder/);
+  assert.doesNotMatch(spokenCheck, /### 2\. Technical Mechanism and Exact Artifacts\n\n/);
 
   console.log("procedureRetentionAssert: PASS");
 })().catch((error) => {

@@ -107,6 +107,16 @@ assert.match(iagWorkflow.answer, /RequestTypeRule/);
 assert.match(iagWorkflow.answer, /provisioning separately/);
 assert.doesNotMatch(iagWorkflow.answer, /IAG_WF_MANAGER|SCI User Group Sync Job|managerrolesecuritypath/);
 
+const deliveryOwners = selectVerifiedWorkflow("Two process owners disagree on SoD exception authority. How do you govern that?");
+assert.equal(deliveryOwners, null);
+const pamOwners = selectVerifiedWorkflow("Who are the PAM owners and controllers in IAG?");
+assert.strictEqual(pamOwners.workflowId, "iag-owners");
+const { recallExpectedAnswer } = require("./lib/expectedAnswers.js");
+assert.notStrictEqual(recallExpectedAnswer("Design the JML model across HR, IAS, IPS and the target apps.")?.id, "ias-ips");
+assert.strictEqual(recallExpectedAnswer("What is the difference between IAS and IPS?")?.id, "ias-ips");
+const { cardCoversAskedWork } = require("./lib/expertiseCards.js");
+assert.equal(cardCoversAskedWork(recallGroundedExperience("Where did you implement IAG access analysis?"), "Where did you implement IAG access analysis?"), false);
+
 const experienceProcedure = selectVerifiedWorkflow("Have you set up privileged access in IAG?");
 assert.strictEqual(experienceProcedure.experienceAsk, true);
 assert.strictEqual(experienceProcedure.workflowId, "iag-pam-setup");

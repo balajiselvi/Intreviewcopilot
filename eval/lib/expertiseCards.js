@@ -547,6 +547,13 @@ function fieldConflictsWithCv(text) {
   return Boolean(text) && STALE_VS_CV.test(String(text));
 }
 
+function cardCoversAskedWork(card, question = "") {
+  const asked = String(question || "").toLowerCase().match(/\b(?:access analysis|ruleset|firefighter|successfactors|developer studio|segregation|fiori|ariba|datasphere)\b/g) || [];
+  if (!asked.length) return true;
+  const hay = `${card?.id || ""} ${(card?.tags || []).join(" ")} ${card?.spoken || ""}`.toLowerCase();
+  return asked.some((term) => hay.includes(term));
+}
+
 function recallGroundedExperience(question = "") {
   const { allScored } = recallExperience(question);
   const hit = (allScored || []).find((row) => row.score > 0
@@ -597,4 +604,4 @@ function formatMemoryCard(card) {
   ].filter(Boolean).join("\n");
 }
 
-module.exports = { EXPERIENCE_CARDS, recallExperience, recallGroundedExperience, formatMemoryCard, PHRASE_BOOSTS, fieldConflictsWithCv, STALE_VS_CV };
+module.exports = { EXPERIENCE_CARDS, recallExperience, recallGroundedExperience, formatMemoryCard, PHRASE_BOOSTS, fieldConflictsWithCv, cardCoversAskedWork, STALE_VS_CV };
