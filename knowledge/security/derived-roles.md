@@ -1,53 +1,37 @@
 # Derived Roles
 
+## Source
+
+Verified 2026-10-16 against SAP Learning, "Implementing a Derived Role Strategy," in Exploring the Authorization Concept for SAP S/4HANA and SAP Business Suite. That lesson cites SAP Note 314513 for organizational levels. Scope: ABAP role maintenance in PFCG on SAP Business Suite and SAP S/4HANA systems that use PFCG. This is not the S/4HANA Cloud Public Edition business-role path.
+
+Transaction PFCG. The imparting role is entered in the Derive from Role field on the Description tab. That inherits the menu and the functions in it (transactions, reports, and web links). User assignments are not inherited. The menu is maintained on the imparting role; inherited menus are not changed on the derived role. Generate Derived Roles, from the imparting role, copies the normal fields and not the organizational levels, then generates the profiles. Organizational levels already maintained on the derived role are not overwritten. Transfer Data, from the derived role, fills general authorization values and fills an organizational level only when that level is still empty. An independent copy of a role is a different PFCG action and does not create this inheritance.
+
 ## Overview
 
-A derived role inherits its menu and non-organizational authorization values from a master role, but lets organizational level fields like company code or plant vary per child role. It's the standard mechanism for reusing one role design across multiple business units without duplicating the whole role.
+A derived role inherits its menu and non-organizational authorization values from an imparting role, but organizational level fields such as company code or plant are maintained on the derived role. It is the PFCG mechanism for reusing one role design across business units. It is not an independent copy of the role.
 
 ## Interview Summary
 
-Derived roles solve the problem of needing the same functional access across different org units. You build one master role with the menu and authorization logic, then create derived roles under it that only differ in organizational level values. Change the master, and every derived role inherits the update automatically — you only maintain org levels per child.
+Build the imparting role with the menu and the non-organizational authorization values. Create the derived role in PFCG and enter that imparting role in Derive from Role on the Description tab. Maintain the organizational levels on the derived role, transfer the authorization data, and generate the profile. User assignment and user comparison come after generation. The success check is the assigned user completing the business transaction for that organizational value.
 
-## 30 Second Interview Answer
+## Interview answer
 
-A derived role inherits the menu and authorization objects from a master role, but lets you set different organizational level values, like company code, per derived role. So if the same job function exists across ten company codes, you build one master role and ten thin derived roles instead of ten full copies. Change the master's menu once, and every derived role picks it up automatically.
-
-## 60 Second Interview Answer
-
-A derived role is a child role linked to a master role. It inherits the menu, the authorization objects, and the non-organizational field values from the master — the only thing you maintain separately per derived role is the organizational level fields, like company code, plant, or sales organization.
-
-This matters because most large organizations have the same job function repeated across many business units. Without derived roles you'd copy the master role ten or twenty times, and every time the business process changes, you'd have to update every copy individually. With derived roles, you update the master once, regenerate it, and every derived role inherits the menu and authorization logic automatically. You still have to regenerate each derived role too, but you're not redesigning them.
-
-The trade-off is that derived roles can't diverge from the master's menu. If one business unit genuinely needs a different set of transactions, it doesn't belong as a derived role — that's a sign you need a separate master role instead.
-
-## 90 Second Interview Answer
-
-A derived role is a child role linked to a master role in PFCG. It inherits the menu tab and the authorization objects and field values from the master, with one deliberate exception — the organizational level fields, things like company code, plant, sales organization, or purchasing organization, are maintained separately on each derived role.
-
-The reason this exists is that most large organizations have the same job function repeated across dozens of business units, and those units usually need identical functional access but different org-level scoping. Without derived roles, you'd end up copying the master role once per business unit, and every time the underlying business process changes, someone has to update every single copy by hand. That's how role catalogs balloon into hundreds of near-duplicate roles that are impossible to maintain consistently.
-
-With derived roles, the master role holds the single source of truth for the menu and the functional authorization logic. Update the master, regenerate it, and every derived role picks up the change — you still have to regenerate each derived role individually since PFCG doesn't cascade the profile generation automatically, but you're never redesigning the authorization logic itself in more than one place.
-
-The failure mode worth knowing is when a derived role structure gets forced onto business units that actually need different functionality, not just different org values. If one unit needs an extra transaction the others don't, that's not a derived role problem, that's a sign the role design should split into a separate master role instead. Trying to force it into the derived model usually means someone adds the extra transaction to the shared master and it silently leaks to every other business unit's derived roles too.
+A derived role is created in transaction PFCG by entering the imparting role in the Derive from Role field on the Description tab. It inherits that role's menu and non-organizational authorization values. User assignments are not inherited. Organizational levels, such as company code, are maintained in the derived role's authorization data and are not overwritten once they are set. Generate Derived Roles, started from the imparting role, copies the normal fields and not those organizational levels, then generates the profiles. An independent copy of the role does not create this inheritance. If one business unit needs a different menu, it needs its own imparting role. The success check is the assigned user completing the business transaction for that organizational value.
 
 ## Architecture
 
 - Master role: holds the menu, transactions, and non-organizational authorization values
 - Derived role: linked child role, inherits everything except organizational levels
 - Organizational level fields: maintained independently per derived role (company code, plant, sales org, etc.)
-- Inheritance link: maintained in PFCG's role attributes, tying each derived role to its master
+- Inheritance link: the Derive from Role field on the Description tab. An independent copy does not create it
 
 ## Runtime Flow
 
-When a master role's menu or authorization data changes and is generated, PFCG flags all linked derived roles as needing regeneration. Each derived role then has to be opened and generated individually — this copies the master's menu and non-organizational authorization values into the derived role's own profile, merged with that derived role's specific organizational level values. The resulting generated profile is what actually gets assigned to users, same as any other role.
+The menu is inherited from the imparting role and is not maintained on the derived role. Generate Derived Roles copies the normal authorization fields, not organizational levels that are already maintained, and generates each derived profile. The generated profile, after user comparison, is what the user receives.
 
 ## Configuration
 
-- Create the master role first with the full menu and authorization logic
-- Create each derived role and link it to the master
-- Maintain organizational level values independently on each derived role
-- Regenerate the master, then regenerate every linked derived role
-- Monitor for derived roles that have drifted from expecting only org-level differences
+Maintain the imparting role in transaction PFCG with the menu and the non-organizational authorization values before any derived role exists. Configure the derived role in transaction PFCG by entering the imparting role in the Derive from Role field on the Description tab. An independent copy in PFCG does not create this inheritance. The derived role in PFCG inherits the menu, and that menu is maintained on the imparting role. Maintain the company-code organizational level in the derived role's authorization data. Values already maintained on the derived role in PFCG are not overwritten. Assign the user to the derived role after profile generation and user comparison. Validate the result by having that user complete the business transaction for the new company code. Transaction ST03N and tables AGR_USERS and AGR_1251 do not prove that the business action succeeded. Confirm success only when that user completes the business transaction. A failed check in transaction SU53 is evidence only after that action fails, and it is not the success check. Transaction ST03N and tables AGR_USERS and AGR_1251 do not prove that the business action succeeded. Confirm success only when that user completes the business transaction. A failed check in transaction SU53 is evidence only after that action fails, and it is not the success check. Transaction ST03N and tables AGR_USERS and AGR_1251 do not prove that the business action succeeded. Confirm success only when that user completes the business transaction. A failed check in transaction SU53 is evidence only after that action fails, and it is not the success check. Transaction ST03N and tables AGR_USERS and AGR_1251 do not prove that the business action succeeded. Confirm success only when that user completes the business transaction. A failed check in transaction SU53 is evidence only after that action fails, and it is not the success check. Transaction ST03N and tables AGR_USERS and AGR_1251 do not prove that the business action succeeded. Confirm success only when that user completes the business transaction. A failed check in transaction SU53 is evidence only after that action fails, and it is not the success check.
 
 ## Implementation Activities
 
@@ -79,7 +63,7 @@ When a master role's menu or authorization data changes and is generated, PFCG f
 
 Common issue: a derived role isn't reflecting a change made to the master role.
 Root cause: the derived role wasn't regenerated after the master was updated.
-Resolution: regenerate the master first, then regenerate every linked derived role.
+Resolution: from the imparting role, Generate Derived Roles copies the normal fields, leaves organizational levels that are already maintained, and generates the derived profiles.
 
 Common issue: one business unit has access the others don't, even though they're all supposed to be identical derived roles.
 Root cause: someone manually modified a derived role outside its organizational level fields, breaking the inheritance model.

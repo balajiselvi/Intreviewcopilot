@@ -4,6 +4,13 @@ const path = require("node:path");
 const { headingAlignment } = require("../services/sectionHeading.js");
 
 const root = path.join(__dirname, "..");
+const authorizationErrors = fs.readFileSync(path.join(root, "knowledge/troubleshooting/authorization-errors.md"), "utf8");
+const su53Definition = authorizationErrors.match(/## SU53: What It Shows and What It Does Not Prove[\s\S]*?(?=\n## |$)/)?.[0];
+assert.ok(su53Definition, "SU53 has a directly retrievable definition and limitation");
+assert.match(su53Definition, /recent failed authorization checks/i);
+assert.match(su53Definition, /not a simulation or proof/i);
+assert.match(su53Definition, /assigned user perform(?:ing)? the intended transaction or application action/i);
+assert.match(su53Definition, /Sources? checked 2026-10-17[\s\S]*learning\.sap\.com/i);
 const fiori = fs.readFileSync(path.join(root, "knowledge/s4hana/s4hana-security.md"), "utf8");
 const publicMissingApp = fiori.match(/## Troubleshooting: Public Edition app is missing[\s\S]*?(?=\n## Troubleshooting: Fiori app opens)/)?.[0];
 const privateMissingApp = fiori.match(/## Troubleshooting: Private Edition or on-premise app is missing[\s\S]*?(?=\n## |$)/)?.[0];

@@ -8,6 +8,12 @@ Authorization troubleshooting is isolation, not a list of transactions. The symp
 
 Start from the symptom and the product. Confirm identity, then the application, then the check that failed. Collect evidence that distinguishes missing assignment, failed object check, failed analysis authorization, failed OData service, or failed token/role collection. Fix the root layer, then prevent by correcting SU24, catalogs, or provisioning mappings.
 
+## SU53: What It Shows and What It Does Not Prove
+
+In an ABAP system, transaction SU53 displays recent failed authorization checks for the user, including the authorization object and checked values. Use it immediately after reproducing an authorization denial; another later failed check can replace the evidence, and the retained history is bounded. SU53 is diagnostic evidence for a failed check, not a simulation or proof that a role grants successful access. If SU53 reports that the checks shown were successful, that means the reported problem is not explained by those authorization checks; it does not prove that the user completed the business action. Validate access by having the assigned user perform the intended transaction or application action. If SU53 does not capture the failure, use the applicable authorization trace while reproducing it.
+
+Source checked 2026-10-17: [SAP Learning, Troubleshooting Authorization Checks](https://learning.sap.com/courses/exploring-the-authorization-concept-for-sap-s-4hana-and-sap-business-suite/troubleshouting-authorization-checks); [SAP Learning, Evaluate Users and Authorizations](https://learning.sap.com/courses/technical-implementation-and-operation-i-of-sap-s-4hana-and-sap-business-suite/evaluate-users-and-authorizations). Applies to ABAP authorization troubleshooting; it does not apply to S/4HANA Cloud Public Edition, where SAP GUI transactions are not customer administration tools.
+
 ## 30 Second Interview Answer
 
 I would not open PFCG first. I would ask what the user saw: no tile, dump, “not authorized,” empty report, or login failure. Login is authentication. Empty BW data is often analysis authorization. A GUI error with an object name is a classic AUTHORITY-CHECK. Then I pick the matching evidence path — STAUTHTRACE or SU53 on ABAP, RSECADMIN on BW, IdP/IAS logs on SSO, BTP cockpit logs on role collections.

@@ -713,6 +713,10 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
 
   return {
     text: sourceBlocks.join("\n\n"),
+    procedureText: chunks
+      .filter((chunk) => chunk?.content)
+      .map((chunk) => `## ${String(chunk.heading || chunk.section || "").trim()}\n${String(chunk.content).trim()}`)
+      .join("\n\n"),
     evidence: [...new Map(chunks.map((chunk) => [
       String(chunk.heading || chunk.section || chunk.sourceFile || chunk.documentId || "knowledge").slice(0, 160),
       chunk
@@ -1472,9 +1476,9 @@ export default async function handler(req, res) {
     // experience questions, which remain governed by the candidate-evidence rules above.
     let retrievedProcedureAnswer = "";
     if (!promptPayload.expectedSpokenAnswer
-      && !/\b(?:have you|did you|your experience|tell me about a time|walk me through a time)\b/i.test(effectiveQuestion)) {
+      && !/\b(?:have you|did you|your experience|tell me about a time|walk me through a time)\b/i.test(question)) {
       try {
-        const steps = authoritativeProcedure(effectiveQuestion, knowledgeContext, interviewContext.answerScope);
+        const steps = authoritativeProcedure(question, knowledgeResult.procedureText || knowledgeContext, interviewContext.answerScope);
         if (steps.length >= 3) {
           retrievedProcedureAnswer = renderSpokenProcedure(effectiveQuestion, steps);
           promptPayload.expectedSpokenAnswer = retrievedProcedureAnswer;

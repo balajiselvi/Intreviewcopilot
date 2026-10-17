@@ -206,6 +206,15 @@ function firstWindowTools(text, n = 40) {
 
 const ROLE_TABLES = "AGR_USERS|AGR_1251|AGR_1252|AGR_TCODES|AGR_DEFINE";
 
+function unrelatedArtifactProvesOutcome(answer) {
+  return String(answer || "").split(/(?<=[.?!])\s+/).some((sentence) => (
+    /\b(?:ST03N|AGR_USERS|AGR_1251|AGR_DEFINE)\b/i.test(sentence)
+    && /\b(?:confirm\w*|prove\w*|proof|ensur\w*|verif\w*)\b/i.test(sentence)
+    && /\b(?:post\w*|business (?:action|transaction)|succeeded|being executed)\b/i.test(sentence)
+    && !/\b(?:not|do not|don't|cannot|isn't|is not|does not|only if|if (?:it|the action|any) fails)\b/i.test(sentence)
+  ));
+}
+
 function su53ProvesSuccess(text) {
   const source = String(text || "");
   const sentences = source.split(/(?<=[.?!])\s+/);
@@ -214,6 +223,7 @@ function su53ProvesSuccess(text) {
     if (/\b(?:troubleshoot|only if|if any authorization|last failed|not evidence|not proof|does not|do not|cannot|is not|not a simulation|does not store a passed)\b/i.test(sentence)) return false;
     return /\b(?:using|via|through|use)\s+(?:transaction\s+)?SU53\b[\s\S]{0,70}\b(?:to\s+)?(?:confirm|verify|prove|ensure|validate)\b/i.test(sentence)
       || /\bSU53\b[\s\S]{0,50}\bto\s+(?:confirm|verify|prove|ensure|validate)\b/i.test(sentence)
+      || /\bSU53\b[\s\S]{0,180}\b(?:verification tool|confirm whether|verify whether|confirm that|verify that)\b[\s\S]{0,100}\b(?:user|access|authorization|action|succeed|success)\b/i.test(sentence)
       || /\b(?:clean|successful)\s+SU53\b[\s\S]{0,160}\b(?:no authorization|functioning as intended|succeeded|success|proves?|confirms?)\b/i.test(sentence)
       || /\b(?:confirm(?:s|ing)?|prove[sd]?|validat(?:e|es|ing)|ensur(?:e|es|ing))\b[\s\S]{0,80}\bSU53\b[\s\S]{0,80}\b(?:without|can access|success|functioning)\b/i.test(sentence);
   });
@@ -286,11 +296,14 @@ function evaluateLive(c, answer, generation) {
   }
 
   if (c.id === "CON-03" || c.id === "ADV-01" || c.id === "ADV-10") {
-    if (/\bsu53\b/i.test(a) && /\bsimulat/i.test(a) && !/\bnot (?:a |role )?simulat/i.test(a)) {
+    if (/\bsu53\b/i.test(a) && /\bsimulat/i.test(a) && !/\bnot\s+(?:a\s+)?(?:role\s+)?simulat/i.test(a)) {
       push("technical terminology precision", "prompt synthesis", "SU53 described as simulation");
     }
     if (c.id === "ADV-01" && /\byes\b/i.test(lower.slice(0, 40)) && /\bsimulat/i.test(a)) {
       push("factual correctness", "prompt synthesis", "answered that SU53 is role simulation");
+    }
+    if (c.id === "CON-03" && !/\blast (?:failed authorization check|authorization check that failed)s?\b/i.test(a)) {
+      push("factual correctness", "knowledge/retrieval", "SU53 definition omitted that it displays the last failed authorization check");
     }
   }
 
@@ -385,6 +398,26 @@ function evaluateLive(c, answer, generation) {
     if (!/\bPFCG\b/.test(a) || !/\b(?:org(?:anizational)? level|company[- ]code)\b/i.test(a)) {
       push("factual correctness", "prompt synthesis", "derived-role answer omitted PFCG or the company-code organizational level");
     }
+    if (!/\bderive from role\b/i.test(a) || !/\bmenu\b/i.test(a)) {
+      push("factual correctness", "prompt synthesis", "derived-role answer did not use the Derive from Role field or the inherited menu");
+    }
+    const orgOnDescription = a.split(/(?<=[.?!])\s+/).some((sentence) => (
+      /\bdescription tab\b/i.test(sentence)
+      && /\b(?:organizational levels?|company[- ]code)\b/i.test(sentence)
+      && !/\bnot\b/i.test(sentence)
+    ));
+    if (orgOnDescription) {
+      push("factual correctness", "prompt synthesis", "organizational levels were entered on the Description tab");
+    }
+    const prescribesCopy = a.split(/(?<=[.?!])\s+/).some((sentence) => (
+      /\bcopy role\b/i.test(sentence) || /\bcopy(?:ing)?\s+(?:an |the )?(?:existing )?(?:master|parent) role\b/i.test(sentence)
+    ) && !/\b(?:do not|don't|not|instead of|rather than|different)\b/i.test(sentence));
+    if (prescribesCopy) {
+      push("factual correctness", "prompt synthesis", "derived role was created by copying the role");
+    }
+  }
+  if (/\b(?:prove|proof)\b/i.test(c.q) && unrelatedArtifactProvesOutcome(a)) {
+    push("factual correctness", "prompt synthesis", "a usage statistic or assignment table was used as proof of the business action");
   }
 
   return failures;
@@ -400,9 +433,11 @@ function sourceContracts() {
   };
   check("define-not-apply-override", !/Open with how you apply this in SAP/.test(prompt), "define requiredElements overwrite still present");
   check("define-structure-what-it-is", /define: "Structure: what it is/.test(prompt), "MODE_STRUCTURES.define missing what-it-is");
+  check("simple-definition-diagnostic-boundary", /diagnostic tool, define exactly what evidence it displays/.test(prompt) && /not an invented validation procedure/.test(prompt), "simple factual diagnostic answer lacks an explicit evidence boundary");
   check("impl-su53-not-simulation", /not a simulation of the role/.test(prompt) && /not proof that access succeeded/.test(prompt), "IMPLEMENTATION_WALKTHROUGH missing SU53 distinction");
   check("artifact-type-in-prompt", /a table is not a transaction/.test(prompt) && /tables AGR_USERS/.test(prompt), "prompt does not distinguish role tables from transactions");
   check("cutover-su53-not-proof", /clean SU53 is not cutover proof/i.test(prompt) && /does not store a passed check/.test(prompt), "Cutover template still allows SU53 as success evidence");
+  check("derive-from-role-in-prompt", /Derive from Role/.test(prompt) && /independent copy is not derivation/.test(prompt), "role-design prompt still allows Copy Role as derivation");
   check("composites-not-forbidden", /do not state them as generally forbidden/.test(planner), "design contract missing composite conditionality");
   check("finish-reason-captured", /finish_reason/.test(chat), "stream does not record finish_reason");
   check("generation-sse", /writeSSEEvent\(res, "generation"/.test(chat), "generation metadata event missing");
@@ -422,11 +457,11 @@ function sourceContracts() {
   );
   const technicalAnswer = [
     "### 1. Direct Answer",
-    "I would create the derived role from the parent in PFCG and copy the authorization data with the new company-code org level.",
+    "I would create the derived role in PFCG by entering the imparting role in Derive from Role.",
     "### 2. Technical Mechanism and Exact Artifacts",
-    "PFCG uses the parent role, SU24 proposal data, and AGR_1251 for the generated authorization values.",
+    "The derived role inherits the menu and the non-organizational values. I maintain the company-code organizational level on the derived role. Table AGR_1251 holds the authorization values.",
     "### 3. Validation and Operational Boundary",
-    "I would generate the profile and confirm the assigned user receives only that company code."
+    "I would generate the profile and have the assigned user complete the business transaction for that company code."
   ].join("\n");
   const pmpCase = CASES.find((item) => item.id === "PMP-03");
   const implCase = CASES.find((item) => item.id === "IMP-01");
@@ -437,7 +472,7 @@ function sourceContracts() {
   check("pmp-unrelated-transactions-fail", transactionFailures.some((item) => item.failureCategory === "governance alignment"), JSON.stringify(transactionFailures));
   check("technical-transactions-remain-valid", !technicalFailures.some((item) => item.failureCategory === "governance alignment" || item.evidence.includes("omitted PFCG")), JSON.stringify(technicalFailures));
   const su53SuccessAnswer = technicalAnswer.replace(
-    "I would generate the profile and confirm the assigned user receives only that company code.",
+    "I would generate the profile and have the assigned user complete the business transaction for that company code.",
     "I would use SU53 to confirm that users assigned to the derived role can access the transactions without encountering authorization errors."
   );
   const failedCheckAnswer = [
@@ -448,6 +483,27 @@ function sourceContracts() {
     "### 3. Validation and Operational Boundary",
     "Use it only when the business action fails."
   ].join("\n");
+  const su53FalseVerification = [
+    "### 1. Direct Answer",
+    "SU53 analyzes authorization failures and displays the last failed check.",
+    "### 2. Technical Mechanism and Exact Artifacts",
+    "It shows the object and checked values after a denial.",
+    "### 3. Validation and Operational Boundary",
+    "The output of SU53 serves as a verification tool for administrators to confirm whether the user has the necessary authorizations to perform a specific action."
+  ].join("\n");
+  const su53ConceptCase = CASES.find((item) => item.id === "CON-03");
+  const falseVerificationFailures = evaluateLive(su53ConceptCase, su53FalseVerification, { finish_reason: "stop" });
+  check("su53-general-verification-claim-fails", falseVerificationFailures.some((item) => item.evidence.includes("proof that access succeeded")), JSON.stringify(falseVerificationFailures));
+  const su53CorrectConcept = [
+    "### 1. Direct Answer",
+    "SU53 is an ABAP authorization-error analysis transaction that displays the user's last failed authorization check.",
+    "### 2. Technical Mechanism and Exact Artifacts",
+    "After reproducing a denial, it shows the failed object and checked values for investigation.",
+    "### 3. Validation and Operational Boundary",
+    "It is failure evidence, not a role simulation or proof that a business action succeeds. Test the intended action with the assigned user."
+  ].join("\n");
+  const correctConceptFailures = evaluateLive(su53ConceptCase, su53CorrectConcept, { finish_reason: "stop" });
+  check("su53-correct-concept-passes", correctConceptFailures.length === 0, JSON.stringify(correctConceptFailures));
   const tableTransactionAnswer = [
     "### 1. Direct Answer",
     "I would read the role contents before changing the ruleset.",
@@ -506,13 +562,51 @@ function sourceContracts() {
     "### 1. Direct Answer",
     "I would derive the role in PFCG for the new company code.",
     "### 2. Technical Mechanism and Exact Artifacts",
-    "Transaction PFCG maintains the organizational level, then I generate the profile. I would read tables AGR_USERS and AGR_1251.",
+    "I enter the imparting role in Derive from Role. The derived role inherits the menu. I maintain the company-code organizational level, then generate the profile. I would read tables AGR_USERS and AGR_1251.",
     "### 3. Validation and Operational Boundary",
     "I would have a user assigned to the derived role complete a business transaction for the new company code. The success of this process is validated when that user can execute the transaction without encountering authorization errors. A trace or SU53 can be used to troubleshoot any issues that arise, but the assigned user completes the intended business action."
   ].join("\n\n");
   check("imp01-su53-paragraph-fails", evaluateLive(implCase, imp01Su53, { finish_reason: "stop" }).some((item) => /proof that access succeeded|role UAT/.test(item.evidence)), "saved IMP-01 validation paragraph was not rejected");
   check("followup-su53-confirmation-fails", evaluateLive(CASES.find((item) => item.id === "FOL-02"), fol02Su53, { finish_reason: "stop" }).some((item) => item.evidence.includes("proof that access succeeded")), "follow-up SU53 confirmation was not rejected");
-  check("failure-branch-su53-passes", !evaluateLive(implCase, imp11Ok, { finish_reason: "stop" }).some((item) => /proof that access succeeded|role UAT|role table|omitted PFCG/.test(item.evidence)), "derived-role failure branch was rejected");
+  const fol02UsageProof = [
+    "### 1. Direct Answer",
+    "I would have the assigned user post in the new company code.",
+    "### 2. Technical Mechanism and Exact Artifacts",
+    "I would use transaction ST03N to confirm that the posting transactions are being executed.",
+    "### 3. Validation and Operational Boundary",
+    "The assigned user completes the posting."
+  ].join("\n");
+  const fol02TablesNotProof = [
+    "### 1. Direct Answer",
+    "I would have the assigned user post a document in the new company code.",
+    "### 2. Technical Mechanism and Exact Artifacts",
+    "Tables AGR_USERS and AGR_1251 show the assignment. They do not prove the posting succeeded.",
+    "### 3. Validation and Operational Boundary",
+    "The proof is the user completing the posting transaction. SU53 is only used if that action fails."
+  ].join("\n");
+  const fol02Case = CASES.find((item) => item.id === "FOL-02");
+  check("usage-statistic-as-posting-proof-fails", evaluateLive(fol02Case, fol02UsageProof, { finish_reason: "stop" }).some((item) => item.evidence.includes("proof of the business action")), "ST03N was accepted as proof of posting");
+  check("assignment-table-denial-passes", !evaluateLive(fol02Case, fol02TablesNotProof, { finish_reason: "stop" }).some((item) => /proof of the business action|proof that access succeeded/.test(item.evidence)), "a negated table check was rejected");
+  check("failure-branch-su53-passes", !evaluateLive(implCase, imp11Ok, { finish_reason: "stop" }).some((item) => /proof that access succeeded|role UAT|role table|omitted PFCG|copying the role|Derive from Role field|Description tab/.test(item.evidence)), "derived-role failure branch was rejected");
+  const copyRoleAnswer = [
+    "### 1. Direct Answer",
+    "You start by copying an existing master role.",
+    "### 2. Technical Mechanism and Exact Artifacts",
+    "In PFCG, use the Copy Role function, then set the company-code organizational level.",
+    "### 3. Validation and Operational Boundary",
+    "The assigned user completes the business transaction for that company code."
+  ].join("\n");
+  check("copy-role-method-fails", evaluateLive(implCase, copyRoleAnswer, { finish_reason: "stop" }).some((item) => item.evidence.includes("copying the role")), "Copy Role was accepted as derivation");
+  check("derive-from-role-passes", !technicalFailures.some((item) => /copying the role|Derive from Role field|Description tab|omitted PFCG/.test(item.evidence)), JSON.stringify(technicalFailures));
+  const orgOnDescription = [
+    "### 1. Direct Answer",
+    "I would derive the role in PFCG.",
+    "### 2. Technical Mechanism and Exact Artifacts",
+    "On the Description tab, specify the organizational levels, such as the new company code. The role inherits the menu.",
+    "### 3. Validation and Operational Boundary",
+    "The assigned user completes the business transaction."
+  ].join("\n");
+  check("org-level-on-description-tab-fails", evaluateLive(implCase, orgOnDescription, { finish_reason: "stop" }).some((item) => item.evidence.includes("Description tab")), "organizational levels on the Description tab were accepted");
   const passedCheck = [
     "### 1. Direct Answer",
     "A clean SU53 does not prove that the cutover succeeded. It only indicates that the last authorization check did not fail.",
@@ -696,7 +790,13 @@ function familyCounts(list) {
     sameTopicSodDistinct: { ok: sameTopicDistinct, uniqueIntentScope: [...sodKeys] },
     liveFailures,
     routed,
-    liveRows
+    liveRows,
+    domainVerification: [
+      { domain: "PFCG derived roles", status: "verified", scope: "SAP Business Suite and SAP S/4HANA systems that use PFCG. Not S/4HANA Cloud Public Edition business roles.", source: "SAP Learning, Implementing a Derived Role Strategy, checked 2026-10-16. The lesson cites SAP Note 314513 for organizational levels.", artifact: "Transaction PFCG. Description-tab field Derive from Role. Imparting role. Generate Derived Roles copies normal fields, not maintained organizational levels." },
+      { domain: "SU53", status: "verified", scope: "ABAP authorization checks on Business Suite and S/4HANA.", source: "SAP Help, Analyzing Authorization Checks, NetWeaver 7.31; SAP Learning, Troubleshooting Authorization Checks, checked 2026-10-16.", artifact: "Transaction SU53 displays recent failed authorization checks. It is not proof that a business action succeeded." },
+      { domain: "AGR_USERS and AGR_1251", status: "partially-verified", scope: "ABAP PFCG role tables.", source: "SAP KBA 3307728 names table AGR_TCODES and lists AGR_1251, BC-SEC-AUT-PFC, ABAP platform. Column pages were not opened. They are absent from the SAP Learning transaction list checked 2026-10-16.", artifact: "Tables, not transactions." },
+      { domain: "GRC Access Control, IAG, IAS, IPS, BTP, Fiori Public versus Private, SuccessFactors, Ariba, SAC, Datasphere, BW, HANA, SAP IDM, Activate", status: "not-reverified", scope: "Present in the knowledge files. Currency was not rechecked against SAP Help, Notes, or Learning in this pass.", source: "None re-opened this session.", artifact: "Do not treat the index as proof of the current release." }
+    ]
   };
   const preserveSavedLive = !LIVE && !RESCORE && fs.existsSync(OUT);
   if (!preserveSavedLive) {

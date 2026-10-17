@@ -186,7 +186,7 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   );
 
   const chat = fs.readFileSync(path.join(root, "pages/api/chat.js"), "utf8");
-  assert.match(chat, /authoritativeProcedure\(effectiveQuestion, knowledgeContext, interviewContext\.answerScope\)/);
+  assert.match(chat, /authoritativeProcedure\(question, knowledgeResult\.procedureText \|\| knowledgeContext, interviewContext\.answerScope\)/);
   assert.match(chat, /retrievedProcedureAnswer = renderSpokenProcedure\(effectiveQuestion, steps\)/);
   assert.match(chat, /route: "RETRIEVED_PROCEDURE"/);
   assert.match(chat, /writeSSEChunk\(res, retrievedProcedureAnswer\)/);
@@ -285,6 +285,8 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   assert.match(derivedRole.prompt, /tables AGR_USERS/);
   assert.match(derivedRole.prompt, /not proof that access succeeded/);
   assert.match(derivedRole.prompt, /a table is not a transaction/);
+  assert.match(derivedRole.prompt, /Derive from Role/);
+  assert.match(derivedRole.prompt, /independent copy is not derivation/);
   const authorizationError = compose(
     "A user gets an authorization error after FB01. How would you investigate?",
     "Troubleshooting",
