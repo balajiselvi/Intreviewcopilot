@@ -76,7 +76,7 @@ Resource planning architecture includes:
    - Cross-train: develop backups for key roles
 
 5. **Resource Transitions**
-   - As project moves from Explore (design-heavy) to Execute (config-heavy), adjust staffing
+   - As the project moves from Explore to Realize, adjust staffing from design to configuration and test
    - Deploy phase: increase support team, decrease config team
    - Post-go-live: reduce to smaller support team
 
@@ -85,7 +85,7 @@ Resource planning architecture includes:
 Resource planning includes:
 
 1. **Resource Plan**
-   - By phase: who's needed in Discover, Explore, Execute, Deploy, Post-Go-Live
+   - By phase: who is needed in Discover, Prepare, Explore, Realize, Deploy, and Run
    - By workstream: who works in FI, MM, SD, testing, data migration
    - Timeline: start date, end date, ramp-up/ramp-down
 

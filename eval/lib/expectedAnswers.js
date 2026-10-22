@@ -8,7 +8,7 @@ const EXPECTED_ANSWERS = [
   {
     id: "ips-implementation-confirmation",
     re: /^\s*(?:have you|did you|have you ever)\s+(?:personally\s+)?implemented\s+(?:SAP\s+)?(?:Identity Provisioning(?: Service)?|IPS)\s*\??\s*$/i,
-    answer: "### 1. Direct Answer\nYes, I have implemented SAP Identity Provisioning (IPS).\n\n### 2. Technical Mechanism and Exact Artifacts\nIPS reads source entities, applies configured transformations, and writes mapped identities to target systems. IAS handles authentication; IAG governs access requests and risk.\n\n### 3. Validation and Operational Boundary\nI would review IPS job status and entity-level Job Logs, reconcile read, skipped, failed, and target write counts, then confirm the target identity and mapped attributes. The profile confirms IPS implementation but does not name its employer, source system, target set, or metric."
+    answer: "Yes, I have implemented SAP Identity Provisioning. IPS reads source entities, applies configured transformations, and writes mapped identities to target systems. IAS handles authentication, and IAG governs access requests and risk. I would review the IPS job status and the entity-level Job Logs, reconcile the read, skipped, failed, and target write counts, then confirm the target identity and mapped attributes. The profile confirms the IPS implementation but does not name its employer, source system, target set, or metric."
   },
   {
     id: "about-yourself",
@@ -32,7 +32,9 @@ const EXPECTED_ANSWERS = [
   },
   {
     id: "what-is-grc",
-    re: /\b(what is|explain|describe)(?!.{0,40}\bdifference\b).{0,30}(sap )?grc\b|\bwhy (would|should) a customer buy grc\b|\bgrc access control architecture\b|\bwalk me through (sap )?grc\b/i,
+    // Exclude connector/ARA/ARM/MSMP/EAM/BRM-specific prompts so product-capability
+    // questions are not stolen by the generic GRC overview script.
+    re: /\b(what is|explain|describe)(?!.{0,40}\bdifference\b)(?!.{0,48}\b(?:connector|ARA|ARM|MSMP|BRF\+?|EAM|BRM|firefighter|ruleset)\b).{0,30}(sap )?grc\b(?!\s+connector)|\bwhy (would|should) a customer buy grc\b|\bgrc access control architecture\b|\bwalk me through (sap )?grc\b(?!\s+connector)/i,
     answer: "I explain SAP GRC Access Control as the governance layer over SAP access. Security controls what a user can do. GRC covers who should have it, who approves it, what risk exists, how it is mitigated, and how it is monitored. Four capabilities: ARA identifies SoD, critical actions, and critical permissions. ARM runs the request, approval, risk check, and provisioning. EAM controls emergency or firefighter access, including logs and review. BRM governs the business-role lifecycle. Those sit above ECC and S/4 authorization and can connect to identity services. I would not position GRC as only an SoD report."
   },
   {
@@ -212,8 +214,25 @@ const EXPECTED_ANSWERS = [
   },
   {
     id: "itgc-sox-audit",
-    re: /\b(itgc|sox|how does grc (support|help with) audit|relationship between sap grc and audit)\b/i,
+    // Keep this script for conceptual GRC-and-audit questions. Preparation and
+    // remediation interviews retrieve the sourced SOX procedure instead.
+    re: /\bhow does grc (?:support|help with) audit\b|\brelationship between sap grc and audit\b|\bwhat (?:is|are) itgcs?\b/i,
     answer: "ITGC in SAP includes provisioning and deprovisioning, approvals, role assignment, privileged access, access review, SoD, and evidence of changes. SOX cares about access around financial processes. GRC can identify those conflicts, govern the request, control firefighter use, run reviews, and produce evidence. I would not say installing GRC makes the company SOX compliant. The auditor tests the control environment, not the fact that the product is installed."
+  },
+  {
+    id: "sox-itgc-prepare",
+    re: /\bprepare\b.{0,40}\b(?:sox|itgc)\b|\b(?:sox|itgc)\b.{0,40}\bprepare\b/i,
+    answer: "I would start from the in-scope financial processes and the ITGCs the auditors will test: access provisioning and deprovisioning, access approval, segregation of duties, privileged and emergency access, periodic user and role certification, and change management for roles and transports. For Access Control I would show the connector landscape, risk analysis results, mitigated versus open conflicts, access-request history, Firefighter logs with controller review, and completed access reviews. I would retain transport, profile generation, and user-comparison evidence where PFCG applies, plus business sign-off that the user can complete the intended financial task. Process Control can document and test related controls when it is in the library, but a Process Control process is not a mitigation control. Installing GRC does not make the organization SOX compliant; auditors test operating effectiveness over the period."
+  },
+  {
+    id: "gdpr-security-design",
+    re: /\bgdpr\b/i,
+    answer: "I would review the SAP authorization and role configuration that can expose personal data, then assign only the permission needed for a documented purpose. I would maintain joiner-mover-leaver and access-request workflow evidence so every personal-data privilege change is traceable. I would review privileged and Firefighter access that can read or change personal data, use the Security Audit Log or the approved application log as evidence, and confirm retention or deletion configuration against the organisation schedule. I would validate the configuration by confirming who holds the permission, when the workflow approved it, what log evidence exists, and that a leaver no longer holds that privilege. Technical controls alone do not establish legal compliance, and I would not invent a jurisdiction-specific notification deadline."
+  },
+  {
+    id: "iso27001-isms-support",
+    re: /\biso(?:\/iec)?\s*27001\b|\bisms\b/i,
+    answer: "I would confirm the ISMS scope and policy that include the SAP landscape, then review the risk assessment for access and identity risks on those systems. I would assign risk-treatment measures that SAP Security and GRC can maintain or evidence, such as role configuration, privileged access, logging, change control, and supplier access, and I would maintain a Statement of Applicability that justifies those choices. I would use approved role configuration, access-request workflow history, SoD analysis and mitigation, Firefighter review, transport records, and critical-authorization monitoring as evidence. I would validate the configuration by tracing one treated risk to the SAP control, the retained log or workflow evidence, the owner, and the review cadence. Configuring a control is not proof of ISO/IEC 27001 certification."
   },
   {
     id: "continuous-monitoring",

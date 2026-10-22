@@ -82,8 +82,10 @@ cases.push("unnamed user count is methodology");
 
 cases.push("years question does not invent a total");
 {
-  const text = expectMode("How many years of experience do you have?", "", "methodology", null);
-  absent(text, /\b17\b|\b13\b/, "invented years");
+  const text = expectMode("How many years of experience do you have?", "", "profile", null);
+  present(text, /17\+ years of overall IT experience/, "confirmed IT years");
+  present(text, /12\+ years of SAP GRC Security/, "confirmed SAP years");
+  absent(text, /15\+ years|10\+ years|ITIL/, "contradictory years");
 }
 
 cases.push("client geography stays labelled");
@@ -156,6 +158,14 @@ cases.push("two named programmes are not merged");
   present(text, /Dover Corporation/, "dover block");
   present(text, /Eminnov Technologies/, "eminnov block");
   assert.ok(text.indexOf("Dover") < text.indexOf("Eminnov") || text.indexOf("Eminnov") < text.indexOf("Dover"));
+}
+
+cases.push("confirmed years and certification survive a short cv");
+{
+  const text = expectMode("How many years of SAP GRC experience do you have, and are you PMP certified?", "", "profile", null);
+  present(text, /12\+ years of SAP GRC Security/, "confirmed years");
+  present(text, /PMP certified/, "confirmed certification");
+  absent(text, /8,700|Dover Corporation/, "employer volume");
 }
 
 cases.push("technical how-to does not attach the full CV");

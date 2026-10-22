@@ -3,6 +3,8 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const root = path.join(__dirname, "..");
+const { explicitProductTopics } = require("../lib/interviewContext.js");
+const { deliveryProcedureAdjustment } = require("../services/sectionHeading.js");
 const ips = fs.readFileSync(path.join(root, "knowledge/btp/ips.md"), "utf8");
 const heading = "## Troubleshooting: failed entities and missing target accounts";
 const start = ips.indexOf(heading);
@@ -14,6 +16,28 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
 
 (async () => {
   const { authoritativeProcedure, renderSpokenProcedure } = await import("../lib/procedureRetention.js");
+  const { fitSpokenLength } = await import("../lib/procedureRetention.js");
+  const { questionProcedureIntent } = await import("../lib/procedureRetention.js");
+  const { selectVerifiedWorkflow } = require("../lib/verifiedWorkflow.js");
+  assert.equal(questionProcedureIntent("How do I attach the BRFplus agent rule?"), "configure");
+  assert.equal(questionProcedureIntent("Why does the MSMP request have no approver?"), "troubleshoot");
+  assert.equal(questionProcedureIntent("How do I troubleshoot the rule-result mapping?"), "troubleshoot");
+  assert.ok(explicitProductTopics("How do I troubleshoot the rule-result mapping?").includes("GRC"));
+  const iagBridgeAnswer = "IAG is a Cloud Foundry service. In a hybrid SAP Access Control 12.0 bridge, validate the documented topology and keep cloud IAG setup separate from backend MSMP configuration. Confirm that each selected service produces the expected governance result and separately verify the resulting target access.";
+  for (const mode of ["concise", "medium", "lengthy"]) {
+    const fitted = fitSpokenLength(iagBridgeAnswer, mode, "How would you configure IAG?");
+    assert.match(fitted, /^IAG is a Cloud Foundry service\./, `${mode} retains the direct opening`);
+    assert.match(fitted, /SAP Access Control 12\.0 bridge/, `${mode} preserves decimal release text`);
+    assert.doesNotMatch(fitted, /(?:^|[.!?]\s+)0 bridge/);
+  }
+  const accessRequestQuestion = "How would you set up access requests in IAG?";
+  const accessRequestWorkflow = selectVerifiedWorkflow(accessRequestQuestion);
+  assert.equal(accessRequestWorkflow.workflowId, "iag-workflow-determination");
+  const conciseAccessRequest = fitSpokenLength(accessRequestWorkflow.answer, "concise", accessRequestQuestion);
+  assert.match(conciseAccessRequest, /^Workflow determination maps a request type to a path/i);
+  assert.match(conciseAccessRequest, /downstream provisioning separately after approval/i,
+    "concise fit must retain the approval-to-provisioning boundary");
+  assert.ok(deliveryProcedureAdjustment("How do I attach the BRFplus agent rule?", { heading: "Configure a BRFplus agent rule for MSMP" }) > 0);
   const question = "An IPS job ended with failed entities and target accounts are missing. How would you technically triage it?";
   const steps = authoritativeProcedure(question, knowledge, "STAGE_INVESTIGATION");
 
@@ -28,10 +52,27 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   assert.doesNotMatch(steps.join(" "), /leaver|deprovision|manual deactivat|deduplication|SU01|PFCG/i);
 
   const spoken = renderSpokenProcedure(question, steps);
-  assert.match(spoken, /^### 1\. Direct Answer\nScope one entity/);
-  assert.match(spoken, /### 2\. Technical Mechanism and Exact Artifacts/);
-  assert.match(spoken, /### 3\. Validation and Operational Boundary/);
+  assert.match(spoken, /^Scope one entity/);
+  assert.doesNotMatch(spoken, /Direct Answer|Technical Mechanism|Validation and Operational Boundary/);
   assert.match(spoken, /Classify each miss as unread, filtered\/transformation-skipped, or target-write failure/);
+
+  const ipsImplementation = fs.readFileSync(path.join(root, "knowledge/btp/ips.md"), "utf8");
+  const implementationHeading = "## Implementation Activities";
+  const implementationStart = ipsImplementation.indexOf(implementationHeading);
+  assert.notEqual(implementationStart, -1);
+  const implementationRest = ipsImplementation.slice(implementationStart);
+  const implementationEnd = implementationRest.slice(implementationHeading.length).search(/\n## /);
+  const implementationSection = implementationEnd < 0
+    ? implementationRest
+    : implementationRest.slice(0, implementationHeading.length + implementationEnd);
+  const joinerQuestion = "Walk me through configuring a joiner job in IPS.";
+  const joinerSteps = authoritativeProcedure(joinerQuestion, implementationSection, "IMPLEMENTATION_WALKTHROUGH");
+  const joinerAnswer = renderSpokenProcedure(joinerQuestion, joinerSteps);
+  assert.match(joinerAnswer, /^First, define the authoritative source/);
+  assert.match(joinerAnswer, /Finally, configure notifications/);
+  assert.match(joinerAnswer, /\.$/);
+  assert.doesNotMatch(joinerAnswer, /(?:^|\s)-\s/);
+  assert.doesNotMatch(joinerAnswer, /I would first Decision/i);
 
   const bw = fs.readFileSync(path.join(root, "knowledge/bw/bw-security.md"), "utf8");
   const bwHeading = "## Troubleshooting: query runs but returns no data for one user";
@@ -110,7 +151,8 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   assert.match(rulesSteps.join(" "), /Administration > Rule Setup[\s\S]*Business Function Group[\s\S]*Download File[\s\S]*Upload & Process[\s\S]*Processing Log and Validation Log[\s\S]*Manage Jobs[\s\S]*Job Scheduler/i);
   assert.doesNotMatch(rulesSteps.join(" "), /Which of those do you want\?/i);
   const rulesSpoken = renderSpokenProcedure(rulesQuestion, rulesSteps);
-  assert.match(rulesSpoken, /### 1\. Direct Answer[\s\S]*Rule Setup[\s\S]*### 2\. Technical Mechanism and Exact Artifacts[\s\S]*Upload & Process[\s\S]*Processing Log and Validation Log[\s\S]*### 3\. Validation and Operational Boundary/i);
+  assert.match(rulesSpoken, /Rule Setup[\s\S]*Upload & Process[\s\S]*Processing Log and Validation Log/i);
+  assert.doesNotMatch(rulesSpoken, /Direct Answer|Technical Mechanism|Validation and Operational Boundary/);
   assert.doesNotMatch(rulesSpoken, /Which of those do you want\?/i);
 
   const msmp = fs.readFileSync(path.join(root, "knowledge/grc/msmp.md"), "utf8");
@@ -173,9 +215,10 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   assert.doesNotMatch(customFioriSteps.join(" "), /PFCG role|SEGW service|\/IWFND\/MAINT_SERVICE[^,;]*register|SU53 trace|ST03N/i,
     "a Public Edition Fiori build answer must not prescribe customer-managed ABAP transactions");
   const customFioriSpoken = renderSpokenProcedure(customFioriQuestion, customFioriSteps);
-  assert.match(customFioriSpoken, /^### 1\. Direct Answer\nFor a custom SAP Fiori app in S\/4HANA Cloud Public Edition/);
-  assert.match(customFioriSpoken, /### 2\. Technical Mechanism and Exact Artifacts[\s\S]*SAP Business Application Studio[\s\S]*Maintain Business Roles/);
-  assert.match(customFioriSpoken, /### 3\. Validation and Operational Boundary[\s\S]*Validate service binding preview/);
+  assert.match(customFioriSpoken, /^For a custom SAP Fiori app in S\/4HANA Cloud Public Edition/);
+  assert.match(customFioriSpoken, /SAP Business Application Studio[\s\S]*Maintain Business Roles/);
+  assert.match(customFioriSpoken, /Validate service binding preview/);
+  assert.doesNotMatch(customFioriSpoken, /Direct Answer|Technical Mechanism|Validation and Operational Boundary/);
   assert.doesNotMatch(customFioriSpoken, /\b(?:assign|maintain|configure|use|create)\s+(?:the\s+)?(?:PFCG|SEGW|\/IWFND\/MAINT_SERVICE|SU53|STAUTHTRACE)\b/i,
     "do not recommend customer-managed ABAP tools for this Public Edition procedure");
 
@@ -186,16 +229,23 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   );
 
   const chat = fs.readFileSync(path.join(root, "pages/api/chat.js"), "utf8");
-  assert.match(chat, /authoritativeProcedure\(question, knowledgeResult\.procedureText \|\| knowledgeContext, interviewContext\.answerScope\)/);
-  assert.match(chat, /retrievedProcedureAnswer = renderSpokenProcedure\(effectiveQuestion, steps\)/);
+  assert.match(chat, /authoritativeProcedure\(procedureQuestion, knowledgeResult\.procedureText \|\| knowledgeContext, interviewContext\.answerScope\)/);
+  assert.match(chat, /fitSpokenLength\(\s*renderSpokenProcedure\(effectiveQuestion, alignedSteps\)/);
+  assert.match(chat, /\bfitSpokenLength\b/);
   assert.match(chat, /route: "RETRIEVED_PROCEDURE"/);
   assert.match(chat, /writeSSEChunk\(res, retrievedProcedureAnswer\)/);
   assert.match(chat, /Retrieved procedure retention failed \(non-fatal\)/);
 
   const prompt = fs.readFileSync(path.join(root, "lib/prompt/interviewPrompt.js"), "utf8");
   assert.match(prompt, /For an answerable technical question, do not respond by asking the interviewer to choose between adjacent interpretations/);
-  assert.match(prompt, /Return one coherent spoken interview answer using exactly these three Markdown headings in this order/);
-  assert.doesNotMatch(prompt, /No section titles/);
+  assert.match(prompt, /SPOKEN ARCHITECT FORMAT/);
+  assert.match(prompt, /\* \*\*Decision:\*\*/);
+  assert.match(prompt, /\* \*\*Mechanism:\*\*/);
+  assert.match(prompt, /\* \*\*Governance:\*\*/);
+  assert.match(prompt, /\* \*\*Validation:\*\*/);
+  assert.match(prompt, /I would first Decision/);
+  assert.doesNotMatch(prompt, /### 1\. Direct Answer/);
+  assert.doesNotMatch(prompt, /three required answer headings/);
   assert.match(prompt, /profile confirms IPS implementation but does not identify an employer or metric[\s\S]*do not attribute it to Dover/);
   const { recallGroundedExperience, formatMemoryCard } = require("./lib/expertiseCards.js");
   const ipsExperience = recallGroundedExperience("Have you implemented IPS?");
@@ -206,14 +256,15 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   const { resolvePreparedScript } = require("../lib/scriptMatch.js");
   const ipsConfirmation = resolvePreparedScript("Have you personally implemented IPS?");
   assert.equal(ipsConfirmation?.id, "ips-implementation-confirmation");
-  assert.match(ipsConfirmation.answer, /^### 1\. Direct Answer[\s\S]*### 2\. Technical Mechanism and Exact Artifacts[\s\S]*### 3\. Validation and Operational Boundary/);
+  assert.match(ipsConfirmation.answer, /^Yes, I have implemented SAP Identity Provisioning/);
+  assert.doesNotMatch(ipsConfirmation.answer, /Direct Answer|Technical Mechanism|Validation and Operational Boundary/);
   assert.equal(resolvePreparedScript("Have you implemented IPS for SuccessFactors?"), null,
     "do not affirm an undocumented IPS source-system implementation as a candidate fact");
 
   const { register } = require("node:module");
   const { pathToFileURL } = require("node:url");
   await register(pathToFileURL(path.join(__dirname, "lib/extlessResolveHook.mjs")).href);
-  const { buildSapInterviewPrompt } = await import("../lib/prompt/interviewPrompt.js");
+  const { buildSapInterviewPrompt, scaleResponseLength, normalizeResponseLength } = await import("../lib/prompt/interviewPrompt.js");
   const { buildReasoningContract } = await import("../lib/reasoningPlanner.js");
   const { resolveInterviewContext } = require("../lib/interviewContext.js");
   const compose = (question, category, knowledgeContext) => {
@@ -278,13 +329,14 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   );
   assert.equal(cutoverPlan.reasoningContract.deliveryQuestion, true);
   assert.equal(derivedRole.reasoningContract.requireTechnicalArtifacts, true);
-  assert.match(derivedRole.prompt, /must name only the relevant verified/);
+  assert.match(derivedRole.prompt, /Name only plane-correct artifacts|must name only the relevant verified/);
+  assert.match(derivedRole.prompt, /\* \*\*Decision:\*\*/);
   assert.match(derivedRole.prompt, /PFCG/);
   assert.match(derivedRole.prompt, /SU24/);
   assert.match(derivedRole.prompt, /transaction ST03N supplies usage data/);
   assert.match(derivedRole.prompt, /tables AGR_USERS/);
-  assert.match(derivedRole.prompt, /not proof that access succeeded/);
-  assert.match(derivedRole.prompt, /a table is not a transaction/);
+  assert.match(derivedRole.prompt, /not proof that access succeeded|failed-check display alone is not success proof/);
+  assert.match(derivedRole.prompt, /a table is not a transaction/i);
   assert.match(derivedRole.prompt, /Derive from Role/);
   assert.match(derivedRole.prompt, /independent copy is not derivation/);
   const authorizationError = compose(
@@ -293,7 +345,7 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
     "SOURCE: auth.md\nStart with SU53."
   );
   assert.equal(authorizationError.reasoningContract.deliveryQuestion, false);
-  assert.match(authorizationError.prompt, /must name only the relevant verified/);
+  assert.match(authorizationError.prompt, /Name only plane-correct artifacts|must name only the relevant verified/);
   assert.match(authorizationError.prompt, /SUPPORTING KNOWLEDGE/);
 
   const syncKnowledge = [
@@ -324,8 +376,109 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
     "If it is absent from App Finder, confirm the business role and catalog.",
     "Use Display Authorization Trace only after the app opens and a runtime check fails."
   ]);
-  assert.match(spokenCheck, /### 2\. Technical Mechanism and Exact Artifacts\nIf it is absent from App Finder/);
-  assert.doesNotMatch(spokenCheck, /### 2\. Technical Mechanism and Exact Artifacts\n\n/);
+  assert.match(spokenCheck, /If the app is in App Finder but absent from the expected page[\s\S]*If it is absent from App Finder/);
+  assert.doesNotMatch(spokenCheck, /Direct Answer|Technical Mechanism|Validation and Operational Boundary/);
+
+  const fioriFile = fs.readFileSync(path.join(root, "knowledge/fiori/fiori-security.md"), "utf8");
+  const accessQuestion = "If the user cannot access a Fiori app, how do you troubleshoot?";
+  const accessSteps = authoritativeProcedure(accessQuestion, fioriFile, "STAGE_INVESTIGATION");
+  assert.ok(accessSteps.length >= 3, "the generic Fiori troubleshooting procedure must be speakable");
+  const accessSpoken = renderSpokenProcedure(accessQuestion, accessSteps);
+  assert.match(accessSpoken, /missing|cannot see/i);
+  assert.match(accessSpoken, /Public Edition/);
+  assert.match(accessSpoken, /on-premise|on premise/i);
+  assert.match(accessSpoken, /complete the intended business task/i);
+  assert.doesNotMatch(accessSpoken, /Direct Answer|Technical Mechanism|Validation and Operational Boundary/);
+  const onPremQuestion = `${accessQuestion} Follow-up: What if my server was on premise?`;
+  const onPremSteps = authoritativeProcedure(onPremQuestion, fioriFile, "STAGE_INVESTIGATION");
+  const onPremSpoken = renderSpokenProcedure(onPremQuestion, onPremSteps);
+  assert.match(onPremSpoken, /PFCG/);
+  assert.match(onPremSpoken, /\/IWFND\/ERROR_LOG/);
+  assert.match(onPremSpoken, /SU53/);
+  assert.match(onPremSpoken, /not proof of success|not proof that access succeeded|rather than proof of success/i);
+  assert.doesNotMatch(onPremSpoken, /Maintain Business Users/);
+  assert.doesNotMatch(onPremSpoken, /Direct Answer|Technical Mechanism/);
+
+  const joule = fs.readFileSync(path.join(root, "knowledge/btp/joule-security.md"), "utf8");
+  const jouleHeading = "## 30 Second Interview Answer";
+  const jouleStart = joule.indexOf(jouleHeading);
+  assert.notEqual(jouleStart, -1, "Joule spoken procedure must exist");
+  const jouleRest = joule.slice(jouleStart);
+  const jouleEnd = jouleRest.slice(jouleHeading.length).search(/\n## /);
+  const jouleSection = jouleEnd < 0 ? jouleRest : jouleRest.slice(0, jouleHeading.length + jouleEnd);
+  const jouleQuestion = "How is identity and access administered for SAP Joule?";
+  const jouleSteps = authoritativeProcedure(jouleQuestion, `## 30 Second Interview Answer\n${jouleSection}`, "");
+  assert.ok(jouleSteps.length >= 3, "Joule administration must stay a retrieved procedure");
+  assert.match(jouleSteps.join(" "), /Trust Configuration/);
+  assert.match(jouleSteps.join(" "), /Global User ID/);
+  assert.match(jouleSteps.join(" "), /joule_tenant_admin/);
+  assert.match(jouleSteps.join(" "), /joule_analytics_admin/);
+  assert.match(jouleSteps.join(" "), /joule_end_user/);
+  assert.match(jouleSteps.join(" "), /Do not assign an S\/4HANA business role or a PFCG role/);
+
+  const roleQuestion = "What's the sequence to generate and assign a new single role?";
+  const roleFile = fs.readFileSync(path.join(root, "knowledge/security/pfcg.md"), "utf8");
+  const roleHeading = "## Generate and assign a single role";
+  const roleStart = roleFile.indexOf(roleHeading);
+  assert.notEqual(roleStart, -1);
+  const roleRest = roleFile.slice(roleStart);
+  const roleEnd = roleRest.slice(roleHeading.length).search(/\n## /);
+  const roleSection = roleEnd < 0 ? roleRest : roleRest.slice(0, roleHeading.length + roleEnd);
+  const roleSteps = authoritativeProcedure(roleQuestion, roleSection, "IMPLEMENTATION_WALKTHROUGH");
+  const roleSpoken = renderSpokenProcedure(roleQuestion, roleSteps);
+  assert.ok(roleSteps.length >= 3, "single-role sequence must be a retrieved procedure");
+  assert.match(roleSpoken, /AGR_USERS/);
+  assert.doesNotMatch(roleSpoken, /transaction AGR_USERS/i);
+  assert.match(roleSpoken, /table AGR_USERS|Table AGR_USERS/);
+  assert.match(roleSpoken, /SU53/);
+  assert.match(roleSpoken, /does not treat that display as proof|not proof|do not treat that display/i);
+
+  const rolloutQuestion = "How would you design Fiori security for a new S/4 rollout?";
+  const rolloutFile = fs.readFileSync(path.join(root, "knowledge/fiori/fiori-security.md"), "utf8");
+  const rolloutHeading = "## Design Fiori security for an S/4 rollout";
+  const rolloutStart = rolloutFile.indexOf(rolloutHeading);
+  assert.notEqual(rolloutStart, -1);
+  const rolloutRest = rolloutFile.slice(rolloutStart);
+  const rolloutEnd = rolloutRest.slice(rolloutHeading.length).search(/\n## /);
+  const rolloutSection = rolloutEnd < 0 ? rolloutRest : rolloutRest.slice(0, rolloutHeading.length + rolloutEnd);
+  const rolloutSteps = authoritativeProcedure(rolloutQuestion, rolloutSection, "");
+  const rolloutSpoken = renderSpokenProcedure(rolloutQuestion, rolloutSteps);
+  assert.ok(rolloutSteps.length >= 3, "Fiori rollout design must be a retrieved procedure");
+  assert.match(rolloutSpoken, /Public Edition does not use PFCG/);
+  assert.match(rolloutSpoken, /Maintain Business Roles/);
+  assert.match(rolloutSpoken, /SU53/);
+  assert.match(rolloutSpoken, /not treat that display as proof|does not prove|do not treat that display/i);
+  assert.match(rolloutSpoken, /complete the intended business task/);
+
+  const processControl = fs.readFileSync(path.join(root, "knowledge/grc/process-control.md"), "utf8");
+  const manualTestQuestion = "How would you implement a manual control test plan in SAP GRC Process Control?";
+  const manualTestSteps = authoritativeProcedure(manualTestQuestion, processControl, "IMPLEMENTATION_WALKTHROUGH");
+  const manualTestAnswer = renderSpokenProcedure(manualTestQuestion, manualTestSteps);
+  assert.ok(manualTestSteps.length >= 3, "manual Process Control testing must select its assessment procedure, not transport guidance");
+  assert.match(manualTestAnswer, /manual (?:control )?test plan[\s\S]*Planner[\s\S]*Assessments[\s\S]*Pass or Fail[\s\S]*issue owner[\s\S]*retest/i);
+  assert.doesNotMatch(manualTestAnswer, /transport request|production import/i);
+
+  const hanaViewQuestion = "A HANA user can connect but cannot read one view. What checks isolate the access boundary?";
+  const hanaViewSteps = authoritativeProcedure(hanaViewQuestion,
+    `### SOURCE: hana/hana-authorization.md | SECTION: ${hanaHeading}\n${hanaSection}`,
+    "STAGE_INVESTIGATION");
+  const hanaSpoken = fitSpokenLength(renderSpokenProcedure(hanaViewQuestion, hanaViewSteps), "concise", hanaViewQuestion);
+  assert.match(hanaSpoken, /GET_INSUFFICIENT_PRIVILEGE_ERROR_DETAILS/,
+    "length fitting must preserve dotted procedure names inside code spans");
+  assert.match(hanaSpoken, /object, schema, object type, and missing privilege/i,
+    "concise troubleshooting must retain evidence used to isolate the affected object");
+
+  assert.equal(normalizeResponseLength("interview"), "medium");
+  assert.equal(normalizeResponseLength("concise"), "concise");
+  assert.equal(scaleResponseLength(700, "medium"), 700);
+  assert.equal(scaleResponseLength(700, "concise"), 280);
+  assert.ok(scaleResponseLength(700, "lengthy") > 700);
+  const concisePrompt = buildSapInterviewPrompt({ question: roleQuestion, analysis: { category: "Implementation", secondaryCategories: [] }, responseLength: "concise" });
+  const lengthyPrompt = buildSapInterviewPrompt({ question: roleQuestion, analysis: { category: "Implementation", secondaryCategories: [] }, responseLength: "lengthy" });
+  assert.match(concisePrompt, /Selected response length is concise/);
+  assert.match(lengthyPrompt, /Selected response length is lengthy/);
+  assert.match(fs.readFileSync(path.join(root, "pages/interview.js"), "utf8"), /responseLength: currentConfig\.responseLength \|\| "medium"/);
+  assert.doesNotMatch(fs.readFileSync(path.join(root, "pages/interview.js"), "utf8"), /responseLength: "interview"/);
 
   console.log("procedureRetentionAssert: PASS");
 })().catch((error) => {

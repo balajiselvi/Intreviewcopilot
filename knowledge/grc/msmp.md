@@ -65,6 +65,14 @@ For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, 
 
 SAP Help: Maintaining Tasks and Authorizations for Request Approvers; SAP KBA 2050802 (expert transaction scope); SAP Support Content: BRF plus Flat Rule - SAP Access Control Integration.
 
+## Configure an MSMP workflow for an access request
+
+I would first check whether the delivered Access Request Approval workflow already covers the request type before I change Maintain MSMP Workflows. If it does, I would reuse that process and only change the initiator, paths, stages, agents, and route mapping that the business requires. If a new path is required, I would generate the BRF+ initiator or routing rule in Define Workflow-Related MSMP Rules before changing MSMP. In Maintain MSMP Workflows I would set the process global settings, declare the rule and every RULE_RESULT, maintain agents for each stage, create the paths and stages, map each rule result to a path, then generate the MSMP version. I would validate with a test request and confirm the selected path, stage, approver, and audit log in Request Status Instance Status. I would open provisioning logs only after the request is approved and the target assignment fails. Source checked 2026-10-21: SAP Help Maintain MSMP Workflows; SAP Support Content BRF plus Flat Rule integration; SAP Community MSMP Workflow Configuration for Access Control 12.0.
+
+## Troubleshoot an MSMP access request with no approver
+
+I would open the stuck access request in Request Status and inspect Instance Status for the path, stage, and Approvers of Selected Path, then read the audit log to see where processing stopped. If no path was selected, I would inspect Maintain MSMP Workflows for the process, initiator, route mapping, and whether the MSMP version was generated after the last change. If the expected path is present but no approver appears, I would treat that as an agent-determination failure and inspect the stage BRF+ agent rule against the request attributes, then confirm the RULE_RESULT still maps to that stage. If the approver is present but the request never moves, I would check timeout and escalation settings and the background jobs that evaluate MSMP timeouts. I would use View Provisioning Logs only when the request is already approved and the target still lacks the assignment. I would not diagnose an Access Control MSMP stuck request with BW analysis authorizations or IAG manager groups. Source checked 2026-10-21: SAP Access Control Viewing Your Request Status; Maintain MSMP Workflows; BRF plus Flat Rule integration.
+
 ## Migration Activities
 
 - Validate MSMP process configuration transported correctly to the target system

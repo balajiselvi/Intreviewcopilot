@@ -124,4 +124,10 @@ const experienceCard = recallGroundedExperience("Have you set up privileged acce
 assert.match(experienceCard.spoken, /not an IAG PAM ID/);
 assert.doesNotMatch(experienceCard.spoken, /I implemented privileged access management in IAG/);
 
+const firefighterLaunch = selectVerifiedWorkflow(
+  "A Firefighter user cannot launch an approved emergency session. What do you validate?"
+);
+assert.strictEqual(firefighterLaunch.workflowId, "grc-firefighter-launch-troubleshooting");
+assert.doesNotMatch(firefighterLaunch.answer, /^Create the firefighter ID on the target system/);
+
 console.log("phase5 source contract assertions: PASS");

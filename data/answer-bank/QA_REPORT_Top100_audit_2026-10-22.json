@@ -1,0 +1,1057 @@
+{
+  "generated_at": "2026-10-22T10:01:06.635Z",
+  "archive_path": "data/answer-bank/archive/original-pre-audit-2026-10-22/SAP_Security_GRC_Senior_Consultant_Top_100_QA.json",
+  "archive_sha256_json": "2d05acffcb27c3d462f20de8d242b305c57eab21b64f73c3407ec0d109398994",
+  "top100_path": "data/answer-bank/SAP_Security_GRC_Senior_Consultant_Top_100_QA.json",
+  "counts": {
+    "total": 100,
+    "changed": 10,
+    "unchanged": 90,
+    "source_verified_help_portal": 0,
+    "internally_reviewed": 100,
+    "needs_landscape": 0
+  },
+  "provenance_note": "Observed generic connector answer traced to knowledge/grc/connectors.md interview prose via generation/retrieval; Top-100 had no connector-definition ID. what-is-grc PREPARED_SCRIPT could steal connector wording.",
+  "records": [
+    {
+      "id": "SAPSC-001",
+      "question": "How do you approach an end-to-end SAP application security assessment?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-002",
+      "question": "What are the main layers of an SAP security architecture?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-003",
+      "question": "How do you decide whether a security issue is design-related or configuration-related?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-004",
+      "question": "How do you apply least privilege in a complex SAP landscape?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-005",
+      "question": "What evidence do you collect before making SAP security recommendations?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-006",
+      "question": "How do you prioritize security remediation findings?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-007",
+      "question": "How would you design security for a global SAP template?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-008",
+      "question": "How do you explain authentication, authorization, provisioning, and governance to a client?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-009",
+      "question": "What is your approach to security architecture trade-offs?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-010",
+      "question": "How do you establish a baseline for an SAP security program?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-011",
+      "question": "Walk me through PFCG role design. (classic ECC/S/4HANA private edition)",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-012",
+      "question": "What is the difference between a single, composite, and derived role?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-013",
+      "question": "How do SU24 proposals fit into role construction?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-014",
+      "question": "How do you troubleshoot an authorization failure using SU53 and STAUTHTRACE?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-015",
+      "question": "How do you design organizational restrictions in roles?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-016",
+      "question": "How do you avoid overly broad wildcard values in authorizations?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-017",
+      "question": "How do you govern technical and service users?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-018",
+      "question": "How do you design firefighter or emergency access without weakening normal roles?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-019",
+      "question": "How do you design role naming, ownership, and lifecycle standards?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-020",
+      "question": "How do you test a role before production deployment?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-021",
+      "question": "How does SAP S/4HANA security differ between Private Edition/on-premises and Public Edition?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-022",
+      "question": "How do you design security for SAP Fiori applications?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-023",
+      "question": "A Fiori tile is visible but the application fails. How do you troubleshoot it?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-024",
+      "question": "How do you approach a brownfield ECC-to-S/4HANA security conversion?",
+      "status": "internally_reviewed",
+      "changed": true,
+      "fixes": [
+        "answer",
+        "must_include",
+        "must_not"
+      ],
+      "change_rationale": "Added explicit connector/ruleset retarget, ARA completeness criterion, and cutover controls for brownfield practicality.",
+      "answer_unchanged_from_archive": false,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-025",
+      "question": "How do you approach greenfield S/4HANA role design?",
+      "status": "internally_reviewed",
+      "changed": true,
+      "fixes": [
+        "answer",
+        "must_include",
+        "must_not"
+      ],
+      "change_rationale": "Clarified edition boundary, SU24, ruleset-from-day-one and test expectations.",
+      "answer_unchanged_from_archive": false,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-026",
+      "question": "How do you secure SAP BI/BW reporting access?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-027",
+      "question": "What security considerations matter for MDG, SRM, CRM, SCM, and HR?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-028",
+      "question": "How do you assess security impact from a Fiori or S/4 release change?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-029",
+      "question": "How do you prevent excessive access through reports, interfaces, or direct URLs?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-030",
+      "question": "How do you secure custom ABAP applications from an authorization perspective?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-031",
+      "question": "Explain segregation of duties and why it matters in SAP.",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-032",
+      "question": "How do you configure or maintain an SAP GRC ARA ruleset?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-033",
+      "question": "How do you investigate a high-risk SoD conflict found by ARA?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-034",
+      "question": "What is the difference between preventive and detective SoD controls?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [
+        "flagged_generic_opening_unfixed"
+      ],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-035",
+      "question": "How do you handle false positives and false negatives in an SoD ruleset?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-036",
+      "question": "How do you design mitigating controls for an unavoidable SoD conflict?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-037",
+      "question": "How do you manage critical access risks that are not classic SoD conflicts?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-038",
+      "question": "How would you explain an SoD risk matrix to business leadership?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-039",
+      "question": "How do you validate GRC ARA results after a role redesign?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-040",
+      "question": "How do you govern SoD ruleset changes over time?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-041",
+      "question": "Explain the end-to-end SAP GRC Access Request Management flow.",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-042",
+      "question": "How do you troubleshoot an access request stuck in MSMP?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-043",
+      "question": "What is the difference between MSMP and BRF+ in GRC Access Control?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-044",
+      "question": "An MSMP request has no approver. How do you investigate?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-045",
+      "question": "How do you design request types and risk checks in ARM?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-046",
+      "question": "How do you troubleshoot a BRF+ rule that returns the right result but MSMP follows the wrong path?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-047",
+      "question": "How do you troubleshoot a failed GRC provisioning request?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-048",
+      "question": "How do you handle access removals and leaver events through GRC?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-049",
+      "question": "How do you design ARM integration with identity management and target systems?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-050",
+      "question": "How do you test an MSMP/BRF+ workflow change?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-051",
+      "question": "Explain SAP GRC Emergency Access Management and Firefighter controls.",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-052",
+      "question": "How do you troubleshoot missing or incomplete Firefighter logs?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-053",
+      "question": "How do you design the Firefighter controller review process?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-054",
+      "question": "How do you design SAP GRC Business Role Management (BRM)?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-055",
+      "question": "A technical role is stale in BRM. How do you investigate it?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-056",
+      "question": "How do you distinguish BRM role lifecycle issues from access certification issues?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-057",
+      "question": "How do you monitor GRC Access Control jobs and connectors?",
+      "status": "internally_reviewed",
+      "changed": true,
+      "fixes": [
+        "must_not",
+        "aliases"
+      ],
+      "change_rationale": "Narrow aliases/must_not so monitoring does not steal connector definition or configure questions.",
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-058",
+      "question": "How do you handle a failed GRC role or user synchronization?",
+      "status": "internally_reviewed",
+      "changed": true,
+      "fixes": [
+        "must_not",
+        "aliases"
+      ],
+      "change_rationale": "Removed overly broad connector sync troubleshooting alias that collided with connector setup prompts.",
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-059",
+      "question": "How do you manage technical-role changes that affect multiple business roles?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-060",
+      "question": "How do you establish access recertification governance?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-061",
+      "question": "How do you design an automated SAP security control?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-062",
+      "question": "How do you design and test a manual control?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-063",
+      "question": "What is the difference between control design effectiveness and operating effectiveness?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-064",
+      "question": "How do you handle an audit finding related to access approvals?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-065",
+      "question": "How do SOX and ITGC relate to SAP access controls?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-066",
+      "question": "How do you produce audit-ready evidence from SAP GRC?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-067",
+      "question": "How do you measure effectiveness of SAP security controls?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-068",
+      "question": "How do you use a risk-control matrix in an SAP security assessment?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-069",
+      "question": "How do you test controls across an S/4HANA migration?",
+      "status": "internally_reviewed",
+      "changed": true,
+      "fixes": [
+        "answer",
+        "must_include",
+        "must_not"
+      ],
+      "change_rationale": "Tied control testing to connector freshness, ARA fixtures and product boundaries.",
+      "answer_unchanged_from_archive": false,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-070",
+      "question": "How would you respond when a manual control test fails?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-071",
+      "question": "How do you manage access-control exceptions without weakening governance?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-072",
+      "question": "A user can log in but cannot execute a transaction. What is your diagnostic sequence?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-073",
+      "question": "A user sees data outside their organizational scope. What do you do?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-074",
+      "question": "GRC ARA shows a sudden drop in SoD conflicts. How do you determine whether it is real?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-075",
+      "question": "A business role exists but the user does not receive the intended access. How do you investigate?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-076",
+      "question": "A security transport causes a production access incident. How do you manage it?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-077",
+      "question": "A GRC access request is approved but the user has no access. What are the likely layers?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-078",
+      "question": "How do you investigate a suspected unauthorized change to security roles?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-079",
+      "question": "How do you troubleshoot inconsistent GRC and target-system role data?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-080",
+      "question": "A role redesign fixes one SoD conflict but creates another. How do you proceed?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-081",
+      "question": "A Fiori app works for one user but fails for another with the same role. What would you check?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-082",
+      "question": "How do you plan a full-cycle SAP security implementation?",
+      "status": "internally_reviewed",
+      "changed": true,
+      "fixes": [
+        "answer",
+        "must_include",
+        "must_not"
+      ],
+      "change_rationale": "Made phases operational and called out connector/provisioning architecture forks.",
+      "answer_unchanged_from_archive": false,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-083",
+      "question": "How do you organize an SAP Security workstream in SAP Activate?",
+      "status": "internally_reviewed",
+      "changed": true,
+      "fixes": [
+        "answer",
+        "must_include",
+        "must_not"
+      ],
+      "change_rationale": "Added connector validation and AC/PC/IAG separation into Activate narrative.",
+      "answer_unchanged_from_archive": false,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-084",
+      "question": "How do you plan security cutover and rollback for an S/4 migration?",
+      "status": "internally_reviewed",
+      "changed": true,
+      "fixes": [
+        "answer",
+        "must_include",
+        "must_not"
+      ],
+      "change_rationale": "Strengthened go/no-go evidence to include connector and ARA completeness.",
+      "answer_unchanged_from_archive": false,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-085",
+      "question": "How do you manage scope, schedule, and quality across a security workstream?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-086",
+      "question": "How do you prepare for SAP security testing and UAT?",
+      "status": "internally_reviewed",
+      "changed": true,
+      "fixes": [
+        "answer",
+        "must_include",
+        "must_not"
+      ],
+      "change_rationale": "Added defect-layer taxonomy and ARA/connector testing expectations.",
+      "answer_unchanged_from_archive": false,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-087",
+      "question": "How do you manage security dependencies with Basis, functional, development and IAM teams?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-088",
+      "question": "How do you move from project delivery to stable security operations?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-089",
+      "question": "How do you estimate effort for an SAP security assessment or role redesign?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-090",
+      "question": "How do you evaluate an SAP security migration strategy?",
+      "status": "internally_reviewed",
+      "changed": true,
+      "fixes": [
+        "answer",
+        "must_include",
+        "must_not"
+      ],
+      "change_rationale": "Added connector and provisioning-path decision criteria to migration strategy.",
+      "answer_unchanged_from_archive": false,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-091",
+      "question": "How do you communicate a critical security risk to client leadership?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-092",
+      "question": "How do you handle disagreement with a client over a security recommendation?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-093",
+      "question": "How do you foster collaboration and develop junior security consultants?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-094",
+      "question": "How do you contribute to proposal development for SAP security work?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-095",
+      "question": "How do you drive continuous improvement in security service delivery?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-096",
+      "question": "How do you manage competing priorities during a critical go-live?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-097",
+      "question": "How do you present a complex SAP security design to nontechnical stakeholders?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-098",
+      "question": "How do you respond when asked about a SAP product or project not listed in your CV?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-099",
+      "question": "How do you structure a STAR answer about resolving a major security issue?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    },
+    {
+      "id": "SAPSC-100",
+      "question": "How do you know when to escalate rather than solve an issue within the team?",
+      "status": "internally_reviewed_only_no_authoritative_source_pass",
+      "changed": false,
+      "fixes": [],
+      "change_rationale": null,
+      "answer_unchanged_from_archive": true,
+      "source_refs": []
+    }
+  ]
+}

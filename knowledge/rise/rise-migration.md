@@ -14,7 +14,7 @@ RISE migration moves master and transactional data from existing systems (ECC, l
 
 ## 60 Second Interview Answer
 
-A RISE migration is a complex choreography: data is pulled from legacy systems using extract tools (LSMW, XI, custom programs), transformed to conform to RISE-required structures (GL hierarchies, cost center assignments, customer master fields), cleansed (removing duplicates, fixing missing values), and loaded to SAP in controlled batches. During Explore and Execute phases, migration specialists develop detailed mapping specifications, build and test extraction routines, and rehearse cutover scenarios. Parallel run—operating both legacy and RISE for 1–2 cycles—validates that SAP processes produce identical business results. Post-cutover, delta migration captures any transactions missed between final load and go-live. Common challenges: legacy data quality issues (duplicate customers, inconsistent GL mapping), complex consolidation (merging multiple legacy instances), and tight cutover windows.
+A RISE migration is a complex choreography: data is pulled from legacy systems using extract tools (LSMW, XI, custom programs), transformed to conform to RISE-required structures (GL hierarchies, cost center assignments, customer master fields), cleansed (removing duplicates, fixing missing values), and loaded to SAP in controlled batches. During Explore and Realize, migration specialists develop detailed mapping specifications, build and test extraction routines, and rehearse cutover scenarios. Parallel run—operating both legacy and RISE for 1–2 cycles—validates that SAP processes produce identical business results. Post-cutover, delta migration captures any transactions missed between final load and go-live. Common challenges: legacy data quality issues (duplicate customers, inconsistent GL mapping), complex consolidation (merging multiple legacy instances), and tight cutover windows.
 
 ## 90 Second Interview Answer
 
@@ -289,7 +289,7 @@ Data migration configuration includes:
 **Root Cause:** Data volumes underestimated. Performance tuning inadequate (database parameters not optimized). Batch size too large (memory issues causing restarts).
 
 **Resolution:**
-- Stress test during Execute phase (load expected volume, identify bottlenecks)
+- Stress test during Realize (load expected volume, identify bottlenecks)
 - Parallelize load jobs (load GL accounts on Job 1, customers on Job 2, materials on Job 3 concurrently)
 - Tune database (increase buffer pools, sort areas for batch input)
 - Reduce batch size if memory-constrained (load 10,000 records per batch instead of 50,000)
@@ -376,7 +376,7 @@ Data migration configuration includes:
    Transactions that exceed legacy limits won't be in legacy comparison; those are "new" RISE transactions. Document them separately. In reconciliation, exclude transactions created during cutover window from comparison (they won't be in legacy). Post-cutover reconciliation focuses on opening balances and transactions before cutover window.
 
 6. **How would you handle a situation where mapping rules are ambiguous for a large portion of data?**
-   Don't proceed with ambiguous mapping. Business owner must decide (e.g., "if legacy GL account is ambiguous, assign to GL 9999 Other, then assign post-go-live"). Document decision. If ambiguity affects >10% of data, extend Execute phase to clarify mappings—rushing through causes post-cutover issues.
+   Don't proceed with ambiguous mapping. Business owner must decide (e.g., "if legacy GL account is ambiguous, assign to GL 9999 Other, then assign post-go-live"). Document decision. If ambiguity affects >10% of data, extend Realize to clarify mappings—rushing through causes post-cutover issues.
 
 7. **If RISE data load performance is much worse than tested (expected 4 hours, actually 12), and cutover window doesn't allow extra time, what options exist?**
    Option 1: Parallelize load (run multiple jobs simultaneously on different processes). Option 2: Defer non-critical data to Wave 2 (reduce load scope). Option 3: Extend cutover window (add extra 8 hours). Option 4: Load data pre-cutover in smaller batches (load Friday morning, validate, cutover Friday evening). Escalate to steering committee with options and impacts.
@@ -420,7 +420,7 @@ Data migration configuration includes:
 
 ## Best Practices
 
-- **Audit source data early:** Don't wait until Execute phase to discover data quality issues. Assess in Discover; plan cleanup in Explore.
+- **Audit source data early:** Don't wait until Realize to discover data quality issues. Assess in Discover; plan cleanup in Explore.
 - **Establish clear mapping:** Document all transformation rules before building code. Business review and sign-off on mappings prevents rework.
 - **Test with production-like volume:** If expecting 10M records, test load with 10M, not 100. Performance issues surface only at scale.
 - **Parallel run is non-negotiable:** Don't skip parallel run to save timeline. It's the only validation before cutover.
@@ -437,7 +437,7 @@ Data migration configuration includes:
 - **Inadequate parallel run:** 1-week parallel run isn't enough for complex migrations. Run 2–3 cycles to build confidence.
 - **No delta migration planning:** Transactions created during cutover window lost if delta plan missing. Delta is critical.
 - **Treating data migration as IT task:** Data quality decisions are business decisions. Involve finance, supply chain leads early and often.
-- **Inadequate testing:** "We'll handle issues post-go-live" leads to reconciliation chaos post-cutover. Test thoroughly Execute phase.
+- **Inadequate testing:** "We'll handle issues post-go-live" leads to reconciliation chaos post-cutover. Test thoroughly during Realize.
 
 ## Interviewer's Hidden Expectations
 

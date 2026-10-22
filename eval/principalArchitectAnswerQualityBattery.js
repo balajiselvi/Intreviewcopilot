@@ -16,9 +16,20 @@ const path = require("path");
 const { resolveInterviewContext, QUESTION_INTENTS } = require("../lib/interviewContext");
 const { DEFAULT_CAREER_BACKGROUND } = require("./lib/careerTimeline");
 
-const LIVE = process.argv.includes("--live") || process.env.EVAL_LIVE === "1";
-const RESCORE = process.argv.includes("--rescore");
-const OUT = path.join(__dirname, "results", "principal-architect-answer-quality.json");
+const modeArg = process.argv.find((arg) => arg.startsWith("--mode="));
+const requestedMode = modeArg ? modeArg.slice("--mode=".length) : null;
+const LIVE = requestedMode === "live" || (!requestedMode && (process.argv.includes("--live") || process.env.EVAL_LIVE === "1"));
+const MODE = requestedMode || (LIVE ? "live" : process.argv.includes("--rescore") ? "rescore" : "offline");
+const RESCORE = requestedMode === "rescore" || process.argv.includes("--rescore");
+const outputArg = process.argv.find((arg) => arg.startsWith("--output="));
+const inputArg = process.argv.find((arg) => arg.startsWith("--input="));
+const defaultStamp = new Date().toISOString().replace(/[:.]/g, "-");
+const OUT = path.resolve(outputArg ? outputArg.slice("--output=".length) : path.join(__dirname, "results", `principal-architect-answer-quality-${MODE}-${defaultStamp}.json`));
+const INPUT = inputArg ? path.resolve(inputArg.slice("--input=".length)) : null;
+const INJECT_FAILURE = process.argv.includes("--test-failure");
+const INJECT_LIVE_FAILURE = process.argv.includes("--test-live-failure");
+const INJECT_PARTIAL_OUTPUT = process.argv.includes("--test-partial-output");
+let outputCreatedByRun = false;
 const TARGET_JOB_DESCRIPTION = "Chalhoub Group — Lead, Identity Security & Access Management. SAP S/4HANA IAM/Security workstream. Do not invent Chalhoub experience.";
 
 const I = QUESTION_INTENTS;
@@ -161,6 +172,7 @@ const CASES = [
   { id: "DOM-BTP-RC", family: "architecture", unseen: true, q: "How do SAP BTP role collections differ from S/4HANA PFCG roles?", route: () => true },
   { id: "DOM-BTP-DEST", family: "troubleshooting", unseen: true, q: "A BTP application cannot reach an on-premise system. What do you check in the destination and Cloud Connector?", route: () => true },
   { id: "DOM-S4-ED", family: "architecture", unseen: true, q: "What changes in role administration between SAP S/4HANA Cloud Public Edition and Private Edition?", route: () => true },
+  { id: "DOM-S4-VERIFY", family: "architecture", unseen: true, q: "How would you design security for SAP S/4HANA Cloud, and how would you verify that the user has the required access?", route: () => true },
   { id: "DOM-FIORI-MISS", family: "troubleshooting", unseen: true, q: "In SAP S/4HANA Cloud Public Edition, a user cannot see a Fiori app. What do you check first?", route: () => true },
   { id: "DOM-SF", family: "implementation", unseen: true, q: "How are role-based permissions assigned in SAP SuccessFactors?", route: () => true },
   { id: "DOM-ARIBA", family: "troubleshooting", unseen: true, q: "A user can log in to SAP Ariba but cannot create a requisition. What do you check?", route: () => true },
@@ -237,6 +249,46 @@ function su53ProvesSuccess(text) {
   return instrument || passedCheck;
 }
 
+function s4CloudQuestion(question) {
+  const q = String(question || "");
+  if (!/\bS\/?4(?:HANA)?\s+Cloud\b/i.test(q)) return false;
+  const privateOnly = /\b(?:private\s+(?:cloud\s+)?edition|private\s+cloud|on[- ]premise)\b/i.test(q)
+    && !/\bpublic\b/i.test(q);
+  return !privateOnly;
+}
+
+function publicEditionUsesOnPremStep(question, answer) {
+  const q = String(question || "");
+  if (!/public edition/i.test(q) || /private edition/i.test(q)) return false;
+  return String(answer || "").split(/(?<=[.?!])\s+/).some((sentence) => {
+    const onPrem = /\b(?:PFCG|SU53|STAUTHTRACE|\/UI2\/FLPCM_CUST)\b/.test(sentence);
+    if (!onPrem) return false;
+    return !/\b(?:do not|don't|does not|not involve|not the|not a|not used|not by|private edition|on-premise|on premise)\b/i.test(sentence);
+  });
+}
+
+function s4CloudUsesForeignAuthorization(question, answer) {
+  if (!s4CloudQuestion(question)) return false;
+  let privateScope = false;
+  return String(answer || "").split(/(?<=[.?!])\s+/).some((sentence) => {
+    if (/\bpublic edition\b/i.test(sentence) && !/\b(?:private edition|on-premise|on premise)\b/i.test(sentence)) privateScope = false;
+    if (/\b(?:private edition|on-premise|on premise)\b/i.test(sentence)) privateScope = true;
+    const foreign = /\b(?:PFCG|SUIM|SU24|AGR_USERS|AGR_1251|role collections?)\b/i.test(sentence);
+    if (!foreign || privateScope) return false;
+    return !/\b(?:do not|don't|does not|not involve|not the|not a|not used|not by|private edition|on-premise|on premise)\b/i.test(sentence);
+  });
+}
+
+function s4CloudVerificationMissing(question, answer) {
+  const q = String(question || "");
+  if (!s4CloudQuestion(q) || !/\b(?:verif|design|architect)\b/i.test(q)) return false;
+  const a = String(answer || "");
+  return !/Maintain Business Roles/i.test(a)
+    || !/Maintain Business Users/i.test(a)
+    || !/Display Authorization Trace/i.test(a)
+    || !/\b(?:assigned user|business user)\b[\s\S]{0,80}\b(?:perform|complet|execut)/i.test(a);
+}
+
 function tableCalledTransaction(text) {
   const table = `(?:${ROLE_TABLES})`;
   const labeled = new RegExp(
@@ -268,12 +320,17 @@ function evaluateLive(c, answer, generation) {
     });
   };
 
-  const headings = ["### 1. Direct Answer", "### 2. Technical Mechanism and Exact Artifacts", "### 3. Validation and Operational Boundary"];
-  if (family !== "experience" && headings.some((heading) => !a.includes(heading))) {
-    push("answer contract", "prompt synthesis", "technical answer omitted a required heading");
+  if (/^#{1,6}\s+|\b(?:direct answer|technical mechanism and exact artifacts|validation and operational boundary|key takeaways)\b/i.test(a)) {
+    push("answer contract", "prompt synthesis", "spoken answer used a report heading");
   }
-  if (/public edition/i.test(c.q) && /\b(PFCG|SU53|STAUTHTRACE|\/UI2\/FLPCM_CUST)\b/.test(a) && !/\b(do not|not the|not a public|not used|private edition only)\b/i.test(a)) {
+  if (publicEditionUsesOnPremStep(c.q, a)) {
     push("wrong edition", "retrieval or answer construction", "Public Edition answer used an on-premise artifact as a step");
+  }
+  if (s4CloudUsesForeignAuthorization(c.q, a)) {
+    push("wrong edition", "retrieval or answer construction", "S/4HANA Cloud answer used PFCG, SUIM, an AGR table, or a BTP role collection as the authorization design");
+  }
+  if (s4CloudVerificationMissing(c.q, a)) {
+    push("verification evidence", "retrieval or answer construction", "S/4HANA Cloud design did not use Maintain Business Roles, Maintain Business Users, the assigned user performing the app, and Display Authorization Trace");
   }
 
   if (incomplete(a)) {
@@ -443,12 +500,10 @@ function sourceContracts() {
   check("generation-sse", /writeSSEEvent\(res, "generation"/.test(chat), "generation metadata event missing");
   check("concept-no-cv-first", /This is a concept question\. Reason from the product mechanism/.test(prompt), "concept still selects CV engagement first");
   check("delivery-artifacts-in-prompt", /project-delivery artifacts and controls/.test(prompt) && /must name only the relevant verified/.test(prompt), "delivery and technical mechanism instructions are not both present");
+  check("spoken-style-in-prompt", /speak one continuous answer the candidate can say aloud/.test(prompt) && /Do not use Markdown headings/.test(prompt), "prompt still requests report headings");
   const deliveryAnswer = [
-    "### 1. Direct Answer",
     "I would recover the slip by resequencing only the work the critical path can release.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "The controls are the integrated workplan, the RAID register, the accountable owner, the change-control record, and the quality gate.",
-    "### 3. Validation and Operational Boundary",
     "I would measure the forecast milestone, the test exit criteria, and the closure evidence, and I would get sponsor approval before any date trade-off."
   ].join("\n");
   const transactionAnswer = deliveryAnswer.replace(
@@ -456,11 +511,8 @@ function sourceContracts() {
     "I would utilize ST03N, AGR_USERS, PFCG, and SU24 to document the role changes."
   );
   const technicalAnswer = [
-    "### 1. Direct Answer",
     "I would create the derived role in PFCG by entering the imparting role in Derive from Role.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "The derived role inherits the menu and the non-organizational values. I maintain the company-code organizational level on the derived role. Table AGR_1251 holds the authorization values.",
-    "### 3. Validation and Operational Boundary",
     "I would generate the profile and have the assigned user complete the business transaction for that company code."
   ].join("\n");
   const pmpCase = CASES.find((item) => item.id === "PMP-03");
@@ -476,40 +528,43 @@ function sourceContracts() {
     "I would use SU53 to confirm that users assigned to the derived role can access the transactions without encountering authorization errors."
   );
   const failedCheckAnswer = [
-    "### 1. Direct Answer",
     "No. SU53 reports the last failed authorization check.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "After an AUTHORITY-CHECK fails, transaction SU53 shows the object and the failed value. It is not proof that access succeeded.",
-    "### 3. Validation and Operational Boundary",
     "Use it only when the business action fails."
   ].join("\n");
   const su53FalseVerification = [
-    "### 1. Direct Answer",
     "SU53 analyzes authorization failures and displays the last failed check.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "It shows the object and checked values after a denial.",
-    "### 3. Validation and Operational Boundary",
     "The output of SU53 serves as a verification tool for administrators to confirm whether the user has the necessary authorizations to perform a specific action."
   ].join("\n");
   const su53ConceptCase = CASES.find((item) => item.id === "CON-03");
   const falseVerificationFailures = evaluateLive(su53ConceptCase, su53FalseVerification, { finish_reason: "stop" });
   check("su53-general-verification-claim-fails", falseVerificationFailures.some((item) => item.evidence.includes("proof that access succeeded")), JSON.stringify(falseVerificationFailures));
   const su53CorrectConcept = [
-    "### 1. Direct Answer",
     "SU53 is an ABAP authorization-error analysis transaction that displays the user's last failed authorization check.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "After reproducing a denial, it shows the failed object and checked values for investigation.",
-    "### 3. Validation and Operational Boundary",
     "It is failure evidence, not a role simulation or proof that a business action succeeds. Test the intended action with the assigned user."
   ].join("\n");
   const correctConceptFailures = evaluateLive(su53ConceptCase, su53CorrectConcept, { finish_reason: "stop" });
   check("su53-correct-concept-passes", correctConceptFailures.length === 0, JSON.stringify(correctConceptFailures));
+  const cloudCase = CASES.find((item) => item.id === "DOM-S4-VERIFY");
+  const cloudAbapAnswer = [
+    "I would design SAP S/4HANA Cloud security in PFCG and verify the user with SUIM.",
+    "AGR_USERS shows the assignment and a BTP role collection grants the app.",
+    "User acceptance testing and an authorization trace confirm the access."
+  ].join("\n");
+  const cloudCorrectAnswer = [
+    "For SAP S/4HANA Cloud Public Edition I design the business role in Maintain Business Roles and assign it in Maintain Business Users.",
+    "The role carries the business catalogs and the restriction values. Private Edition role maintenance stays in PFCG and is not this path.",
+    "The assigned user performs the intended app. Display Authorization Trace then shows successful, failed, or filtered checks. A filtered check is a missing role or restriction value, not proof that the business action succeeded."
+  ].join("\n");
+  const cloudAbapFailures = evaluateLive(cloudCase, cloudAbapAnswer, { finish_reason: "stop" });
+  const cloudCorrectFailures = evaluateLive(cloudCase, cloudCorrectAnswer, { finish_reason: "stop" });
+  check("s4-cloud-pfcg-verification-fails", cloudAbapFailures.some((item) => item.evidence.includes("PFCG")), JSON.stringify(cloudAbapFailures));
+  check("s4-cloud-business-user-verification-passes", cloudCorrectFailures.length === 0, JSON.stringify(cloudCorrectFailures));
   const tableTransactionAnswer = [
-    "### 1. Direct Answer",
     "I would read the role contents before changing the ruleset.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "I would check the assignments using transactions like AGR_USERS and AGR_1251.",
-    "### 3. Validation and Operational Boundary",
     "I would compare that result with the ruleset function before calling it a false positive."
   ].join("\n");
   const tableNamedAnswer = tableTransactionAnswer.replace(
@@ -521,19 +576,13 @@ function sourceContracts() {
   const tableFailures = evaluateLive(CASES.find((item) => item.id === "TS-06"), tableTransactionAnswer, { finish_reason: "stop" });
   const namedTableFailures = evaluateLive(CASES.find((item) => item.id === "TS-06"), tableNamedAnswer, { finish_reason: "stop" });
   const cleanSu53Answer = [
-    "### 1. Direct Answer",
     "Yes, a clean SU53 indicates that there were no authorization failures during the cutover.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "I would review the role assignments after the transport.",
-    "### 3. Validation and Operational Boundary",
     "That result shows the cutover access succeeded."
   ].join("\n");
   const cleanSu53Denial = [
-    "### 1. Direct Answer",
     "No. A clean SU53 is not evidence that cutover succeeded.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "Transaction SU53 stores the last failed authorization check. Transaction SUIM shows the assignment.",
-    "### 3. Validation and Operational Boundary",
     "The cutover check is the assigned user completing the business transaction, plus reconciliation."
   ].join("\n");
   const cleanFailures = evaluateLive(CASES.find((item) => item.id === "ADV-05"), cleanSu53Answer, { finish_reason: "stop" });
@@ -543,45 +592,30 @@ function sourceContracts() {
   check("clean-su53-success-fails", cleanFailures.some((item) => item.evidence.includes("proof that access succeeded")), JSON.stringify(cleanFailures));
   check("clean-su53-denial-passes", !cleanDenialFailures.some((item) => item.evidence.includes("proof that access succeeded")), JSON.stringify(cleanDenialFailures));
   const imp01Su53 = [
-    "### 1. Direct Answer",
     "I would derive the role in PFCG and set the company-code organizational level.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "Transaction PFCG copies the parent. Generate the profile and assign the user.",
-    "### 3. Validation and Operational Boundary",
     "To validate the derived role, use transaction SU53 to check for any authorization failures after testing the role with a user assigned to it. Ensure that the user can perform the required transactions for the new company code. This end-to-end check confirms that the derived role is functioning correctly."
   ].join("\n\n");
   const fol02Su53 = [
-    "### 1. Direct Answer",
     "I would have the assigned user post a document in the new company code.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "I would read tables AGR_USERS and AGR_1251.",
-    "### 3. Validation and Operational Boundary",
     "The validation would involve executing a test transaction while monitoring the authorization trace (using transaction SU53) to confirm that the necessary authorizations are granted."
   ].join("\n\n");
   const imp11Ok = [
-    "### 1. Direct Answer",
     "I would derive the role in PFCG for the new company code.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "I enter the imparting role in Derive from Role. The derived role inherits the menu. I maintain the company-code organizational level, then generate the profile. I would read tables AGR_USERS and AGR_1251.",
-    "### 3. Validation and Operational Boundary",
     "I would have a user assigned to the derived role complete a business transaction for the new company code. The success of this process is validated when that user can execute the transaction without encountering authorization errors. A trace or SU53 can be used to troubleshoot any issues that arise, but the assigned user completes the intended business action."
   ].join("\n\n");
   check("imp01-su53-paragraph-fails", evaluateLive(implCase, imp01Su53, { finish_reason: "stop" }).some((item) => /proof that access succeeded|role UAT/.test(item.evidence)), "saved IMP-01 validation paragraph was not rejected");
   check("followup-su53-confirmation-fails", evaluateLive(CASES.find((item) => item.id === "FOL-02"), fol02Su53, { finish_reason: "stop" }).some((item) => item.evidence.includes("proof that access succeeded")), "follow-up SU53 confirmation was not rejected");
   const fol02UsageProof = [
-    "### 1. Direct Answer",
     "I would have the assigned user post in the new company code.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "I would use transaction ST03N to confirm that the posting transactions are being executed.",
-    "### 3. Validation and Operational Boundary",
     "The assigned user completes the posting."
   ].join("\n");
   const fol02TablesNotProof = [
-    "### 1. Direct Answer",
     "I would have the assigned user post a document in the new company code.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "Tables AGR_USERS and AGR_1251 show the assignment. They do not prove the posting succeeded.",
-    "### 3. Validation and Operational Boundary",
     "The proof is the user completing the posting transaction. SU53 is only used if that action fails."
   ].join("\n");
   const fol02Case = CASES.find((item) => item.id === "FOL-02");
@@ -589,39 +623,27 @@ function sourceContracts() {
   check("assignment-table-denial-passes", !evaluateLive(fol02Case, fol02TablesNotProof, { finish_reason: "stop" }).some((item) => /proof of the business action|proof that access succeeded/.test(item.evidence)), "a negated table check was rejected");
   check("failure-branch-su53-passes", !evaluateLive(implCase, imp11Ok, { finish_reason: "stop" }).some((item) => /proof that access succeeded|role UAT|role table|omitted PFCG|copying the role|Derive from Role field|Description tab/.test(item.evidence)), "derived-role failure branch was rejected");
   const copyRoleAnswer = [
-    "### 1. Direct Answer",
     "You start by copying an existing master role.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "In PFCG, use the Copy Role function, then set the company-code organizational level.",
-    "### 3. Validation and Operational Boundary",
     "The assigned user completes the business transaction for that company code."
   ].join("\n");
   check("copy-role-method-fails", evaluateLive(implCase, copyRoleAnswer, { finish_reason: "stop" }).some((item) => item.evidence.includes("copying the role")), "Copy Role was accepted as derivation");
   check("derive-from-role-passes", !technicalFailures.some((item) => /copying the role|Derive from Role field|Description tab|omitted PFCG/.test(item.evidence)), JSON.stringify(technicalFailures));
   const orgOnDescription = [
-    "### 1. Direct Answer",
     "I would derive the role in PFCG.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "On the Description tab, specify the organizational levels, such as the new company code. The role inherits the menu.",
-    "### 3. Validation and Operational Boundary",
     "The assigned user completes the business transaction."
   ].join("\n");
   check("org-level-on-description-tab-fails", evaluateLive(implCase, orgOnDescription, { finish_reason: "stop" }).some((item) => item.evidence.includes("Description tab")), "organizational levels on the Description tab were accepted");
   const passedCheck = [
-    "### 1. Direct Answer",
     "A clean SU53 does not prove that the cutover succeeded. It only indicates that the last authorization check did not fail.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "Transaction SUIM shows the assignments.",
-    "### 3. Validation and Operational Boundary",
     "The assigned user still has to complete the business transaction."
   ].join("\n");
   check("su53-passed-check-misstatement-fails", evaluateLive(CASES.find((item) => item.id === "ADV-05"), passedCheck, { finish_reason: "stop" }).some((item) => item.evidence.includes("proof that access succeeded")), "clean SU53 described as a passed check was not rejected");
   const msmpOk = [
-    "### 1. Direct Answer",
     "I would configure the MSMP path for the ARM request.",
-    "### 2. Technical Mechanism and Exact Artifacts",
     "I would maintain the stages and the BRFplus agent rule.",
-    "### 3. Validation and Operational Boundary",
     "I would simulate an access request and check the instance status. A trace or SU53 would only be used to investigate any failures after the request has been processed."
   ].join("\n\n");
   check("msmp-simulation-plus-failure-su53-passes", !evaluateLive(CASES.find((item) => item.id === "IMP-02"), msmpOk, { finish_reason: "stop" }).some((item) => /role UAT|proof that access succeeded/.test(item.evidence)), "MSMP simulation was treated as SU53 success evidence");
@@ -637,6 +659,51 @@ function familyCounts(list) {
 }
 
 (async () => {
+  if (!["offline", "live", "rescore"].includes(MODE) || (MODE === "live") !== LIVE || (RESCORE && !INPUT)) {
+    console.error("Invalid evaluation mode. Use --mode=offline, --mode=live, or --mode=rescore --input=<existing-report>.");
+    process.exitCode = 2;
+    return;
+  }
+  if (fs.existsSync(OUT)) {
+    console.error(`Refusing to overwrite evaluation output: ${OUT}`);
+    process.exitCode = 2;
+    return;
+  }
+  if (INJECT_PARTIAL_OUTPUT) {
+    fs.mkdirSync(path.dirname(OUT), { recursive: true });
+    fs.writeFileSync(OUT, JSON.stringify({ status: "running", partial: true }), { flag: "wx" });
+    outputCreatedByRun = true;
+  }
+  if (LIVE) {
+    const { APP_BASE_URL, OPENAI_API_KEY } = require("./lib/env");
+    let serviceAvailable = false;
+    try {
+      const response = await fetch(APP_BASE_URL, { signal: AbortSignal.timeout(3000) });
+      serviceAvailable = response.status < 500;
+    } catch {}
+    if (!serviceAvailable || !OPENAI_API_KEY) {
+      const report = {
+        generatedAt: new Date().toISOString(),
+        mode: MODE,
+        status: "blocked",
+        infrastructure: {
+          serviceAvailable,
+          providerCredentialPresent: Boolean(OPENAI_API_KEY),
+          reason: !serviceAvailable ? "Application service is unavailable at the configured evaluation URL." : "Provider credential is not configured."
+        },
+        counts: { total: CASES.length, completed: 0 },
+        live: false,
+        liveRows: [],
+        liveFailures: []
+      };
+      fs.mkdirSync(path.dirname(OUT), { recursive: true });
+      fs.writeFileSync(OUT, JSON.stringify(report, null, 2), { flag: "wx" });
+      outputCreatedByRun = true;
+      console.log(JSON.stringify({ mode: MODE, status: "blocked", reason: report.infrastructure.reason, out: OUT }, null, 2));
+      process.exitCode = 2;
+      return;
+    }
+  }
   const routingFailures = [];
   const routed = [];
   for (const c of CASES) {
@@ -678,8 +745,8 @@ function familyCounts(list) {
 
   const liveFailures = [];
   const liveRows = [];
-  if (RESCORE && fs.existsSync(OUT)) {
-    const prev = JSON.parse(fs.readFileSync(OUT, "utf8"));
+  if (RESCORE && INPUT && fs.existsSync(INPUT)) {
+    const prev = JSON.parse(fs.readFileSync(INPUT, "utf8"));
     for (const row of prev.liveRows || []) {
       const c = CASES.find((x) => x.id === row.id);
       if (!c) continue;
@@ -700,8 +767,8 @@ function familyCounts(list) {
   } else if (LIVE) {
     const { generateAnswer } = require("./lib/generateAnswer");
     const onlyIds = new Set(String(process.env.EVAL_CASE_IDS || "").split(",").map((id) => id.trim()).filter(Boolean));
-    const resume = fs.existsSync(OUT) && (onlyIds.size || process.argv.includes("--resume"));
-    const priorRows = resume ? (JSON.parse(fs.readFileSync(OUT, "utf8")).liveRows || []) : [];
+    const resume = INPUT && fs.existsSync(INPUT) && (onlyIds.size || process.argv.includes("--resume"));
+    const priorRows = resume ? (JSON.parse(fs.readFileSync(INPUT, "utf8")).liveRows || []) : [];
     const done = new Set(priorRows.filter((row) => row.answer && !row.error && !onlyIds.has(row.id)).map((row) => row.id));
     for (const row of priorRows.filter((row) => done.has(row.id))) {
       const c = CASES.find((item) => item.id === row.id);
@@ -767,18 +834,31 @@ function familyCounts(list) {
       fs.mkdirSync(path.dirname(OUT), { recursive: true });
       fs.writeFileSync(OUT, JSON.stringify({
         generatedAt: new Date().toISOString(),
+        mode: MODE,
+        status: "running",
         live: true,
         partial: true,
         counts: { total: CASES.length, completed: liveRows.length },
         liveFailures,
         liveRows
-      }, null, 2));
+      }, null, 2), { flag: outputCreatedByRun ? "w" : "wx" });
+      outputCreatedByRun = true;
     }
   }
 
+  if (INJECT_FAILURE) contracts.push({ name: "injected-regression-failure", evidence: "Deliberate test failure." });
+  if (INJECT_LIVE_FAILURE) liveFailures.push({ failureCategory: "injected-live-answer-quality-failure", evidence: "Deliberate test failure." });
+  const hardFail = contracts.length
+    || routingFailures.length
+    || !sameTopicDistinct
+    || unseenPct < 0.6
+    || liveFailures.length;
   const report = {
     generatedAt: new Date().toISOString(),
-    live: LIVE || liveRows.length > 0,
+    mode: MODE,
+    status: hardFail ? "failed" : "passed",
+    live: LIVE,
+    answerSource: RESCORE ? "saved-live-captures" : LIVE ? "current-live-calls" : "deterministic-offline-checks",
     counts: {
       total: CASES.length,
       unseen,
@@ -798,32 +878,27 @@ function familyCounts(list) {
       { domain: "GRC Access Control, IAG, IAS, IPS, BTP, Fiori Public versus Private, SuccessFactors, Ariba, SAC, Datasphere, BW, HANA, SAP IDM, Activate", status: "not-reverified", scope: "Present in the knowledge files. Currency was not rechecked against SAP Help, Notes, or Learning in this pass.", source: "None re-opened this session.", artifact: "Do not treat the index as proof of the current release." }
     ]
   };
-  const preserveSavedLive = !LIVE && !RESCORE && fs.existsSync(OUT);
-  if (!preserveSavedLive) {
-    fs.mkdirSync(path.dirname(OUT), { recursive: true });
-    fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
-  }
+  fs.mkdirSync(path.dirname(OUT), { recursive: true });
+  fs.writeFileSync(OUT, JSON.stringify(report, null, 2), { flag: outputCreatedByRun ? "w" : "wx" });
+  outputCreatedByRun = true;
 
-  const hardFail = contracts.length
-    || routingFailures.length
-    || !sameTopicDistinct
-    || unseenPct < 0.6
-    || liveFailures.length;
   if (hardFail && contracts.length) {
     console.error(contracts.map((item) => `${item.name}: ${item.evidence}`).join("\n"));
   }
   console.log(JSON.stringify({
     total: CASES.length,
+    mode: MODE,
+    status: report.status,
     unseenPct: Number(unseenPct.toFixed(3)),
     families: familyCounts(CASES),
     sourceContracts: contracts.length,
     routingFailures: routingFailures.length,
     sameTopicSodDistinct: sameTopicDistinct,
-    live: LIVE || liveRows.length > 0,
+    live: LIVE,
     liveFailures: liveFailures.length,
     out: OUT
   }, null, 2));
-  if (hardFail) process.exitCode = 1;
+  process.exit(hardFail ? 1 : 0);
 })().catch((error) => {
   console.error(error);
   process.exit(1);

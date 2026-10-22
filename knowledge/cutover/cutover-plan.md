@@ -2,7 +2,7 @@
 
 ## Overview
 
-Security cutover is the controlled move of users, roles, and identity jobs into production. Success is measured by expected access working, unexpected access absent, emergency access logged, and a documented rollback. SU53 is a defect diagnostic, not a cutover exit criterion.
+Security cutover is the controlled move of users, roles, and identity jobs into production. Success is measured by expected access working, unexpected access absent, emergency access logged, and a rollback position the platform actually supports. SU53 is a defect diagnostic, not a cutover exit criterion. After users post business documents in the new or converted system, do not claim that a technical rollback is still available.
 
 ## Interview Summary
 

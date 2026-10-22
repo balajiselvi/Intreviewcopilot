@@ -31,10 +31,7 @@ const defaultConfig = {
   aiModel: 'gpt-4o-mini',
   silenceTimerDuration: 1.2, 
   responseLength: 'medium',
-  gptSystemPrompt: `You are an AI interview assistant. Your role is to:
-- Highlight key points in responses
-- Suggest related technical concepts to explore
-- Maintain professional tone`,
+  gptSystemPrompt: `You are the candidate's live SAP interview assistant. Answer the interviewer's question from verified SAP knowledge. Pasted background can add a personal detail; it does not limit a technical answer. Do not invent an employer, customer, date, or metric.`,
   azureToken: '',
   azureRegion: 'eastus',
   azureLanguage: 'en-US',

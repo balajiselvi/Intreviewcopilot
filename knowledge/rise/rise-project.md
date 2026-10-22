@@ -2,23 +2,23 @@
 
 ## Overview
 
-RISE projects represent a fundamental shift in how SAP implementations are executed. Unlike traditional implementations that could take 2–3 years, RISE projects adopt a cloud-centric, agile, pre-configured approach designed to accelerate time-to-value. A RISE project involves not just software deployment but organizational transformation: moving from on-premise to cloud, adopting new processes, building new skills, and establishing governance structures for a cloud-native SAP environment. Understanding project governance, phasing, resource models, and change management is critical for anyone supporting or leading RISE initiatives at enterprise scale.
+A RISE with SAP delivery uses SAP Activate as the implementation framework. Confirm the configuration work in the six Activate phases: Discover, Prepare, Explore, Realize, Deploy, and Run. In Realize, configure the approved scope and complete the cutover evidence before Deploy. Do not replace Realize with an Execute phase, and do not drop Prepare or Run. The service contract is separate from the phase names. Before assigning infrastructure, application security, or single sign-on work, confirm the roles-and-responsibilities document for that edition. In the March 2026 private-edition document, the application security concept and the design and implementation of single sign-on are customer Excluded Tasks. Duration, standard-process adoption, and wave scope come from the approved plan. Do not quote a universal timeline or a universal adoption percentage.
 
 ## Interview Summary
 
-RISE projects use pre-built industry packages, accelerated methodologies, and cloud-native governance to compress implementation timelines from years to months. Success depends on clear business case alignment, executive sponsorship, experienced partner selection, and structured change management.
+RISE delivery follows SAP Activate: Discover, Prepare, Explore, Realize, Deploy, and Run. The customer owns the application security concept and the single sign-on design and implementation under the March 2026 private-edition roles-and-responsibilities document. SAP's standard services and excluded tasks differ by line item. Confirm the contract before stating who operates a component.
 
 ## 30 Second Interview Answer
 
-RISE is a cloud implementation model where SAP provides a pre-configured, industry-specific S/4HANA system with built-in best practices, reducing customization and shortening go-live from years to months. A RISE project includes infrastructure (SAP Cloud Infrastructure), proven implementation methods (RISE methodology), and managed services. The key difference from traditional implementations: less design, more adoption of SAP's standard processes.
+Use SAP Activate for a RISE delivery: Discover, Prepare, Explore, Realize, Deploy, and Run. Confirm the fit-to-standard scope in Explore, configure and test in Realize, and complete the cutover and hypercare in Deploy. Confirm the authorization owner from the contracted roles and responsibilities. Do not rename Realize to Execute, and do not invent a 6-to-12-month duration.
 
 ## 60 Second Interview Answer
 
-RISE projects follow a structured methodology tailored by industry: Financial Services, Manufacturing, Public Sector, etc. The approach involves business case development, team formation, process adoption workshops, and phased go-live. SAP provides the cloud infrastructure through BTP and/or SAP Cloud Infrastructure; the customer provides business leadership, subject-matter experts, and change champions. The project timeline typically spans 6–12 months from kickoff to go-live, compared to 24–36 months for traditional implementations. Critical success factors include executive sponsorship, willingness to adopt SAP standard processes rather than force customization, and skilled partner guidance.
+Start by confirming the RISE edition and the service package. Discover confirms the business case and the deployment choice. Prepare completes the plan, the governance, and the initial landscape. Explore confirms the fit-to-standard gaps and the authorization scope. Realize configures the solution and completes the test evidence. Deploy completes the cutover, the go/no-go review, and hypercare. Run hands the service to operations. For SAP S/4HANA Cloud, private edition, the March 2026 roles-and-responsibilities document makes the application security concept, single sign-on design, single sign-on implementation, and corporate identity-provider integration customer tasks. Infrastructure security is a different service line. Do not apply one RACI to every contract.
 
 ## 90 Second Interview Answer
 
-A RISE project is a complete engagement: business case development, organizational readiness assessment, team ramp-up, process workshops, configuration, testing, hypercare, and knowledge transfer. SAP's methodology is pre-built and proven, reducing guesswork about what works. The customer's role is to understand their business, identify gaps with SAP standard processes, and make deliberate decisions about which processes to change versus customize. A skilled project manager ensures clear scope, manages stakeholder expectations, and keeps the team focused on adoption over customization. Most RISE implementations adopt 70–80% of SAP standard processes, customize 15–20%, and leave 5% for future phases. The phased go-live approach—typically Wave 1 (core financials), Wave 2 (operations), Wave 3+ (analytics, advanced features)—spreads risk and builds organizational capability incrementally. Success is measured not by go-live date but by adoption quality, user satisfaction, and business value realization 3–6 months post-go-live.
+Treat RISE as a contracted operating model delivered through SAP Activate, not as a fixed week count. The programme still needs a steering decision path, a RAID log, named workstream owners, and change control. Those are delivery controls. They do not change the phase names. In Explore, confirm which processes are adopted and which extensions are approved. In Realize, configure only the approved scope and complete integration and authorization testing. In Deploy, rehearse the cutover, record the go/no-go evidence, and define hypercare ownership before production use. The March 2026 private-edition roles-and-responsibilities document is the source for who performs application security and single sign-on. A different edition, hyperscaler, or service package can change a line item. Do not claim that most programmes adopt 70 percent of standard processes, and do not name a partner firm as a required method.
 
 ## Architecture
 
@@ -28,14 +28,16 @@ RISE projects operate within a governance structure that includes:
 2. **Program Management Office (PMO)** — Overseeing timeline, budget, resource allocation
 3. **Project Core Team** — Project Manager, Business Analyst, Solution Architect, Technical Lead, Change Manager
 4. **Workstream Leads** — Finance, Supply Chain, Manufacturing, HR, etc. (by industry/company structure)
-5. **Partner Organization** — Implementation partner (Deloitte, Accenture, SAP Consulting) providing methodology and experts
+5. **Partner Organization** — The contracted implementation partner, when the customer engages one. The firm is a contract fact, not a required method.
 6. **SAP RISE Support** — Managed service provider offering cloud infrastructure, Proactive Client Services (PCS), and escalation support
 
-The project phases align with RISE methodology:
-- **Discover** (Weeks 1–4): Business case, gap analysis, team formation
-- **Explore** (Weeks 5–12): Process workshops, configuration design, test strategy
-- **Execute** (Weeks 13–32): Configuration, build, testing (system/integration/user acceptance)
-- **Deploy** (Weeks 33+): Go-live preparation, cutover, hypercare, knowledge transfer
+The project phases are the SAP Activate phases. Do not attach a universal week count:
+- **Discover**: business case, high-level scope, deployment choice
+- **Prepare**: plan, governance, team, initial landscape
+- **Explore**: fit-to-standard workshops, backlog, authorization scope
+- **Realize**: configuration, integration, and test evidence
+- **Deploy**: cutover rehearsal, go/no-go, production cutover, hypercare
+- **Run**: operational handover and continuous improvement
 
 ## Runtime Flow
 
@@ -62,34 +64,29 @@ The project phases align with RISE methodology:
    - Design documents prepared (system, security, integration, reporting)
    - Test strategy and test cases developed
 
-5. **Execute Phase**
-   - Configuration in sandbox environment
-   - Build (customization, custom development if necessary)
-   - Unit testing by development team
-   - System testing by technical team
-   - Integration testing with interfaces and extensions
-   - User acceptance testing (UAT) with business users
+5. **Realize Phase**
+   - Configure the approved scope
+   - Complete unit, integration, and user-acceptance evidence
+   - Confirm authorization testing for the edition in scope
 
 6. **Deploy Phase**
-   - Production environment setup
-   - Cutover planning (data migration, manual processes for delta period)
-   - Go-live readiness review
-   - Cutover execution (data load, configuration transport, system startup)
-   - Hypercare (1–2 weeks of intensive post-go-live support)
-   - Knowledge transfer and hand-off to operations
+   - Rehearse the cutover
+   - Complete the go/no-go review
+   - Execute the production cutover
+   - Run hypercare for the period named in the approved plan
 
-7. **Post-Go-Live**
-   - Operational support period (typically 2–3 months with partner/SAP support)
-   - Business value realization review (6 months post-go-live)
-   - Future enhancement planning (Wave 2, advanced analytics, etc.)
+7. **Run**
+   - Hand the service to operations
+   - Continue adoption and improvement
+   - Do not invent a fixed hypercare length
 
 ## Configuration
 
-RISE projects use SAP's RISE methodology, which is delivered through:
+RISE delivery uses SAP Activate. Do not describe a separate Execute phase, a universal 70 percent preconfiguration, or an "SCI tool" as the methodology.
 
-1. **SAP Activate Methodology** — Accelerated, best-practice-driven approach with predefined roles, templates, and checklists
-2. **RISE Package Scope** — Industry-specific configuration templates that pre-populate 70% of typical configuration
-3. **Solution Configuration and Implementation** (SCI) tool — Cloud-based collaboration platform where RISE scope is documented, assigned, and tracked
+1. **SAP Activate** — Discover, Prepare, Explore, Realize, Deploy, and Run
+2. **Contracted scope** — The service package and the roles-and-responsibilities document decide which tasks SAP performs
+3. **Approved backlog** — Fit-to-standard decisions and extensions are recorded in the programme's own control, not assumed from a percentage
 
 Key configuration elements:
 
@@ -294,7 +291,7 @@ Project governance artifacts include:
 **Root Cause:** Inadequate performance testing before go-live, database not sized for production load, custom code has performance issues, poor index strategy.
 
 **Resolution:**
-- Conduct performance testing during Execute phase with production-like data volumes
+- Conduct performance testing during Realize with production-like data volumes
 - Identify and optimize slow-running reports/batch jobs before go-live
 - Baseline system performance (response times, throughput) during UAT
 - Monitor actual performance post-go-live and compare to baseline
@@ -304,10 +301,10 @@ Project governance artifacts include:
 ## Common Interview Questions
 
 1. **What is RISE and how does it differ from traditional SAP implementations?**
-   RISE is a cloud-centric, pre-configured implementation model that leverages industry-specific best practices to reduce timeline and customization. Traditional implementations could take 2–3 years with significant custom development; RISE targets 6–12 months with 70–80% adoption of SAP standard processes, reducing cost and risk.
+   RISE with SAP is a contracted service and operating model. Deliver it with SAP Activate: Discover, Prepare, Explore, Realize, Deploy, and Run. Do not quote a universal duration or a universal standard-process percentage.
 
 2. **What are the key phases of a RISE project?**
-   Discover (gap analysis, team formation), Explore (process design, configuration planning), Execute (build, testing), Deploy (go-live preparation, cutover), and Post-Go-Live (hypercare, optimization).
+   Discover, Prepare, Explore, Realize, Deploy, and Run. Do not replace Realize with Execute, and do not drop Prepare or Run.
 
 3. **What is the role of the Steering Committee in a RISE project?**
    The Steering Committee provides executive oversight, approves business case, resolves escalations beyond project management, and ensures executive sponsorship. Typically includes CFO, COO, CIO, and key business line leaders.
@@ -322,16 +319,16 @@ Project governance artifacts include:
    Steering Committee (executive leadership), PMO (program oversight), Project Core Team (PM, BA, Architect, Tech Lead, Change Manager), Workstream Leads (by functional area), and partner organization providing methodology and expertise.
 
 7. **What is RISE methodology and why does it accelerate implementation?**
-   RISE methodology is SAP's proven best-practice approach (similar to SAP Activate). It includes predefined roles, templates, and checklists that eliminate design rework. Industry-specific RISE packages provide 70% pre-built configuration, reducing customization effort.
+   The implementation framework is SAP Activate. A service package does not by itself prove a percentage of prebuilt configuration. Confirm the contracted scope.
 
 8. **How are waves used in RISE projects?**
-   Waves are phased go-lives (Wave 1: core financials, Wave 2: operations, Wave 3+: advanced features). Typically 4–8 weeks apart, waves spread risk and allow organizational learning between go-lives.
+   A wave is a release decision in the approved plan. Do not assign a universal wave content list or a universal gap between waves.
 
 9. **What is the role of change management in a RISE project?**
    Change management addresses user adoption, organizational transformation, and resistance. Includes communications, training, stakeholder engagement, and culture change activities. Critical for driving adoption and realizing business value post-go-live.
 
 10. **What is hypercare and why is it important?**
-    Hypercare is 1–2 weeks of intensive post-go-live support with partner consultants on-site. Focuses on immediate issue resolution, user support, data validation, and knowledge transfer to internal operations team.
+    Hypercare is the intensive support period after production cutover. Its length and staffing come from the approved Deploy plan. Do not invent a one-to-two-week duration.
 
 11. **How is risk managed in a RISE project?**
     Risks are identified during Discover, tracked in Risk Register with ownership and mitigation strategies. Executive sponsor and PMO review risks weekly. Go-live readiness review confirms all high-risk items mitigated.
@@ -346,7 +343,7 @@ Project governance artifacts include:
     Business analyst documents as-is processes, facilitates to-be workshops with users, translates business requirements into configuration, develops UAT test cases, and supports hypercare.
 
 15. **What are the typical timelines for each RISE phase?**
-    Discover: 4–6 weeks, Explore: 8–10 weeks, Execute: 20–24 weeks, Deploy: 2–4 weeks (includes cutover + hypercare). Total project duration: typically 6–12 months from kickoff to stable operations.
+    There is no universal week count. Confirm the duration in the approved plan for that contract and landscape.
 
 16. **What is cutover and what must be planned for it?**
     Cutover is the switch from legacy system to SAP system (typically over a weekend or month-end). Planning includes data loads, configuration transport, system startup, manual processes documentation, and rollback procedures.
@@ -371,7 +368,7 @@ Project governance artifacts include:
 2. **How would you handle a situation where the business stakeholder wants a significant customization that conflicts with RISE best practices?**
    First, understand the business driver (regulatory requirement, unique competitive advantage, legacy system limitation). Facilitate design workshop to explore SAP standard process and gap analysis. If customization is still justified, submit formal change request with cost/timeline impact. Use go/no-go decision process (steering committee approves based on ROI).
 
-3. **What if key partner consultants leave the project during critical Execute phase?**
+3. **What if key partner consultants leave during Realize?**
    Immediately activate backup resources from partner (contractual obligation). Conduct knowledge transfer with departing consultants. Accelerate cross-training of internal team on critical tasks. If necessary, bring in interim resources to backfill. Document all design decisions in shared repository to reduce knowledge loss.
 
 4. **How would you address user adoption resistance if UAT reveals widespread discomfort with the new system?**
@@ -451,7 +448,7 @@ Project governance artifacts include:
 ## Best Practices
 
 - **Start with clear business case:** Quantify business drivers, ROI, success metrics before project kickoff. Revisit during Discover phase to confirm assumptions.
-- **Executive sponsorship is non-negotiable:** Project without strong C-level sponsor is 3x more likely to fail. Invest in sponsor engagement, ensure they remove obstacles.
+- **Executive sponsorship is non-negotiable:** Name the sponsor, the decisions that sponsor owns, and the escalation path. Do not invent a failure multiple.
 - **Adopt RISE discipline:** Resist customization pressure. Most customization is wants, not needs. Use Wave approach to defer non-critical customization to Wave 2+.
 - **Invest in change management from day one:** Don't treat change management as an afterthought. Business process change is harder than software deployment.
 - **Balance speed with quality:** RISE timelines are aggressive. Don't compromise on UAT quality or hypercare coverage to meet timeline.
@@ -465,7 +462,7 @@ Project governance artifacts include:
 - **Treating RISE like traditional implementation:** RISE has different expectations (adopt standard processes, less customization). Using traditional methodology on RISE leads to scope creep and schedule overrun.
 - **Weak executive sponsorship:** Executive sponsor visible only at kickoff and go-live. Without ongoing sponsor engagement, project lacks authority to drive change.
 - **Insufficient change management:** Business users resent imposed change; adoption suffers. Invest in communications, training, stakeholder engagement, change champions.
-- **Data migration as afterthought:** Postponing data migration planning until Execute phase causes rework. Plan data migration in Discover, execute pilots during Explore.
+- **Data migration as afterthought:** Plan data migration in Discover and Prepare, and rehearse it before Deploy. Do not leave the first rehearsal until Realize is nearly closed.
 - **Inadequate testing discipline:** Skipping performance testing, integration testing, or UAT cycles leads to post-go-live surprises and support overload.
 - **Customization instead of adoption:** Every customization request becomes an argument; each custom development slows delivery and increases maintenance. Default to "adopt standard."
 - **No Wave planning:** Trying to deliver everything in Wave 1 leads to scope creep and missed timelines. Wave approach distributes work, spreads risk, allows learning.
@@ -476,7 +473,7 @@ Project governance artifacts include:
 - **Practical RISE experience:** Have you managed or participated in a RISE project? Can you speak to real decisions, challenges, outcomes?
 - **Change management awareness:** Do you treat RISE as a people/process change initiative or just a software project? Change management skills are critical.
 - **Governance discipline:** Can you describe project governance, escalation processes, and how you keep projects on track despite chaos?
-- **Realistic timeline expectations:** RISE timelines are tight (6–12 months). A candidate who acknowledges this and discusses trade-off decisions shows maturity.
+- **Realistic timeline expectations:** Use the approved plan. Do not quote a universal 6-to-12-month duration.
 - **Team leadership:** Can you describe how you built, motivated, and retained a high-performing project team?
 - **Wave strategy:** Understanding why waves are strategic (not an afterthought) shows depth of project thinking.
 
@@ -484,7 +481,7 @@ Project governance artifacts include:
 
 - Candidate explains RISE business model and why it accelerates implementation
 - Discusses executive sponsorship, change management, team structure as critical success factors
-- Can articulate RISE phasing (Discover, Explore, Execute, Deploy) and Wave approach with specifics
+- Can articulate SAP Activate: Discover, Prepare, Explore, Realize, Deploy, and Run
 - Shares concrete example from real project (challenge faced, how it was resolved, outcome)
 - Mentions data migration, testing, hypercare, and post-go-live support as non-negotiable aspects
 - Acknowledges trade-offs and constraints (can't customize everything, must adopt standard processes)

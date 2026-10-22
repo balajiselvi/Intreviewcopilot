@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
 import { Box, Button, Container, Grid, Paper, Typography, Avatar } from '@mui/material';
 import { styled, ThemeProvider } from '@mui/material/styles';
@@ -10,7 +10,8 @@ import CodeIcon from '@mui/icons-material/Code';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SpeedIcon from '@mui/icons-material/Speed';
-import Link from 'next/link'; // Import Next.js Link
+import Link from 'next/link';
+import SettingsDialog from '../components/SettingsDialog';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main, // Use primary color from theme
@@ -85,11 +86,14 @@ const features = [
   {
     icon: <SettingsIcon fontSize="large" />,
     title: 'Customizable Settings',
-    description: 'Tailor AI models, API keys, and behavior to your specific needs and preferences.',
+    description: 'Tailor the AI model, API keys, silence detection, and speech transcription to the live interview.',
+    action: 'settings',
   },
 ];
 
 export default function LandingPage() {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
   return (
     <ThemeProvider theme={darkTheme}>
       <Head>
@@ -137,7 +141,7 @@ export default function LandingPage() {
           <Grid container spacing={4}>
             {features.map((feature) => (
               <Grid item xs={12} sm={6} md={4} key={feature.title}>
-                <FeaturePaper elevation={3}> {/* Use elevation for subtle shadow */}
+                <FeaturePaper elevation={3}>
                   <FeatureIcon>{feature.icon}</FeatureIcon>
                   <Typography variant="h6" component="h3" gutterBottom>
                     {feature.title}
@@ -145,6 +149,17 @@ export default function LandingPage() {
                   <Typography variant="body1" color="textSecondary">
                     {feature.description}
                   </Typography>
+                  {feature.action === 'settings' && (
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      startIcon={<SettingsIcon />}
+                      onClick={() => setSettingsOpen(true)}
+                      sx={{ mt: 2 }}
+                    >
+                      Open settings
+                    </Button>
+                  )}
                 </FeaturePaper>
               </Grid>
             ))}
@@ -165,6 +180,8 @@ export default function LandingPage() {
           </Typography>
         </Container>
       </Section>
+
+      <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
 
       <Footer>
         <Typography variant="body2">

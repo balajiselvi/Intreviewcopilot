@@ -6,7 +6,7 @@ const { selectProductScopedChunks } = require("../lib/productKnowledgeScope.js")
 const { productKnowledgeFolders } = require("../lib/productKnowledgeScope.js");
 const { retrieveCandidatesStage } = require("../services/retrievalService.js");
 const { selectVerifiedWorkflow } = require("../lib/verifiedWorkflow.js");
-const { deliveryProcedureAdjustment } = require("../services/sectionHeading.js");
+const { deliveryProcedureAdjustment, namedSourceAdjustment } = require("../services/sectionHeading.js");
 
 const root = path.join(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
@@ -39,6 +39,7 @@ for (const [question, topic] of [
   ["How do you diagnose a BW/4HANA analysis authorization?", "BW"],
   ["How do you apply an analytic privilege in SAP HANA?", "HANA"],
   ["How do I secure data in Datasphere?", "Datasphere"],
+  ["How do I implement a manual assessment in SAP GRC Process Control?", "Process Control"],
   ["How does SAP IDM provision users?", "SAP IDM"]
 ]) {
   assert.equal(explicitProductTopic(question), topic, question);
@@ -51,6 +52,13 @@ assert.deepEqual(
   ["grc"],
   "SAP Access Control questions use the GRC knowledge lane even when the interviewer omits the GRC acronym"
 );
+assert.deepEqual(
+  productKnowledgeFolders("How do I implement a manual assessment in SAP GRC Process Control?"),
+  ["grc"],
+  "Process Control is a distinct GRC product scope"
+);
+assert.ok(productKnowledgeFolders("On an SAP GRC program, a vendor delay threatens cutover; how do I govern recovery and escalation?").includes("project-management"));
+assert.equal(namedSourceAdjustment("How do I implement a test in SAP GRC Process Control?", { sourceFolder: "grc", sourceFile: "process-control.md" }), 0.22);
 assert.ok(resolveInterviewContext({
   questionRaw: "How do you troubleshoot a SuccessFactors employee access issue?"
 }).forbiddenProductBoundaries.includes("S/4 Public Edition Display Authorization Trace"));
@@ -58,6 +66,22 @@ assert.ok(resolveInterviewContext({
 assert.deepEqual(
   explicitProductTopics("How do you secure an SAC live connection to Datasphere?"),
   ["SAC", "Datasphere"]
+);
+assert.equal(explicitProductTopic("How is identity and access administered for SAP Joule?"), "Joule");
+assert.deepEqual(
+  productKnowledgeFolders("How is identity and access administered for SAP Joule?"),
+  ["btp"],
+  "Joule uses its own knowledge lane and does not require a candidate project"
+);
+assert.deepEqual(
+  productKnowledgeFolders("How would you deliver a programme with SAP Activate?"),
+  ["project-management", "rise"],
+  "SAP Activate uses the project and RISE lanes"
+);
+assert.deepEqual(
+  productKnowledgeFolders("How do you choose between a greenfield new implementation and a system conversion?"),
+  ["project-types", "project-management", "cutover", "hypercare", "rise"],
+  "Transition-path questions use the implementation lifecycle lanes"
 );
 const diagnosticCandidates = [
   { sourceFolder: "rise", heading: "Public Edition troubleshooting: app is missing" },
@@ -120,8 +144,25 @@ assert.deepEqual(
 const publicFioriFolders = productKnowledgeFolders("In S/4HANA Cloud Public Edition, a user cannot see a Fiori app.");
 assert.ok(publicFioriFolders.includes("fiori") && publicFioriFolders.includes("s4hana"));
 assert.ok(!publicFioriFolders.includes("rise") && !publicFioriFolders.includes("security"), "Public Edition retrieval excludes Private Edition and generic ABAP security lanes");
+const unqualifiedCloudFolders = productKnowledgeFolders("How would you design security for SAP S/4HANA Cloud, and how would you verify that the user has the required access?");
+assert.ok(unqualifiedCloudFolders.includes("s4hana") && unqualifiedCloudFolders.includes("fiori"));
+assert.ok(!unqualifiedCloudFolders.includes("security") && !unqualifiedCloudFolders.includes("rise"), "S/4HANA Cloud without a private or on-premise edition must not retrieve the PFCG lane");
 const privateFioriFolders = productKnowledgeFolders("In S/4HANA Cloud Private Edition, a user cannot see a Fiori app.");
 assert.ok(privateFioriFolders.includes("rise"), "Private Edition retrieval retains RISE deployment guidance");
+const seniorFolders = productKnowledgeFolders("How do you explain a SoD risk to a nontechnical stakeholder?");
+assert.ok(seniorFolders.includes("grc") && seniorFolders.includes("project-management"),
+  "a client-facing SoD explanation keeps Access Control and the senior delivery lane");
+assert.ok(!productKnowledgeFolders("How do I configure the MSMP workflow for an access request in SAP Access Control?").includes("project-management"),
+  "an MSMP configuration question does not open the senior delivery lane");
+assert.deepEqual(
+  selectProductScopedChunks("How do you secure an SAC live connection to Datasphere?", [
+    { sourceFolder: "sac", heading: "Common Interview Questions" },
+    { sourceFolder: "sac", heading: "Configuration" },
+    { sourceFolder: "datasphere", heading: "Tough Follow-up Questions" }
+  ]).map((chunk) => chunk.heading),
+  ["Configuration"],
+  "a retrieved procedure outranks an interview-question bank in the answer budget"
+);
 assert.deepEqual(
   selectProductScopedChunks("How do you secure an SAC live connection to Datasphere?", diagnosticCandidates).map((c) => c.sourceFolder),
   ["sac", "datasphere"],
@@ -200,6 +241,19 @@ assert.match(iagRuleset.answer, /Administration > Rule Setup/);
 assert.match(iagRuleset.answer, /Upload & Process/);
 assert.match(iagRuleset.answer, /Processing Log and Validation Log/);
 assert.doesNotMatch(iagRuleset.answer, /Which of those do you want\?|Ruleset Management/);
+
+for (const question of [
+  "The BRFplus decision table returns a value but the request follows the wrong path. What do you check?",
+  "An MSMP request routes to an unexpected path even though the initiator rule returns a result. How do you troubleshoot it?"
+]) {
+  const routeMapping = selectVerifiedWorkflow(question);
+  assert.equal(routeMapping.workflowId, "grc-msmp-route-mapping-troubleshooting", question);
+  assert.match(routeMapping.answer, /initiator rule selects the MSMP path/i);
+  assert.match(routeMapping.answer, /RULE_RESULT.*mapped to the intended path/i);
+  assert.match(routeMapping.answer, /Instance Status/i);
+  assert.doesNotMatch(routeMapping.answer, /GRCMSMP/i);
+  assert.match(routeMapping.answer, /do not change the stage.s agent rule to correct a path/i);
+}
 
 (async () => {
   const candidates = ["idm", "rise"].map((sourceFolder, index) => ({

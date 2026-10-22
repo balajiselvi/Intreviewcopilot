@@ -30,6 +30,7 @@ import {
 } from '../lib/speechSessionGuard';
 import { createSpeechTurnDetector, looksLikeContinuationShape } from '../lib/speechTurnDetector';
 import { decideInterviewTurn } from '../lib/turnDecision';
+import { shouldIgnoreDuplicateSubmit, submissionKey } from '../lib/submitIdempotency';
 import { takeUtterance } from '../lib/deferredContinuation';
 import {
   formatSessionPreparation,
@@ -200,6 +201,7 @@ export default function InterviewPage() {
   const throttledDispatchSetAIResponseRef = useRef(null);
   const activeRequestRef = useRef(null);
   const isProcessingRef = useRef(false);
+  const recentSubmitRef = useRef(null);
   const generationStartedAtRef = useRef(0);
   const historyRef = useRef(history);
   const pendingAnalysisRef = useRef(null);
@@ -903,6 +905,16 @@ export default function InterviewPage() {
       speechTurnsRef.current[source]?.releaseFinalize();
       return;
     }
+    const submittedAt = Date.now();
+    if (shouldIgnoreDuplicateSubmit({
+      previous: recentSubmitRef.current,
+      text,
+      now: submittedAt,
+      retry: Boolean(meta.retry)
+    })) {
+      return;
+    }
+    recentSubmitRef.current = { key: submissionKey(text), at: submittedAt };
     if (isProcessingRef.current) {
       showSnackbar('Please wait for the current response to finish.', 'info');
       return;
@@ -957,6 +969,9 @@ export default function InterviewPage() {
     } catch (gateError) {
       console.error("Question admission failed:", gateError);
     }
+    if (turn.normalizedQuestion) {
+      text = String(turn.normalizedQuestion);
+    }
     if (turn.decision !== "ANSWER") {
       const detector = speechTurnsRef.current[source];
       if (!meta.manual && detector && meta.utteranceId) {
@@ -967,6 +982,7 @@ export default function InterviewPage() {
           console.error("Failed to settle a non-question turn:", settleError);
         }
       }
+      const ignoreNoise = turn.reason === "ignore-noise" || String(turn.scriptAnswer || "") === "[IGNORE_NOISE]";
       commitHistory({
         type: "question",
         text,
@@ -978,6 +994,16 @@ export default function InterviewPage() {
         disposition: turn.decision,
         admissionReason: turn.reason
       });
+      if (ignoreNoise) {
+        commitHistory({
+          type: "answer",
+          text: "[IGNORE_NOISE]",
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          source: "admission",
+          status: "completed",
+          disposition: "IGNORE"
+        });
+      }
       setTurnDisposition({ decision: turn.decision, route: "NONE", reason: turn.reason });
       recordAdmissionTurn(text, turn.decision, turn.reason);
       return;
@@ -1008,6 +1034,7 @@ export default function InterviewPage() {
     isProcessingRef.current = true;
     generationStartedAtRef.current = Date.now();
     setIsProcessing(true);
+    setTurnDisposition(null);
     setGenerationError(null);
     const retryCount = meta.retry
       ? (Number(retryTarget?.retryCount ?? (retryQuestionId === previousAsk.questionId ? previousAsk.retryCount : 0)) || 0) + 1
@@ -1061,7 +1088,7 @@ export default function InterviewPage() {
         model: currentConfig.aiModel,
         question: text,
         history: conversationHistoryForAPI,
-        responseLength: "interview",
+        responseLength: currentConfig.responseLength || "medium",
         customInstructions: currentConfig.gptSystemPrompt,
         candidateResume: currentConfig.candidateResume,
         jobDescription: currentConfig.jobDescription,
@@ -1695,8 +1722,8 @@ export default function InterviewPage() {
             {turnDisposition && (
               <Chip
                 size="small"
-                color={turnDisposition.decision === "DEFER" ? "warning" : turnDisposition.route === "PREPARED_SCRIPT" ? "success" : turnDisposition.decision === "IGNORE" ? "default" : "info"}
-                label={turnDisposition.decision === "IGNORE" ? "Ignored — not a question" : turnDisposition.decision === "DEFER" ? "Deferred — incomplete" : turnDisposition.route === "PREPARED_SCRIPT" ? "Prepared script" : "Generated"}
+                color={turnDisposition.decision === "DEFER" ? "warning" : (turnDisposition.route === "PREPARED_SCRIPT" || turnDisposition.route === "ANSWER_BANK") ? "success" : turnDisposition.decision === "IGNORE" ? "default" : "info"}
+                label={turnDisposition.decision === "IGNORE" ? "Ignored — not a question" : turnDisposition.decision === "DEFER" ? "Deferred — incomplete" : turnDisposition.route === "PREPARED_SCRIPT" ? "Prepared script" : turnDisposition.route === "ANSWER_BANK" ? "Answer bank" : "Generated"}
                 sx={{ mr: 1 }}
               />
             )}
@@ -1798,16 +1825,19 @@ export default function InterviewPage() {
                     <Tooltip title="Clear System Transcription">
                       <IconButton onClick={handleClearSystemTranscription}><DeleteSweepIcon /></IconButton>
                     </Tooltip>
-                    {!systemAutoMode && (
-                      <Button
-                        onClick={() => handleManualSubmit('system')}
-                        variant="outlined"
-                        color="primary"
-                        startIcon={<SendIcon />}
-                        disabled={!transcriptionFromStore.trim()}
-                      >
-                        Submit
-                      </Button>
+                    <Button
+                      onClick={() => handleManualSubmit('system')}
+                      variant="outlined"
+                      color="primary"
+                      startIcon={<SendIcon />}
+                      disabled={!transcriptionFromStore.trim()}
+                    >
+                      Submit text
+                    </Button>
+                    {systemAutoMode && (
+                      <Typography variant="caption" color="text.secondary" sx={{ width: "100%" }}>
+                        Auto-Submit applies to captured interviewer speech. Typed text still uses Submit text or Enter.
+                      </Typography>
                     )}
                   </Box>
                 </CardContent>
@@ -1887,6 +1917,13 @@ export default function InterviewPage() {
                   >
                     <List sx={{ px: 2, py: 1 }}>
                       {getAiResponsesToDisplay().map(renderHistoryItem)}
+                      {!isProcessing && !generationError && turnDisposition?.decision === 'DEFER' && (
+                        <ListItem sx={{ px: 0, py: 1 }}>
+                          <Alert severity="warning" sx={{ width: '100%' }}>
+                            This transcript was not sent to the assistant because it appears incomplete. Edit the question and submit it again.
+                          </Alert>
+                        </ListItem>
+                      )}
                       {isProcessing && (
                         <ListItem sx={{ justifyContent: 'center', py: 2, flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -1925,6 +1962,9 @@ export default function InterviewPage() {
                     label="Manual Input Mode"
                     sx={{ mb: 1 }}
                   />
+                  <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
+                    This switch controls microphone auto-submit. Typed text can always be submitted.
+                  </Typography>
                   <TextField
                     fullWidth
                     multiline
@@ -1949,17 +1989,15 @@ export default function InterviewPage() {
                     <Tooltip title="Clear Your Transcription">
                       <IconButton onClick={handleClearMicTranscription}><DeleteSweepIcon /></IconButton>
                     </Tooltip>
-                    {isManualMode && (
-                      <Button
-                        onClick={() => handleManualSubmit('microphone')}
-                        variant="outlined"
-                        color="primary"
-                        startIcon={<SendIcon />}
-                        disabled={!micTranscription.trim()}
-                      >
-                        Submit
-                      </Button>
-                    )}
+                    <Button
+                      onClick={() => handleManualSubmit('microphone')}
+                      variant="outlined"
+                      color="primary"
+                      startIcon={<SendIcon />}
+                      disabled={!micTranscription.trim()}
+                    >
+                      Submit text
+                    </Button>
                   </Box>
                 </CardContent>
               </Card>

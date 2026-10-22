@@ -236,18 +236,30 @@ indexFile = appConfig?.knowledge?.indexFile || "./data/knowledgeIndex.json",
 fileSystem = fs
 } = {}) {
 let cachedIndex = null;
+let cachedStamp = "";
 
 return Object.freeze({
 type: RETRIEVAL_PROVIDER_TYPES.LOCAL_KNOWLEDGE_INDEX,
 async getCandidates() {
-if (!cachedIndex) {
+let stamp = cachedStamp;
+try {
+if (typeof fileSystem.stat === "function") {
+const stat = await fileSystem.stat(indexFile);
+stamp = `${stat.mtimeMs}:${stat.size}`;
+}
+} catch (error) {
+defaultLogger?.warn?.("knowledge index stat failed", { indexFile, error: error?.message });
+}
+if (!cachedIndex || stamp !== cachedStamp) {
 const fileContent = await fileSystem.readFile(indexFile, "utf8");
 cachedIndex = JSON.parse(fileContent);
+cachedStamp = stamp || "loaded";
 }
 return cachedIndex?.chunks || [];
 },
 clearCache() {
 cachedIndex = null;
+cachedStamp = "";
 }
 });
 }

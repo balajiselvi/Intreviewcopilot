@@ -183,7 +183,7 @@ export default function SettingsDialog({ open, onClose, onSave }) {
         <TextField
           fullWidth margin="dense" name="candidateResume" label="Your Real Background" multiline rows={4}
           value={settings.candidateResume || ''} onChange={handleChange}
-          helperText="Paste your expertise narrative/CV. The live Copilot uses this plus documented case-study cards as short-term memory. Only this text plus those cards may be phrased as personal experience."
+          helperText="Optional extra background. Technical SAP answers are not limited to this text. The confirmed baseline is 17+ years of overall IT experience, 12+ years of SAP GRC Security, and a PMP certification. Do not invent an employer, customer, date, or metric."
           sx={{mt:2}}
         />
         <TextField

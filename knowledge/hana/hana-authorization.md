@@ -44,6 +44,10 @@ The role-type distinction is where I'd expect a sharper follow-up. Catalog roles
 - Analytic privileges are defined against a specific analytic or calculation view and reference the attribute values used to filter rows
 - HDI container role deployment is scoped to that container's schema, keeping application-owned role content independent from the broader system catalog
 
+## Design least-privilege analytic privileges for a reporting role
+
+Separate object privileges that allow SELECT on the view from analytic privileges that inject the row filter. Define analytic privileges against the analytic or calculation views the reporting role must read, using the business attributes that bound the intended rows. Prefer repository or HDI roles so the reporting security concept transports with the application; reserve catalog roles for ad hoc administration. Assign the least role set that carries those privileges, then validate with a representative user that intended rows return and out-of-scope rows do not. Object privileges alone do not provide row-level security. Do not describe BW RSECADMIN analysis authorizations as the HANA analytic-privilege procedure.
+
 ## Implementation Activities
 
 - Decide catalog vs. repository roles per use case: ad hoc/administrative access can use catalog roles, but anything tied to an application's security concept or requiring transport should be a repository/HDI role

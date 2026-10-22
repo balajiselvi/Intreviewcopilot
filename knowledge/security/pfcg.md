@@ -4,6 +4,10 @@
 
 PFCG is the Profile Generator, the standard transaction for building and maintaining roles in SAP. It's where you assign transactions to a role's menu, pull in authorization defaults from SU24, maintain field values, and generate the actual authorization profile that gets assigned to users. Every role in the system — single, derived, or composite — is built and maintained through PFCG.
 
+## Generate and assign a single role
+
+Use transaction PFCG to create the single role, add the required transactions on the Menu tab, and maintain organizational levels on the Authorizations tab. Generate the authorization profile in PFCG after that authorization data is complete, because the generated profile is what the user buffer checks. Assign the role on the PFCG User tab or in transaction SU01, then run user comparison so the profile enters the user buffer. Review table AGR_USERS for the user assignment and table AGR_1251 for authorization values, and do not treat AGR_USERS as a transaction. Transport the released role change with the Change and Transport System and import it in the target system. Validate the result by having the assigned user complete the business transaction for the maintained organizational value. Use transaction SU53 only to read the last failed authorization check, and do not treat that display as proof that the business action succeeded.
+
 ## Interview Summary
 
 PFCG turns a list of transactions into a working authorization profile. You add transactions to the menu tab, the system pulls SU24 default values into the authorization tab, you adjust field values and organizational levels, and then generate the profile. That generated profile is what actually gets checked at runtime, not the role definition itself.

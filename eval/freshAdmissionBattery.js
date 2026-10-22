@@ -20,6 +20,9 @@ const VALID = [
   ["Explain how SU24 proposals become role defaults.", {}],
   ["What changed in authorizations between ECC and S/4?", {}],
   ["How many catalog assignments sit behind a Fiori space?", {}],
+  ["How to build roles in IAG?", {}],
+  ["How to create a PFCG role?", {}],
+  ["How to configure an ARM request?", {}],
   ["Would you transport a role before ARA simulation?", {}],
   ["Describe the MSMP stages you would keep.", {}],
   ["Is least privilege the same control as SoD?", {}],
@@ -82,7 +85,12 @@ const AMBIGUOUS = [
   ["How how how did the cutover begin", {}],
   ["Identify customer then partner.", {}],
   ["Something about the ruleset.", {}],
-  ["You you you the access.", {}]
+  ["You you you the access.", {}],
+  ["What if my server was on premise?", {}],
+  ["the role or", {}],
+  ["How to IAG?", {}],
+  ["How to IAG?", { priorQuestion: PRIOR }],
+  ["How to GRC?", { priorQuestion: PRIOR }]
 ];
 
 const FOLLOW_UPS = [
@@ -95,7 +103,9 @@ const FOLLOW_UPS = [
   ["Any other control besides mitigation?", { priorQuestion: PRIOR }],
   ["So the provisioning step?", { priorQuestion: PRIOR }],
   ["What about the audit evidence?", { priorQuestion: PRIOR }],
-  ["And the hypercare window?", { priorQuestion: PRIOR }]
+  ["And the hypercare window?", { priorQuestion: PRIOR }],
+  ["What if my server was on premise?", { priorQuestion: "If the user cannot access a Fiori app, how do you troubleshoot?" }],
+  ["What if the app is missing from the launchpad?", { priorQuestion: "If the user cannot access a Fiori app, how do you troubleshoot?" }]
 ];
 
 function check(rows, expected) {

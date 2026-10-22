@@ -73,13 +73,25 @@ A requester searches for and selects a business role by name in the ARM request 
 
 ## Troubleshooting
 
+### Business role approved but technical role is stale
+
+Common issue: a business role change is approved in BRM but the technical role on the target is stale or missing.
+Root cause: the underlying technical role was redesigned or not transported, while the BRM business-to-technical mapping still points at the old technical role, or ownership between BRM maintainers and PFCG role admins was unclear.
+Resolution: compare the BRM mapping with the technical roles that exist on the target, correct the mapping or transport the technical role, then re-test provisioning through that business role. Do not start with Access Control certification Authorization Sync unless the symptom is stale certification review data.
+
+### Business role name no longer matches granted access
+
 Common issue: a business role provisions access that no longer matches its name's intent.
 Root cause: the underlying technical role was redesigned, but the business role mapping wasn't updated to match.
 Resolution: review and correct the business role's technical role mapping.
 
+### Requester cannot find a business role
+
 Common issue: a requester can't find an appropriate business role for their actual need.
 Root cause: no business role exists for that job function, or the naming isn't intuitive enough to find via search.
 Resolution: create the missing business role, or improve the naming convention for discoverability.
+
+### Overlapping business roles
 
 Common issue: two different business roles end up granting overlapping or conflicting access.
 Root cause: business role mappings weren't reviewed holistically as the catalog grew.

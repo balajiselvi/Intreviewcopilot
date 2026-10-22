@@ -33,10 +33,18 @@ async function generateEmbeddings(chunks) {
     const results = [];
 
     let i = 0;
+    let reused = 0;
 
     for (const chunk of chunks) {
+        // Unchanged documents already carry embeddings from the prior index.
+        // Reuse them so a controlled rebuild only embeds newly parsed chunks.
+        if (Array.isArray(chunk.embedding) && chunk.embedding.length > 0) {
+            reused += 1;
+            results.push(chunk);
+            continue;
+        }
 
-        console.log(`Embedding ${++i}/${chunks.length}`);
+        console.log(`Embedding ${++i}/${chunks.length - reused}`);
 
         const embedding = await generateEmbedding(chunk.content);
 
@@ -45,6 +53,10 @@ async function generateEmbeddings(chunks) {
             embedding
         });
 
+    }
+
+    if (reused) {
+        console.log(`Reused ${reused} existing embeddings; generated ${i} new embeddings.`);
     }
 
     return results;

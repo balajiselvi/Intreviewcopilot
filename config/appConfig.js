@@ -88,7 +88,7 @@
     schemaVersion: '1.0.0',
     parserVersion: 'a5fdef3073fe',
     chunkVersion: '59c1e5914015',
-    embeddingModel: process.env.EMBEDDING_MODEL_ID || 'text-embedding-3-small',
+    embeddingModel: 'Xenova/all-MiniLM-L6-v2',
     indexVersion: parseInt(process.env.KNOWLEDGE_INDEX_VERSION) || 1,
     chunking: {
       strategy: process.env.CHUNKING_STRATEGY || 'semantic',
@@ -98,8 +98,8 @@
       supportedStrategies: ['semantic', 'fixed', 'hybrid']
     },
     embedding: {
-      modelId: process.env.EMBEDDING_MODEL_ID || 'text-embedding-3-small',
-      dimensionality: 1536,
+      modelId: 'Xenova/all-MiniLM-L6-v2',
+      dimensionality: 384,
       batchSize: parseInt(process.env.EMBEDDING_BATCH_SIZE) || 100,
       maxRetries: 3,
       timeoutMs: 30000

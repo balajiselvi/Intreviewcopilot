@@ -21,14 +21,15 @@ const { recallExpectedAnswer } = require("../../eval/lib/expectedAnswers.js");
 const { DEFAULT_CAREER_BACKGROUND, STATED_PROFILE, scopeCareerEvidence, scopedHistoryOnly } = require("../../eval/lib/careerTimeline.js");
 const { shouldInheritPriorDomain, hasStrongTechnicalEvidence, isPlaneFoil, isTopicContinuation } = require("../../lib/contextInheritance.js");
 const { publicLlmError, isIncompleteGeneration } = require("../../lib/generationGuard.js");
-const { appendQa } = require("../../lib/interviewSessionStore.js");
+const { appendQa, readScenarioTimeline, writeScenarioTimeline } = require("../../lib/interviewSessionStore.js");
+const { timelinePromptForTurn, nextScenarioTimeline, extractTimeline, unspecifiedTimelinePolicy, isContextOnlyTimeline } = require("../../lib/scenarioTimeline.js");
 const { decideInterviewTurn } = require("../../lib/turnDecision.js");
 const { selectVerifiedWorkflow } = require("../../lib/verifiedWorkflow.js");
 const { historyForCurrentTurn } = require("../../lib/currentTurnHistory.js");
 const { priorAnchor } = require("../../lib/questionAdmission.js");
 const { resolveInterviewContext, sanitizeDebugContext, toHistoryContext, QUESTION_INTENTS, explicitProductTopic, resolveProductScope } = require("../../lib/interviewContext.js");
 const { productKnowledgeFolders, selectProductScopedChunks } = require("../../lib/productKnowledgeScope.js");
-import { authoritativeProcedure, renderSpokenProcedure, shapeSpokenContract } from "../../lib/procedureRetention.js";
+import { authoritativeProcedure, fitSpokenLength, questionProcedureIntent, renderSpokenProcedure, shapeSpokenContract } from "../../lib/procedureRetention.js";
 
 const MAX_HISTORY_ITEMS = 6;
 const DEFAULT_TIMEOUT_MS = 25000;
@@ -652,7 +653,7 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
   // an Ariba or SAC failure). Retrieve a wider candidate set, then enforce the
   // explicit product lane before selecting the normal answer budget.
   const sourceFolders = productKnowledgeFolders(retrievalQuery);
-  const searchK = sourceFolders.length ? Math.max(topK, 12) : topK;
+  const searchK = Math.max(topK, 12);
   const candidates = (await searchKnowledge(
     retrievalQuery,
     analysis,
@@ -675,7 +676,7 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
   // branch merely because it resembles one word in the symptom.
   const scopedDiagnosticChunks = diagnosticChunks.filter((chunk) => !/\bproduction support\b/i.test(String(chunk.heading || chunk.section || "")));
   const chunks = diagnosticSections.has(answerScope) && scopedDiagnosticChunks.length ? scopedDiagnosticChunks : rankedChunks;
-  if (!chunks || chunks.length === 0) return { text: "", evidence: [] };
+  if (!chunks || chunks.length === 0) return { text: "", evidence: [], procedurePool: productScoped.slice(0, 12) };
 
   const maxChars = APP_CONFIG?.maxContextCharacters || 3000;
   const seenChunks = new Set();
@@ -717,6 +718,7 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
       .filter((chunk) => chunk?.content)
       .map((chunk) => `## ${String(chunk.heading || chunk.section || "").trim()}\n${String(chunk.content).trim()}`)
       .join("\n\n"),
+    procedurePool: productScoped.slice(0, 12),
     evidence: [...new Map(chunks.map((chunk) => [
       String(chunk.heading || chunk.section || chunk.sourceFile || chunk.documentId || "knowledge").slice(0, 160),
       chunk
@@ -725,6 +727,19 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
       label: String(chunk.heading || chunk.section || chunk.sourceFile || chunk.documentId || "knowledge").slice(0, 160)
     }))
   };
+}
+
+function alignedProcedureText(question, chunks = []) {
+  const stop = new Set(["about", "after", "would", "could", "should", "there", "their", "which", "where", "while", "through"]);
+  const terms = [...new Set((String(question || "").toLowerCase().match(/[a-z0-9]{5,}/g) || []).filter((term) => !stop.has(term)))];
+  const aligned = (Array.isArray(chunks) ? chunks : []).filter((chunk) => {
+    const heading = String(chunk?.heading || chunk?.section || "").toLowerCase();
+    return terms.filter((term) => heading.includes(term)).length >= 2;
+  });
+  return aligned
+    .filter((chunk) => chunk?.content)
+    .map((chunk) => `## ${String(chunk.heading || chunk.section || "").trim()}\n${String(chunk.content).trim()}`)
+    .join("\n\n");
 }
 
 function prepareConversationHistory(history = []) {
@@ -1014,13 +1029,17 @@ export default async function handler(req, res) {
     sessionPreparation,
     interviewSessionId,
     debug: requestDebug,
-    retryCount: clientRetryCount
+    retryCount: clientRetryCount,
+    responseLength: requestedResponseLength
   } = req.body || {};
 
   // Falls back to the configured default (OPENAI_MODEL) when the client doesn't
   // specify one — lets provider/model be set purely through env vars for deployments
   // not driven by the Settings dialog, without any code change.
   const model = requestedModel || APP_CONFIG?.llm?.defaultModel;
+  const responseLength = ["concise", "medium", "lengthy"].includes(String(requestedResponseLength || "").trim().toLowerCase())
+    ? String(requestedResponseLength).trim().toLowerCase()
+    : "medium";
 
   if (!model || !question?.trim()) {
     return res.status(400).json({
@@ -1034,7 +1053,23 @@ export default async function handler(req, res) {
   } catch (error) {
     logger?.error?.("Question admission failed:", error);
   }
-  if (turn.decision !== "ANSWER" || turn.route === "PREPARED_SCRIPT") {
+  if (turn.normalizedQuestion) {
+    question = String(turn.normalizedQuestion);
+  }
+  const persistIncomingTimeline = (text, answer = "") => {
+    try {
+      if (!interviewSessionId || !String(text || "").trim()) return;
+      const active = readScenarioTimeline(interviewSessionId);
+      const decision = nextScenarioTimeline({ active, question: text, answer });
+      if (decision.action === "replace") writeScenarioTimeline(interviewSessionId, decision.timeline);
+      if (decision.action === "clear") writeScenarioTimeline(interviewSessionId, null);
+    } catch (timelineError) {
+      logger?.error?.("Scenario timeline capture failed:", timelineError);
+    }
+  };
+  if (turn.decision !== "ANSWER") persistIncomingTimeline(question, turn.scriptAnswer || "");
+
+  if (turn.decision !== "ANSWER" || turn.route === "PREPARED_SCRIPT" || turn.route === "ANSWER_BANK") {
     if (!setSSEHeaders(res)) {
       return res.status(500).json({ error: "Failed to initialize streaming response." });
     }
@@ -1045,26 +1080,31 @@ export default async function handler(req, res) {
         reason: turn.reason,
         scriptId: turn.scriptId || null,
         confidence: turn.confidence || 0,
-        evidenceMode: turn.evidenceMode || null
+        evidenceMode: turn.evidenceMode || null,
+        normalizedQuestion: turn.normalizedQuestion || null
       });
-      if (turn.decision !== "ANSWER" && interviewSessionId) {
-        try {
-          appendQa(
-            interviewSessionId,
-            { model, company: String(company || "").slice(0, 80), source: "live-interview" },
-            {
-              question,
-              answerShown: "",
-              status: turn.decision,
-              disposition: turn.decision,
-              route: "NONE",
-              source: "admission",
-              errorCode: turn.reason || "",
-              latencyMs: 0
-            }
-          );
-        } catch (recordError) {
-          logger?.error?.("Admission session write failed:", recordError);
+      if (turn.decision !== "ANSWER") {
+        const ignorePayload = String(turn.scriptAnswer || "").trim() || (turn.reason === "ignore-noise" ? "[IGNORE_NOISE]" : "");
+        if (ignorePayload) writeSSEChunk(res, ignorePayload);
+        if (interviewSessionId) {
+          try {
+            appendQa(
+              interviewSessionId,
+              { model, company: String(company || "").slice(0, 80), source: "live-interview" },
+              {
+                question,
+                answerShown: ignorePayload,
+                status: turn.decision,
+                disposition: turn.decision,
+                route: "NONE",
+                source: "admission",
+                errorCode: turn.reason || "",
+                latencyMs: 0
+              }
+            );
+          } catch (recordError) {
+            logger?.error?.("Admission session write failed:", recordError);
+          }
         }
       }
       if (turn.route === "PREPARED_SCRIPT" && turn.scriptAnswer) {
@@ -1093,6 +1133,32 @@ export default async function handler(req, res) {
           logger?.error?.("Prepared script session write failed:", recordError);
         }
       }
+      // Answer-bank text is authored and must stream verbatim (no spoken-contract reshape).
+      if (turn.route === "ANSWER_BANK" && turn.scriptAnswer) {
+        writeSSEChunk(res, turn.scriptAnswer);
+        try {
+          if (interviewSessionId) {
+            appendQa(
+              interviewSessionId,
+              { model, company: String(company || "").slice(0, 80), source: "live-interview" },
+              {
+                question,
+                answerShown: turn.scriptAnswer,
+                status: "completed",
+                model,
+                source: "answer-bank",
+                route: "ANSWER_BANK",
+                scriptId: turn.scriptId || "",
+                disposition: "ANSWER",
+                evidenceMode: turn.evidenceMode || "",
+                latencyMs: 0
+              }
+            );
+          }
+        } catch (recordError) {
+          logger?.error?.("Answer bank session write failed:", recordError);
+        }
+      }
       if (res?.writable) {
         res.write("data: [DONE]\n\n");
         res.end();
@@ -1105,9 +1171,96 @@ export default async function handler(req, res) {
   }
 
   try {
+    const storedTimeline = interviewSessionId ? readScenarioTimeline(interviewSessionId) : null;
+    const timelinePolicy = unspecifiedTimelinePolicy(question, storedTimeline);
+    if (timelinePolicy) {
+      if (!setSSEHeaders(res)) {
+        return res.status(500).json({ error: "Failed to initialize streaming response." });
+      }
+      writeSSEEvent(res, "admission", {
+        decision: "ANSWER",
+        route: "RETRIEVED_PROCEDURE",
+        reason: "timeline-policy",
+        scriptId: null,
+        confidence: 1,
+        evidenceMode: null
+      });
+      writeSSEChunk(res, timelinePolicy);
+      persistIncomingTimeline(question, timelinePolicy);
+      try {
+        if (interviewSessionId) {
+          appendQa(
+            interviewSessionId,
+            { model, company: String(company || "").slice(0, 80), source: "live-interview" },
+            {
+              question,
+              answerShown: timelinePolicy,
+              status: "completed",
+              model,
+              source: "timeline-policy",
+              route: "RETRIEVED_PROCEDURE",
+              disposition: "ANSWER",
+              latencyMs: 0
+            }
+          );
+        }
+      } catch (recordError) {
+        logger?.error?.("Timeline policy session write failed:", recordError);
+      }
+      if (res?.writable) {
+        res.write("data: [DONE]\n\n");
+        res.end();
+      }
+      return;
+    }
+  } catch (timelinePolicyError) {
+    logger?.error?.("Timeline policy failed:", timelinePolicyError);
+  }
+
+  if (isContextOnlyTimeline(question)) {
+    persistIncomingTimeline(question, "");
+    if (!setSSEHeaders(res)) {
+      return res.status(500).json({ error: "Failed to initialize streaming response." });
+    }
+    try {
+      writeSSEEvent(res, "admission", {
+        decision: "DEFER",
+        route: "NONE",
+        reason: "timeline-context",
+        scriptId: null,
+        confidence: 1,
+        evidenceMode: null
+      });
+      if (interviewSessionId) {
+        appendQa(
+          interviewSessionId,
+          { model, company: String(company || "").slice(0, 80), source: "live-interview" },
+          {
+            question,
+            answerShown: "",
+            status: "deferred",
+            model,
+            source: "timeline-context",
+            route: "NONE",
+            disposition: "DEFER",
+            latencyMs: 0
+          }
+        );
+      }
+    } catch (contextError) {
+      logger?.error?.("Timeline context capture failed:", contextError);
+    }
+    if (res?.writable) {
+      res.write("data: [DONE]\n\n");
+      res.end();
+    }
+    return;
+  }
+
+  try {
     const verified = selectVerifiedWorkflow(question);
     if (verified?.answer) {
-      let spoken = shapeSpokenContract(verified.answer);
+      let spoken = fitSpokenLength(shapeSpokenContract(verified.answer), responseLength, question);
       if (verified.experienceAsk) {
         try {
           const card = recallGroundedExperience(question);
@@ -1430,7 +1583,8 @@ export default async function handler(req, res) {
       engineeringJudgmentContext,
       model,
       sapComponents: technicalReasoning.recommendedComponents,
-      activeDomainScope: resolved.contextSource === "inherited" ? resolved.resolvedDomain : ""
+      activeDomainScope: resolved.contextSource === "inherited" ? resolved.resolvedDomain : "",
+      responseLength
     };
 
     if (customInstructions?.trim()) promptPayload.customInstructions = customInstructions.trim();
@@ -1458,7 +1612,12 @@ export default async function handler(req, res) {
         const recallQuery = `${effectiveQuestion} ${resolved.resolvedDomain || ""}`.trim();
         const strongest = recallGroundedExperience(recallQuery);
         const procedureQuestion = interviewContext.answerScope === "IMPLEMENTATION_WALKTHROUGH";
-        if (strongest && !scopedHistoryOnly(promptPayload.evidenceMode) && !procedureQuestion) {
+        const asksPersonalHistory = /\b(?:have you|did you|your experience|tell me about|worked with|worked on|your role|your responsibilities)\b/i.test(question);
+        const awarenessOnly = strongest?.strength === "thin";
+        if (asksPersonalHistory && awarenessOnly && strongest?.spoken && !procedureQuestion) {
+          promptPayload.expectedSpokenAnswer = shapeSpokenContract(strongest.spoken);
+          promptPayload.speakExpectedAnswer = true;
+        } else if (strongest && !scopedHistoryOnly(promptPayload.evidenceMode) && !procedureQuestion && !(awarenessOnly && !asksPersonalHistory)) {
           promptPayload.documentedExperience = formatMemoryCard(strongest);
           promptPayload.experienceSelection = {
             confidence: strongest.strength || strongest.confidence || "medium",
@@ -1474,13 +1633,57 @@ export default async function handler(req, res) {
     // one coherent, ordered procedure block, make that block the answer anchor. This is a
     // single-pass generation still: it adds no model call and does not apply to personal-
     // experience questions, which remain governed by the candidate-evidence rules above.
+    let scenarioTurn = { promptBlock: "", active: null };
+    try {
+      const storedTimeline = interviewSessionId ? readScenarioTimeline(interviewSessionId) : null;
+      const historyText = (Array.isArray(history) ? history : []).map((item) => item?.content || "").join("\n");
+      const recovered = !storedTimeline ? extractTimeline(historyText) : null;
+      const activeTimeline = storedTimeline || (recovered
+        ? { ...recovered, scenarioId: `scn_${interviewSessionId || "history"}`, source: "candidate" }
+        : null);
+      scenarioTurn = {
+        active: activeTimeline,
+        promptBlock: timelinePromptForTurn({ active: activeTimeline, question })
+      };
+      promptPayload.scenarioTimeline = scenarioTurn.promptBlock;
+      if (!storedTimeline && activeTimeline && scenarioTurn.promptBlock && interviewSessionId) {
+        writeScenarioTimeline(interviewSessionId, activeTimeline);
+      }
+    } catch (timelineError) {
+      logger?.error?.("Scenario timeline read failed:", timelineError);
+    }
+    const persistScenarioTimeline = (answer) => {
+      try {
+        if (!interviewSessionId || !String(answer || "").trim()) return;
+        const decision = nextScenarioTimeline({ active: scenarioTurn.active, question, answer });
+        if (decision.action === "replace") writeScenarioTimeline(interviewSessionId, decision.timeline);
+        if (decision.action === "clear") writeScenarioTimeline(interviewSessionId, null);
+      } catch (timelineError) {
+        logger?.error?.("Scenario timeline update failed:", timelineError);
+      }
+    };
+
     let retrievedProcedureAnswer = "";
-    if (!promptPayload.expectedSpokenAnswer
+    if (!scenarioTurn.promptBlock
+      && !promptPayload.expectedSpokenAnswer
       && !/\b(?:have you|did you|your experience|tell me about a time|walk me through a time)\b/i.test(question)) {
       try {
-        const steps = authoritativeProcedure(question, knowledgeResult.procedureText || knowledgeContext, interviewContext.answerScope);
-        if (steps.length >= 3) {
-          retrievedProcedureAnswer = renderSpokenProcedure(effectiveQuestion, steps);
+        const procedureQuestion = questionProcedureIntent(question, interviewContext.answerScope)
+          ? question
+          : (effectiveQuestion || question);
+        const steps = authoritativeProcedure(procedureQuestion, knowledgeResult.procedureText || knowledgeContext, interviewContext.answerScope)
+          || [];
+        const alignedSteps = steps.length ? steps : authoritativeProcedure(
+          procedureQuestion,
+          alignedProcedureText(procedureQuestion, knowledgeResult.procedurePool),
+          interviewContext.answerScope
+        );
+        if (alignedSteps.length >= 3) {
+          retrievedProcedureAnswer = fitSpokenLength(
+            renderSpokenProcedure(effectiveQuestion, alignedSteps),
+            responseLength,
+            procedureQuestion
+          );
           promptPayload.expectedSpokenAnswer = retrievedProcedureAnswer;
         }
       } catch (error) {
@@ -1497,6 +1700,9 @@ export default async function handler(req, res) {
     // neighboring generic advice even though those steps were supplied as its answer
     // anchor. Speak the verified sequence directly; experience questions and turns
     // without a coherent procedure continue through the normal single-pass model path.
+    if (!retrievedProcedureAnswer && promptPayload.speakExpectedAnswer && promptPayload.expectedSpokenAnswer) {
+      retrievedProcedureAnswer = promptPayload.expectedSpokenAnswer;
+    }
     if (retrievedProcedureAnswer) {
       streamStarted = true;
       recordedAnswer = retrievedProcedureAnswer;
@@ -1505,9 +1711,11 @@ export default async function handler(req, res) {
         route: "RETRIEVED_PROCEDURE",
         reason: "coherent-source-procedure",
         confidence: 1,
-        evidenceMode: null
+        evidenceMode: null,
+        responseLength
       });
       writeSSEChunk(res, retrievedProcedureAnswer);
+      persistScenarioTimeline(retrievedProcedureAnswer);
       recordLiveQa({
         question,
         questionRaw: question,
@@ -1545,7 +1753,7 @@ export default async function handler(req, res) {
     // Ceiling is sized to the question's length tier (see lib/prompt/interviewPrompt.js) —
     // the main lever for keeping generation under the ~5-6s target in a single-pass
     // architecture, since streaming wall-clock time scales with tokens produced.
-    const maxTokens = getMaxTokensForCategory(analysis.category, analysis.secondaryCategories, effectiveQuestion, analysis.isDeepenFollowUp, reasoningContract.reasoningMode, interviewContext.depth, interviewContext.answerScope, knowledgeContext);
+    const maxTokens = getMaxTokensForCategory(analysis.category, analysis.secondaryCategories, effectiveQuestion, analysis.isDeepenFollowUp, reasoningContract.reasoningMode, interviewContext.depth, interviewContext.answerScope, knowledgeContext, responseLength);
 
     if (debugEnabled) {
       writeSSEEvent(res, "context", sanitizeDebugContext(interviewContext, {
@@ -1632,7 +1840,8 @@ export default async function handler(req, res) {
           route: "GENERATION",
           reason: turn.reason,
           scriptId: null,
-          evidenceMode: promptPayload.evidenceMode || "full"
+          evidenceMode: promptPayload.evidenceMode || "full",
+          responseLength
         });
       } catch (admissionError) {
         logger?.error?.("Generation admission event failed:", admissionError);
@@ -1670,6 +1879,7 @@ export default async function handler(req, res) {
           total_tokens: tokenUsage?.total_tokens ?? null
         });
       }
+      persistScenarioTimeline(recordedAnswer);
       recordLiveQa({
         question,
         questionRaw: question,

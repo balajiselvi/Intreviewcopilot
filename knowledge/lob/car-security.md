@@ -2,25 +2,25 @@
 
 ## Overview
 
-SAP CAR (Customer Activity Repository) is a retail platform for POS and customer activity data, typically sitting on SAP HANA. Security interviews should treat it as an analytics/operational data platform: who can load POS data, who can run queries, and how personally identifiable or commercially sensitive activity is restricted. It is not Ariba and it is not SAC.
+SAP Customer Activity Repository application authorization is the SAP NetWeaver Application Server ABAP authorization model. Create the CAR authorization role in PFCG. Use the authorization role /POSDW/ADMINISTRATOR for administration such as deleting data. Use the authorization role /POSDW/SALES_AUDIT for daily POS inbound monitoring. Use the authorization role /POSDW/DPP_SECURITY for private and sensitive subject data. Do not treat CAR as an SAC team permission or an Ariba requisition permission.
 
 ## Interview Summary
 
-CAR access usually combines HANA database privileges, application users, and sometimes BW-style analytical restrictions depending on how reporting is consumed. POS data is high-volume and often personal. Least privilege on DBA-style HANA users and clear separation between POS inbound processing and enterprise reporting are the architectural points.
+Create the CAR authorization role in PFCG. Use the authorization role /POSDW/ADMINISTRATOR for administration such as deleting data. Use the authorization role /POSDW/SALES_AUDIT for daily POS inbound monitoring. Use the authorization role /POSDW/DPP_SECURITY for private and sensitive subject data. Copy the standard role into the customer namespace before restricting activities.
 
 ## 30 Second Interview Answer
 
-CAR is a retail POS and customer-activity platform on HANA. I would separate technical users that load POS from analysts who query activity, then enforce HANA object privileges and analytic privileges on sensitive customer and basket data. Downstream BW analysis authorizations or SAC teams/folders are additional planes — a SAC story permission does not replace CAR HANA access. Enterprise IAM still authenticates via IdP/IAS and provisions the CAR/HANA user; it does not invent a PFCG catalog for CAR. Privacy and PCI-adjacent POS data need explicit purpose limitation, not generic encryption talk.
+Create the CAR authorization role in PFCG from the standard role that matches the job. Use the authorization role /POSDW/ADMINISTRATOR for administrative tasks such as deleting data. Use the authorization role /POSDW/SALES_AUDIT for daily monitoring of POS inbound data. Use the authorization role /POSDW/DPP_SECURITY only for users who must see subject-specific personal data. Assign the authorization role to the ABAP user. Confirm the user can open the intended POS transaction, such as the POS Workbench. Do not treat a SAC story permission as CAR authorization.
 
 ## Distinctions
 
-- HANA privileges on CAR tables/views
-- Application processing users versus analysts
-- Downstream SAC/BW authorization is a separate check
-- Retail privacy and PCI-adjacent POS data need explicit controls
+- Application authorization is PFCG on the CAR ABAP system.
+- /POSDW/ADMINISTRATOR, /POSDW/SALES_AUDIT, and /POSDW/DPP_SECURITY are different jobs.
+- Personal-data access is a separate role, not a general analyst role.
+- A downstream BW or SAC permission does not replace the CAR PFCG role.
 
-## Related Topics
+## Source
 
-- knowledge/hana/hana-authorization.md
-- knowledge/bw/analysis-authorizations.md
-- knowledge/sac/sac-security.md
+Checked 2026-10-19 against the SAP Customer Activity Repository Administration Guide for release 6.0 and for 5.0 SPS07, section Authorizations and Role and Authorization Concept. https://help.sap.com/doc/6c0e30d3f38b402b8527765dff7c9c9f/6.0.0/en-US/SAP_Customer_Activity_Repository_Administration_Guide.pdf
+
+The guide states that CAR uses SAP NetWeaver Application Server ABAP authorizations and that role maintenance uses transaction PFCG. HANA database privileges under the CAR database are a separate plane and were not re-documented in this pass.

@@ -10,7 +10,7 @@ SAP implementation methodology: structured approach (planning → design → bui
 
 ## 30 Second Interview Answer
 
-Implementation methodology is the structured framework for SAP projects: ASAP-like phases (blueprint → dev → testing → go-live → support), governance (steering committee), stage gates (formal approvals), risk management, change management, quality gates. Discipline prevents scope creep and timeline slippage. Examples: Accelerated SAP (ASAP), Activate (SAP's modern methodology for cloud projects).
+For a current SAP Cloud ERP or RISE delivery, use SAP Activate: Discover, Prepare, Explore, Realize, Deploy, and Run. ASAP is an older framework and is not this phase sequence. Confirm the configuration, the authorization scope, and the cutover evidence in the phase that owns them. Do not rename Realize to Execute.
 
 ## 60 Second Interview Answer
 

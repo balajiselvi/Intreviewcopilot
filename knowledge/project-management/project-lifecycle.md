@@ -2,23 +2,23 @@
 
 ## Overview
 
-SAP implementations follow structured phases: Discover (understand current state and business needs), Explore (design future-state SAP processes), Execute (configure and test), Deploy (prepare for go-live and cut over), and Post-Go-Live (stabilize and optimize). Each phase has clear deliverables, decision gates, and dependencies. Understanding the lifecycle helps project teams anticipate what's coming, plan resources, and manage stakeholder expectations.
+SAP Activate uses six phases: Discover, Prepare, Explore, Realize, Deploy, and Run. Discover confirms the business case and the high-level scope. Prepare completes the plan, the governance, and the initial landscape. Explore confirms fit-to-standard gaps and the authorization scope. Realize configures the solution and completes test evidence. Deploy completes the cutover, the go/no-go review, and hypercare. Run completes the operational handover. Do not replace Realize with an Execute phase, and do not drop Prepare or Run. A customer programme may add its own gates. Those gates do not rename the phases, and they do not create a universal duration.
 
 ## Interview Summary
 
-SAP project lifecycle progresses through five phases: Discover (requirements), Explore (design), Execute (build and test), Deploy (go-live), and Post-Go-Live (stabilization and optimization).
+SAP Activate progresses through Discover, Prepare, Explore, Realize, Deploy, and Run. Confirm the configuration and the cutover evidence in the phase that owns them.
 
 ## 30 Second Interview Answer
 
-SAP projects follow a structured lifecycle: Discover phase gathers requirements; Explore phase designs how SAP will work; Execute phase configures and tests; Deploy phase executes cutover; Post-Go-Live phase stabilizes the system and optimizes processes. Each phase builds on the previous, and decisions made early affect everything downstream.
+Use the SAP Activate sequence. Discover confirms scope. Prepare completes the plan and the team. Explore confirms the fit-to-standard design and the authorization scope. Realize configures and tests. Deploy completes the cutover and hypercare. Run operates the solution. Do not call the build phase Execute.
 
 ## 60 Second Interview Answer
 
-The SAP lifecycle has five phases. **Discover:** understand current state, gather requirements, understand business drivers. **Explore:** design future-state processes using SAP standard, perform fit-gap analysis, document blueprint, make scope/build/buy decisions. **Execute:** configure SAP based on blueprint, conduct unit testing, integration testing, user acceptance testing. **Deploy:** prepare users (training, communications), execute data migration, run parallel (old and new system simultaneously), perform cutover (legacy stops, SAP begins). **Post-Go-Live:** hypercare (intensive support week 1), adoption monitoring, issue resolution, optimization. Each phase has clear gates: Discover gate confirms requirements, Explore gate confirms design, Execute gate confirms testing complete, Deploy gate confirms ready for go-live, Post-Go-Live gate confirms system stable.
+SAP Activate has six phases. Discover confirms the business case and the high-level scope. Prepare completes the plan, the governance, and the initial landscape. Explore confirms fit-to-standard gaps, extension decisions, and the authorization scope. Realize configures the approved scope and completes integration and test evidence. Deploy completes cutover rehearsal, the go/no-go review, production cutover, and hypercare. Run completes the operational handover. Do not attach a universal week count to a phase.
 
 ## 90 Second Interview Answer
 
-SAP projects progress through five phases, each with distinct objectives and deliverables. **Discover (typically 4-8 weeks):** conduct workshops, interview stakeholders, understand current processes, identify pain points, document requirements (functional, technical, non-functional, constraints). Deliverable: requirements document and executive summary of scope/timeline/cost/risk. Gate: business approves requirements. **Explore (typically 6-12 weeks):** design how SAP will work, perform detailed fit-gap analysis (what does SAP do vs what's required), make customization decisions (build/buy/configure), create blueprint (process flows, configuration specs, custom development scope). Deliverable: blueprint and gap-resolution decisions. Gate: business and technical architects approve design. **Execute (typically 8-16 weeks):** configure SAP (module customization, interfaces, reports), develop custom code if needed, conduct testing (unit testing by developers, integration testing between modules, user acceptance testing with business users). Deliverable: configured system, tested and approved by business. Gate: UAT sign-off. **Deploy (typically 2-4 weeks):** prepare users (training, communications, support structure), execute data migration (load master data and historical transactions), run parallel (both systems operating, validate results match), perform cutover (turn off legacy, turn on SAP). Deliverable: go-live. Gate: cutover successful, system operational. **Post-Go-Live (typically 4-8 weeks stabilization):** hypercare (intensive support day 1-7), adoption monitoring (track usage, identify issues), optimization (performance tuning, refinement of processes). Deliverable: stable system, team transitioned to business-as-usual support. Gate: stabilization complete, system performing within targets.
+Use the six SAP Activate phases and the evidence that closes each one. Discover confirms the business case, the scope, and the deployment choice. Prepare completes the plan, the owners, the RAID log, and the initial landscape. Explore confirms the fit-to-standard gaps, the extension decisions, and the authorization scope. Realize configures the approved scope and completes integration and test evidence. Deploy rehearses the cutover, completes the go/no-go review, executes the production cutover, and runs hypercare. Run completes the operational handover. Do not assign a universal week count. A customer gate can be added, but it does not rename Realize to Execute and it does not remove Prepare or Run.
 
 ## Architecture
 
@@ -324,18 +324,18 @@ Lifecycle phases include:
 
 ## What Makes This a 10/10 Answer
 
-- Candidate explains five phases with objectives and deliverables
+- Candidate explains the six SAP Activate phases and the evidence that closes each one
 - Discusses realistic timeline for each phase
 - Shares example: phase issue (design problem, testing overrun) and how it was managed
 - Understands phase gates and decision criteria
-- Explains why phases can't be skipped (Explore informs Execute)
+- Explains why phases can't be skipped (Explore informs Realize)
 - Discusses resource needs variation across phases
 - Shows awareness: skipping phases creates rework later
 
 ## Red Flags
 
 - Candidate doesn't know the phases or their sequence
-- Confuses Explore (design) with Execute (build)
+- Confuses Explore with Realize, or calls the build phase Execute
 - Hasn't participated in a structured project lifecycle
 - Thinks timeline can be cut by combining phases
 
@@ -344,9 +344,9 @@ Lifecycle phases include:
 - Project lifecycle
 - Discover phase
 - Explore phase
-- Execute phase
+- Realize phase
 - Deploy phase
-- Post-Go-Live phase
+- Run phase
 - Phase gates
 - Parallel run
 - Cutover

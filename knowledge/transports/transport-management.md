@@ -1,0 +1,9 @@
+# SAP transport and release
+
+## Move configuration through development quality and production
+
+Record the configuration or role change on a transport request in the development system and release it from the Transport Organizer, transactions SE09 and SE10, after the developer check. Import the released request into quality with the Transport Management System, transaction STMS. A successful import return code shows that the objects arrived. It does not show that the business process, role, or control was accepted. Run the technical test in quality, then obtain user-acceptance sign-off for the business task. Production import is a separate authorization and happens in the approved window after that sign-off. Confirm the imported object in production by repeating the business task, not by reading the import log alone. If quality passes and production fails, compare the imported request, its dependencies, and the target configuration before opening an urgent correction. Source checked 2026-10-21: SAP ABAP Change and Transport System, Transport Organizer SE09 and SE10, and Transport Management System STMS. ChaRM screen steps are not stated here because a current ChaRM procedure was not verified for this file.
+
+## Role transport and business acceptance
+
+Transport a PFCG role as part of the released request and import it with STMS. Generate and compare the role in the target system when the import does not leave the profile ready for the user. User-acceptance approval is the assigned user completing the business transaction for the maintained organizational value. Table AGR_USERS shows the assignment and is not a transaction. Transaction SU53 shows the last failed authorization check and is not proof that the business action succeeded. A rejected import or a missing dependency is corrected in development and transported again. Do not treat the quality test as production authorization.

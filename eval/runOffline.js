@@ -8,11 +8,24 @@ const scripts = [
   "retrievalScoreAssert.js",
   "productBoundaryAssert.js",
   "iagInterviewAccuracyBattery.js",
+  "iagProductBoundaryAssert.js",
   "procedureRetentionAssert.js",
   "knowledgeContentGuardAssert.js",
   "contextInheritanceAssert.js", "convergenceRoutingAssert.js", "freshAdmissionBattery.js",
   "experienceGroundingBattery.js", "deferredContinuationBattery.js", "responseModeCollisionMatrix.js",
-  "phase5ContractAssert.js"
+  "phase5ContractAssert.js",
+  "scenarioTimelineAssert.js",
+  "submitIdempotencyAssert.js",
+  "speechTranscriptBoundaryAssert.js",
+  "profileFactsAssert.js",
+  "knowledgeStubCoverageAssert.js",
+  "indexEncoderIdentityAssert.js",
+  "seniorAnswerQualityAssert.js",
+  "principalArchitectBatteryRunnerAssert.js",
+  "answerQualityContractAssert.js",
+  "answerBankAssert.js",
+  "connectorBankAssert.js",
+  "scenarioBankAssert.js"
 ];
 let failed = 0;
 for (const script of scripts) {

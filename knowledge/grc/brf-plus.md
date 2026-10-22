@@ -49,6 +49,14 @@ When an MSMP stage requires agent determination, it calls the linked BRF+ functi
 - Maintain decision table rows to cover all realistic organizational scenarios
 - Test rule evaluation against edge cases, not just the common path
 
+## Configure a BRFplus agent rule for MSMP
+
+I would first confirm whether the change is an initiator rule or an agent rule before changing anything. The initiator rule selects the MSMP path from request attributes. The agent rule resolves who must approve at a stage. For an agent rule I would generate the BRF+ flat rule shell in Define Workflow-Related MSMP Rules for process SAP_GRAC_ACCESS_REQUEST with rule kind Agent Rule, then open BRF+ and maintain the decision table so each realistic attribute combination returns the intended agent result. I would activate the application, function, and decision table, declare that rule in Maintain MSMP Workflows Maintain Rules, attach it to the stage that needs agent determination, and regenerate the MSMP version. I would test with a request that matches the decision-table row and confirm the Approvers of Selected Path in Request Status Instance Status. A missing decision-table row is an agent gap, not proof that the path mapping is wrong. Source checked 2026-10-21: SAP Support Content BRF plus Flat Rule - SAP Access Control Integration; SAP Help Define Workflow-Related MSMP Rules and Maintain MSMP Workflows.
+
+## Configure a BRFplus initiator rule for MSMP
+
+I would create a custom initiator only when one process needs multiple paths that the delivered initiator cannot express. In Define Workflow-Related MSMP Rules I would choose process SAP_GRAC_ACCESS_REQUEST, BRF+ Flat Rule, and Initiator Rule, generate the rule and decision table, then maintain RULE_RESULT values for each path condition. After activating the BRF+ objects I would add the function ID in Maintain Rules, declare every RULE_RESULT, set the initiator as the process global initiator, map each result to a path in Maintain Route Mapping, and generate the MSMP version. I would validate by submitting one request per RULE_RESULT and confirming the selected path in Instance Status. Source checked 2026-10-21: SAP Support Content BRF plus Flat Rule integration; SAP Community Build a simple BRF+ Initiator Rule.
+
 ## Implementation Activities
 
 - Design decision tables based on actual organizational approval authority

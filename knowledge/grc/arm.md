@@ -51,6 +51,10 @@ A request is submitted and immediately triggers a risk simulation against the AR
 - Integrate ARA risk simulation into the request submission process
 - Configure connectors for automated provisioning to target systems
 
+## Design access request from submission through target provisioning
+
+For an end-to-end ARM design question, keep the sequence explicit: submission, ARA risk simulation, MSMP/BRF+ approval, then connector provisioning. Configure request types so risk simulation cannot be skipped before routing. MSMP defines paths and stages; BRF+ resolves agents at each stage. After final approval, the provisioning framework assigns technical roles through the target connector. Validate with Request Status, Instance Status, and provisioning logs, then confirm the target assignment. Approval completion alone is not proof the target received access. ARM is not direct PFCG assignment and is not IAG Access Request RequestTypeRule routing.
+
 ## Implementation Activities
 
 - Design request types and their required approval stages based on business requirements

@@ -2,7 +2,16 @@
  * Live-interview career facts from the candidate CV (authoritative).
  * Employer/client names below are allowed in spoken answers. Do not add Accenture, Chalhoub, or extra clients.
  */
-const DEFAULT_CAREER_BACKGROUND = `Balaji Chandran — SAP GRC Consultant / Security & GRC Architect. This CV is the source of truth for first-person experience. Do not invent employers, tools, metrics, or incidents that are not written here.
+const PROFILE_FACTS = `Confirmed profile facts. A two-page CV is a summary and does not limit these facts:
+- 17+ years of overall IT experience.
+- 12+ years of SAP GRC Security experience.
+- PMP certified.
+- IPS implementation experience is confirmed. Do not attach that work to Dover or invent the project, source system, or target.
+Do not invent additional certifications, employers, dates, or metrics. Do not state a different year count.`;
+
+const DEFAULT_CAREER_BACKGROUND = `Balaji Chandran — SAP GRC Consultant / Security & GRC Architect. The engagement record below keeps the detail a two-page CV cannot list. Do not invent employers, tools, metrics, or incidents that are not written here.
+
+${PROFILE_FACTS}
 
 CAREER TIMELINE (pick the strongest matching engagement for THIS question; do not rotate employers; do not merge programmes into one fictional project):
 - Dover Corporation via Ascent Staffing (08/2022–06/2026): Security & GRC lead, Fortune 500 ECC-to-S/4HANA, 11 countries, 28 legal entities, 8,700+ users, 45 systems, team of 8, three phased go-lives on a 15-month schedule. GRC AC 12.0 (ARA, ARM, BRM, EAM): 18 connected systems, 250+ custom SoD rules, 300 mitigating controls, 4,000+ ARM requests/year, 95 firefighter owners. S/4 role landscape: 1,650 PFCG roles, 350 business roles, 220 Fiori catalogs; every role SoD-simulated in ARA/BRM before transport; 2,400+ SoD conflicts cleared before cutover. ARM MSMP (manager, role owner, security, SoD reviewer) with BRF+ and auto-provisioning replacing manual SU01. UAR/role-owner certification for SOX windows. Testing: 2,500 test cases, UAT with 200 business users; cutover/hypercare for all three go-lives; L2/L3 GRC support. Primary contact for internal and Big-4 auditors; SOX 404/ITGC evidence; no significant access-control findings. IAG integration with S/4HANA and BTP; IAS trust, Azure AD SAML 2.0 SSO and MFA; BTP role collections under the same request/review process as on-prem roles. IPS implementation is confirmed separately, but the profile does not attribute it to Dover or name the project, source system, target set, or configuration performed. Authored GRC workbook, rule-set design, role-design standard, SOPs, RACI. Do not claim IDM Developer Studio at Dover.
@@ -120,7 +129,10 @@ Do not attach dates, team sizes, user counts, or another programme's results.`;
 
 function namedProgrammes(question = "") {
   const text = String(question || "").toLowerCase();
-  return PROGRAMMES.filter((programme) => programme.aliases.some((alias) => text.includes(alias)));
+  return PROGRAMMES.filter((programme) => programme.aliases.some((alias) => {
+    const escaped = alias.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`(?:^|[^a-z0-9])${escaped}(?:$|[^a-z0-9])`, "i").test(text);
+  }));
 }
 
 function namedProgrammeIds(question = "") {
@@ -209,6 +221,9 @@ function scopeCareerEvidence(question = "", priorQuestion = "") {
       text: selected.map(renderProgramme).join("\n")
     };
   }
+  if (!selected.length && personalCue(question) && /\b(?:how many years|years of experience|pmp|certification|certified)\b/i.test(question)) {
+    return { mode: "profile", programmeId: null, text: PROFILE_FACTS };
+  }
   if (!selected.length && demandsSpecificFact(question)) {
     return { mode: "methodology", programmeId: null, text: METHODOLOGY_EVIDENCE };
   }
@@ -276,6 +291,7 @@ function auditHistoricalClaims(answer = "", evidenceText = "") {
 
 module.exports = {
   DEFAULT_CAREER_BACKGROUND,
+  PROFILE_FACTS,
   STATED_PROFILE,
   PROGRAMMES,
   namedProgrammes,

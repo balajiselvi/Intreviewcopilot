@@ -2,57 +2,47 @@
 
 ## Overview
 
-S/4HANA security builds on the same PFCG and authorization object foundation as ECC, but shifts emphasis toward Fiori-based business roles, simplified authorization objects tied to the new data model, and different SoD considerations because S/4HANA consolidates functionality that used to span multiple ECC transactions into fewer, broader ones.
+Design SAP S/4HANA Cloud Public Edition access in Maintain Business Roles, assign that business role in Maintain Business Users, and verify it by having the assigned user perform the intended app while Display Authorization Trace records successful, failed, or filtered checks. Private Edition and on-premise role design stays in PFCG. PFCG, SU24, SUIM, AGR_USERS, and a BTP role collection are not the Public Edition design.
 
 ## Interview Summary
 
-The mechanics of authorization checking haven't changed from ECC — it's still AUTHORITY-CHECK against authorization objects assigned through PFCG roles. What's different is the shape of the roles: S/4HANA business roles are Fiori-app-centric, some authorization objects were simplified or consolidated with the move away from classic tables, and SoD analysis has to account for transactions that now do more than their ECC equivalent did.
+Design SAP S/4HANA Cloud Public Edition access in Maintain Business Roles, assign that business role in Maintain Business Users, and verify it by having the assigned user perform the intended app while Display Authorization Trace records successful, failed, or filtered checks. A filtered check means the business role is not assigned or the restriction value is missing. Private Edition and on-premise success is the assigned user completing the business transaction in the PFCG role.
 
 ## 30 Second Interview Answer
 
-S/4HANA security runs on the same authorization mechanics as ECC — PFCG roles, authorization objects, AUTHORITY-CHECK at runtime. What changes is the role shape. S/4HANA is Fiori-first, so business roles are built around app catalogs and groups rather than transaction lists, and some transactions got consolidated or simplified, which means segregation of duties analysis has to be re-baselined rather than just carried over from ECC.
+Design SAP S/4HANA Cloud Public Edition access in Maintain Business Roles, assign that business role in Maintain Business Users, and verify it by having the assigned user perform the intended app while Display Authorization Trace records successful, failed, or filtered checks. Create the role from an SAP business-role template, assign the business catalogs, and maintain the restriction values the function requires. Activate the trace for that business user and the apps, let the user execute them, then deactivate the trace. A filtered check means the user is not assigned the business role for that restriction type, or the required value is not maintained. A trace status does not replace the user completing the business action.
 
 ## 60 Second Interview Answer
 
-S/4HANA security is built on the same foundation as ECC security — PFCG roles, authorization objects, the same AUTHORITY-CHECK runtime mechanism. Nothing about the fundamental enforcement model changed.
-
-What's different is the shape of the access. S/4HANA is designed around Fiori as the primary user interface, so business roles are built around Fiori catalogs and groups that determine which apps show up on a user's launchpad, in addition to the traditional backend authorization objects those apps still need. Some classic transactions were consolidated or simplified in S/4HANA's data model — the new MM/FI integration, for example, changed how certain authorization checks apply compared to their ECC equivalent.
-
-The practical consequence for security teams is that segregation of duties analysis can't just be copied over from ECC. A transaction that did one narrow thing in ECC might now be part of a broader Fiori app doing more, which changes what functions and risks actually apply, and rulesets need to be re-evaluated against the S/4HANA-specific transaction and app landscape rather than assumed to carry over unchanged.
+Design SAP S/4HANA Cloud Public Edition access in Maintain Business Roles, assign that business role in Maintain Business Users, and verify it by having the assigned user perform the intended app while Display Authorization Trace records successful, failed, or filtered checks. SAP S/4HANA Cloud Public Edition 2608 uses Maintain Business Users to assign business roles and Maintain Business Roles to create roles, maintain authorization restrictions, and start from SAP business-role templates. Activate the trace, have the user execute the app, deactivate the trace, and review successful, failed, and filtered checks. Review the trace promptly because the system deletes it after a time, and a selection returns at most 10,000 data sets. SAP S/4HANA Cloud Private Edition and an on-premise system keep role maintenance in PFCG and assignment on the ABAP user master. On those systems, success is the assigned user completing the business transaction. SU53 or STAUTHTRACE is evidence only after an authorization check fails.
 
 ## 90 Second Interview Answer
 
-S/4HANA security doesn't change the fundamental authorization enforcement model — it's still PFCG-built roles carrying authorization objects, checked at runtime through the same AUTHORITY-CHECK mechanism that's been in SAP since the ECC days and before. Anyone who understands classic SAP security mechanics already understands the runtime layer of S/4HANA security.
-
-What genuinely changes is the shape of what gets built. S/4HANA is architected Fiori-first, meaning the primary user experience is app tiles on a launchpad rather than transaction codes typed into a command field. Business roles in S/4HANA are built around Fiori catalogs and groups — catalogs determine which apps a role can access, groups determine how those apps are organized on the launchpad — layered on top of the traditional backend authorization objects those apps still ultimately depend on. A well-designed S/4HANA role has to get both layers right: the Fiori catalog and group assignment for launchpad access, and the underlying authorization objects for what the app is actually allowed to do once opened.
-
-The other significant shift is in the transaction and data model landscape itself. S/4HANA consolidated a lot of functionality that spanned multiple separate ECC transactions into fewer, more integrated apps — the universal journal in FI is the classic example, merging what used to be separate FI and CO data structures. This has a direct security consequence: authorization objects and the business functions they represent don't map one-to-one from ECC to S/4HANA in every case, which means segregation of duties rulesets built for an ECC landscape can't simply be ported over and trusted. They need to be re-evaluated against what the S/4HANA transactions and Fiori apps actually do, because a function that was narrow and separable in ECC might now be part of a broader, more integrated app in S/4HANA, changing what combinations actually represent genuine conflict risk.
+Design SAP S/4HANA Cloud Public Edition security in Maintain Business Roles from an SAP template, and assign its business catalogs and restrictions. Assign that business role in Maintain Business Users so the user can open the app. Verify access by having the assigned user perform the intended app. Activate Display Authorization Trace for that business user, let the user execute the app, and deactivate the trace. Read each check as successful, failed, or filtered, and treat a filtered check as a missing business role or an unmaintained restriction value. Confirm the business function only when that user completes the app. Private Edition and on-premise role design stays in PFCG, and SU53 is evidence only after an authorization check fails.
 
 ## Architecture
 
-- PFCG roles and authorization objects: unchanged foundational mechanism from ECC
-- Fiori catalogs: determine which apps a role grants launchpad access to
-- Fiori groups: organize app tiles on the launchpad
-- Backend authorization objects: still required for what an app is allowed to do
-- Simplified/consolidated data model: changes what some authorization objects and transactions actually represent
+The security architecture of SAP S/4HANA Cloud follows the edition. In Public Edition, design access in Maintain Business Roles with business catalogs and restrictions, assign the business role in Maintain Business Users, and record the checks in Display Authorization Trace. In Private Edition and on-premise, maintain the role in PFCG and assign it on the ABAP user master, then have that user complete the business transaction. An identity provider or a provisioning job does not replace that edition's authorization tool. Do not use a BTP role collection as an S/4HANA Cloud business role.
 
 ## Runtime Flow
 
-A user opens their Fiori launchpad, and the tiles they see are determined by the Fiori catalogs and groups assigned through their role. Selecting a tile launches the underlying app, which — exactly like a classic ECC transaction — executes AUTHORITY-CHECK statements against the backend authorization objects required for that app's functionality. The Fiori layer controls visibility and access to the app itself; the backend authorization objects control what the app is allowed to actually do once opened.
+On Public Edition the business user signs in to the tenant, opens the app granted by the assigned business role, and the application checks the restrictions maintained on that role. Display Authorization Trace records those checks as successful, failed, or filtered. On Private Edition and on-premise, the PFCG profile supplies the authorization values, and a failed check is inspected only after the business transaction fails.
 
 ## Configuration
 
-- Build S/4HANA business roles combining Fiori catalog/group assignment with backend authorization objects
-- Maintain SU24 defaults for S/4HANA-specific and custom Fiori apps
-- Re-evaluate segregation of duties rulesets against the S/4HANA transaction and app landscape
-- Validate authorization object behavior against the simplified data model where relevant
+In SAP S/4HANA Cloud Public Edition, create the business role in Maintain Business Roles from a template, assign the business catalogs, and maintain the restrictions. Assign that role in Maintain Business Users. Have the assigned user perform the intended app. Activate Display Authorization Trace for that user, let the user execute the app, deactivate the trace, and correct a failed or filtered check in the business role. Confirm the business function only when that user completes it. On Private Edition or on-premise, maintain the role in PFCG and assign it on the ABAP user master. Have that assigned user complete the business transaction in the PFCG role. Read SU53 or STAUTHTRACE only after an authorization check fails.
+
+## Source
+
+Checked 2026-10-17 against the SAP S/4HANA Cloud Public Edition 2608 Feature Scope Description, Identity and Access Management: Maintain Business Users assigns business roles, Maintain Business Roles creates roles and authorization restrictions from SAP templates, and Display Authorization Trace analyzes missing or insufficient authorizations for a business user. https://help.sap.com/doc/7c9e0bbbd1664c2581b2038a1c7ae4b3/2608.500/en-US/FSD_CE2608.pdf
+
+SAP Learning, Creating an Authorization Trace, in Managing User Identity and Access in SAP S/4HANA Cloud Public Edition: Activate Trace for the business user and apps, the user executes the apps, Deactivate Trace, then read successful, failed, or filtered. A filtered check means the user is not assigned the business role for that restriction type or the required value is not maintained. Traces are deleted after a time, and a selection returns at most 10,000 data sets. https://learning.sap.com/courses/managing-user-identity-and-access-in-sap-s-4hana-cloud-public-edition/creating-an-authorization-trace_c872d7fa-4a8e-4635-ba4f-df2f86f5f0d7
+
+Private Edition role maintenance in PFCG is the procedure recorded on 2026-10-13 from SAP Learning, Assigning Permissions to Users. This pass did not re-open that lesson.
 
 ## Implementation Activities
 
-- Design S/4HANA business roles around Fiori app groupings tied to actual job functions
-- Map Fiori catalogs and groups alongside backend authorization content for each role
-- Re-baseline segregation of duties analysis for the S/4HANA-specific transaction landscape
-- Validate authorization behavior for consolidated or simplified transactions against ECC expectations
+These activities apply to Private Edition and on-premise role design. They are not the SAP S/4HANA Cloud Public Edition procedure. Maintain the role in PFCG and assign it on the ABAP user master. Have the assigned user complete the business transaction in the PFCG role. Read SU53 or STAUTHTRACE only after an authorization check fails. Re-baseline segregation of duties when a target transaction differs from its ECC equivalent.
 
 ## Migration Activities
 
@@ -74,7 +64,7 @@ A user opens their Fiori launchpad, and the tiles they see are determined by the
 
 ## Troubleshooting: Public Edition app is missing
 
-In SAP S/4HANA Cloud Public Edition 2608, first ask the user to search App Finder or All My Apps. SAP Help says App Finder lists apps available for the user's role, while a launchpad page shows only the subset selected by the administrator. If the app is in App Finder but absent from the expected page, inspect the user's space assignment and page content in Manage Launchpad Spaces and Manage Launchpad Pages. If it is absent from App Finder, use Maintain Business Users to confirm assigned business roles, then Maintain Business Roles and IAM Information System to verify the business catalog or direct IAM app assignment and activation. Check restrictions or scope only when they explain app eligibility. KBA 3499342 covers a navigation-target application with no tile. These are Fiori apps, not transactions. A missing app is not an OData authorization trace case. Source checked 2026-10-15 against SAP Help Portal, SAP Fiori Launchpad for SAP S/4HANA Cloud Public Edition 2608: App Finder and Spaces and Pages.
+Inspect App Finder or All My Apps for the user's role in SAP S/4HANA Cloud Public Edition 2608 before treating the app as missing. SAP Help says App Finder lists apps available for the user's role, while a launchpad page shows only the subset selected by the administrator. If the app is in App Finder but absent from the expected page, inspect the user's space assignment and page content in Manage Launchpad Spaces and Manage Launchpad Pages. If it is absent from App Finder, use Maintain Business Users to confirm assigned business roles, then Maintain Business Roles and IAM Information System to verify the business catalog or direct IAM app assignment and activation. Check the user's restrictions or scope only when they explain app eligibility. KBA 3499342 covers a navigation-target application with no tile. These are Fiori apps, not transactions. A missing app is not an OData authorization trace case. Source checked 2026-10-15 against SAP Help Portal, SAP Fiori Launchpad for SAP S/4HANA Cloud Public Edition 2608: App Finder and Spaces and Pages.
 
 ## Troubleshooting: Fiori app opens but a request fails
 
@@ -144,11 +134,7 @@ AGR_1251, AGR_TCODES, USOBT_C, USOBX_C
 
 ## Best Practices
 
-- Design S/4HANA business roles around both Fiori catalog/group and backend authorization together, not separately
-- Re-baseline segregation of duties analysis specifically for the S/4HANA transaction and app landscape
-- Maintain SU24 data for every custom Fiori app built on the platform
-- Validate consolidated transaction authorization behavior against ECC-era assumptions before trusting them
-- Test both Fiori app access and backend authorization independently when troubleshooting
+Design SAP S/4HANA Cloud Public Edition security in Maintain Business Roles from an SAP template, and assign its business catalogs and restrictions. Assign that business role in Maintain Business Users so the user can open the app. Verify access by having the assigned user perform the intended app. Activate Display Authorization Trace for that business user, let the user execute the app, and deactivate the trace. Read each check as successful, failed, or filtered, and treat a filtered check as a missing business role or an unmaintained restriction value. Confirm the business function only when that user completes the app. On Private Edition or on-premise, maintain the role in PFCG and assign it on the ABAP user master. Have that assigned user complete the business transaction in the PFCG role. Read SU53 or STAUTHTRACE only after an authorization check fails. Do not use SU24, AGR_USERS, or a BTP role collection as the Public Edition design.
 
 ## Common Mistakes
 

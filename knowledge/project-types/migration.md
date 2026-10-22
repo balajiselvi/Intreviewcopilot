@@ -2,102 +2,27 @@
 
 ## Overview
 
-SAP data migration is the process of extracting data from legacy systems and loading it into SAP (greenfield, brownfield, or bluefield projects). Data migration is typically the longest and most complex phase of SAP implementation because: (1) legacy data is often poor quality (duplicates, missing values, incorrect formats), (2) data schema differs significantly (legacy vendor A's schema vs SAP's schema), (3) data volumes are massive (terabytes of 20+ years of transactions), (4) data integrity is mission-critical (financial data must be accurate, auditable). Data migration requires: master data governance (define clean data), ETL tools (extract-transform-load), reconciliation processes (validate legacy vs SAP), and careful cutover execution (final data load, parallel run validation). Poor data migration causes post-go-live chaos: incorrect balances, missing transactions, customer records corrupted. This is why data migration is often the make-or-break factor in SAP projects.
+Data movement depends on the transition path. A new implementation loads selected master data and open transactional data with the SAP S/4HANA Migration Cockpit. Completed, closed, and partially closed transactional data cannot be migrated on that path. A system conversion keeps the data in the same system identity and converts it with Software Update Manager. Selective data transition moves a verified slice, such as selected company codes and a time slice on the documented lean path. Reconcile the selected scope before the go/no-go review. Do not quote a universal duration or a universal data volume.
 
 ## Interview Summary
 
-Data migration: extracting legacy data, transforming to SAP schema, loading into SAP. Challenges: legacy data quality (duplicates, missing), schema differences (different vendor systems), massive volumes (20+ years of data). Critical success factors: master data governance, data cleansing, ETL tools, reconciliation, validation. Poor migration = post-go-live chaos (incorrect balances, missing data, customer problems).
+Name the path before naming the tool. Migration Cockpit belongs to a new implementation. Software Update Manager belongs to a system conversion. A selective path needs an explicit company-code and time-slice scope. Reconciliation is the evidence, not a claim that all history arrived.
 
 ## 30 Second Interview Answer
 
-Data migration: legacy data → SAP data. Key challenges: (1) Data quality (duplicates, missing values), (2) Schema transformation (legacy vendor A schema → SAP schema), (3) Volume (terabytes of 20-year history). Strategy: master data governance upfront, data cleansing (remove duplicates), ETL tools (automate transformation), reconciliation (validate legacy vs SAP match), pilot migration (test small dataset first).
+For a new implementation, load the approved master and open transactional data with the Migration Cockpit and leave closed history behind. For a system conversion, validate the converted data in the same system after Software Update Manager. For selective data transition, reconcile the company codes and time slice that the contract actually includes.
 
 ## 60 Second Interview Answer
 
-Data migration transforms legacy system data into SAP format and loads it. Process: (1) Extract data from legacy system. (2) Transform to SAP schema (map fields, convert formats, cleanse). (3) Load into SAP. (4) Validate (verify data accuracy, reconcile balances).
-
-Challenges: Legacy data quality is often poor (20-year accumulation of errors, duplicates, incomplete records). SAP schema differs from legacy vendor (consolidating multiple vendors = multiple transforms). Volume can be massive (terabytes, can take days to load).
-
-Strategy: (1) Master data governance (define what "clean" data looks like). (2) Data cleansing (remove duplicates, fill missing values, standardize formats). (3) ETL tools (automate transformation; don't script manually). (4) Pilot migration (test with subset of data first). (5) Reconciliation (legacy data vs SAP data—must match). (6) Iterative refinement (pilot reveals issues, fix transforms, re-pilot).
-
-Timeline: 2-4 months typical (longer for large/complex data).
+Prepare the data owner, the mapping, the cleansing rule, and the reconciliation report before the first rehearsal. A failed reconciliation is a go/no-go issue, not a hypercare cleanup. Security confirms that the organizational values in the migrated data still match the role design. After cutover, hypercare investigates a balance or access defect against that evidence.
 
 ## 90 Second Interview Answer
 
-Data migration is moving legacy system data into SAP. It's complex because legacy data is messy, schema is different, volumes are huge, and accuracy is mission-critical (financial data, customer records must be 100% accurate).
+Do not treat every legacy extract as eligible for every target. The new-implementation restriction on closed transactional data is a product rule. A partner tool that claims a wider scope is outside SAP certification unless the selected scenario says otherwise. State that boundary, then describe the rehearsal, the reconciliation owner, and the decision to continue or stop.
 
-**Key Phases:**
+## Source
 
-1. **Assess & Plan (Weeks 1-2):**
-   - Catalog what data exists in legacy system
-   - Identify which legacy data moves to SAP (not everything does)
-   - Analyze data quality (identify duplicates, missing values, bad formats)
-   - Estimate data volume and transformation complexity
-   - Plan data migration timeline
-
-2. **Design (Weeks 3-4):**
-   - Define target SAP data model (what fields, formats, validation rules)
-   - Map legacy fields → SAP fields (transformation rules)
-   - Design data cleansing approach (remove duplicates, fill gaps, validate)
-   - Select ETL tools (SAP Data Services, SAP Cloud Integration, third-party tools)
-   - Plan reconciliation approach (how to validate migrated data)
-
-3. **Build (Weeks 5-8):**
-   - Develop ETL scripts/mappings (legacy schema → SAP schema)
-   - Implement data cleansing logic (deduplicate, standardize formats)
-   - Build validation checks (data quality gates)
-   - Set up test environment (isolated SAP system for migration testing)
-
-4. **Pilot Migration (Weeks 9-10):**
-   - Extract small subset of legacy data (sample by entity, customer segment, date range)
-   - Transform via ETL scripts
-   - Load into test SAP environment
-   - Validate data (check for errors, missing values, format issues)
-   - Reconcile: legacy totals vs SAP totals (must match)
-   - Identify and fix data issues
-   - Re-run pilot until validation passes
-
-5. **Full Migration Prep (Weeks 11-12):**
-   - Refine ETL scripts based on pilot findings
-   - Prepare data cleansing for full dataset
-   - Plan full migration timeline (how many days to extract, transform, load)
-   - Prepare rollback procedure (in case migration fails)
-   - Freeze legacy system data (no new entries while migrating)
-
-6. **Go-Live Cutover (Days 1-3):**
-   - Final extract from legacy (all data as of cutover date)
-   - Final transform and load into SAP
-   - Reconciliation (final validation; legacy vs SAP must match)
-   - User access to SAP (legacy system shut down or read-only)
-   - Parallel run period: both systems live for 1-4 weeks (business validates)
-
-7. **Post-Go-Live (Weeks 13-16):**
-   - Ongoing data validation (spot checks, reconciliation)
-   - Issue resolution (data discrepancies investigated, corrected)
-   - Performance optimization (data model tuning if needed)
-   - Legacy system archival or decommissioning
-
-**Data Cleansing (Critical Step):**
-
-- **Deduplication:** Identify duplicate customer/vendor/product records (consolidate into one master record)
-- **Format Standardization:** Convert dates/numbers/strings to SAP standard
-- **Missing Value Handling:** Fill required fields (use defaults or ask business)
-- **Validation Rules:** Apply business rules (GL accounts must be valid, dates must be logical, amounts must be positive)
-- **Reconciliation:** Sum of legacy records = sum of migrated records (by entity, by period, by transaction type)
-
-**Challenges & Mitigation:**
-
-- **Challenge:** Data quality so poor that migration takes 2x longer than planned.
-  **Mitigation:** Start data assessment early (pilot migration in development phase), allocate extra time budget.
-
-- **Challenge:** ETL tool crashes mid-load (terabytes of data); data in inconsistent state.
-  **Mitigation:** Use robust ETL tools, implement restart logic (load can resume from checkpoint), test with full dataset size in test environment.
-
-- **Challenge:** Legacy and SAP don't reconcile; variance of $10M in customer balances.
-  **Mitigation:** Detailed reconciliation analysis (by entity, by GL account, by transaction type), identify root cause (data loss, transformation error, timing differences), fix and re-run subset.
-
-- **Challenge:** Mid-migration, business discovers legacy data they want to keep (thought was irrelevant).
-  **Mitigation:** Scope migration carefully before starting; have "freeze" on new requirements; keep legacy system read-only archive for reference.
+Checked 2026-10-20. SAP Learning, Describing the Customer Transition Paths to SAP S/4HANA Cloud Private Edition. https://learning.sap.com/courses/implementing-sap-s-4hana-cloud-private-edition/describing-the-customer-transition-paths-to-sap-s-4hana-cloud-private-edition_b8aa0951-21d6-44d0-b9f5-81cd24b2b8bb
 
 ## Architecture
 

@@ -95,9 +95,8 @@ function finishReport(report, startedAt) {
 
 /**
  * The only supported indexing service. Unchanged documents retain their
- * already parsed chunks, but all chunks still pass through the current
- * embedding service. The retained metadata is the future extension point for
- * safe embedding reuse when checksum and embedding version both match.
+ * already parsed chunks and embeddings when checksum and embedding version
+ * match. Only newly parsed chunks are embedded.
  */
 async function buildKnowledgeIndex() {
   const startedAt = Date.now();
@@ -164,16 +163,24 @@ async function buildKnowledgeIndex() {
       }
     }
 
-    const validatedChunks = ChunkCollectionSchema.parse(chunksToEmbed);
+    // Validate chunk shape without stripping embeddings already present on
+    // unchanged documents. ChunkCollectionSchema omits embedding and would
+    // force a full re-embed on every controlled rebuild.
+    const validatedChunks = chunksToEmbed.map((chunk) => {
+      const base = ChunkCollectionSchema.element.parse(chunk);
+      if (Array.isArray(chunk.embedding) && chunk.embedding.length > 0) {
+        return { ...base, embedding: chunk.embedding };
+      }
+      return base;
+    });
     logger.info("knowledge.index.embeddings.generating", {
       totalChunks: validatedChunks.length,
       documentsProcessed: report.documentsProcessed,
       documentsSkipped: report.documentsSkipped,
-      documentsUpdated: report.documentsUpdated
+      documentsUpdated: report.documentsUpdated,
+      reusableEmbeddings: validatedChunks.filter((chunk) => Array.isArray(chunk.embedding) && chunk.embedding.length > 0).length
     });
 
-    // Embedding reuse is deliberately deferred. Every current build generates
-    // embeddings through the unchanged embedding service.
     const embeddedChunks = await generateEmbeddings(validatedChunks);
     const knowledgeIndex = KnowledgeIndexSchema.parse({
       version: appConfig.knowledge.indexVersion,

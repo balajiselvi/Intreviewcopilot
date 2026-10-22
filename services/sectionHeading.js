@@ -29,6 +29,7 @@ const NAMED_SOURCE_PATTERNS = Object.freeze([
   ["ariba", /\bariba\b/i],
   ["datasphere", /\bdatasphere\b/i],
   ["sac", /\b(?:sac|analytics cloud)\b/i],
+  ["process-control", /\b(?:SAP GRC )?Process Control\b/i],
   ["cutover", /\bcutover\b/i],
   ["hypercare", /\bhypercare\b/i]
 ]);
@@ -44,8 +45,8 @@ function namedSourceAdjustment(question, chunk = {}) {
     .map(([source]) => source);
   if (!asked.length) return 0;
   const file = `${chunk.sourceFolder || ""} ${chunk.sourceFile || ""}`.toLowerCase().replace(/\.md\b/g, " ");
-  const fileTokens = new Set(file.split(/[^a-z0-9]+/).filter(Boolean));
-  if (asked.some((token) => fileTokens.has(token))) return 0.22;
+  const normalizedFile = ` ${file.replace(/[^a-z0-9]+/g, " ").trim()} `;
+  if (asked.some((token) => normalizedFile.includes(` ${token.replace(/[^a-z0-9]+/g, " ").trim()} `))) return 0.22;
   const content = ` ${normalizeHeadingText(chunk.content || "")} `;
   if (asked.some((token) => content.includes(` ${token} `))) return 0;
   return -0.2;
@@ -67,11 +68,16 @@ function deliveryProcedureAdjustment(question, chunk = {}, analysis = {}) {
     || /troubleshoot|diagnos|production support/i.test(intent)
     || /troubleshoot|production support/i.test(category);
   const asksDelivery = /\b(cutover|hypercare|go-live|go live|implement)\b/i.test(q);
-  if (!asksTrouble && !asksDelivery) return 0;
+  const asksConfigure = /\b(how (?:do|would|to)\b.{0,40}\bconfigur|configur(?:e|ation|ing)\b|integrat(?:e|ion|ing)\b|attach|link|route|set up|implement)\b/i.test(q)
+    || /configur|implement/i.test(intent)
+    || /configuration|implementation/i.test(category);
+  if (!asksTrouble && !asksDelivery && !asksConfigure) return 0;
   const wrapperHeading = /\b(what makes|common interview|red flags|hidden expectations|keywords|tough follow|interview summary|\d+ second interview answer)\b/i.test(heading);
   const procedureHeading = asksTrouble
     ? /\b(troubleshoot|troubleshooting|diagnos|diagnostic|investigation|triage|failing authorization|service not active|symptom|problem|missing app|failed entities)\b/i.test(heading)
-    : /\b(runtime flow|best practices|implementation|cutover|hypercare|go-live|configuration|troubleshoot)\b/i.test(heading);
+    : asksConfigure
+      ? /\b(configur|technical configuration|agent rule|initiator rule|integrate|implementation|runtime flow)\b/i.test(heading)
+      : /\b(runtime flow|best practices|implementation|cutover|hypercare|go-live|configuration|troubleshoot)\b/i.test(heading);
   const deliveryBody = /\b(runbook|rehearsal|rollback|go\/no-go)\b/i.test(content);
   let delta = 0;
   // A visibility failure and a request-time failure are different diagnostic stages.
@@ -91,8 +97,15 @@ function deliveryProcedureAdjustment(question, chunk = {}, analysis = {}) {
   if (procedureHeading) delta += 0.28;
   if (asksDelivery && deliveryBody) delta += 0.12;
   if (wrapperHeading) delta -= 0.24;
-  else if (asksTrouble && !procedureHeading) delta -= 0.20;
+  else if ((asksTrouble || asksConfigure) && !procedureHeading) delta -= 0.20;
   if (asksDelivery && /\barchitecture\b/i.test(heading) && !deliveryBody) delta -= 0.16;
+  // Keep MSMP workflow how-tos on MSMP configure/troubleshoot sections rather than
+  // neighboring BRF agent-rule essays when the question did not ask for BRF+.
+  const asksMsmp = /\bMSMP\b/i.test(q);
+  const asksBrf = /\bBRF\+?\b|\bBRFplus\b|\bBRF\s*plus\b/i.test(q);
+  if (asksConfigure && asksMsmp && !asksBrf && /^configure an msmp\b/i.test(heading)) delta += 0.22;
+  if (asksConfigure && asksMsmp && !asksBrf && /\b(?:agent rule|initiator rule)\b/i.test(heading)) delta -= 0.28;
+  if (asksConfigure && asksBrf && /\b(?:agent rule|initiator rule|brf)\b/i.test(heading)) delta += 0.22;
   return delta;
 }
 
