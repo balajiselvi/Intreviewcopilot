@@ -273,7 +273,14 @@ Never invent a GitHub repository.
 
 ## Development Server
 
-Never run two Next.js dev servers against the same project `.next` directory.
+Never run two Next.js dev servers against the same project `.next` directory. `npm run dev` uses `.next-dev` (`next.config.mjs`) and listens on `127.0.0.1:3000` via `scripts/dev-server.js`.
+
+## Cursor Cloud specific instructions
+
+- Install with `npm ci`. Node 22 on the default image satisfies the documented Node 18+ requirement. Do not upgrade npm or rewrite the lockfile.
+- Start the app with `npm run dev`. The Cloud Agent start script skips launch when `http://127.0.0.1:3000/api/hello` is already answering, and sets `LLM_VALIDATION_MODE` to `retrieval-only` only when that variable is unset.
+- In retrieval-only mode, `POST /api/chat` runs analysis and retrieval without an API key. A question that matches a verified workflow still returns a spoken answer in the interview UI. `full` mode calls a provider and needs a key from Settings or from `OPENAI_API_KEY` / `GEMINI_API_KEY`.
+- `npm run lint` opens an interactive ESLint setup prompt because this repository has no ESLint config. `npm run build` is the non-interactive production check. `npm test` runs `eval/runOffline.js`.
 
 ## Decision Rule
 
