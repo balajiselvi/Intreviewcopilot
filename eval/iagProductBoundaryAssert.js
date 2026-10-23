@@ -15,6 +15,10 @@ const cases = [
   { q: "How does the IAG Bridge interact with SAP Access Control?", topic: "IAG", workflow: "iag-access-control-bridge", folders: ["iag", "grc"] },
   { q: "How would you configure IAG?", topic: "IAG", workflow: "iag-general-implementation" },
   { q: "What are the main steps to implement SAP Cloud Identity Access Governance?", topic: "IAG", workflow: "iag-general-implementation" },
+  // Conceptual overview asks must fall through; the broad IAG implementation workflow is a procedural mismatch.
+  { q: "Explain IAG?", topic: "IAG", workflow: null },
+  { q: "Explain SAP Cloud IAG?", topic: "IAG", workflow: null },
+  { q: "What is IAG?", topic: "IAG", workflow: null },
   { q: "How do you configure IAG Access Analysis?", topic: "IAG", workflow: "iag-analysis-ruleset" },
   { q: "How would you set up access requests in IAG?", topic: "IAG", workflow: "iag-workflow-determination" },
   { q: "How do you configure access certification in IAG?", topic: "IAG", workflow: "iag-certification-review" },

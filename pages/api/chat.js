@@ -18,22 +18,56 @@ import APP_CONFIG from "../../config/appConfig";
 const require = createRequire(import.meta.url);
 const { recallGroundedExperience, formatMemoryCard, fieldConflictsWithCv, cardCoversAskedWork } = require("../../eval/lib/expertiseCards.js");
 const { recallExpectedAnswer } = require("../../eval/lib/expectedAnswers.js");
-const { DEFAULT_CAREER_BACKGROUND, STATED_PROFILE, scopeCareerEvidence, scopedHistoryOnly } = require("../../eval/lib/careerTimeline.js");
+const {
+  DEFAULT_CAREER_BACKGROUND,
+  STATED_PROFILE,
+  scopeCareerEvidence,
+  scopedHistoryOnly,
+  isProfileCredentialQuestion,
+  buildCredentialConfirmationAnswer
+} = require("../../eval/lib/careerTimeline.js");
 const { shouldInheritPriorDomain, hasStrongTechnicalEvidence, isPlaneFoil, isTopicContinuation } = require("../../lib/contextInheritance.js");
-const { publicLlmError, isIncompleteGeneration } = require("../../lib/generationGuard.js");
+const {
+  publicLlmError,
+  isIncompleteGeneration,
+  sanitizeSpokenAnswer,
+  anonymizeStarEmployers
+} = require("../../lib/generationGuard.js");
+const {
+  LLM_REQUEST_TIMEOUT_MS,
+  MAX_RETRIES,
+  isRetryableLlmError,
+  runWithExponentialRetry,
+  resolveProviderFailoverChain,
+  generateWithReliability,
+  buildLocalKnowledgeFallback
+} = require("../../lib/liveReliability.js");
 const { appendQa, readScenarioTimeline, writeScenarioTimeline } = require("../../lib/interviewSessionStore.js");
 const { timelinePromptForTurn, nextScenarioTimeline, extractTimeline, unspecifiedTimelinePolicy, isContextOnlyTimeline } = require("../../lib/scenarioTimeline.js");
 const { decideInterviewTurn } = require("../../lib/turnDecision.js");
 const { selectVerifiedWorkflow } = require("../../lib/verifiedWorkflow.js");
 const { historyForCurrentTurn } = require("../../lib/currentTurnHistory.js");
 const { priorAnchor } = require("../../lib/questionAdmission.js");
-const { resolveInterviewContext, sanitizeDebugContext, toHistoryContext, QUESTION_INTENTS, explicitProductTopic, resolveProductScope } = require("../../lib/interviewContext.js");
+const { resolveInterviewContext, sanitizeDebugContext, toHistoryContext, QUESTION_INTENTS, explicitProductTopic, resolveProductScope, evaluateLayer7Clarity, clarificationRequired } = require("../../lib/interviewContext.js");
 const { productKnowledgeFolders, selectProductScopedChunks } = require("../../lib/productKnowledgeScope.js");
+const {
+  isBehavioralStarIntent,
+  buildStarFrameworkBlock,
+  buildLowRelevanceArchitectFramework,
+  isProductComparisonQuestion,
+  buildProductComparisonDirective,
+  buildStarLocalFallback,
+  starMayNameEmployer
+} = require("../../lib/intentRouter.js");
+const { formatSessionPreparation, normalizeSessionPreparation } = require("../../lib/sessionPreparation.js");
 import { authoritativeProcedure, fitSpokenLength, questionProcedureIntent, renderSpokenProcedure, shapeSpokenContract } from "../../lib/procedureRetention.js";
 
 const MAX_HISTORY_ITEMS = 6;
+/** Overall request budget (retrieval + generation). Per-LLM attempt is capped at LLM_REQUEST_TIMEOUT_MS (4s). */
 const DEFAULT_TIMEOUT_MS = 25000;
 const RESPONSE_WRITE_TIMEOUT = 100;
+/** Live retrieval must clear this composite score or fall back to an architect framework block. */
+const LIVE_RELEVANCE_THRESHOLD = 0.45;
 
 // Startup diagnostics - log once per process
 let STARTUP_LOGGED = false;
@@ -295,6 +329,21 @@ function writeSSEChunk(res, text) {
     logger?.error?.("Failed to write SSE chunk:", error);
     return false;
   }
+}
+
+/** Complete-answer writes only — never use on token-stream micro-chunks (trim would glue words). */
+function writeSSEAnswer(res, text, { starAnonymize = false } = {}) {
+  let safe = sanitizeSpokenAnswer(text);
+  if (starAnonymize) safe = anonymizeStarEmployers(safe);
+  return writeSSEChunk(res, safe);
+}
+
+function finalizeSpokenAnswer(text, { behavioralStarMode = false, question = "" } = {}) {
+  let safe = sanitizeSpokenAnswer(text);
+  if (behavioralStarMode && !starMayNameEmployer(question)) {
+    safe = anonymizeStarEmployers(safe);
+  }
+  return safe;
 }
 
 // The prompt's explicit "no markdown formatting" rule (lib/prompt/interviewPrompt.js) is
@@ -661,6 +710,25 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
     sourceFolders.length ? { metadataFilters: { sourceFolders } } : {}
   )) || [];
   const productScoped = selectProductScopedChunks(retrievalQuery, candidates);
+  const topScore = Math.max(
+    Number(productScoped?.[0]?.score ?? 0),
+    Number(productScoped?.[0]?.semanticScore ?? 0),
+    Number(productScoped?.[0]?.confidenceScore ?? 0)
+  );
+  // Weak top hit: do NOT inject debug/fallback prose into knowledgeContext (it leaked to the UI).
+  // Return empty retrieval + a flag so the prompt layer can ask the LLM for a normal 4-bullet answer.
+  if (!productScoped.length || topScore < LIVE_RELEVANCE_THRESHOLD) {
+    const domain = analysis?.domain || analysis?.category || primaryCategory || "General";
+    return {
+      text: "",
+      procedureText: "",
+      procedurePool: [],
+      evidence: [],
+      lowRelevanceFallback: true,
+      lowRelevanceDirective: buildLowRelevanceArchitectFramework({ domain, question: retrievalQuery }),
+      topScore
+    };
+  }
   const rankedChunks = productScoped.slice(0, topK);
   const diagnosticSections = new Set(["STAGE_INVESTIGATION"]);
   // Keep symptom-specific sections even when their headings use "troubleshooting"
@@ -816,22 +884,73 @@ async function createOpenAiChatStream(client, { model, systemPrompt, recentHisto
 }
 
 function isTransientLlmError(error) {
-  const classified = publicLlmError(error);
-  return classified.autoRetry === true;
+  return isRetryableLlmError(error);
 }
 
-// A provider stream may fail after the HTTP request was accepted but before it yields
-// its first answer token. Retry that case once at the route boundary for every provider.
-// Retrying after a token was written could duplicate or contradict text already shown.
-async function runProviderStreamWithRetry(run, { signal, hasOutput } = {}) {
-  try {
-    return await run();
-  } catch (error) {
-    if (signal?.aborted || hasOutput?.() || !isTransientLlmError(error)) {
-      throw error;
+// Route-level retry: up to 3 retries with exponential backoff + jitter on 429/5xx/timeouts.
+// Never retries after the first answer token is already on the wire (avoids duplicated speech).
+async function runProviderStreamWithRetry(run, { signal, hasOutput, sleepFn } = {}) {
+  return runWithExponentialRetry(() => run(), {
+    signal,
+    hasOutput,
+    maxRetries: MAX_RETRIES,
+    sleepFn,
+    isRetryable: isTransientLlmError
+  });
+}
+
+function streamLocalKnowledgeFallback(res, question, {
+  knowledgeContext = "",
+  evidence = [],
+  behavioralStarMode = false,
+  writeChunk = writeSSEChunk,
+  writeEvent = writeSSEEvent
+} = {}) {
+  // Credential / years asks must never dump a random KB chunk (PMP/ITIL was matching PAM).
+  // STAR turns must never dump a random KB chunk (that was flashing wrong Decision bullets).
+  const fallback = isProfileCredentialQuestion(question)
+    ? {
+      answer: buildCredentialConfirmationAnswer(question),
+      chunk: null,
+      route: "PROFILE_CREDENTIAL_FALLBACK",
+      sourceFile: "profile-facts",
+      heading: "Confirmed profile credentials"
     }
-    return run();
+    : behavioralStarMode
+    ? {
+      answer: buildStarLocalFallback(question),
+      chunk: null,
+      route: "STAR_LOCAL_FALLBACK",
+      sourceFile: "star-local-fallback",
+      heading: "Behavioral STAR methodology"
+    }
+    : buildLocalKnowledgeFallback(question, {
+      prefetchedText: knowledgeContext,
+      evidence
+    });
+  const answer = finalizeSpokenAnswer(fallback.answer, {
+    behavioralStarMode,
+    question
+  });
+  try {
+    writeEvent?.(res, "admission", {
+      decision: "ANSWER",
+      route: fallback.route || (behavioralStarMode ? "STAR_LOCAL_FALLBACK" : "LOCAL_KNOWLEDGE_FALLBACK"),
+      reason: "llm-unavailable-or-timeout",
+      confidence: 0.7,
+      evidenceMode: isProfileCredentialQuestion(question)
+        ? "profile-facts"
+        : behavioralStarMode
+        ? "star-methodology"
+        : "local-knowledge",
+      sourceFile: fallback.sourceFile || null,
+      heading: fallback.heading || null
+    });
+  } catch {
+    // admission is informational; answer delivery is mandatory
   }
+  writeChunk?.(res, answer);
+  return { ...fallback, answer };
 }
 
 async function streamOpenAIResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens, onUsage, onChunk }) {
@@ -1020,18 +1139,29 @@ export default async function handler(req, res) {
   const {
     apiKey: clientApiKey,
     model: requestedModel,
-    question,
+    question: requestedQuestion,
     history = [],
     customInstructions,
     candidateResume,
     jobDescription,
     company,
     sessionPreparation,
+    sessionPrep: rawSessionPrep,
     interviewSessionId,
     debug: requestDebug,
     retryCount: clientRetryCount,
     responseLength: requestedResponseLength
   } = req.body || {};
+
+  // Sidebar metadata: prefer structured fields; fall back to the formatted string the UI already sends.
+  const sessionPrep = normalizeSessionPreparation(rawSessionPrep || {});
+  const sessionPreparationText = formatSessionPreparation(sessionPrep)
+    || (typeof sessionPreparation === "string" ? sessionPreparation.trim() : "");
+
+  // Must be let: phonetic/admission normalization may rewrite the spoken transcript
+  // (e.g. "Explain IAG?" → "Explain SAP Cloud IAG?"). Reassigning a destructured const
+  // threw TypeError before SSE started, which the UI mapped to "temporary error".
+  let question = typeof requestedQuestion === "string" ? requestedQuestion : "";
 
   // Falls back to the configured default (OPENAI_MODEL) when the client doesn't
   // specify one — lets provider/model be set purely through env vars for deployments
@@ -1068,6 +1198,35 @@ export default async function handler(req, res) {
     }
   };
   if (turn.decision !== "ANSWER") persistIncomingTimeline(question, turn.scriptAnswer || "");
+
+  // Layer 7 early gate: clarify before bank/workflow/generation invents across missing or conflicting boundaries.
+  // Exact answer-bank / prepared-script hits remain authoritative when admission already selected them.
+  if (turn.decision === "ANSWER" && turn.route !== "PREPARED_SCRIPT" && turn.route !== "ANSWER_BANK") {
+    try {
+      const layer7Early = evaluateLayer7Clarity({ question });
+      if (layer7Early.needsClarify && layer7Early.clarificationPrompt) {
+        if (!setSSEHeaders(res)) {
+          return res.status(500).json({ error: "Failed to initialize streaming response." });
+        }
+        writeSSEEvent(res, "admission", {
+          decision: "ANSWER",
+          route: "CLARIFY",
+          reason: layer7Early.reason || "layer7-ambiguity",
+          scriptId: null,
+          confidence: 1,
+          evidenceMode: null
+        });
+        writeSSEChunk(res, layer7Early.clarificationPrompt);
+        if (res?.writable) {
+          res.write("data: [DONE]\n\n");
+          res.end();
+        }
+        return;
+      }
+    } catch (layer7Error) {
+      logger?.error?.("Layer 7 clarity gate failed:", layer7Error);
+    }
+  }
 
   if (turn.decision !== "ANSWER" || turn.route === "PREPARED_SCRIPT" || turn.route === "ANSWER_BANK") {
     if (!setSSEHeaders(res)) {
@@ -1368,20 +1527,20 @@ export default async function handler(req, res) {
     envApiKey = APP_CONFIG?.llm?.apiKeys?.openai || APP_CONFIG?.llm?.apiKeys?.openrouter;
   }
   const apiKey = clientApiKey || envApiKey || "";
+  const forceLocalFallback = process.env.LIVE_RELIABILITY_FORCE_FALLBACK === "1"
+    || String(req.body?.forceLocalFallback || "") === "1"
+    || String(req.body?.forceLocalFallback || "").toLowerCase() === "true";
 
-  // Production mode requires an API key
-  if (isProduction && !apiKey) {
-    let provider = 'openai';
-    if (isClaudeModel(model)) provider = 'anthropic';
-    else if (isGeminiModel(model)) provider = 'gemini';
-
+  // Missing keys must not crash the live UI — continue and serve local KB fallback at generation time.
+  if (isProduction && !apiKey && !forceLocalFallback) {
+    let provider = "openai";
+    if (isClaudeModel(model)) provider = "anthropic";
+    else if (isGeminiModel(model)) provider = "gemini";
     logger?.warn?.({
-      event: 'interview.missing_api_key',
+      event: "interview.missing_api_key_fallback",
       model,
-      provider
-    });
-    return res.status(400).json({
-      error: "An API key is required for production mode — supply one in Settings or configure OPENAI_API_KEY/GEMINI_API_KEY/ANTHROPIC_API_KEY/OPENROUTER_API_KEY."
+      provider,
+      message: "No API key available; local knowledge fallback will be used if generation is required."
     });
   }
 
@@ -1499,13 +1658,23 @@ export default async function handler(req, res) {
       reasoningContract.isHybrid
     );
 
+    // Layer 8: behavioral / project-leadership asks bypass the vector index entirely and use STAR framing.
+    const behavioralStarMode = isBehavioralStarIntent(effectiveQuestion || question, interviewContext)
+      || isBehavioralStarIntent(question, interviewContext);
+    if (behavioralStarMode) {
+      analysis.isBehavioral = true;
+      if (!analysis.category || analysis.category === "General") analysis.category = "Behavioral";
+    }
+
     // A plain continuation ("then what?") doesn't need fresh retrieval -- the prior context
     // already covers it. A "go deeper" follow-up is the opposite case: the interviewer is
     // asking for MORE technical specificity than the first pass gave, which is exactly when
     // additional targeted retrieval helps most. Skipping it there was starving the one
     // follow-up type that most needed grounding.
-    const shouldRetrieve = interviewContext.retrievalDecision === "retrieve"
-      || interviewContext.retrievalDecision === "active-context";
+    const shouldRetrieve = !behavioralStarMode && (
+      interviewContext.retrievalDecision === "retrieve"
+      || interviewContext.retrievalDecision === "active-context"
+    );
     const abortIfTimedOut = () => {
       if (controller.signal.aborted) {
         throw Object.assign(new Error("Request timed out while generating response."), { name: "AbortError" });
@@ -1547,6 +1716,8 @@ export default async function handler(req, res) {
     }
     abortIfTimedOut();
     const knowledgeContext = knowledgeResult.text;
+    const lowRelevanceFallback = knowledgeResult.lowRelevanceFallback === true;
+    const lowRelevanceDirective = String(knowledgeResult.lowRelevanceDirective || "").trim();
     interviewContext.retrievalEvidence = knowledgeResult.evidence;
 
     // Engineering Memory Platform integration (docs/EXPERIENCE_ACQUISITION_ENGINE_DESIGN.md
@@ -1570,7 +1741,9 @@ export default async function handler(req, res) {
       }
     }
     abortIfTimedOut();
-    const engineeringJudgmentContext = renderEngineeringJudgmentSection(engineeringJudgment);
+    const engineeringJudgmentContext = behavioralStarMode
+      ? ""
+      : renderEngineeringJudgmentSection(engineeringJudgment);
 
     const promptPayload = {
       question: providerQuestion,
@@ -1579,15 +1752,49 @@ export default async function handler(req, res) {
       reasoningContract,
       technicalReasoning,
       interviewer,
-      knowledgeContext,
+      knowledgeContext: behavioralStarMode
+        ? buildStarFrameworkBlock({
+          domain: analysis.domain || interviewContext.questionTopic || "",
+          sessionPrep,
+          question: effectiveQuestion || question
+        })
+        : knowledgeContext,
+      // Prompt-only; never stream this string to the UI as answer text.
+      lowRelevanceDirective: (!behavioralStarMode && lowRelevanceFallback) ? lowRelevanceDirective : "",
       engineeringJudgmentContext,
+      behavioralStarMode,
+      sessionPrep,
       model,
-      sapComponents: technicalReasoning.recommendedComponents,
+      sapComponents: behavioralStarMode ? [] : technicalReasoning.recommendedComponents,
       activeDomainScope: resolved.contextSource === "inherited" ? resolved.resolvedDomain : "",
       responseLength
     };
 
     if (customInstructions?.trim()) promptPayload.customInstructions = customInstructions.trim();
+    // Anti-hallucination: always reinforce T-code plane boundaries (SM20≠purge, etc.).
+    try {
+      const { TCODE_VERIFICATION_RULE } = require("../../lib/turnDecision.js");
+      const rule = String(turn?.tcodeVerificationRule || TCODE_VERIFICATION_RULE || "").trim();
+      if (rule) {
+        promptPayload.customInstructions = promptPayload.customInstructions
+          ? `${promptPayload.customInstructions}\n\n${rule}`
+          : rule;
+      }
+    } catch (tcodeRuleError) {
+      logger?.error?.("T-code verification rule inject failed:", tcodeRuleError);
+    }
+    // Product comparison: ban analogies; force technical architecture matrix.
+    try {
+      const cmpQuestion = String(effectiveQuestion || question || "").trim();
+      if (!behavioralStarMode && isProductComparisonQuestion(cmpQuestion)) {
+        const cmpDirective = buildProductComparisonDirective(cmpQuestion);
+        promptPayload.customInstructions = promptPayload.customInstructions
+          ? `${promptPayload.customInstructions}\n\n${cmpDirective}`
+          : cmpDirective;
+      }
+    } catch (cmpRuleError) {
+      logger?.error?.("Product comparison directive inject failed:", cmpRuleError);
+    }
     try {
       const extra = candidateResume?.trim();
       const evidence = scopeCareerEvidence(effectiveQuestion, priorAnchor(history));
@@ -1664,7 +1871,14 @@ export default async function handler(req, res) {
     };
 
     let retrievedProcedureAnswer = "";
-    if (!scenarioTurn.promptBlock
+    // Low-relevance turns must go through the LLM 4-bullet path — never stream empty/fallback prose.
+    // Also refuse first-person canned Fiori stubs that used to leak from the knowledge index.
+    const looksLikeHardcodedStub = (text) => /If the server is on premise,\s*I would follow the ABAP Fiori path/i.test(String(text || ""))
+      || /LOW-RELEVANCE RETRIEVAL FALLBACK/i.test(String(text || ""))
+      || /INTERNAL RETRIEVAL NOTE/i.test(String(text || ""));
+    if (!lowRelevanceFallback
+      && !behavioralStarMode
+      && !scenarioTurn.promptBlock
       && !promptPayload.expectedSpokenAnswer
       && !/\b(?:have you|did you|your experience|tell me about a time|walk me through a time)\b/i.test(question)) {
       try {
@@ -1679,19 +1893,22 @@ export default async function handler(req, res) {
           interviewContext.answerScope
         );
         if (alignedSteps.length >= 3) {
-          retrievedProcedureAnswer = fitSpokenLength(
+          const candidate = fitSpokenLength(
             renderSpokenProcedure(effectiveQuestion, alignedSteps),
             responseLength,
             procedureQuestion
           );
-          promptPayload.expectedSpokenAnswer = retrievedProcedureAnswer;
+          if (!looksLikeHardcodedStub(candidate)) {
+            retrievedProcedureAnswer = candidate;
+            promptPayload.expectedSpokenAnswer = retrievedProcedureAnswer;
+          }
         }
       } catch (error) {
         logger?.error?.("Retrieved procedure retention failed (non-fatal):", error);
       }
     }
     if (jobDescription?.trim()) promptPayload.jobDescription = jobDescription.trim();
-    if (sessionPreparation?.trim()) promptPayload.sessionPreparation = sessionPreparation.trim();
+    if (sessionPreparationText) promptPayload.sessionPreparation = sessionPreparationText;
     if (company?.trim()) promptPayload.company = company.trim();
 
     // A model paraphrase is not a safe final authority when the current question has
@@ -1705,6 +1922,7 @@ export default async function handler(req, res) {
     }
     if (retrievedProcedureAnswer) {
       streamStarted = true;
+      retrievedProcedureAnswer = sanitizeSpokenAnswer(retrievedProcedureAnswer);
       recordedAnswer = retrievedProcedureAnswer;
       writeSSEEvent(res, "admission", {
         decision: "ANSWER",
@@ -1714,7 +1932,7 @@ export default async function handler(req, res) {
         evidenceMode: null,
         responseLength
       });
-      writeSSEChunk(res, retrievedProcedureAnswer);
+      writeSSEAnswer(res, retrievedProcedureAnswer);
       persistScenarioTimeline(retrievedProcedureAnswer);
       recordLiveQa({
         question,
@@ -1770,9 +1988,20 @@ export default async function handler(req, res) {
 
     if (interviewContext.retrievalDecision === "clarify") {
       streamStarted = true;
-      recordedAnswer = interviewContext.questionTopic === "General"
-        ? "Could you finish the question so I stay on the exact topic?"
-        : `Could you finish that question about ${interviewContext.questionTopic}?`;
+      recordedAnswer = String(interviewContext.clarificationPrompt || "").trim()
+        || clarificationRequired(
+          interviewContext.questionTopic === "General"
+            ? "The question is incomplete. Could you please repeat or rephrase it with the specific SAP product and deployment context?"
+            : `Could you finish that question about ${interviewContext.questionTopic} with the specific product or deployment context needed?`
+        );
+      writeSSEEvent(res, "admission", {
+        decision: "ANSWER",
+        route: "CLARIFY",
+        reason: interviewContext.layer7Reason || "clarify",
+        scriptId: null,
+        confidence: 1,
+        evidenceMode: null
+      });
       writeSSEChunk(res, recordedAnswer);
       recordLiveQa({
         question,
@@ -1805,6 +2034,13 @@ export default async function handler(req, res) {
         recordedAnswer += text;
       }
     };
+
+    // STAR employer safety: buffer tokens, then emit one anonymized complete answer.
+    // Live streaming would otherwise flash CV employer brands before post-processing.
+    const starBufferEmployers = behavioralStarMode && !starMayNameEmployer(effectiveQuestion || question);
+    if (starBufferEmployers) {
+      streamOptions.res = { writable: false };
+    }
 
     streamStarted = true;
 
@@ -1855,22 +2091,105 @@ export default async function handler(req, res) {
       });
 
       let fullAnswerText = "";
+      let generationRoute = "GENERATION";
+      let generationModel = model;
 
-      const generateWithSelectedProvider = () => {
-        if (isClaudeModel(model)) return streamClaudeResponse(streamOptions);
-        if (isGeminiModel(model)) return streamGeminiResponse(streamOptions);
-        if (isGroqModel(model)) return streamGroqResponse(streamOptions);
-        if (APP_CONFIG?.llm?.apiKeys?.openai) return streamOpenAIResponse(streamOptions);
-        if (APP_CONFIG?.llm?.apiKeys?.openrouter) return streamOpenRouterResponse(streamOptions);
-        return streamOpenAIResponse(streamOptions);
-      };
-      fullAnswerText = await runProviderStreamWithRetry(generateWithSelectedProvider, {
-        signal: controller.signal,
-        hasOutput: () => recordedAnswer.length > 0
-      });
-      recordedAnswer = fullAnswerText || "";
+      const shouldSkipRemoteLlm = forceLocalFallback || !apiKey;
+
+      if (shouldSkipRemoteLlm) {
+        logger?.warn?.({
+          event: "interview.local_knowledge_fallback",
+          reason: forceLocalFallback ? "forced" : "missing-api-key",
+          model
+        });
+        const fallback = streamLocalKnowledgeFallback(res, effectiveQuestion || question, {
+          knowledgeContext,
+          evidence: knowledgeResult.evidence || interviewContext?.retrievalEvidence || [],
+          behavioralStarMode
+        });
+        fullAnswerText = fallback.answer;
+        recordedAnswer = fallback.answer;
+        generationRoute = behavioralStarMode ? "STAR_LOCAL_FALLBACK" : "LOCAL_KNOWLEDGE_FALLBACK";
+      } else {
+        const providerChain = resolveProviderFailoverChain({
+          primaryModel: model,
+          primaryApiKey: apiKey,
+          apiKeys: APP_CONFIG?.llm?.apiKeys || {}
+        });
+
+        const runProviderAttempt = async ({ provider, model: attemptModel, apiKey: attemptKey, signal }) => {
+          const attemptOptions = {
+            ...streamOptions,
+            apiKey: attemptKey,
+            model: attemptModel,
+            signal
+          };
+          if (provider === "anthropic" || isClaudeModel(attemptModel)) {
+            return streamClaudeResponse(attemptOptions);
+          }
+          if (provider === "gemini" || isGeminiModel(attemptModel)) {
+            return streamGeminiResponse(attemptOptions);
+          }
+          if (provider === "groq" || isGroqModel(attemptModel)) {
+            return streamGroqResponse(attemptOptions);
+          }
+          if (provider === "openrouter") {
+            return streamOpenRouterResponse(attemptOptions);
+          }
+          if (APP_CONFIG?.llm?.apiKeys?.openrouter && !APP_CONFIG?.llm?.apiKeys?.openai) {
+            return streamOpenRouterResponse(attemptOptions);
+          }
+          return streamOpenAIResponse(attemptOptions);
+        };
+
+        try {
+          const reliable = await generateWithReliability(runProviderAttempt, {
+            chain: providerChain,
+            parentSignal: controller.signal,
+            hasOutput: () => recordedAnswer.length > 0,
+            // STAR answers need artifact density; 4s hard-cut was forcing wrong KB local fallback.
+            timeoutMs: behavioralStarMode ? Math.max(LLM_REQUEST_TIMEOUT_MS, 12000) : LLM_REQUEST_TIMEOUT_MS,
+            maxRetries: MAX_RETRIES
+          });
+          fullAnswerText = finalizeSpokenAnswer(reliable.text || recordedAnswer || "", {
+            behavioralStarMode,
+            question: effectiveQuestion || question
+          });
+          recordedAnswer = fullAnswerText;
+          if (starBufferEmployers && fullAnswerText) {
+            writeSSEChunk(res, fullAnswerText);
+          }
+          generationModel = reliable.model || model;
+          if (reliable.usedFailover) {
+            logger?.info?.({
+              event: "interview.provider_failover_success",
+              fromModel: model,
+              toModel: generationModel,
+              provider: reliable.provider
+            });
+          }
+        } catch (llmError) {
+          if (recordedAnswer.length > 0) {
+            throw llmError;
+          }
+          logger?.warn?.({
+            event: "interview.local_knowledge_fallback",
+            reason: llmError?.code || llmError?.name || "llm-failed",
+            message: String(llmError?.message || "").slice(0, 200)
+          });
+          const fallback = streamLocalKnowledgeFallback(res, effectiveQuestion || question, {
+            knowledgeContext,
+            evidence: knowledgeResult.evidence || interviewContext?.retrievalEvidence || [],
+            behavioralStarMode
+          });
+          fullAnswerText = fallback.answer;
+          recordedAnswer = fallback.answer;
+          generationRoute = behavioralStarMode ? "STAR_LOCAL_FALLBACK" : "LOCAL_KNOWLEDGE_FALLBACK";
+        }
+      }
+
       abortIfTimedOut();
-      if (res?.writable) {
+      if (res?.writable && generationRoute === "GENERATION") {
         writeSSEEvent(res, "generation", {
           finish_reason: tokenUsage?.finish_reason || null,
           maxTokens,
@@ -1887,14 +2206,14 @@ export default async function handler(req, res) {
         interviewContext,
         answerShown: recordedAnswer,
         status: isIncompleteGeneration(tokenUsage?.finish_reason) ? "partial" : (recordedAnswer.trim() ? "completed" : "empty"),
-        model,
+        model: generationModel,
         retryCount: Number(clientRetryCount) || 0,
         latencyMs: Date.now() - qaStartedMs,
         usage: tokenUsage,
         source: req.body?.source,
-        route: "GENERATION",
+        route: generationRoute,
         disposition: "ANSWER",
-        evidenceMode: promptPayload.evidenceMode || "full",
+        evidenceMode: generationRoute === "LOCAL_KNOWLEDGE_FALLBACK" ? "local-knowledge" : (promptPayload.evidenceMode || "full"),
         retrieval: knowledgeResult.evidence,
         errorCode: isIncompleteGeneration(tokenUsage?.finish_reason) ? "incomplete" : null
       });
@@ -1903,21 +2222,24 @@ export default async function handler(req, res) {
       // content chunk is already on the wire — never delays the spoken answer, and a
       // failure here must never break the already-delivered response.
       try {
-        if (isIncompleteGeneration(tokenUsage?.finish_reason)) {
+        if (generationRoute === "LOCAL_KNOWLEDGE_FALLBACK") {
+          // Fallback answers are already grounded; skip incomplete-token signaling.
+        } else if (isIncompleteGeneration(tokenUsage?.finish_reason)) {
           res.write("data: [DONE]\n\n");
           return;
-        }
-        const qualityAnalysis = runPostAnswerEvaluation({
-          question,
-          answer: fullAnswerText,
-          analysis,
-          sapComponents: technicalReasoning.recommendedComponents,
-          interviewer,
-          candidateResume: promptPayload.candidateResume || ""
-        });
-        qualityAnalysis.contextSummary = toHistoryContext(interviewContext);
-        if (res?.writable) {
-          res.write(`event: analysis\ndata: ${JSON.stringify(qualityAnalysis)}\n\n`);
+        } else {
+          const qualityAnalysis = runPostAnswerEvaluation({
+            question,
+            answer: fullAnswerText,
+            analysis,
+            sapComponents: technicalReasoning.recommendedComponents,
+            interviewer,
+            candidateResume: promptPayload.candidateResume || ""
+          });
+          qualityAnalysis.contextSummary = toHistoryContext(interviewContext);
+          if (res?.writable) {
+            res.write(`event: analysis\ndata: ${JSON.stringify(qualityAnalysis)}\n\n`);
+          }
         }
       } catch (evalError) {
         logger?.error?.("Post-answer evaluation failed (non-fatal):", evalError);
@@ -1928,6 +2250,18 @@ export default async function handler(req, res) {
       res.write("data: [DONE]\n\n");
     }
   } catch (error) {
+    // Surface the full provider/runtime failure in the Next.js terminal for live debugging.
+    console.error("EXACT API GENERATION ERROR:", error?.response?.data || error?.message || error);
+    console.error("EXACT API GENERATION STACK:", error?.stack || "(no stack)");
+    console.error("EXACT API GENERATION META:", {
+      name: error?.name || null,
+      code: error?.code || error?.error?.code || null,
+      status: error?.status || error?.statusCode || error?.response?.status || null,
+      openaiKeyPresent: Boolean(process.env.OPENAI_API_KEY),
+      openaiKeyLength: process.env.OPENAI_API_KEY ? String(process.env.OPENAI_API_KEY).length : 0,
+      clientKeyPresent: Boolean(apiKey),
+      model
+    });
     logger?.error?.("Interview Copilot Error", {
       model,
       provider: isClaudeModel(model) ? "anthropic" : isGeminiModel(model) ? "gemini" : isGroqModel(model) ? "groq" : (APP_CONFIG?.llm?.apiKeys?.openai ? "openai" : "openrouter"),
@@ -1937,33 +2271,93 @@ export default async function handler(req, res) {
       errorMessage: String(error?.message || "").slice(0, 240)
     });
 
-    const classified = publicLlmError(error);
-    const errorMessage = controller.signal.aborted
-      ? "Request timed out while generating response."
-      : classified.userMessage;
-
-    recordLiveQa({
-      question,
-      questionRaw: question,
-      questionResolved: interviewContext?.questionResolved || question,
-      interviewContext,
-      answerShown: recordedAnswer,
-      status: recordedAnswer.trim() ? "partial" : "failed",
-      model,
-      retryCount: Number(clientRetryCount) || 0,
-      latencyMs: Date.now() - qaStartedMs,
-      usage: tokenUsage,
-      source: req.body?.source,
-      retrieval: interviewContext?.retrievalEvidence || [],
-      errorCode: controller.signal.aborted ? "timeout" : (classified.code || "failed")
-    });
-
-    if (res?.writable) {
-      writeSSEError(res, errorMessage);
+    // Zero-crash guarantee: prefer local KB answer over any orange/red Generation failed banner.
+    if (res?.writable && !recordedAnswer.trim()) {
       try {
-        res.write("data: [DONE]\n\n");
-      } catch {
-        // stream may already be closing
+        const starMode = isBehavioralStarIntent(question, interviewContext);
+        const fallback = streamLocalKnowledgeFallback(res, question, {
+          knowledgeContext: "",
+          evidence: interviewContext?.retrievalEvidence || [],
+          behavioralStarMode: starMode
+        });
+        recordedAnswer = fallback.answer;
+        recordLiveQa({
+          question,
+          questionRaw: question,
+          questionResolved: interviewContext?.questionResolved || question,
+          interviewContext,
+          answerShown: recordedAnswer,
+          status: "completed",
+          model,
+          retryCount: Number(clientRetryCount) || 0,
+          latencyMs: Date.now() - qaStartedMs,
+          usage: tokenUsage,
+          source: req.body?.source,
+          route: "LOCAL_KNOWLEDGE_FALLBACK",
+          disposition: "ANSWER",
+          evidenceMode: "local-knowledge",
+          retrieval: interviewContext?.retrievalEvidence || [],
+          errorCode: null
+        });
+        try {
+          res.write("data: [DONE]\n\n");
+        } catch {
+          // stream may already be closing
+        }
+      } catch (fallbackError) {
+        logger?.error?.("Local knowledge fallback failed", {
+          message: String(fallbackError?.message || "").slice(0, 200)
+        });
+        const classified = publicLlmError(error);
+        const errorMessage = controller.signal.aborted
+          ? "Request timed out while generating response."
+          : classified.userMessage;
+        recordLiveQa({
+          question,
+          questionRaw: question,
+          questionResolved: interviewContext?.questionResolved || question,
+          interviewContext,
+          answerShown: recordedAnswer,
+          status: "failed",
+          model,
+          retryCount: Number(clientRetryCount) || 0,
+          latencyMs: Date.now() - qaStartedMs,
+          usage: tokenUsage,
+          source: req.body?.source,
+          retrieval: interviewContext?.retrievalEvidence || [],
+          errorCode: controller.signal.aborted ? "timeout" : (classified.code || "failed")
+        });
+        writeSSEError(res, errorMessage);
+        try {
+          res.write("data: [DONE]\n\n");
+        } catch {
+          // stream may already be closing
+        }
+      }
+    } else {
+      const classified = publicLlmError(error);
+      recordLiveQa({
+        question,
+        questionRaw: question,
+        questionResolved: interviewContext?.questionResolved || question,
+        interviewContext,
+        answerShown: recordedAnswer,
+        status: recordedAnswer.trim() ? "partial" : "failed",
+        model,
+        retryCount: Number(clientRetryCount) || 0,
+        latencyMs: Date.now() - qaStartedMs,
+        usage: tokenUsage,
+        source: req.body?.source,
+        retrieval: interviewContext?.retrievalEvidence || [],
+        errorCode: controller.signal.aborted ? "timeout" : (classified.code || "failed")
+      });
+      // Partial answer already visible — close cleanly without an error banner.
+      if (res?.writable) {
+        try {
+          res.write("data: [DONE]\n\n");
+        } catch {
+          // stream may already be closing
+        }
       }
     }
   } finally {

@@ -3,13 +3,14 @@
  * Employer/client names below are allowed in spoken answers. Do not add Accenture, Chalhoub, or extra clients.
  */
 const PROFILE_FACTS = `Confirmed profile facts. A two-page CV is a summary and does not limit these facts:
-- 17+ years of overall IT experience.
-- 12+ years of SAP GRC Security experience.
-- PMP certified.
-- IPS implementation experience is confirmed. Do not attach that work to Dover or invent the project, source system, or target.
-Do not invent additional certifications, employers, dates, or metrics. Do not state a different year count.`;
+- Title posture: Senior Principal SAP Security, GRC & Cloud IAM Architect.
+- 17+ years of overall IT experience; 12+ years hands-on enterprise SAP Security / GRC Access Control / Cloud IAM field leadership.
+- Certifications: PMP; ITIL V4 Foundation. Both are confirmed — do not deny them.
+- IPS implementation experience is confirmed. Do not attach that work to a named employer or invent the project, source system, or target.
+- SAP GRC Process Control: basic conceptual knowledge ONLY. Do NOT claim Process Control project delivery, configuration ownership, or implementation experience. Be frank: Access Control (ARA/ARM/BRM/EAM) is the delivered depth; Process Control is adjacent awareness sufficient to distinguish planes, not to narrate a PC programme.
+Do not invent additional certifications, employers, dates, dollar metrics, or Process Control delivery claims. Do not state a different year count.`;
 
-const DEFAULT_CAREER_BACKGROUND = `Balaji Chandran — SAP GRC Consultant / Security & GRC Architect. The engagement record below keeps the detail a two-page CV cannot list. Do not invent employers, tools, metrics, or incidents that are not written here.
+const DEFAULT_CAREER_BACKGROUND = `Balaji Chandran — Senior Principal SAP Security, GRC & Cloud IAM Architect. Speak with Principal-level technical authority. The engagement record below keeps the detail a two-page CV cannot list. Do not invent employers, tools, metrics, or incidents that are not written here.
 
 ${PROFILE_FACTS}
 
@@ -116,8 +117,38 @@ Documented employers, without metrics: Dover Corporation, Eminnov Technologies, 
 A user count, country list, duration, team size, or total years of experience is not identified for an unnamed engagement.
 Use methodology: the figure depends on which engagement is being discussed.`;
 
-const DEFAULT_STATED_PROFILE = `Use candidate-specific facts only when they are supplied in the current interview profile or CV. Technical knowledge is not evidence of personal experience. Do not deny an explicitly supplied candidate fact because a CV summary is incomplete. Do not invent employers, project names, metrics, budgets, or outcomes.`;
+const DEFAULT_STATED_PROFILE = `Candidate posture: Senior Principal SAP Security, GRC & Cloud IAM Architect with 12+ years enterprise field depth, PMP, and ITIL V4 Foundation. Speak with absolute confidence and uncompromising technical depth — battle-tested go-live and hypercare judgment, not textbook summaries.
+Use candidate-specific facts only when they are supplied in the current interview profile or CV. Technical knowledge is not evidence of personal experience. Do not deny an explicitly supplied candidate fact because a CV summary is incomplete. Do not invent employers, project names, metrics, budgets, or outcomes.
+Process Control honesty: if asked about SAP GRC Process Control, state frankly that depth is Access Control; Process Control knowledge is basic/conceptual only — do not invent a PC delivery story.`;
+
 const STATED_PROFILE = String(process.env.CANDIDATE_PROFILE_NOTES || DEFAULT_STATED_PROFILE).trim();
+
+function isProfileCredentialQuestion(question = "") {
+  return /\b(?:PMP|ITIL|certified|certification|certifications|how many years|years of (?:experience|sap)|overall IT experience)\b/i.test(String(question || ""));
+}
+
+/**
+ * Short spoken confirmation from PROFILE_FACTS — never a random KB chunk.
+ */
+function buildCredentialConfirmationAnswer(question = "") {
+  const q = String(question || "");
+  const asksPmp = /\bPMP\b/i.test(q);
+  const asksItil = /\bITIL\b/i.test(q);
+  const asksYears = /\byears\b/i.test(q);
+  if (asksPmp && asksItil) {
+    return "Yes — I hold a valid PMP certification and ITIL V4 Foundation. Both are confirmed profile credentials.";
+  }
+  if (asksPmp) {
+    return "Yes — I hold a valid PMP certification. That is a confirmed profile credential.";
+  }
+  if (asksItil) {
+    return "Yes — I hold ITIL V4 Foundation. That is a confirmed profile credential.";
+  }
+  if (asksYears) {
+    return "I have 17+ years of overall IT experience and 12+ years of hands-on enterprise SAP Security, GRC Access Control, and Cloud IAM field leadership.";
+  }
+  return "Confirmed profile credentials include PMP and ITIL V4 Foundation, with 12+ years of enterprise SAP Security / GRC / Cloud IAM field leadership.";
+}
 
 const TECHNICAL_EVIDENCE = `Answer from the technical knowledge for this question.
 Do not recite employers, dates, geographies, team sizes, user counts, or project outcomes.
@@ -298,5 +329,7 @@ module.exports = {
   namedProgrammeIds,
   scopeCareerEvidence,
   scopedHistoryOnly,
-  auditHistoricalClaims
+  auditHistoricalClaims,
+  isProfileCredentialQuestion,
+  buildCredentialConfirmationAnswer
 };

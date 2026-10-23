@@ -40,6 +40,20 @@ SAP is explicit that IAG doesn't replace GRC Access Control outright. In practic
 - Coexistence model: connects to on-premise GRC Access Control via an integration bridge rather than replacing it outright
 - Scope: governs both on-premise SAP systems and cloud/non-SAP applications from one platform
 
+## IAG vs GRC Access Control 12.0 — technical boundaries (no analogies)
+
+| Plane | SAP GRC Access Control 12.0 | SAP Cloud IAG |
+| --- | --- | --- |
+| Stack | On-prem/private ABAP (`GRCFND_A`), NWBC/SPRO | SaaS microservices on SAP BTP |
+| Risk | ARA ruleset in ABAP DB | Access Analysis service + connector sync |
+| Request | ARM + MSMP + BRF+ | Access Request service (Business Rules in IAG; not MSMP) |
+| Privileged | EAM Firefighter / SPM tables | Privileged Access Management (PAM) |
+| Identity into tool | ABAP logon / NWBC | IAS authentication into IAG |
+| Integration | SM59 RFC / Integration Framework | Cloud Connector, BTP destinations, REST; IAG Bridge to GRC |
+| Coexistence | May remain SoR for ABAP deep ruleset | Bridge hybrid; declare SoR per process |
+
+Interview answers for "how does IAG differ from GRC" MUST use Decision/Mechanism/Governance/Validation with the table content — never doors/keys or other conceptual analogies.
+
 ## Configuration
 
 - Master data setup (business processes, risks, rule content) has to be configured before Access Analysis and Access Request produce meaningful results — this is conceptually similar to ruleset/BRF+ setup in on-prem GRC, but configured through the IAG service itself rather than SPRO

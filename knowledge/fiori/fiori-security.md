@@ -53,19 +53,31 @@ If the tile is missing, stay on launchpad resolution for that deployment. Public
 
 ## Troubleshoot a user who cannot access a Fiori app
 
-I would first check whether the user cannot see the app or whether the app opens and then fails, because a missing app and a runtime authorization failure are different problems. I would confirm the deployment before choosing a tool, and I would not treat a Public Edition business role as the same path as an on-premise PFCG role. On Public Edition I would use Maintain Business Users and Maintain Business Roles, and I would use Display Authorization Trace only after the app opens and an authorization check fails. Public Edition does not use PFCG, SU53, or Gateway error logs for that check. On an on-premise or Private Edition system I would check the user's PFCG role, the catalog assignment, and the target mapping before looking at a runtime service error. If the app is visible but the user still fails, I would reproduce the issue and inspect the browser error and the Gateway logs in /IWFND/ERROR_LOG and /IWBEP/ERROR_LOG when that frontend and backend topology applies. I would use SU53 or STAUTHTRACE only when the log shows an authorization failure, because SU53 displays the last failed authorization check and is not proof that access succeeded. I would correct the demonstrated cause and then have the affected user complete the intended business task in the app.
+- **Decision:** Separate a missing app (launchpad content / role assignment) from an opened app that fails at runtime, and select tools only after confirming Public Edition versus on-premise / Private Edition.
+- **Mechanism:** Public Edition: Maintain Business Users, Maintain Business Roles, then Display Authorization Trace only after the app opens and an authorization check fails. Public Edition does not use PFCG, SU53, or Gateway error logs for that check. On-premise or Private Edition: confirm the user's PFCG role contains the catalog and target mapping before runtime service diagnosis; if the app is visible but fails, inspect browser errors and Gateway logs in /IWFND/ERROR_LOG and /IWBEP/ERROR_LOG for that topology.
+- **Governance:** Do not treat a Public Edition business role as interchangeable with an on-premise PFCG role; keep edition-correct tooling.
+- **Validation:** Use SU53 or STAUTHTRACE only when the log shows an authorization failure — SU53 displays the last failed authorization check and is not proof that access succeeded. Correct the demonstrated cause, then have the affected user complete the intended business task in the app.
 
 ## Troubleshoot Fiori access when the server is on premise
 
-If the server is on premise, I would follow the ABAP Fiori path for the same user and app. I would check the user's PFCG role and whether that role contains the catalog and the target mapping for the app. A missing app is a launchpad content or role-assignment problem, so I would not start with an authorization trace. If the app opens and the user still gets an error, I would reproduce it and inspect the browser error and the Gateway logs in /IWFND/ERROR_LOG and /IWBEP/ERROR_LOG according to the actual frontend and backend topology. I would not assume every system uses a hub. I would use SU53 or STAUTHTRACE only when that log shows an authorization failure, and SU53 shows the last failed check rather than proof of success. I would correct the demonstrated cause and have the affected user complete the intended business task.
+- **Decision:** On-premise ABAP Fiori troubleshooting starts with launchpad content and PFCG assignment, not with an authorization trace for a missing app.
+- **Mechanism:** Check the user's PFCG role and whether that role contains the catalog and the target mapping for the app. If the app opens and still errors, reproduce and inspect the browser error plus Gateway logs in /IWFND/ERROR_LOG and /IWBEP/ERROR_LOG for the actual frontend/backend topology; do not assume every system uses a hub.
+- **Governance:** Keep missing-app diagnosis on content/role assignment; do not jump to SU53 for a tile that never launches.
+- **Validation:** Use SU53 or STAUTHTRACE only when the log shows an authorization failure — SU53 shows the last failed check rather than proof of success. Correct the demonstrated cause and have the affected user complete the intended business task.
 
 ## Fiori app missing from the launchpad
 
-When the app is missing, I would check the user's role assignment and the launchpad content before any runtime log. On Public Edition I would use Maintain Business Users and Maintain Business Roles and confirm the catalog, space, and page. On an on-premise system I would check the PFCG role, the catalog, and the target mapping. I would not use SU53 to explain a missing app, because that display is the last failed authorization check after a request has already run. I would validate by searching the launchpad as the affected user and confirming the app is available for the intended business task.
+- **Decision:** A missing app is a launchpad content or role-assignment problem; do not start with a runtime authorization display.
+- **Mechanism:** Public Edition: Maintain Business Users and Maintain Business Roles; confirm catalog, space, and page. On-premise: check the PFCG role, the catalog, and the target mapping.
+- **Governance:** Do not use SU53 to explain a missing app — that display is the last failed authorization check after a request has already run.
+- **Validation:** Search the launchpad as the affected user and confirm the app is available for the intended business task.
 
 ## Fiori app opens and returns an authorization error
 
-When the app opens and then returns an authorization error, I would reproduce the failure as the affected user and read the error text before changing a role. On Public Edition I would use Display Authorization Trace and correct only the failed authorization or restriction evidence. On an on-premise system I would inspect /IWFND/ERROR_LOG and /IWBEP/ERROR_LOG, then use SU53 or STAUTHTRACE only if the log shows an authorization failure. I would correct that demonstrated cause and have the user complete the intended business task. SU53 is not proof that the task succeeded.
+- **Decision:** When the app opens and then fails authorization, reproduce first and read the error text before changing a role.
+- **Mechanism:** Public Edition: Display Authorization Trace; correct only the failed authorization or restriction evidence. On-premise: inspect /IWFND/ERROR_LOG and /IWBEP/ERROR_LOG, then use SU53 or STAUTHTRACE only if the log shows an authorization failure.
+- **Governance:** Do not widen roles beyond the demonstrated failure object or restriction.
+- **Validation:** Have the user complete the intended business task after the fix. SU53 is not proof that the task succeeded.
 
 ## Public Edition troubleshooting: app is missing
 

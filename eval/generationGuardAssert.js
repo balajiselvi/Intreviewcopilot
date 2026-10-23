@@ -13,11 +13,15 @@ assert.equal(publicLlmError({ name: "APIConnectionTimeoutError", message: "Reque
 assert.strictEqual(classifyGenerationFailure({ message: "Failed to fetch" }).code, "transient");
 assert.strictEqual(classifyGenerationFailure({ message: "empty generation" }).code, "empty");
 assert.match(classifyGenerationFailure({ message: "empty generation" }).userMessage, /Retry/);
+assert.strictEqual(classifyGenerationFailure({ httpStatus: 500, message: "Assignment to constant variable." }).code, "internal");
+assert.match(classifyGenerationFailure({ httpStatus: 500, message: "Assignment to constant variable." }).userMessage, /internal error/i);
 
 const fs = require("fs");
 const path = require("path");
 const interview = fs.readFileSync(path.join(__dirname, "../pages/interview.js"), "utf8");
 const chat = fs.readFileSync(path.join(__dirname, "../pages/api/chat.js"), "utf8");
+assert.match(chat, /let question = typeof requestedQuestion/);
+assert.match(chat, /question: requestedQuestion/);
 assert.match(interview, /speechSessionGuard/);
 assert.match(interview, /safeCloseAudioConfig/);
 assert.match(interview, /invokeSpeechCallback/);

@@ -75,3 +75,21 @@ Spoken architect style: Decision → Mechanism → Governance → Validation.
 - **Mechanism:** Maintain master without org-specific values where derivation applies; child roles get org levels via `PFCG` Org Level maintenance or derived-role tools. When BUKRS/WERKS sets change, update derivation matrix and regenerate affected derived roles; transport as a set. Align BW analysis characteristics and S/4 org roles to the same enterprise org model where shared.
 - **Governance:** Master menu/object changes go through one governance path; local plants cannot invent divergent masters. Quarterly org-role attestation by business owners.
 - **Validation:** User in plant A derived role sees only plant A documents (`STAUTHTRACE` on org object); plant B attempt fails; `SUIM` shows correct derived role assignment after mover HR event.
+
+## Q11: How do you configure, read, and purge the Security Audit Log (SAL) without confusing SM19 / SM20 / SM18?
+
+- **Decision:** Keep SAL planes distinct — configure filters, read/analyze events, and purge/reorganize files are three different administration acts with three different toolchains. Never use a read transaction to delete audit files.
+- **Mechanism:**
+  - **Configure:** `SM19` or `RSAU_CONFIG` — maintain audit filters, activate/deactivate recording, set which events (logon, user admin, RFC, critical T-codes, etc.) are written.
+  - **Read / analyze:** `SM20`, `SM20N`, or `RSAU_READ_LOG` — evaluate/display Security Audit Log entries for investigation and SIEM correlation. These are **read-only analysis** tools.
+  - **Purge / reorganize / delete:** `SM18`, report `RSAUPURG`, or `RSAU_ADMIN` — reorganize and delete audit log files from the file system / SAL store after retention. Typical SAP minimum retention before deletion is **>= 3 days** (enforce the customer's longer legal/SOX schedule if stricter).
+  - **Authorization:** Administration of audit logging commonly requires authorization object `S_ADMI_FCD` with value `AUDA` (plus any landscape-specific role restrictions).
+- **Governance:** Separation of duties — analysts who read `SM20` must not hold standing purge rights in Production; purge jobs require change control, retention evidence, and dual approval where policy demands. Do not invent alternate T-codes for deletion.
+- **Validation:** After configure, prove events appear in `SM20`/`RSAU_READ_LOG`. After purge, confirm target age files are removed via `SM18`/`RSAUPURG`/`RSAU_ADMIN` evidence and that recent events inside the retention window remain readable. A successful `SM20` display is **not** proof that purge ran.
+
+## Q12: How do you purge Security Audit Logs in SAP (deletion path only)?
+
+- **Decision:** Purge SAL only through the reorganization/deletion path — `SM18`, `RSAUPURG`, or `RSAU_ADMIN` — never through `SM20`/`SM20N`/`RSAU_READ_LOG`.
+- **Mechanism:** Schedule or execute `RSAUPURG` (or transaction `SM18` / `RSAU_ADMIN` on the release in use) against audit files older than the approved retention (minimum often **3 days**, longer if audit policy requires). Confirm filter activation remains in `SM19`/`RSAU_CONFIG` so new events continue to write after cleanup.
+- **Governance:** Document retention days, change ticket, and who holds `S_ADMI_FCD`/`AUDA`. Production purge is a controlled Basis/Security admin act, not an analyst convenience.
+- **Validation:** Pre-purge count/age of files; post-purge confirm only expired files removed; recent window still visible in `SM20`/`RSAU_READ_LOG`.

@@ -930,31 +930,14 @@ export default function InterviewPage() {
         console.error("Deferred continuation failed:", assemblyError);
         assembly = { action: "pass", text, pending: null };
       }
-      pendingFragmentRef.current = assembly.pending;
+      // Zero-drop transcript policy: never park incomplete speech. If a hold slips through,
+      // force-pass the fragment into generation instead of showing "Deferred — incomplete".
       if (assembly.action === "hold") {
-        const detector = speechTurnsRef.current[source];
-        if (!meta.manual && detector && meta.utteranceId) {
-          try {
-            detector.acknowledgeCommit(meta.utteranceId);
-            detector.notifyGenerationSettled(meta.utteranceId);
-          } catch (settleError) {
-            console.error("Failed to settle a deferred fragment:", settleError);
-          }
-        }
-        commitHistory({
-          type: "question",
-          text: assembly.recordText || text,
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          source,
-          questionId: `q_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-          utteranceId: meta.utteranceId || null,
-          status: "completed",
-          disposition: assembly.disposition || "DEFER",
-          admissionReason: "deferred-fragment"
-        });
-        setTurnDisposition({ decision: assembly.disposition || "DEFER", route: "NONE", reason: "deferred-fragment" });
-        recordAdmissionTurn(assembly.recordText || text, assembly.disposition || "DEFER", "deferred-fragment");
-        return;
+        pendingFragmentRef.current = null;
+        text = String(assembly.recordText || assembly.text || text).trim() || text;
+        assembly = { action: "pass", pending: null, text, recordText: text, disposition: null, generates: true };
+      } else {
+        pendingFragmentRef.current = assembly.pending;
       }
       if (assembly.text) text = assembly.text;
     }
@@ -971,6 +954,19 @@ export default function InterviewPage() {
     }
     if (turn.normalizedQuestion) {
       text = String(turn.normalizedQuestion);
+    }
+    // Zero-drop / force pass-through: never block non-empty transcripts (DEFER or otherwise).
+    // Pure empty stays ignored; noise token still short-circuits below via scriptAnswer.
+    if (String(text || "").trim() && turn.decision !== "ANSWER") {
+      const noise = turn.reason === "ignore-noise" || String(turn.scriptAnswer || "") === "[IGNORE_NOISE]";
+      if (!noise) {
+        turn = {
+          ...turn,
+          decision: "ANSWER",
+          reason: "zero-drop-admit",
+          route: turn.route && turn.route !== "NONE" ? turn.route : "GENERATION"
+        };
+      }
     }
     if (turn.decision !== "ANSWER") {
       const detector = speechTurnsRef.current[source];
@@ -1093,6 +1089,13 @@ export default function InterviewPage() {
         candidateResume: currentConfig.candidateResume,
         jobDescription: currentConfig.jobDescription,
         sessionPreparation: formatSessionPreparation(sessionPrep),
+        sessionPrep: {
+          role: sessionPrep.role || "",
+          seniority: sessionPrep.seniority || "",
+          round: sessionPrep.round || "",
+          focus: sessionPrep.focus || "",
+          style: sessionPrep.style || ""
+        },
         company: currentConfig.company,
         interviewSessionId: getLiveInterviewSessionId(),
         source,
@@ -1110,12 +1113,24 @@ export default function InterviewPage() {
         let raw = "";
         try {
           const errorData = await res.json();
-          raw = errorData.error || "";
+          raw = errorData.error || errorData.message || "";
         } catch {
           try {
             raw = await res.text();
           } catch {
             raw = "";
+          }
+        }
+        // Next.js pages-api crashes often return an HTML overlay; pull the embedded message
+        // so internal faults are not mislabeled as generic provider "temporary" errors.
+        if (raw && /<!DOCTYPE html|<html/i.test(raw)) {
+          const embedded = raw.match(/"message":"((?:\\.|[^"\\])*)"/);
+          if (embedded?.[1]) {
+            try {
+              raw = JSON.parse(`"${embedded[1]}"`);
+            } catch {
+              raw = embedded[1].replace(/\\n/g, " ").slice(0, 240);
+            }
           }
         }
         return classifyGenerationFailure({ httpStatus: res.status, message: raw });
@@ -1722,8 +1737,8 @@ export default function InterviewPage() {
             {turnDisposition && (
               <Chip
                 size="small"
-                color={turnDisposition.decision === "DEFER" ? "warning" : (turnDisposition.route === "PREPARED_SCRIPT" || turnDisposition.route === "ANSWER_BANK") ? "success" : turnDisposition.decision === "IGNORE" ? "default" : "info"}
-                label={turnDisposition.decision === "IGNORE" ? "Ignored — not a question" : turnDisposition.decision === "DEFER" ? "Deferred — incomplete" : turnDisposition.route === "PREPARED_SCRIPT" ? "Prepared script" : turnDisposition.route === "ANSWER_BANK" ? "Answer bank" : "Generated"}
+                color={(turnDisposition.route === "PREPARED_SCRIPT" || turnDisposition.route === "ANSWER_BANK") ? "success" : turnDisposition.decision === "IGNORE" ? "default" : "info"}
+                label={turnDisposition.decision === "IGNORE" ? "Ignored — not a question" : turnDisposition.route === "PREPARED_SCRIPT" ? "Prepared script" : turnDisposition.route === "ANSWER_BANK" ? "Answer bank" : "Generated"}
                 sx={{ mr: 1 }}
               />
             )}
@@ -1917,13 +1932,6 @@ export default function InterviewPage() {
                   >
                     <List sx={{ px: 2, py: 1 }}>
                       {getAiResponsesToDisplay().map(renderHistoryItem)}
-                      {!isProcessing && !generationError && turnDisposition?.decision === 'DEFER' && (
-                        <ListItem sx={{ px: 0, py: 1 }}>
-                          <Alert severity="warning" sx={{ width: '100%' }}>
-                            This transcript was not sent to the assistant because it appears incomplete. Edit the question and submit it again.
-                          </Alert>
-                        </ListItem>
-                      )}
                       {isProcessing && (
                         <ListItem sx={{ justifyContent: 'center', py: 2, flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
