@@ -1,6 +1,6 @@
 # SAP Identity Management (IDM) 7.2/8.0 Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** SAP IDM (Identity Center, Developer Studio, Runtime) provisions and orchestrates identities across repositories. It is **not** IAS (authentication), **not** IAG (cloud governance services), and **not** GRC ARA (SoD engine)—though it often integrates with them. Modern programs may migrate IDM workloads to IPS + IAG/SailPoint; say so explicitly when that is the strategy.
 

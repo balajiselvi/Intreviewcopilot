@@ -1,6 +1,6 @@
 # SAP Fiori & Front-End Security Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** Fiori launchpad visibility (catalogs / spaces / pages) is **not** the same as backend execution authorization. Front-end roles grant tiles and target mappings; backend PFCG (or Public Edition business roles) enforce OData/S_SERVICE and business object checks. Gateway (`/IWFND/*`) and backend are often separate systems in hub deployments.
 
@@ -35,6 +35,8 @@ Spoken architect style: Decision → Mechanism → Governance → Validation.
 - **Validation:** `STAUTHTRACE` shows service check pass; deactivate service → controlled failure; custom app UAT with least-privilege role.
 
 ## Q5: How do you integrate Fiori SSO (IAS / SAML / OIDC) without weakening backend authorization?
+
+**Aliases / interview phrasing:** configure Fiori SSO; Fiori SSO setup; IAS Fiori setup; SAML2 Fiori Launchpad; Principal Propagation; OIDC FLP trust.
 
 - **Decision:** SSO establishes identity to FLP; backend still enforces ABAP authorizations for the mapped user—trusted RFC must not become universal trust.
 - **Mechanism:** Configure FLP authentication (SAML/OIDC via IAS); ensure principal propagation / user mapping to backend. Harden `SM59` trusted connections; avoid hard-coded technical users for interactive apps. For Principal Propagation scenarios, validate CERTRULE / short-lived X.509 patterns where used with Cloud Connector.

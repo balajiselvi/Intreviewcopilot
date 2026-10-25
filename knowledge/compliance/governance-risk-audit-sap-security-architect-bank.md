@@ -1,6 +1,6 @@
 # Governance, Risk, Compliance & Audit — SAP Security Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** SoD/critical access (GRC ARA / IAG), ITGCs/SOX, access certification, mitigating controls, Firefighter/PAM governance, and Process Control where in scope. Technical tools **support** compliance; they do not by themselves “make the organization SOX/ISO compliant.”
 

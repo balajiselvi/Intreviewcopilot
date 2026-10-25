@@ -1,6 +1,6 @@
 # Core SAP Security & Authorizations Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** ABAP authorization (PFCG / SU24 / SU25) on ECC and S/4HANA on-premises or Private Edition. This is **not** SuccessFactors RBP, **not** BTP XSUAA role collections, and **not** S/4HANA Cloud Public Edition Maintain Business Roles / IAM apps—name the edition before describing role maintenance.
 

@@ -1,6 +1,6 @@
 # SAP Project Management & Delivery Governance — Security Workstream
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** PMP-style delivery controls applied to SAP security/IAM programs. Complements Activate phase banks and product technical banks. STAR stories must not invent employers, metrics, or customers—use methodology framing when experience is not supplied.
 

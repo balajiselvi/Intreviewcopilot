@@ -1,6 +1,6 @@
 # End-to-End SAP Security Workstream Management Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** The security workstream integrates technical planes (PFCG/IAG/IAS/etc.) with project controls (Activate gates, RAID, RACI). This bank is the operating model—not a substitute for product banks.
 

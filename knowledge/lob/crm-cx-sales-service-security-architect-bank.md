@@ -1,6 +1,6 @@
 # SAP CRM, Sales, Service & Customer Experience Security Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** Classic **SAP CRM** (ABAP) uses PFCG/org models; **Sales Cloud / Service Cloud** use cloud role/permission models with IAS; **Commerce Cloud** has its own Backoffice/user groups. Customer personal data elevates privacy controls. Not interchangeable with S/4 OTC alone—though processes integrate.
 

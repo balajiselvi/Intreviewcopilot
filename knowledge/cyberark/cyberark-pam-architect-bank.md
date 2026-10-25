@@ -1,6 +1,6 @@
 # CyberArk Privileged Access Management (PAM) Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** CyberArk Digital Vault, PVWA, CPM, PSM/PSMP, PTA, CCP/AAM, and related REST/PACLI administration. This is **not** SAP GRC EAM Firefighter alone and **not** a Vault installer guide—focus is HA/DR, Dual Control, rotation, session isolation, secrets for apps, detection, and audit evidence.
 

@@ -31,6 +31,7 @@ const {
   publicLlmError,
   isIncompleteGeneration,
   sanitizeSpokenAnswer,
+  stripBankQuestionLabels,
   anonymizeStarEmployers
 } = require("../../lib/generationGuard.js");
 const {
@@ -56,6 +57,10 @@ const {
   buildLowRelevanceArchitectFramework,
   isProductComparisonQuestion,
   buildProductComparisonDirective,
+  isTechnicalTopicFastPath,
+  TECH_ARTIFACT_FIRST_RULE,
+  buildMasterArchitectDirective,
+  detectTechnicalLifecycle,
   buildStarLocalFallback,
   starMayNameEmployer
 } = require("../../lib/intentRouter.js");
@@ -702,7 +707,9 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
   // an Ariba or SAC failure). Retrieve a wider candidate set, then enforce the
   // explicit product lane before selecting the normal answer budget.
   const sourceFolders = productKnowledgeFolders(retrievalQuery);
-  const searchK = Math.max(topK, 12);
+  // Technical topics (Fiori SSO, BTP, GRC, IAG, …): keep retrieval shallow so generation starts fast.
+  const technicalFastPath = isTechnicalTopicFastPath(retrievalQuery);
+  const searchK = technicalFastPath ? Math.max(topK, 8) : Math.max(topK, 12);
   const candidates = (await searchKnowledge(
     retrievalQuery,
     analysis,
@@ -716,20 +723,26 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
     Number(productScoped?.[0]?.confidenceScore ?? 0)
   );
   // Weak top hit: do NOT inject debug/fallback prose into knowledgeContext (it leaked to the UI).
-  // Return empty retrieval + a flag so the prompt layer can ask the LLM for a normal 4-bullet answer.
+  // Return empty retrieval + a flag so the prompt layer can ask the LLM for fluent spoken prose.
+  // On known technical topics, still pass the best product-scoped chunks when present so the
+  // model is not forced through an empty-retrieval multi-hop path.
   if (!productScoped.length || topScore < LIVE_RELEVANCE_THRESHOLD) {
-    const domain = analysis?.domain || analysis?.category || primaryCategory || "General";
-    return {
-      text: "",
-      procedureText: "",
-      procedurePool: [],
-      evidence: [],
-      lowRelevanceFallback: true,
-      lowRelevanceDirective: buildLowRelevanceArchitectFramework({ domain, question: retrievalQuery }),
-      topScore
-    };
+    if (technicalFastPath && productScoped.length) {
+      // Continue with shallow product context below.
+    } else {
+      const domain = analysis?.domain || analysis?.category || primaryCategory || "General";
+      return {
+        text: "",
+        procedureText: "",
+        procedurePool: [],
+        evidence: [],
+        lowRelevanceFallback: true,
+        lowRelevanceDirective: buildLowRelevanceArchitectFramework({ domain, question: retrievalQuery }),
+        topScore
+      };
+    }
   }
-  const rankedChunks = productScoped.slice(0, topK);
+  const rankedChunks = productScoped.slice(0, technicalFastPath ? Math.min(topK, 4) : topK);
   const diagnosticSections = new Set(["STAGE_INVESTIGATION"]);
   // Keep symptom-specific sections even when their headings use "troubleshooting"
   // or "triage" rather than the bare stems. The old word-boundary regex silently
@@ -755,21 +768,23 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
     if (!chunk?.content) continue;
     const body = String(chunk.content).trim();
     const source = String(chunk.sourceFile || chunk.documentId || "knowledge").slice(0, 120);
-    const heading = String(chunk.heading || chunk.section || "").slice(0, 160);
-    const identity = String(chunk.id || chunk.chunkId || `${source}:${heading}:${body.slice(0, 100)}`);
-    if (!body || seenChunks.has(identity)) continue;
+    const heading = stripBankQuestionLabels(String(chunk.heading || chunk.section || "")).slice(0, 160);
+    const cleanBody = stripBankQuestionLabels(body);
+    const identity = String(chunk.id || chunk.chunkId || `${source}:${heading}:${cleanBody.slice(0, 100)}`);
+    if (!cleanBody || seenChunks.has(identity)) continue;
     seenChunks.add(identity);
 
     // Keep provenance and section boundaries intact. Flattening chunks into anonymous
     // paragraphs let the model splice a Public Edition navigation check, an ABAP Gateway
     // log, and an unrelated role procedure into one confident answer.
+    // Never pass bank "Q5:" labels into the prompt — they leak into spoken answers.
     const label = `### SOURCE: ${source}${heading ? ` | SECTION: ${heading}` : ""}`;
-    const block = `${label}\n${body}`;
+    const block = `${label}\n${cleanBody}`;
     const remaining = maxChars - currentLength;
     if (block.length > remaining) {
       const availableBody = remaining - label.length - 1;
       if (availableBody > 120) {
-        const prefix = body.slice(0, availableBody);
+        const prefix = cleanBody.slice(0, availableBody);
         const sentenceEnd = Math.max(prefix.lastIndexOf(". "), prefix.lastIndexOf(".\n"), prefix.lastIndexOf("."));
         const truncated = sentenceEnd > 80 ? prefix.slice(0, sentenceEnd + 1) : "";
         if (truncated) sourceBlocks.push(`${label}\n${truncated}`);
@@ -784,15 +799,19 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
     text: sourceBlocks.join("\n\n"),
     procedureText: chunks
       .filter((chunk) => chunk?.content)
-      .map((chunk) => `## ${String(chunk.heading || chunk.section || "").trim()}\n${String(chunk.content).trim()}`)
+      .map((chunk) => {
+        const h = stripBankQuestionLabels(String(chunk.heading || chunk.section || "").trim());
+        const c = stripBankQuestionLabels(String(chunk.content).trim());
+        return `## ${h}\n${c}`;
+      })
       .join("\n\n"),
     procedurePool: productScoped.slice(0, 12),
     evidence: [...new Map(chunks.map((chunk) => [
-      String(chunk.heading || chunk.section || chunk.sourceFile || chunk.documentId || "knowledge").slice(0, 160),
+      stripBankQuestionLabels(String(chunk.heading || chunk.section || chunk.sourceFile || chunk.documentId || "knowledge")).slice(0, 160),
       chunk
     ])).values()].slice(0, 6).map((chunk) => ({
       id: String(chunk.id || chunk.chunkId || chunk.documentId || "").slice(0, 100),
-      label: String(chunk.heading || chunk.section || chunk.sourceFile || chunk.documentId || "knowledge").slice(0, 160)
+      label: stripBankQuestionLabels(String(chunk.heading || chunk.section || chunk.sourceFile || chunk.documentId || "knowledge")).slice(0, 160)
     }))
   };
 }
@@ -1199,6 +1218,37 @@ export default async function handler(req, res) {
   };
   if (turn.decision !== "ANSWER") persistIncomingTimeline(question, turn.scriptAnswer || "");
 
+  // Master Technical Architect Directive: verified T-code procedures outrank answer-bank narrative
+  // for configure / troubleshoot / migrate / technical-topic asks (bank prose often lacks GRFNMW_DB_CHECK, /IWFND/ERROR_LOG, etc.).
+  try {
+    if (
+      turn.decision === "ANSWER"
+      && (turn.route === "ANSWER_BANK" || turn.route === "PREPARED_SCRIPT")
+    ) {
+      const lifecycle = detectTechnicalLifecycle(question);
+      const technicalAsk = isTechnicalTopicFastPath(question)
+        || lifecycle === "configure"
+        || lifecycle === "troubleshoot"
+        || lifecycle === "implement_migrate";
+      if (technicalAsk) {
+        const verifiedPrefer = selectVerifiedWorkflow(question);
+        if (verifiedPrefer?.answer) {
+          turn = {
+            ...turn,
+            route: "GENERATION",
+            reason: "verified-workflow-over-bank",
+            scriptId: null,
+            scriptAnswer: "",
+            confidence: 0,
+            via: undefined
+          };
+        }
+      }
+    }
+  } catch (verifiedPreferError) {
+    logger?.error?.("Verified-over-bank preference failed:", verifiedPreferError);
+  }
+
   // Layer 7 early gate: clarify before bank/workflow/generation invents across missing or conflicting boundaries.
   // Exact answer-bank / prepared-script hits remain authoritative when admission already selected them.
   if (turn.decision === "ANSWER" && turn.route !== "PREPARED_SCRIPT" && turn.route !== "ANSWER_BANK") {
@@ -1419,7 +1469,10 @@ export default async function handler(req, res) {
   try {
     const verified = selectVerifiedWorkflow(question);
     if (verified?.answer) {
-      let spoken = fitSpokenLength(shapeSpokenContract(verified.answer), responseLength, question);
+      let spoken = finalizeSpokenAnswer(
+        fitSpokenLength(shapeSpokenContract(verified.answer), responseLength, question),
+        { behavioralStarMode: false, question }
+      );
       if (verified.experienceAsk) {
         try {
           const card = recallGroundedExperience(question);
@@ -1773,12 +1826,17 @@ export default async function handler(req, res) {
     if (customInstructions?.trim()) promptPayload.customInstructions = customInstructions.trim();
     // Anti-hallucination: always reinforce T-code plane boundaries (SM20≠purge, etc.).
     try {
-      const { TCODE_VERIFICATION_RULE } = require("../../lib/turnDecision.js");
+      const { TCODE_VERIFICATION_RULE, OUTPUT_SANITIZER_RULE } = require("../../lib/turnDecision.js");
       const rule = String(turn?.tcodeVerificationRule || TCODE_VERIFICATION_RULE || "").trim();
-      if (rule) {
+      const sanitizerRule = String(turn?.outputSanitizerRule || OUTPUT_SANITIZER_RULE || "").trim();
+      const artifactRule = String(
+        buildMasterArchitectDirective(effectiveQuestion || question) || TECH_ARTIFACT_FIRST_RULE || ""
+      ).trim();
+      const combined = [rule, sanitizerRule, artifactRule].filter(Boolean).join("\n\n");
+      if (combined) {
         promptPayload.customInstructions = promptPayload.customInstructions
-          ? `${promptPayload.customInstructions}\n\n${rule}`
-          : rule;
+          ? `${promptPayload.customInstructions}\n\n${combined}`
+          : combined;
       }
     } catch (tcodeRuleError) {
       logger?.error?.("T-code verification rule inject failed:", tcodeRuleError);
@@ -1871,7 +1929,7 @@ export default async function handler(req, res) {
     };
 
     let retrievedProcedureAnswer = "";
-    // Low-relevance turns must go through the LLM 4-bullet path — never stream empty/fallback prose.
+    // Low-relevance turns must go through the LLM fluent-prose path — never stream empty/fallback prose.
     // Also refuse first-person canned Fiori stubs that used to leak from the knowledge index.
     const looksLikeHardcodedStub = (text) => /If the server is on premise,\s*I would follow the ABAP Fiori path/i.test(String(text || ""))
       || /LOW-RELEVANCE RETRIEVAL FALLBACK/i.test(String(text || ""))

@@ -1,6 +1,6 @@
 # SAP BW/4HANA Analysis Authorizations Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** BW and BW/4HANA **analysis authorizations** (RSECADMIN / `S_RS_AUTH`) govern authorization-relevant characteristic values for query data. They are **not** a substitute for standard ABAP execution authorizations (`S_RS_COMP`, `S_RS_COMP1`, InfoProvider execute). SAC model DAC and HANA analytic privileges are separate planes when those products sit in front of or under BW.
 

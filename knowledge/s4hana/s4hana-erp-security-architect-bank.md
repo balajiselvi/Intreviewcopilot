@@ -1,6 +1,6 @@
 # SAP ECC, S/4HANA & ERP Security Architecture (Edition-Aware)
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** Authorization mechanics differ by deployment:
 - **ECC / S/4HANA on-premises / Private Edition:** PFCG single/composite/derived roles, SU24/SU25, classic TCodes + Fiori.

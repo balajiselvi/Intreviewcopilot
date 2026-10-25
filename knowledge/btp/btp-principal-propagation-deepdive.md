@@ -1,6 +1,6 @@
 # SAP BTP Principal Propagation & Identity Trust Deep-Dive
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** BTP Destinations + XSUAA/IAS + Cloud Connector Principal Propagation + S/4HANA X.509 mapping (`STRUST`, `CERTRULE`, ICM profile parameters). This is **not** Cloud Connector install/HA topology, not IPS provisioning, not GRC EAM Firefighting, and not a substitute for backend PFCG/DCL after the user is mapped.
 

@@ -1,6 +1,6 @@
 # SAP SRM, SCM, IBP & Supply-Chain Application Security Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** Supply-chain apps (SRM, SCM, IBP, MM/WM/PP/SD process auths in ERP) have distinct auth models. **IBP** is cloud planning with its own permission/role concepts; **SRM** classic differs from Ariba; ERP MM/SD use PFCG/business roles. Cross-system SoD (buyer vs goods receipt vs invoice) spans tools.
 

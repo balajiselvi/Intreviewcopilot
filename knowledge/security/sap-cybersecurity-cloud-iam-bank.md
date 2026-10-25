@@ -1,6 +1,6 @@
 # SAP Cybersecurity, Platform Hardening & Cloud IAM Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation. Technical boundaries: enterprise IdP (Okta/Azure AD), SAP IAS, SAL/`RSAU_CONFIG`, ATC/SCI, HANA encryption/SecStore, IAG PAM, Web Dispatcher/ICM, STMS/SCC4, OAuth/mTLS, ETD/SIEM—not classic PFCG role design unless the question bridges identity or hardening controls.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings. Technical boundaries: enterprise IdP (Okta/Azure AD), SAP IAS, SAL/`RSAU_CONFIG`, ATC/SCI, HANA encryption/SecStore, IAG PAM, Web Dispatcher/ICM, STMS/SCC4, OAuth/mTLS, ETD/SIEM—not classic PFCG role design unless the question bridges identity or hardening controls.
 
 ## Q1: How do you architect a Zero Trust Access model for SAP S/4HANA and BTP using Okta/Azure AD, SAP IAS, and Conditional Access?
 

@@ -1,6 +1,6 @@
 # SAP HANA Database & Data-Platform Security Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** HANA users/roles/privileges (SQL + repository/XSA where applicable) are the database plane. They are **not** PFCG roles and **not** BW analysis authorizations—though BW/SAC/S/4 may sit above and depend on HANA privileges for technical connectivity. Distinguish classic HANA repository vs HDI/XSA patterns by release.
 

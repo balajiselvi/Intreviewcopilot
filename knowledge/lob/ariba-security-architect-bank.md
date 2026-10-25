@@ -1,6 +1,6 @@
 # SAP Ariba Security & Procurement Governance Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** SAP Ariba realm authorization is **group- and permission-based** (and project/document team access where applicable). It is **not** PFCG, **not** BTP role collections, and **not** IAG Access Analysis unless an Ariba connector/ruleset is explicitly in the landscape. Authentication is typically SAML/OIDC via corporate IdP / IAS; SSO does not grant Ariba groups.
 

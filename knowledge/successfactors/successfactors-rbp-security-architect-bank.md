@@ -1,6 +1,6 @@
 # SAP SuccessFactors RBP Security Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** SuccessFactors Role-Based Permissions (RBP)—permission roles, permission groups, and target populations. This is **not** SAP PFCG, **not** BTP role collections, and **not** SAC roles. Employee Central (EC) data security, MDF permissions, and module permissions (Recruiting, Onboarding, Compensation, Performance) are distinct grant lists—name the module before listing permissions. HR-driven provisioning to S/4/BTP via IPS is a separate control plane from in-suite RBP.
 

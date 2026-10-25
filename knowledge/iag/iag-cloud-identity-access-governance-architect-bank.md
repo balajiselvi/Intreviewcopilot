@@ -1,6 +1,6 @@
 # SAP IAG — Cloud Identity Access Governance Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** SAP Identity Access Governance (IAG) cloud services are **not** on-prem GRC Access Control renamed. Core services: Access Analysis, Access Request, Certification Review, Role Design, Privileged Access Management. **IAG Bridge** integrates with GRC AC where hybrid. IAS/IPS are identity planes; IAG is governance. Do not claim IAG “replaces PFCG.”
 

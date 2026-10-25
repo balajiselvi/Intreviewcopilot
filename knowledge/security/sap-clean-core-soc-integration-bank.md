@@ -1,6 +1,6 @@
 # SAP Clean Core, ABAP Cloud Security & SOC Integration Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation. Product boundaries: Clean Core / ABAP Cloud release contracts, RAP authorization, Key User vs Developer Extensibility, central ATC on BTP, and ETD/SecurityBridge → Sentinel/Splunk SOC integration—not classic GRC ARA SoD design unless the question bridges compliance reporting.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings. Product boundaries: Clean Core / ABAP Cloud release contracts, RAP authorization, Key User vs Developer Extensibility, central ATC on BTP, and ETD/SecurityBridge → Sentinel/Splunk SOC integration—not classic GRC ARA SoD design unless the question bridges compliance reporting.
 
 ## Q1: How do you enforce Clean Core Extensibility and Release Contracts (C0–C3) in S/4HANA using Developer Extensibility?
 

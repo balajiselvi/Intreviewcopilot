@@ -2,7 +2,7 @@
 
 Senior Principal Architect interview bank. Product boundary: **SAP BTP** (Cloud Foundry / Kyma), **XSUAA**, **SAP Cloud Identity Services (IAS/IPS)**, **Destinations**, **Connectivity / Cloud Connector**, and **Principal Propagation**. Do not answer these as classic PFCG/ECC Security or on-prem GRC Access Control questions unless the question explicitly bridges hybrid landscapes.
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 ## Q1: How do you design the overall SAP BTP security architecture for a hybrid S/4HANA landscape?
 

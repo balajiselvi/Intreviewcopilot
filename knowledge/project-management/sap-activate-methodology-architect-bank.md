@@ -1,6 +1,6 @@
 # SAP Activate Methodology & Quality Gates — Security Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** SAP Activate phases are **Discover → Prepare → Explore → Realize → Deploy → Run**. This is methodology, not the RISE commercial offering and not ASAP. RISE with SAP *uses* Activate as the implementation framework; RACI still comes from the edition-specific Roles & Responsibilities document. Authorization tooling differs by edition: classic PFCG (Private/on-prem) vs Public Edition business roles / IAM apps.
 

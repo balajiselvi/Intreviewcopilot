@@ -1,6 +1,6 @@
 # SAP Implementation, Upgrade & Migration — Security Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** Greenfield, brownfield, and selective/bluefield transformations change security work differently. ECC→S/4, GRC 10→12, IDM modernization, and IAG adoption are distinct workstreams. Always name approach and edition.
 

@@ -1,6 +1,6 @@
 # SAP Integration & Cross-Application Security Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** Covers the access path **identity source → authentication → application authorization → data access → provision/deprovision**. Includes RFC/trusted-RFC, OData/SOAP/REST, SAML/OIDC/OAuth, Integration Suite/CPI, certificates/secrets, and hybrid connectivity. Not a substitute for product-specific banks (PFCG, RBP, XSUAA).
 

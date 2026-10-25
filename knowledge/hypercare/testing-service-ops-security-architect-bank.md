@@ -1,6 +1,6 @@
 # Testing, Service Management & Operational Support — Security Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** Covers authorization test strategy, cutover rehearsals, Production incident/problem/change for security, and BAU evidence. Applies across PFCG, Fiori, IAG/GRC, IAS/IPS, and cloud apps—with product-specific traces.
 

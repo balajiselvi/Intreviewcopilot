@@ -1,6 +1,6 @@
 # SAP Analytics Cloud (SAC) Security Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** SAC has **application roles/permissions** (what users can do in SAC) and **model data access** (Data Access Control / dimension restrictions). Broader roles can override model DAC—design both explicitly. Live connections to BW/S/4/HANA enforce additional backend authorizations; acquired data relies more on SAC-side controls. IAS/IdP authenticates; SAC teams/roles authorize.
 

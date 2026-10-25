@@ -1,6 +1,6 @@
 # SAP Cloud Identity Services — IAS & IPS Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:**
 - **IAS** = authentication, SSO, MFA, corporate IdP federation, application trust.

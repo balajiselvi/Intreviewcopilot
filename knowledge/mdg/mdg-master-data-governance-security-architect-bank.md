@@ -1,6 +1,6 @@
 # SAP MDG — Master Data Governance Security Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** MDG authorization covers change-request (CR) processing, master-data maintenance vs display, and stewardship—on top of underlying ECC/S/4 authorization objects. MDG is **not** IAG and **not** SF RBP. Domains (Customer, Supplier, Material, Financial) have distinct UI/auth models; name the domain.
 

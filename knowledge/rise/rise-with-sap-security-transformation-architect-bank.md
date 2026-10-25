@@ -1,6 +1,6 @@
 # RISE with SAP & Cloud Transformation — Security Architecture
 
-Spoken architect style: Decision → Mechanism → Governance → Validation.
+Spoken architect style: fluent Senior Principal Architect paragraphs — lead with exact T-codes/tables/utilities; never Decision/Mechanism/Governance/Validation headings.
 
 **Product boundaries:** **RISE with SAP** is a business-transformation / commercial cloud offering framework. **SAP Activate** is the implementation methodology (six phases). They are related, not synonyms. Security RACI comes from edition-specific **Roles & Responsibilities**—many application-security and SSO tasks are **customer Excluded Tasks**. Private Edition ≠ Public Edition tooling.
 
