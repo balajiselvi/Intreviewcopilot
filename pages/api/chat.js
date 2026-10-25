@@ -181,8 +181,9 @@ const CATEGORY_RULES = Object.freeze([
   { category: "Architecture", keywords: ["architecture", "landscape", "design", "diagram", "topology"], weight: 3 },
   { category: "BTP", keywords: ["btp", "business technology platform"], weight: 4 },
   { category: "IAS", keywords: ["ias", "identity authentication service"], weight: 4 },
-  { category: "IPS", keywords: ["ips", "identity provision service", "successfactors", "success factors", "sap successfactors"], weight: 4 },
-  { category: "SuccessFactors", keywords: ["rbp", "role-based permission", "role based permission", "permission role", "employee central", "sf rbp"], weight: 4 },
+  // IPS owns SCIM/JML/HR-driven provisioning — do NOT keyword-match bare "SuccessFactors" (that bleeds RBP asks into IPS).
+  { category: "IPS", keywords: ["ips", "identity provision service", "identity provisioning", "scim", "jml", "joiner", "mover", "leaver", "hr trigger", "hr-driven", "provisioning job", "provisioning transformation"], weight: 4 },
+  { category: "SuccessFactors", keywords: ["rbp", "role-based permission", "role based permission", "permission role", "permission group", "target population", "employee central", "sf rbp", "successfactors", "success factors", "sap successfactors", "mdf", "metadata framework", "custom field", "field-level permission", "object definition"], weight: 4 },
   { category: "Ariba", keywords: ["ariba"], weight: 4 },
   { category: "CAR", keywords: ["customer activity repository", "sap car"], weight: 4 },
   { category: "IAG", keywords: ["iag", "identity access governance"], weight: 4 },
@@ -2026,10 +2027,9 @@ export default async function handler(req, res) {
     // into a fresh GRC question even though retrieval had selected GRC sources.
     const recentHistory = prepareConversationHistory(historyForCurrentTurn(history, isFollowUp));
 
-    // Ceiling is sized to the question's length tier (see lib/prompt/interviewPrompt.js) —
-    // the main lever for keeping generation under the ~5-6s target in a single-pass
-    // architecture, since streaming wall-clock time scales with tokens produced.
-    const maxTokens = getMaxTokensForCategory(analysis.category, analysis.secondaryCategories, effectiveQuestion, analysis.isDeepenFollowUp, reasoningContract.reasoningMode, interviewContext.depth, interviewContext.answerScope, knowledgeContext, responseLength);
+    // Fixed completion budget — never omit max_tokens (provider defaults are often ~256–300).
+    // Category budgets remain soft prompt preferences only; API hard-cap is always 2048.
+    const maxTokens = 2048;
 
     if (debugEnabled) {
       writeSSEEvent(res, "context", sanitizeDebugContext(interviewContext, {

@@ -233,17 +233,14 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   assert.match(chat, /fitSpokenLength\(\s*renderSpokenProcedure\(effectiveQuestion, alignedSteps\)/);
   assert.match(chat, /\bfitSpokenLength\b/);
   assert.match(chat, /route: "RETRIEVED_PROCEDURE"/);
-  assert.match(chat, /writeSSEChunk\(res, retrievedProcedureAnswer\)/);
+  assert.match(chat, /writeSSEAnswer\(res, retrievedProcedureAnswer\)/);
   assert.match(chat, /Retrieved procedure retention failed \(non-fatal\)/);
 
   const prompt = fs.readFileSync(path.join(root, "lib/prompt/interviewPrompt.js"), "utf8");
-  assert.match(prompt, /For an answerable technical question, do not respond by asking the interviewer to choose between adjacent interpretations/);
-  assert.match(prompt, /SPOKEN ARCHITECT FORMAT/);
-  assert.match(prompt, /\* \*\*Decision:\*\*/);
-  assert.match(prompt, /\* \*\*Mechanism:\*\*/);
-  assert.match(prompt, /\* \*\*Governance:\*\*/);
-  assert.match(prompt, /\* \*\*Validation:\*\*/);
-  assert.match(prompt, /I would first Decision/);
+  assert.match(prompt, /INTERVIEW COPILOT V2\.1 OPERATING CONTRACT/);
+  assert.match(prompt, /NATURAL INTERVIEW SPOKEN CADENCE/);
+  assert.match(prompt, /RULE 10 — ABSOLUTE RESPONSE COMPLETENESS/);
+  assert.match(prompt, /NEVER output Decision:\/Mechanism:\/Governance:\/Validation:/);
   assert.doesNotMatch(prompt, /### 1\. Direct Answer/);
   assert.doesNotMatch(prompt, /three required answer headings/);
   assert.match(prompt, /profile confirms IPS implementation but does not identify an employer or metric[\s\S]*do not attribute it to Dover/);
@@ -296,7 +293,7 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   assert.doesNotMatch(recovery.prompt, /must name only the relevant verified/);
   assert.doesNotMatch(recovery.prompt, /Name which security plane/);
   assert.doesNotMatch(recovery.prompt, /rewrite it as the SAP Security\/IAM decision/);
-  assert.doesNotMatch(recovery.prompt, /SUPPORTING KNOWLEDGE/);
+  assert.doesNotMatch(recovery.prompt, /={3,}\s*SUPPORTING KNOWLEDGE\s*={3,}/);
   assert.doesNotMatch(recovery.prompt, /MASTER HANDS-ON BANK/);
   assert.doesNotMatch(recovery.prompt, /ST03N supplies usage data/);
   assert.doesNotMatch(recovery.prompt, /use that engagement's tools/);
@@ -307,14 +304,14 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   );
   assert.equal(sponsorDelay.reasoningContract.deliveryQuestion, true);
   assert.doesNotMatch(sponsorDelay.prompt, /must name only the relevant verified/);
-  assert.doesNotMatch(sponsorDelay.prompt, /SUPPORTING KNOWLEDGE/);
+  assert.doesNotMatch(sponsorDelay.prompt, /={3,}\s*SUPPORTING KNOWLEDGE\s*={3,}/);
   const derivedRole = compose(
     "Take me through creating a derived role for a new company code in PFCG.",
     "Role Design",
     "SOURCE: roles.md\nMaintain the derived role in PFCG from SU24 proposals."
   );
   assert.equal(derivedRole.reasoningContract.deliveryQuestion, false);
-  assert.match(derivedRole.prompt, /completing the intended business action/);
+  assert.match(derivedRole.prompt, /completing the (?:intended )?business action|completes the business (?:action|transaction)/);
   const cutoverProof = compose(
     "Can you prove cutover succeeded with a clean SU53?",
     "Cutover",
@@ -330,7 +327,8 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
   assert.equal(cutoverPlan.reasoningContract.deliveryQuestion, true);
   assert.equal(derivedRole.reasoningContract.requireTechnicalArtifacts, true);
   assert.match(derivedRole.prompt, /Name only plane-correct artifacts|must name only the relevant verified/);
-  assert.match(derivedRole.prompt, /\* \*\*Decision:\*\*/);
+  assert.match(derivedRole.prompt, /NATURAL INTERVIEW SPOKEN CADENCE|2 to 3 fluid paragraphs|2–3 fluid paragraphs/);
+  assert.doesNotMatch(derivedRole.prompt, /^\* \*\*Decision:\*\*/m);
   assert.match(derivedRole.prompt, /PFCG/);
   assert.match(derivedRole.prompt, /SU24/);
   assert.match(derivedRole.prompt, /transaction ST03N supplies usage data/);
@@ -470,9 +468,9 @@ const knowledge = `### SOURCE: btp/ips.md | SECTION: Troubleshooting: failed ent
 
   assert.equal(normalizeResponseLength("interview"), "medium");
   assert.equal(normalizeResponseLength("concise"), "concise");
-  assert.equal(scaleResponseLength(700, "medium"), 700);
-  assert.equal(scaleResponseLength(700, "concise"), 280);
-  assert.ok(scaleResponseLength(700, "lengthy") > 700);
+  assert.equal(scaleResponseLength(700, "medium"), 2048);
+  assert.equal(scaleResponseLength(700, "concise"), 2048);
+  assert.equal(scaleResponseLength(700, "lengthy"), 2048);
   const concisePrompt = buildSapInterviewPrompt({ question: roleQuestion, analysis: { category: "Implementation", secondaryCategories: [] }, responseLength: "concise" });
   const lengthyPrompt = buildSapInterviewPrompt({ question: roleQuestion, analysis: { category: "Implementation", secondaryCategories: [] }, responseLength: "lengthy" });
   assert.match(concisePrompt, /Selected response length is concise/);

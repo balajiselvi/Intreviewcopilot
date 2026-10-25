@@ -10,11 +10,12 @@ const cases = [
   { q: "How would you configure governed access requests in IAG?", topic: "IAG", workflow: "iag-workflow-determination" },
   { q: "How would you run periodic access reviews in IAG?", topic: "IAG", workflow: "iag-certification-review" },
   { q: "How would you handle emergency or privileged access through IAG?", topic: "IAG", workflow: "iag-pam-setup" },
-  { q: "How would you configure MSMP and BRF+ for SAP GRC Access Control?", topic: "GRC", workflow: null, folders: ["grc"] },
+  { q: "How would you configure MSMP and BRF+ for SAP GRC Access Control?", topic: "GRC", workflow: "grc-ac12-ara-msmp-config", folders: ["grc"] },
   { q: "How do you build an authorization role in classic SAP ECC using PFCG?", topic: "ECC", workflow: null, folders: ["security", "grc"] },
   { q: "How does the IAG Bridge interact with SAP Access Control?", topic: "IAG", workflow: "iag-access-control-bridge", folders: ["iag", "grc"] },
-  { q: "How would you configure IAG?", topic: "IAG", workflow: "iag-general-implementation" },
-  { q: "What are the main steps to implement SAP Cloud Identity Access Governance?", topic: "IAG", workflow: "iag-general-implementation" },
+  // Broad iag-general-implementation canned stub removed — these fall through to the LLM.
+  { q: "How would you configure IAG?", topic: "IAG", workflow: null },
+  { q: "What are the main steps to implement SAP Cloud Identity Access Governance?", topic: "IAG", workflow: null },
   // Conceptual overview asks must fall through; the broad IAG implementation workflow is a procedural mismatch.
   { q: "Explain IAG?", topic: "IAG", workflow: null },
   { q: "Explain SAP Cloud IAG?", topic: "IAG", workflow: null },
@@ -26,11 +27,11 @@ const cases = [
   { q: "How do you configure IAG role design?", topic: "IAG", workflow: "iag-role-design" },
   { q: "How do you integrate IAG with SAP Access Control 12.0 on-premise?", topic: "IAG", workflow: "iag-access-control-bridge", folders: ["iag", "grc"] },
   { q: "How do you troubleshoot failed IAG access analysis or synchronization?", topic: "IAG", workflow: "iag-analysis-sync-troubleshooting", scope: "STAGE_INVESTIGATION" },
-  { q: "In the connected on-premise GRC system, how do you troubleshoot an MSMP request with no approver?", topic: "GRC", workflow: null, scope: "STAGE_INVESTIGATION", folders: ["grc"] },
-  { q: "How do I configure BRF+ agent determination in MSMP?", topic: "GRC", workflow: null, folders: ["grc"] },
-  { q: "How do I configure the approval path in SAP Access Control 12.0?", topic: "GRC", workflow: null, folders: ["grc"] },
+  { q: "In the connected on-premise GRC system, how do you troubleshoot an MSMP request with no approver?", topic: "GRC", workflow: "grc-msmp-stuck-troubleshoot", scope: "STAGE_INVESTIGATION", folders: ["grc"] },
+  { q: "How do I configure BRF+ agent determination in MSMP?", topic: "GRC", workflow: "grc-ac12-ara-msmp-config", folders: ["grc"] },
+  { q: "How do I configure the approval path in SAP Access Control 12.0?", topic: "GRC", workflow: "grc-ac12-ara-msmp-config", folders: ["grc"] },
   { q: "A connected IAG tenant cannot synchronize access data from its target. How would you diagnose it?", topic: "IAG", workflow: "iag-analysis-sync-troubleshooting", scope: "STAGE_INVESTIGATION" },
-  { q: "What would you validate before enabling IAG Access Request for a new target?", topic: "IAG", workflow: "iag-general-implementation" }
+  { q: "What would you validate before enabling IAG Access Request for a new target?", topic: "IAG", workflow: null }
 ];
 
 const forbiddenGenericIag = /SAP_GRAC_ACCESS_REQUEST|Approvers of Selected Path|BRF\+ decision table|MSMP agent rule/i;
@@ -49,11 +50,12 @@ for (const item of cases) {
     assert.equal(workflow.product, "IAG");
     assert.equal(workflow.task, "Role Design");
     assert.deepEqual(workflow.sourceFiles, ["knowledge/iag/iag-rules-and-roles.md", "knowledge/iag/iag-implementation.md"]);
-    assert.match(workflow.answer, /^I build IAG business roles in Role Designer, Business Roles/);
+    assert.match(workflow.answer, /Role Designer under Business Roles|I build IAG business roles in Role Designer/i);
     assert.match(workflow.answer, /Assignment Approver and Content Approver/);
     assert.match(workflow.answer, /release-dependent/);
     assert.doesNotMatch(workflow.answer, /SAP_GRAC_ACCESS_REQUEST|Approvers of Selected Path|BRF\+ decision table/);
     assert.doesNotMatch(workflow.answer, /Access Analysis for risk evaluation.*Certification Review/);
+    assert.doesNotMatch(workflow.answer, /For IAG, I confirm the Cloud Foundry environment/);
   }
   if (item.workflow === "iag-role-owner") {
     assert.equal(workflow.task, "Role Designer");

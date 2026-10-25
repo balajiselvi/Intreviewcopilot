@@ -59,7 +59,7 @@ Canonical keyword: `RESUME`. Evidence order: repository / Git / tests / runtime 
 
 ## Mission
 
-Build and maintain a Principal Architect-level SAP Security / IAM interview assistant.
+Build and maintain a Principal Architect-level SAP Security / IAM interview assistant (Interview Copilot V2.1).
 
 The quality target is not:
 - more SAP keywords
@@ -67,15 +67,17 @@ The quality target is not:
 - longer answers
 - more prompt rules
 
-The target is:
-- technical correctness
-- architectural reasoning
-- business relevance
-- implementation realism
-- governance depth
-- precise SAP terminology
-- follow-up consistency
-- zero fabricated candidate experience
+The target is the V2.1 priority order:
+1. technical correctness
+2. direct relevance to the question
+3. product and domain accuracy
+4. evidence and implementation specificity
+5. practical troubleshooting and validation
+6. architectural judgment and trade-off awareness
+7. completeness
+8. natural, confident spoken delivery
+
+Never invent project experience, metrics, authorization objects, transactions, APIs, or documentation claims. CV / supplied history is the source of truth for personal experience.
 
 ## Repository Discipline
 

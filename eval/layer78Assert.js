@@ -26,19 +26,17 @@ check("Layer 7 clarify format", () => {
   assert.match(clarificationRequired("Need edition."), /^\* \*\*Clarification Required:\*\*/);
 });
 
-check("Layer 7: unspecified S/4 role design asks for edition", () => {
+check("Layer 7: unspecified S/4 role design answers — no edition stall", () => {
   const hit = evaluateLayer7Clarity({ question: "How do you design roles in S/4HANA?" });
-  assert.equal(hit.needsClarify, true);
-  assert.equal(hit.reason, "missing-edition");
-  assert.match(hit.clarificationPrompt, /Public Cloud or On-Premise\/Private Edition/i);
+  assert.equal(hit.needsClarify, false);
+  assert.equal(hit.lanes.assumedEdition, "on-premise-private");
 });
 
-check("Layer 7: Public Cloud + PFCG conflict clarifies", () => {
+check("Layer 7: Public Cloud + PFCG conflict does not stall — answers with assumed contrast", () => {
   const hit = evaluateLayer7Clarity({
     question: "How do I configure PFCG roles in S/4HANA Public Cloud?"
   });
-  assert.equal(hit.needsClarify, true);
-  assert.equal(hit.reason, "conflicting-edition-tools");
+  assert.equal(hit.needsClarify, false);
 });
 
 check("Layer 7: clear Public Cloud ask does not clarify", () => {
@@ -53,13 +51,19 @@ check("Layer 7: clear IAG configure does not clarify", () => {
   assert.equal(hit.needsClarify, false);
 });
 
-check("Layer 7 wired into resolveInterviewContext", () => {
+check("Layer 7: S/4 vs BW difference does not clarify", () => {
+  const hit = evaluateLayer7Clarity({
+    question: "What is the difference between S4 HANA role design vs BW role?"
+  });
+  assert.equal(hit.needsClarify, false);
+});
+
+check("Layer 7 wired into resolveInterviewContext — technical asks generate", () => {
   const ctx = resolveInterviewContext({
     questionRaw: "How do you design roles in S/4HANA?",
     history: []
   });
-  assert.equal(ctx.retrievalDecision, "clarify");
-  assert.match(ctx.clarificationPrompt, /Clarification Required/);
+  assert.notEqual(ctx.retrievalDecision, "clarify");
 });
 
 check("Layer 8 detects behavioral STAR intents", () => {
@@ -126,7 +130,7 @@ check("Low-relevance directive is internal-only (no UI leak string)", () => {
   assert.doesNotMatch(fb, /no high-confidence/i);
   assert.match(fb, /INTERNAL RETRIEVAL NOTE/);
   assert.match(fb, /do not print/i);
-  assert.match(fb, /Decision:\*\* \/ \* \*\*Mechanism|Decision\/Mechanism\/Governance\/Validation/i);
+  assert.match(fb, /NEVER Decision:\/Mechanism:\/Governance:\/Validation|Decision\/Mechanism\/Governance\/Validation/i);
   assert.match(fb, /Never mention retrieval/i);
   assert.match(fb, /IAG/);
 });
@@ -141,14 +145,17 @@ check("sanitizeSpokenAnswer strips leak and Fiori stub echoes", () => {
   const clean = sanitizeSpokenAnswer(dirty);
   assert.doesNotMatch(clean, /LOW-RELEVANCE RETRIEVAL FALLBACK/);
   assert.doesNotMatch(clean, /ABAP Fiori path/);
-  assert.match(clean, /\*\*Decision:\*\*/);
+  assert.doesNotMatch(clean, /\*\*Decision:\*\*/);
+  assert.match(clean, /SU24 Check\/Maintain for Z-transactions/i);
 });
 
 check("NON-NEGOTIABLE SYSTEM RULES section is in interviewPrompt", () => {
   const prompt = fs.readFileSync(path.join(__dirname, "../lib/prompt/interviewPrompt.js"), "utf8");
   assert.match(prompt, /NON-NEGOTIABLE SYSTEM RULES/);
+  assert.match(prompt, /INTERVIEW COPILOT V2\.1 OPERATING CONTRACT/);
   assert.match(prompt, /RULE 1 — ZERO PROMPT LEAKS/);
   assert.match(prompt, /RULE 3 — UNBREAKABLE PRODUCT BOUNDARIES/);
+  assert.match(prompt, /RULE 10 — ABSOLUTE RESPONSE COMPLETENESS/);
   assert.match(prompt, /SuccessFactors: Permission Roles/);
   assert.match(prompt, /RSECADMIN/);
 });
