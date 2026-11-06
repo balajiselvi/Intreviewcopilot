@@ -47,6 +47,28 @@ Destinations use separate auth types (`OAuth2SAMLBearerAssertion`, client creden
 
 **Do not** answer pure BTP authN/authZ questions with `PFCG`, `AGR_*`, `SU24`, or `SU01` unless the interviewer asks for hybrid on-prem integration.
 
+### SAP BTP — main components / four capability pillars
+
+When asked “What are the main components of SAP BTP?”, lead with the business-capability pillars (not a PFCG inventory):
+
+1. **Database & Data Management** — SAP HANA Cloud, SAP Datasphere, Master Data Governance on BTP.  
+2. **Analytics** — SAP Analytics Cloud (SAC) for planning/BI; live and import connections governed separately from app roles.  
+3. **Application Development & Integration** — SAP Integration Suite (CPI and related), SAP Build, Cloud Foundry, Kyma, ABAP environment / Steampunk, CAP.  
+4. **Intelligent Technologies / AI** — SAP AI Core, Joule, Intelligent RPA / automation services.
+
+Underpinning security/identity for all pillars: **IAS** (authenticate), **IPS** (provision), **XSUAA** (app scopes / role collections), and **IAG** (cloud access governance) where licensed — never collapse these into one product.
+
+### SAP BTP vs SAP Cloud Platform (SCP)
+
+| | **SAP Cloud Platform (SCP)** — legacy | **SAP BTP** — current |
+|---|---|---|
+| Brand | Former PaaS brand (Neo + early Cloud Foundry) | Unified business technology platform |
+| Focus | Extension development and integration on Neo/CF | Database/data, analytics (SAC/Datasphere), app dev/integration, and AI under one commercial model |
+| Structure | Account / subaccount oriented Neo era | **Global Account → Directory → Subaccount** multi-cloud (AWS, Azure, GCP) |
+| Runtime | Proprietary **Neo** plus early CF | **Cloud Foundry**, **Kyma**, **ABAP Cloud**; Neo deprecated / exit path |
+
+Answer difference questions as evolution + scope expansion, not “SCP was renamed overnight.” Security answers stay on IAS/IPS/XSUAA/IAG planes.
+
 ---
 
 ## 3. SAP IAG (five cloud services) vs GRC 12.0 and IAG Bridge

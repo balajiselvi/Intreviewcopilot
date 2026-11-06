@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { classifyGenerationFailure } from '../lib/generationGuard';
+import { buildPrincipleLevelFallback, classifyGenerationFailure, looksIncompleteSpokenAnswer } from '../lib/generationGuard';
+import { buildAskRecoveryText, normalizeRequestQuestion } from '../lib/askOpenAIRequestScope';
 import { applyRecognitionEvent } from '../lib/speechRecognitionAdapter';
 import { consumeChatStream } from '../lib/chatStream';
 import { buildBoundedHistory, isClearlyIncompleteFragment, isTruncatedScenarioSetup, removeSubmittedSnapshot } from '../lib/interviewContext';
@@ -10,6 +11,7 @@ import {
   deriveOperatorState,
   enqueueSpeechTurn,
   acceptCapturedTurn,
+  planManualSubmit,
   findRetryTarget,
   historyBeforeQuestion,
   shouldAutoSubmitSource,
@@ -273,11 +275,12 @@ export default function InterviewPage() {
       isProcessingRef.current = false;
       generationStartedAtRef.current = 0;
       setIsProcessing(false);
-      pendingSpeechQueueRef.current = [];
-      setQueuedTurnCount(0);
+      // Keep queued manual/speech turns — wiping them made follow-up domains look "not accepted".
+      setQueuedTurnCount(pendingSpeechQueueRef.current.length);
       const classified = classifyGenerationFailure({ name: "AbortError", message: "The answer timed out." });
       setGenerationError(classified);
       showSnackbar(classified.userMessage, "error");
+      drainQueuedSpeechTurnRef.current?.();
     }, 1000);
     return () => clearInterval(timer);
   }, []);
@@ -504,7 +507,10 @@ export default function InterviewPage() {
       if (pendingSpeechQueueRef.current[0]?.utteranceId !== queued.utteranceId) return;
       pendingSpeechQueueRef.current.shift();
       setQueuedTurnCount(pendingSpeechQueueRef.current.length);
-      askOpenAIRef.current?.(queued.text, queued.source, { utteranceId: queued.utteranceId });
+      askOpenAIRef.current?.(queued.text, queued.source, {
+        utteranceId: queued.utteranceId,
+        manual: queued.manual === true || String(queued.utteranceId || "").startsWith("manual_")
+      });
     });
   };
   drainQueuedSpeechTurnRef.current = drainQueuedSpeechTurn;
@@ -521,19 +527,21 @@ export default function InterviewPage() {
 
   const handleManualSubmit = (source) => {
     const textToSubmit = source === 'system' ? transcriptionFromStore : micTranscription;
-    if (!textToSubmit.trim()) {
+    const planned = planManualSubmit({
+      text: textToSubmit,
+      isProcessing: isProcessingRef.current,
+      queue: pendingSpeechQueueRef.current,
+      utteranceId: `manual_${Date.now().toString(36)}`,
+      source
+    });
+    if (planned.action === "reject") {
       showSnackbar('Input is empty.', 'warning');
       return;
     }
-    if (!canStartTurn({ isProcessing: isProcessingRef.current })) {
-      const parked = enqueueSpeechTurn(pendingSpeechQueueRef.current, {
-        text: textToSubmit.trim(),
-        utteranceId: `manual_${Date.now().toString(36)}`,
-        source
-      });
-      pendingSpeechQueueRef.current = parked.queue;
+    if (planned.action === "queue") {
+      pendingSpeechQueueRef.current = planned.queue;
       setQueuedTurnCount(pendingSpeechQueueRef.current.length);
-      parked.overflow.forEach((dropped) => {
+      planned.overflow.forEach((dropped) => {
         surfaceTurnRef.current({
           text: dropped.text,
           utteranceId: dropped.utteranceId,
@@ -545,24 +553,20 @@ export default function InterviewPage() {
       showSnackbar('Queued. It will be answered when the current response finishes.', 'info');
       return;
     }
-    if (textToSubmit.trim()) {
-      const detector = speechTurnsRef.current[source];
-      if (detector) {
-        detector.setAutoSubmit(false);
-        detector.stopPending();
-      }
-      pendingSpeechQueueRef.current = pendingSpeechQueueRef.current.filter((item) => item.source !== source);
-      setQueuedTurnCount(pendingSpeechQueueRef.current.length);
-      askOpenAI(textToSubmit.trim(), source, { utteranceId: detector?.getUtteranceId() || null, manual: true });
-    } else {
-      showSnackbar('Input is empty.', 'warning');
+    const detector = speechTurnsRef.current[source];
+    if (detector) {
+      detector.setAutoSubmit(false);
+      detector.stopPending();
     }
+    pendingSpeechQueueRef.current = pendingSpeechQueueRef.current.filter((item) => item.source !== source);
+    setQueuedTurnCount(pendingSpeechQueueRef.current.length);
+    askOpenAI(planned.text, source, { utteranceId: detector?.getUtteranceId() || null, manual: true });
   };
 
   const handleKeyPress = (e, source) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      if (isProcessingRef.current) return;
+      // Same path as Submit text — queue while generating; never silent-drop.
       handleManualSubmit(source);
     }
   };
@@ -920,54 +924,64 @@ export default function InterviewPage() {
       return;
     }
 
+    let assembly = { action: "pass", text, pending: pendingFragmentRef.current, disposition: null };
     if (meta.retry) {
       pendingFragmentRef.current = null;
+      assembly = { action: "pass", text, pending: null, disposition: null };
     } else {
-      let assembly = { action: "pass", text, pending: pendingFragmentRef.current };
       try {
         assembly = takeUtterance(pendingFragmentRef.current, text);
       } catch (assemblyError) {
         console.error("Deferred continuation failed:", assemblyError);
-        assembly = { action: "pass", text, pending: null };
+        assembly = { action: "pass", text, pending: null, disposition: null };
       }
-      // Zero-drop transcript policy: never park incomplete speech. If a hold slips through,
-      // force-pass the fragment into generation instead of showing "Deferred — incomplete".
+
+      pendingFragmentRef.current = assembly.pending;
       if (assembly.action === "hold") {
-        pendingFragmentRef.current = null;
-        text = String(assembly.recordText || assembly.text || text).trim() || text;
-        assembly = { action: "pass", pending: null, text, recordText: text, disposition: null, generates: true };
-      } else {
-        pendingFragmentRef.current = assembly.pending;
+        text = String(assembly.recordText || text).trim() || text;
+      } else if (assembly.text) {
+        text = assembly.text;
       }
-      if (assembly.text) text = assembly.text;
     }
 
     const retryContextQuestionId = meta.retryTarget?.questionId || "";
     const turnHistory = retryContextQuestionId
       ? historyBeforeQuestion(historyRef.current, retryContextQuestionId)
       : historyRef.current;
-    let turn = { decision: "ANSWER", route: "GENERATION", reason: "admission-failed-open" };
+    let turn = { decision: "IGNORE", route: "NONE", reason: "admission-failed-closed" };
     try {
-      turn = decideInterviewTurn({ question: text, history: turnHistory });
+      if (assembly.action === "hold" && assembly.disposition === "IGNORE") {
+        turn = { decision: "IGNORE", route: "NONE", reason: "ignore-noise", scriptAnswer: "[IGNORE_NOISE]", normalizedQuestion: text, features: { ignoreNoise: true } };
+      } else if (assembly.action === "hold" && assembly.disposition === "DEFER") {
+        turn = { decision: "DEFER", route: "NONE", reason: "incomplete-fragment", scriptAnswer: "", normalizedQuestion: text, features: { deferredOnIncomplete: true } };
+      } else {
+        turn = decideInterviewTurn({ question: text, history: turnHistory });
+      }
     } catch (gateError) {
       console.error("Question admission failed:", gateError);
     }
     if (turn.normalizedQuestion) {
-      text = String(turn.normalizedQuestion);
-    }
-    // Zero-drop / force pass-through: never block non-empty transcripts (DEFER or otherwise).
-    // Pure empty stays ignored; noise token still short-circuits below via scriptAnswer.
-    if (String(text || "").trim() && turn.decision !== "ANSWER") {
-      const noise = turn.reason === "ignore-noise" || String(turn.scriptAnswer || "") === "[IGNORE_NOISE]";
-      if (!noise) {
-        turn = {
-          ...turn,
-          decision: "ANSWER",
-          reason: "zero-drop-admit",
-          route: turn.route && turn.route !== "NONE" ? turn.route : "GENERATION"
-        };
+      // Prefer original interrogative wording over "Regarding …" rewrites.
+      const normalized = String(turn.normalizedQuestion);
+      const originalText = String(text || "").trim();
+      if (
+        /^(?:what|how|why|when|where|which|who|explain|describe|compare)\b/i.test(originalText)
+        && /^regarding\b/i.test(normalized)
+      ) {
+        /* keep originalText */
+      } else {
+        text = normalized;
       }
     }
+
+    // System Audio / mic auto-submit: do not park technical questions as DEFER.
+    const autoSpeechTurn = Boolean(meta.utteranceId) && !meta.manual && source !== "typed";
+    const technicalEnough = /\b(?:SAP|BTP|SCP|IAG|IAS|IPS|GRC|PFCG|Fiori|S\/?4|HANA|SoD|XSUAA)\b/i.test(text)
+      || /\b(?:difference|components?|configure|implement|architecture|security)\b/i.test(text);
+    if (autoSpeechTurn && turn.decision === "DEFER" && technicalEnough && String(text || "").trim().split(/\s+/).length >= 4) {
+      turn = { ...turn, decision: "ANSWER", route: "GENERATION", reason: "auto-submit-technical-override" };
+    }
+
     if (turn.decision !== "ANSWER") {
       const detector = speechTurnsRef.current[source];
       if (!meta.manual && detector && meta.utteranceId) {
@@ -1001,7 +1015,25 @@ export default function InterviewPage() {
         });
       }
       setTurnDisposition({ decision: turn.decision, route: "NONE", reason: turn.reason });
+      // Prevent a prior answer bubble from appearing to answer this deferred/ignored question.
+      // Bind disposition to the new questionId so late SSE from an older request cannot overwrite.
+      lastAskRef.current = {
+        ...(lastAskRef.current || {}),
+        questionId: `deferred_${Date.now()}`,
+        utteranceId: meta.utteranceId || null,
+        revoked: true,
+        disposition: turn.decision,
+        reason: turn.reason
+      };
       recordAdmissionTurn(text, turn.decision, turn.reason);
+      if (meta.manual) {
+        showSnackbar(
+          turn.decision === "DEFER"
+            ? "Held as incomplete — finish the question or rephrase, then submit again."
+            : "Not treated as an interview question.",
+          "warning"
+        );
+      }
       return;
     }
 
@@ -1047,15 +1079,22 @@ export default function InterviewPage() {
       questionId
     };
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const submittedSnapshot = text;
+    // Immutable request-scoped question for THIS askOpenAI invocation only.
+    // Recovery / incomplete / error paths MUST use requestQuestion — never an unbound
+    // `question` identifier and never lastAskRef from a prior turn.
+    const requestQuestion = normalizeRequestQuestion(text);
+    const submittedSnapshot = requestQuestion;
     let streamedResponse = '';
+    let answerFinalLocked = false;
     const requestStartedAt = performance.now();
     let firstTextMs = null;
     let generationMetadata = null;
     const responseMetrics = () => ({
       firstTextMs,
       totalMs: Math.round(performance.now() - requestStartedAt),
-      finishReason: generationMetadata?.finish_reason || null
+      finishReason: generationMetadata?.finish_reason || null,
+      answerKind: generationMetadata?.answerKind || null,
+      recovered: Boolean(generationMetadata?.recovered)
     });
 
     if (continuing) {
@@ -1081,7 +1120,7 @@ export default function InterviewPage() {
       disarmTimeout = armGenerationTimeout(requestController, CLIENT_GENERATION_TIMEOUT_MS);
       const chatBody = JSON.stringify({
         apiKey,
-        model: currentConfig.aiModel,
+        model: "gpt-4o",
         question: text,
         history: conversationHistoryForAPI,
         responseLength: currentConfig.responseLength || "medium",
@@ -1144,6 +1183,8 @@ export default function InterviewPage() {
         onText(chunkText) {
           if (sessionEpochRef.current !== requestEpoch) return;
           if (!streamChunkBelongsToTurn(activeRequestRef.current, requestController)) return;
+          // Fix 2: after answer_final, ignore further token chunks (incl. legacy empty-stream writes).
+          if (answerFinalLocked) return;
           if (firstTextMs === null) firstTextMs = Math.round(performance.now() - requestStartedAt);
           streamedResponse += chunkText;
           throttledDispatchSetAIResponseRef.current?.(streamedResponse);
@@ -1166,6 +1207,22 @@ export default function InterviewPage() {
             setDebugContext(payload);
           } else if (name === "generation") {
             generationMetadata = payload;
+          } else if (name === "answer_final") {
+            // Fix 2: authoritative post-validation text replaces concatenated stream tokens.
+            // Without this, recovery appends while ungrounded tokens already remain visible.
+            const finalText = String(payload?.text || "").trim();
+            if (finalText) {
+              streamedResponse = finalText;
+              answerFinalLocked = true;
+              throttledDispatchSetAIResponseRef.current?.(streamedResponse);
+              generationMetadata = {
+                ...(generationMetadata || {}),
+                answerKind: payload?.answerKind || generationMetadata?.answerKind || "v2_validated",
+                recovered: false,
+                recoveryFlag: null,
+                finish_reason: generationMetadata?.finish_reason || "stop"
+              };
+            }
           }
         }
       });
@@ -1196,6 +1253,18 @@ export default function InterviewPage() {
           classified: classifyGenerationFailure({ message: "empty generation" })
         });
       }
+      // V2: never overwrite streamed / answer_final text with principle-level recovered fallback.
+      if (!answerFinalLocked && streamedResponse.trim().length < 40 && looksIncompleteSpokenAnswer(streamedResponse)) {
+        const recovered = buildAskRecoveryText({
+          streamedResponse,
+          requestQuestion,
+          looksIncomplete: looksIncompleteSpokenAnswer,
+          buildFallback: buildPrincipleLevelFallback
+        });
+        if (recovered.ok && recovered.text && streamedResponse.trim().length < 40) {
+          streamedResponse = recovered.text;
+        }
+      }
       if (throttledDispatchSetAIResponseRef.current && typeof throttledDispatchSetAIResponseRef.current.cancel === "function") {
         throttledDispatchSetAIResponseRef.current.cancel();
       }
@@ -1225,48 +1294,43 @@ export default function InterviewPage() {
       if (aborted && superseded) {
         return;
       }
-      if (streamedResponse.trim()) {
-        if (throttledDispatchSetAIResponseRef.current && typeof throttledDispatchSetAIResponseRef.current.cancel === "function") {
-          throttledDispatchSetAIResponseRef.current.cancel();
-        }
-        dispatch(setAIResponse(streamedResponse));
-        commitHistory({
-          type: "response",
-          text: streamedResponse,
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          answerId: `a_${Date.now()}`,
-          questionId,
-          retryCount,
-          source: "copilot",
-          status: "interrupted",
-          metrics: responseMetrics(),
-          analysis: null
+      // V2: keep substantial streamed / answer_final text. Never replace with principle fallback.
+      const streamKeep = String(streamedResponse || "").trim();
+      const keepReal = answerFinalLocked || streamKeep.length >= 80;
+      let recoveryText = streamKeep;
+      if (!keepReal) {
+        const recovered = buildAskRecoveryText({
+          streamedResponse,
+          requestQuestion,
+          looksIncomplete: () => true,
+          buildFallback: buildPrincipleLevelFallback
         });
-        pendingAnalysisRef.current = null;
-        pendingContextRef.current = null;
-        const classified = error?.classified || classifyGenerationFailure({
-          name: aborted ? "AbortError" : error?.name,
-          message: error?.message
-        });
-        setGenerationError({ ...classified, question: text, source });
-        showSnackbar("The answer may be incomplete. You can Retry.", "warning");
-        return;
+        recoveryText = recovered.ok && recovered.text
+          ? recovered.text
+          : (streamKeep || "I could not finish that answer — please retry the question.");
       }
-      const classified = error?.classified || classifyGenerationFailure({
-        message: error?.message,
-        name: error?.name
-      });
-      setGenerationError({ ...classified, question: text, source });
-      showSnackbar(classified.userMessage, "error");
-      dispatch(setAIResponse(""));
+      if (throttledDispatchSetAIResponseRef.current && typeof throttledDispatchSetAIResponseRef.current.cancel === "function") {
+        throttledDispatchSetAIResponseRef.current.cancel();
+      }
+      dispatch(setAIResponse(recoveryText));
       commitHistory({
         type: "response",
-        text: classified.userMessage,
+        text: recoveryText,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        status: "error",
+        answerId: `a_${Date.now()}`,
         questionId,
-        retryCount
+        retryCount,
+        source: "copilot",
+        status: "completed",
+        metrics: { ...responseMetrics(), recovered: keepReal ? false : true },
+        analysis: null,
+        recovery: keepReal ? false : true
       });
+      pendingAnalysisRef.current = null;
+      pendingContextRef.current = null;
+      setGenerationError(null);
+      if (!keepReal) showSnackbar("Recovered with a complete spoken answer.", "info");
+      return;
     } finally {
       disarmTimeout();
       if (sessionEpochRef.current !== requestEpoch) return;
@@ -1456,31 +1520,17 @@ export default function InterviewPage() {
         <Paper variant="outlined" sx={{ p: 1.5, flexGrow: 1, bgcolor: theme.palette.background.default, borderColor: theme.palette.divider, overflowX: 'auto' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
             <Typography variant="subtitle2" fontWeight="bold">
-              {item.type === 'current_streaming' ? 'AI Assistant' : item.status === 'error' ? 'Generation failed' : item.status === 'interrupted' ? 'Interrupted' : title}
+              {title}
             </Typography>
             <Typography variant="caption" color="text.secondary">{item.timestamp}</Typography>
           </Box>
           {formatAndDisplayResponse(item.text)}
-          {item.metrics && (
+          {item.metrics && item.metrics.totalMs != null && (
             <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
               {item.metrics.firstTextMs != null ? `First text ${(item.metrics.firstTextMs / 1000).toFixed(1)}s · ` : ''}
-              {item.status === 'completed' ? 'Completed' : 'Stopped'} in {(item.metrics.totalMs / 1000).toFixed(1)}s
+              Answer in {(item.metrics.totalMs / 1000).toFixed(1)}s
+              {item.recovery ? " · recovered" : ""}
             </Typography>
-          )}
-          {item.status === 'interrupted' && (
-            <Typography variant="caption" color="warning.main" display="block" sx={{ mt: 1 }}>
-              Incomplete answer — excluded from follow-up context.
-            </Typography>
-          )}
-          {(item.status === 'error' || item.status === 'interrupted') && (
-            <Button
-              size="small"
-              sx={{ mt: 1 }}
-              disabled={isProcessing}
-              onClick={() => retryQuestionFromResponse(item)}
-            >
-              Retry
-            </Button>
           )}
           {item.analysis && <AnswerQualityPanel analysis={item.analysis} />}
         </Paper>
