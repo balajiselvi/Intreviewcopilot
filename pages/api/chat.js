@@ -17,7 +17,7 @@ import APP_CONFIG from "../../config/appConfig";
 
 const require = createRequire(import.meta.url);
 const { recallGroundedExperience, formatMemoryCard, fieldConflictsWithCv, cardCoversAskedWork } = require("../../eval/lib/expertiseCards.js");
-const { recallExpectedAnswer } = require("../../eval/lib/expectedAnswers.js");
+const { recallExpectedAnswer } = require("../../lib/preparedSpokenScripts.js");
 const {
   DEFAULT_CAREER_BACKGROUND,
   STATED_PROFILE,
@@ -25,15 +25,31 @@ const {
   scopedHistoryOnly,
   isProfileCredentialQuestion,
   buildCredentialConfirmationAnswer
-} = require("../../eval/lib/careerTimeline.js");
+} = require("../../lib/candidateExperience.js");
 const { shouldInheritPriorDomain, hasStrongTechnicalEvidence, isPlaneFoil, isTopicContinuation } = require("../../lib/contextInheritance.js");
 const {
   publicLlmError,
   isIncompleteGeneration,
+  looksIncompleteSpokenAnswer,
+  findUngroundedTransactionClaims,
+  stripUngroundedSapEntities,
+  isDestructiveEntityStripResult,
+  postStripCoherenceCheck,
+  sanitizeUsageVsAssignmentPlanes,
+  buildPrincipleLevelFallback,
+  recoverNonEmptySpokenAnswer,
+  isMetaRefusalText,
   sanitizeSpokenAnswer,
   stripBankQuestionLabels,
   anonymizeStarEmployers
 } = require("../../lib/generationGuard.js");
+const {
+  validateAndRecoverSpokenAnswer,
+  finalizeSpokenAnswerForDisplay,
+  buildDirectTechnicalFallback,
+  isMetaProcedureResponse,
+  isProviderDisabledOperationalMessage
+} = require("../../lib/answerIntegrityGate.js");
 const {
   LLM_REQUEST_TIMEOUT_MS,
   MAX_RETRIES,
@@ -41,16 +57,47 @@ const {
   runWithExponentialRetry,
   resolveProviderFailoverChain,
   generateWithReliability,
-  buildLocalKnowledgeFallback
+  buildLocalKnowledgeFallback,
+  runAnswerFallbackLadder
 } = require("../../lib/liveReliability.js");
+const {
+  resolveProviderMode,
+  resetProviderStats,
+  getProviderStats,
+  recordDisabledBlocked,
+  assertLiveTransportAllowed,
+  streamMockProviderResponse,
+  DISABLED_GENERATION_MESSAGE
+} = require("../../lib/providerMode.js");
+const { createTraceId, createStageTimer, BUDGETS_MS } = require("../../lib/liveBudgets.js");
+const { isSafeModeEnabled, resolveSafeModeAnswer } = require("../../lib/safeModeRouter.js");
+const { DEFAULT_PROFILE_SLUG } = require("../../lib/preparedAnswerPack.js");
 const { appendQa, readScenarioTimeline, writeScenarioTimeline } = require("../../lib/interviewSessionStore.js");
+const {
+  PROMPT_POLICY_VERSION,
+  buildAnswerProvenance,
+  fingerprintPromptPolicy
+} = require("../../lib/answerProvenance.js");
 const { timelinePromptForTurn, nextScenarioTimeline, extractTimeline, unspecifiedTimelinePolicy, isContextOnlyTimeline } = require("../../lib/scenarioTimeline.js");
 const { decideInterviewTurn } = require("../../lib/turnDecision.js");
 const { selectVerifiedWorkflow } = require("../../lib/verifiedWorkflow.js");
 const { historyForCurrentTurn } = require("../../lib/currentTurnHistory.js");
 const { priorAnchor } = require("../../lib/questionAdmission.js");
 const { resolveInterviewContext, sanitizeDebugContext, toHistoryContext, QUESTION_INTENTS, explicitProductTopic, resolveProductScope, evaluateLayer7Clarity, clarificationRequired } = require("../../lib/interviewContext.js");
-const { productKnowledgeFolders, selectProductScopedChunks } = require("../../lib/productKnowledgeScope.js");
+const {
+  productKnowledgeFolders,
+  selectProductScopedChunks,
+  augmentStemMatchedChunks
+} = require("../../lib/productKnowledgeScope.js");
+const {
+  COVERAGE,
+  assessKnowledgeCoverage,
+  buildCoverageDirective,
+  buildComparisonAnswerBlueprint,
+  buildTransitionPathComparisonFallback,
+  evaluateAnswerConceptCoverage,
+  evaluateUnsupportedTechnicalDetail
+} = require("../../lib/knowledgeCoverage.js");
 const {
   isBehavioralStarIntent,
   buildStarFrameworkBlock,
@@ -65,7 +112,22 @@ const {
   starMayNameEmployer
 } = require("../../lib/intentRouter.js");
 const { formatSessionPreparation, normalizeSessionPreparation } = require("../../lib/sessionPreparation.js");
-import { authoritativeProcedure, fitSpokenLength, questionProcedureIntent, renderSpokenProcedure, shapeSpokenContract } from "../../lib/procedureRetention.js";
+import {
+  asksMsmpScopedBrf,
+  authoritativeProcedure,
+  expandPoolWithHeadingSiblings,
+  fitSpokenLength,
+  isThinProcedureChunk,
+  isWorkflowBackboneAsk,
+  knowledgeFromProcedurePool,
+  mergeSameHeadingChunks,
+  prioritizeProcedureChunks,
+  questionProcedureIntent,
+  renderSpokenProcedure,
+  shapeSpokenContract,
+  shouldPreferRetrievedProcedure
+} from "../../lib/procedureRetention.js";
+import { serveV2Chat, isV2EngineEnabled } from "../../lib/v2Core/serveV2Chat.js";
 
 const MAX_HISTORY_ITEMS = 6;
 /** Overall request budget (retrieval + generation). Per-LLM attempt is capped at LLM_REQUEST_TIMEOUT_MS (4s). */
@@ -199,16 +261,18 @@ const CATEGORY_RULES = Object.freeze([
   // not just under-triggered.
   { category: "RISE", keywords: ["rise"], weight: 4 },
   { category: "ARM", keywords: ["arm", "access request management"], weight: 4 },
-  { category: "ARA", keywords: ["ara", "access risk analysis"], weight: 4 },
-  { category: "EAM", keywords: ["eam", "emergency access management", "firefighter"], weight: 4 },
+  // SoD / risk-violation / business-risk-report signals belong to ARA — not bare "Security".
+  { category: "ARA", keywords: ["ara", "access risk analysis", "sod", "segregation of duties", "risk violation", "risk violations", "excessive sod", "excessive violations", "business reports", "grac_batch_risk_analysis", "ruleset simulation", "toxic combination"], weight: 4 },
+  { category: "EAM", keywords: ["eam", "emergency access management", "firefighter", "fflog", "gracfflog"], weight: 4 },
   { category: "BRM", keywords: ["brm", "business role management"], weight: 4 },
+  { category: "MSMP", keywords: ["msmp", "grfnmw_configure", "stuck workflow", "no approver", "msmp workflow"], weight: 4 },
   { category: "SAP IDM", keywords: ["sap idm", "identity management"], weight: 4 },
   // "tile" and "target mapping" are launchpad vocabulary with no other product meaning here --
   // without them "add a tile" classified as General and never reached the Fiori structure.
   { category: "Fiori", keywords: ["fiori", "launchpad", "ui5", "tile", "target mapping"], weight: 3 },
   { category: "S/4", keywords: ["s/4", "s4", "s/4hana", "s4hana"], weight: 3 },
   { category: "ECC", keywords: ["ecc", "erp"], weight: 3 },
-  { category: "BW", keywords: ["bw", "bw/4hana"], weight: 3 },
+  { category: "BW", keywords: ["bw", "bw/4hana", "analysis authorization", "rsecadmin"], weight: 3 },
   // No category existed for Datasphere/SAC before this -- every question fell through to
   // General, which has no space/privilege authorization model and would default to whatever
   // generic or BW-flavored language the model reached for.
@@ -236,7 +300,9 @@ const CATEGORY_RULES = Object.freeze([
   { category: "Cloud", keywords: ["cloud", "saas", "paas", "iaas"], weight: 2 },
   { category: "Role Design", keywords: ["role design", "pfcg", "single role", "composite role", "derived role", "role catalog", "role mining", "role rationalization", "rationalize roles", "overlapping sap roles", "duplicate roles", "unused roles", "thousands of sap roles", "thousands of roles", "user-role extract", "user role extract", "assignment extract", "agr_users"], weight: 4 },
   { category: "Authorization", keywords: ["authorization", "auth object", "auth field", "authorization object"], weight: 3 },
-  { category: "Security", keywords: ["security", "audit", "compliance", "encryption", "sod", "siem", "threat detection", "enterprise threat detection", "security operations center", "soc"], weight: 2 },
+  // "sod" intentionally removed — SoD risk analysis is ARA (above), not generic Security.
+  { category: "Security", keywords: ["security", "audit", "compliance", "encryption", "siem", "threat detection", "enterprise threat detection", "security operations center", "soc"], weight: 2 },
+  { category: "Methodology", keywords: ["health check", "methodology", "assessment approach", "assessment methodology", "how would you assess", "how do you assess"], weight: 3 },
   { category: "Performance", keywords: ["performance", "optimization", "st03n", "trace", "slow", "bottleneck"], weight: 3 },
   { category: "Migration", keywords: ["migration", "migrate", "conversion", "brownfield", "greenfield"], weight: 3 },
   { category: "Upgrade", keywords: ["upgrade", "patch", "support package", "spau"], weight: 3 },
@@ -708,6 +774,36 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
   // an Ariba or SAC failure). Retrieve a wider candidate set, then enforce the
   // explicit product lane before selecting the normal answer budget.
   const sourceFolders = productKnowledgeFolders(retrievalQuery);
+  // Empty folder list must NOT open the entire corpus — that is how S/4 / bank chunks
+  // contaminated Critical Actions and other definition asks. Prefer general-knowledge
+  // generation with an explicit low-relevance directive instead.
+  if (!sourceFolders.length) {
+    const domain = analysis?.domain || analysis?.category || primaryCategory || "General";
+    const comparisonBlueprint = buildComparisonAnswerBlueprint(retrievalQuery);
+    return {
+      text: "",
+      procedureText: "",
+      procedurePool: [],
+      evidence: [],
+      lowRelevanceFallback: true,
+      knowledgeCoverage: {
+        status: COVERAGE.NO_RELEVANT_KNOWLEDGE,
+        reason: "empty-product-folder-no-unscoped-search",
+        useRetrievedAsGrounding: false,
+        relevantChunks: [],
+        discardedChunks: []
+      },
+      lowRelevanceDirective: [
+        buildCoverageDirective(
+          { status: COVERAGE.NO_RELEVANT_KNOWLEDGE, reason: "empty-product-folder-no-unscoped-search" },
+          { domain, question: retrievalQuery }
+        ),
+        comparisonBlueprint,
+        buildLowRelevanceArchitectFramework({ domain, question: retrievalQuery })
+      ].filter(Boolean).join("\n\n"),
+      topScore: 0
+    };
+  }
   // Technical topics (Fiori SSO, BTP, GRC, IAG, …): keep retrieval shallow so generation starts fast.
   const technicalFastPath = isTechnicalTopicFastPath(retrievalQuery);
   const searchK = technicalFastPath ? Math.max(topK, 8) : Math.max(topK, 12);
@@ -715,35 +811,89 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
     retrievalQuery,
     analysis,
     searchK,
-    sourceFolders.length ? { metadataFilters: { sourceFolders } } : {}
+    { metadataFilters: { sourceFolders } }
   )) || [];
-  const productScoped = selectProductScopedChunks(retrievalQuery, candidates);
+  // Provenance enrichment: when the question names a product whose technical
+  // source file is indexed (brm.md, pfcg.md, …), ensure those chunks enter
+  // scoping even if vector search ranked coaching/bank neighbours higher.
+  const augmentedCandidates = augmentStemMatchedChunks(retrievalQuery, candidates, sourceFolders);
+  const productScoped = selectProductScopedChunks(retrievalQuery, augmentedCandidates);
   const topScore = Math.max(
     Number(productScoped?.[0]?.score ?? 0),
     Number(productScoped?.[0]?.semanticScore ?? 0),
     Number(productScoped?.[0]?.confidenceScore ?? 0)
   );
-  // Weak top hit: do NOT inject debug/fallback prose into knowledgeContext (it leaked to the UI).
-  // Return empty retrieval + a flag so the prompt layer can ask the LLM for fluent spoken prose.
-  // On known technical topics, still pass the best product-scoped chunks when present so the
-  // model is not forced through an empty-retrieval multi-hop path.
-  if (!productScoped.length || topScore < LIVE_RELEVANCE_THRESHOLD) {
-    if (technicalFastPath && productScoped.length) {
+
+  // Phase 2.1: assess coverage before trusting chunks as grounding.
+  let coverage = assessKnowledgeCoverage({
+    question: retrievalQuery,
+    chunks: productScoped,
+    analysis
+  });
+  let scopedForAnswer = coverage.useRetrievedAsGrounding
+    ? (coverage.relevantChunks.length ? coverage.relevantChunks : productScoped)
+    : [];
+
+  // IRRELEVANT_RETRIEVAL: discard hijacking context; allow intelligent LLM fallback.
+  if (coverage.status === COVERAGE.IRRELEVANT_RETRIEVAL) {
+    const domain = analysis?.domain || analysis?.category || primaryCategory || "General";
+    const comparisonBlueprint = buildComparisonAnswerBlueprint(retrievalQuery);
+    return {
+      text: "",
+      procedureText: "",
+      procedurePool: [],
+      evidence: [],
+      lowRelevanceFallback: true,
+      knowledgeCoverage: coverage,
+      lowRelevanceDirective: [
+        buildCoverageDirective(coverage, { domain, question: retrievalQuery }),
+        comparisonBlueprint,
+        buildLowRelevanceArchitectFramework({ domain, question: retrievalQuery })
+      ].filter(Boolean).join("\n\n"),
+      topScore
+    };
+  }
+
+  // Weak top hit OR no relevant knowledge: LLM fallback with coverage-aware directive.
+  // Do NOT inject debug/fallback prose into knowledgeContext (it leaked to the UI).
+  if (
+    coverage.status === COVERAGE.NO_RELEVANT_KNOWLEDGE
+    || !productScoped.length
+    || (topScore < LIVE_RELEVANCE_THRESHOLD && !coverage.useRetrievedAsGrounding)
+  ) {
+    if (technicalFastPath && productScoped.length && coverage.status !== COVERAGE.NO_RELEVANT_KNOWLEDGE) {
       // Continue with shallow product context below.
+      scopedForAnswer = productScoped;
+      coverage = assessKnowledgeCoverage({ question: retrievalQuery, chunks: scopedForAnswer, analysis });
     } else {
       const domain = analysis?.domain || analysis?.category || primaryCategory || "General";
+      const comparisonBlueprint = buildComparisonAnswerBlueprint(retrievalQuery);
       return {
         text: "",
         procedureText: "",
         procedurePool: [],
         evidence: [],
         lowRelevanceFallback: true,
-        lowRelevanceDirective: buildLowRelevanceArchitectFramework({ domain, question: retrievalQuery }),
+        knowledgeCoverage: coverage,
+        lowRelevanceDirective: [
+          buildCoverageDirective(coverage, { domain, question: retrievalQuery }),
+          comparisonBlueprint,
+          buildLowRelevanceArchitectFramework({ domain, question: retrievalQuery })
+        ].filter(Boolean).join("\n\n"),
         topScore
       };
     }
   }
-  const rankedChunks = productScoped.slice(0, technicalFastPath ? Math.min(topK, 4) : topK);
+
+  // Prefer coverage-filtered relevant chunks over raw productScoped when available.
+  const effectiveScoped = scopedForAnswer.length ? scopedForAnswer : productScoped;
+  // Configure / how-to asks: rank procedure sections ahead of Overview / interview summaries
+  // before the topK slice — otherwise stepCount stays 0 and free LLM emits textbook junk.
+  const configureAsk = Boolean(questionProcedureIntent(retrievalQuery, answerScope));
+  const orderedScoped = configureAsk
+    ? prioritizeProcedureChunks(retrievalQuery, effectiveScoped)
+    : effectiveScoped;
+  const rankedChunks = orderedScoped.slice(0, technicalFastPath ? Math.min(topK, 4) : topK);
   const diagnosticSections = new Set(["STAGE_INVESTIGATION"]);
   // Keep symptom-specific sections even when their headings use "troubleshooting"
   // or "triage" rather than the bare stems. The old word-boundary regex silently
@@ -760,6 +910,10 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
   const chunks = diagnosticSections.has(answerScope) && scopedDiagnosticChunks.length ? scopedDiagnosticChunks : rankedChunks;
   if (!chunks || chunks.length === 0) return { text: "", evidence: [], procedurePool: productScoped.slice(0, 12) };
 
+  // Fix 1: keep same-heading siblings in the procedure pool even when topK selected a
+  // citation-only chunk (live BRF Configure heading → footer sibling).
+  const procedurePool = expandPoolWithHeadingSiblings(chunks, productScoped);
+
   const maxChars = APP_CONFIG?.maxContextCharacters || 3000;
   const seenChunks = new Set();
   const sourceBlocks = [];
@@ -770,7 +924,16 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
     const body = String(chunk.content).trim();
     const source = String(chunk.sourceFile || chunk.documentId || "knowledge").slice(0, 120);
     const heading = stripBankQuestionLabels(String(chunk.heading || chunk.section || "")).slice(0, 160);
-    const cleanBody = stripBankQuestionLabels(body);
+    // Skip coaching link dumps and title-only stubs — they are not answer evidence.
+    if (/^related topics$/i.test(heading.trim())) continue;
+    if (body.length < 60 || /^#+\s+\S[\s\S]{0,60}$/.test(body)) continue;
+    // When the selected body is thin, assemble same-heading siblings for the prompt block.
+    const assembled = isThinProcedureChunk(body)
+      ? mergeSameHeadingChunks(chunk, procedurePool)
+      : null;
+    const cleanBody = stripBankQuestionLabels(
+      assembled && !assembled.gap && assembled.text ? assembled.text : body
+    );
     const identity = String(chunk.id || chunk.chunkId || `${source}:${heading}:${cleanBody.slice(0, 100)}`);
     if (!cleanBody || seenChunks.has(identity)) continue;
     seenChunks.add(identity);
@@ -796,28 +959,60 @@ async function fetchKnowledgeContext(question, primaryCategory, secondaryCategor
     currentLength += block.length + 2;
   }
 
+  const procedureText = chunks
+    .filter((chunk) => chunk?.content)
+    .map((chunk) => {
+      const h = stripBankQuestionLabels(String(chunk.heading || chunk.section || "").trim());
+      const raw = String(chunk.content).trim();
+      const assembled = isThinProcedureChunk(raw)
+        ? mergeSameHeadingChunks(chunk, procedurePool)
+        : null;
+      const c = stripBankQuestionLabels(
+        assembled && !assembled.gap && assembled.text ? assembled.text : raw
+      );
+      return `## ${h}\n${c}`;
+    })
+    .join("\n\n");
+
+  const domain = analysis?.domain || analysis?.category || primaryCategory || "General";
+  const needsCoverageDirective = [
+    COVERAGE.RELEVANT_PARTIAL,
+    COVERAGE.CONFLICTING_KNOWLEDGE
+  ].includes(coverage.status);
+  const comparisonBlueprint = buildComparisonAnswerBlueprint(retrievalQuery);
+
   return {
     text: sourceBlocks.join("\n\n"),
-    procedureText: chunks
-      .filter((chunk) => chunk?.content)
-      .map((chunk) => {
-        const h = stripBankQuestionLabels(String(chunk.heading || chunk.section || "").trim());
-        const c = stripBankQuestionLabels(String(chunk.content).trim());
-        return `## ${h}\n${c}`;
-      })
-      .join("\n\n"),
-    procedurePool: productScoped.slice(0, 12),
+    procedureText,
+    procedurePool,
+    knowledgeCoverage: coverage,
+    // Partial/conflicting: keep grounding text but instruct hybrid / qualified generation.
+    lowRelevanceFallback: needsCoverageDirective,
+    lowRelevanceDirective: needsCoverageDirective
+      ? [
+        buildCoverageDirective(coverage, { domain, question: retrievalQuery }),
+        comparisonBlueprint
+      ].filter(Boolean).join("\n\n")
+      : (comparisonBlueprint || ""),
     evidence: [...new Map(chunks.map((chunk) => [
       stripBankQuestionLabels(String(chunk.heading || chunk.section || chunk.sourceFile || chunk.documentId || "knowledge")).slice(0, 160),
       chunk
     ])).values()].slice(0, 6).map((chunk) => ({
       id: String(chunk.id || chunk.chunkId || chunk.documentId || "").slice(0, 100),
-      label: stripBankQuestionLabels(String(chunk.heading || chunk.section || chunk.sourceFile || chunk.documentId || "knowledge")).slice(0, 160)
+      label: stripBankQuestionLabels(String(chunk.heading || chunk.section || chunk.sourceFile || chunk.documentId || "knowledge")).slice(0, 160),
+      sourceFile: String(chunk.sourceFile || chunk.fileName || chunk.documentId || "").slice(0, 160),
+      // Fix 3 provenance — observational metadata only (no ranking change).
+      heading: stripBankQuestionLabels(String(chunk.heading || chunk.section || "")).slice(0, 160),
+      chunkIndex: Number.isFinite(Number(chunk.chunkIndex)) ? Number(chunk.chunkIndex) : null,
+      reviewStatus: chunk.reviewStatus || chunk.approvalStatus || null
     }))
   };
 }
 
 function alignedProcedureText(question, chunks = []) {
+  // Prefer configure-ranked pool text; fall back to multi-term heading overlap.
+  const fromPool = knowledgeFromProcedurePool(question, chunks, 8);
+  if (fromPool.trim()) return fromPool;
   const stop = new Set(["about", "after", "would", "could", "should", "there", "their", "which", "where", "while", "through"]);
   const terms = [...new Set((String(question || "").toLowerCase().match(/[a-z0-9]{5,}/g) || []).filter((term) => !stop.has(term)))];
   const aligned = (Array.isArray(chunks) ? chunks : []).filter((chunk) => {
@@ -828,6 +1023,16 @@ function alignedProcedureText(question, chunks = []) {
     .filter((chunk) => chunk?.content)
     .map((chunk) => `## ${String(chunk.heading || chunk.section || "").trim()}\n${String(chunk.content).trim()}`)
     .join("\n\n");
+}
+
+function sourceFilesFromEvidence(evidence = [], verifiedFiles = []) {
+  const fromEvidence = (Array.isArray(evidence) ? evidence : [])
+    .map((item) => String(item?.sourceFile || item?.label || item?.id || "").trim())
+    .filter(Boolean);
+  const fromVerified = (Array.isArray(verifiedFiles) ? verifiedFiles : [])
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+  return [...new Set([...fromVerified, ...fromEvidence])].slice(0, 12);
 }
 
 function prepareConversationHistory(history = []) {
@@ -855,6 +1060,7 @@ function prepareConversationHistory(history = []) {
 }
 
 async function streamGeminiResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens, onUsage, onChunk }) {
+  assertLiveTransportAllowed(resolveProviderMode(process.env, APP_CONFIG), "gemini-sdk");
   const client = new GoogleGenerativeAI(apiKey);
   const generativeModel = client.getGenerativeModel({
     model,
@@ -924,7 +1130,10 @@ function streamLocalKnowledgeFallback(res, question, {
   evidence = [],
   behavioralStarMode = false,
   writeChunk = writeSSEChunk,
-  writeEvent = writeSSEEvent
+  writeEvent = writeSSEEvent,
+  // When true (generation buffer path), never emit tokens here — caller finalizes first.
+  emit = true,
+  interviewContext = {}
 } = {}) {
   // Credential / years asks must never dump a random KB chunk (PMP/ITIL was matching PAM).
   // STAR turns must never dump a random KB chunk (that was flashing wrong Decision bullets).
@@ -948,10 +1157,25 @@ function streamLocalKnowledgeFallback(res, question, {
       prefetchedText: knowledgeContext,
       evidence
     });
-  const answer = finalizeSpokenAnswer(fallback.answer, {
+  let answer = finalizeSpokenAnswer(fallback.answer, {
     behavioralStarMode,
     question
   });
+  // Do not run integrity recovery on empty local knowledge — callers (especially
+  // PROVIDER_DISABLED) must see emptiness and emit the operational disabled message
+  // instead of a recovered hardcoded principle line.
+  if (String(answer || "").trim().length >= 40) {
+    try {
+      const finalized = finalizeSpokenAnswerForDisplay({
+        question,
+        answer,
+        interviewContext
+      });
+      answer = finalized.answer;
+    } catch {
+      // keep sanitized answer
+    }
+  }
   try {
     writeEvent?.(res, "admission", {
       decision: "ANSWER",
@@ -969,11 +1193,14 @@ function streamLocalKnowledgeFallback(res, question, {
   } catch {
     // admission is informational; answer delivery is mandatory
   }
-  writeChunk?.(res, answer);
+  if (emit !== false && res?.writable !== false) {
+    writeChunk?.(res, answer);
+  }
   return { ...fallback, answer };
 }
 
 async function streamOpenAIResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens, onUsage, onChunk }) {
+  assertLiveTransportAllowed(resolveProviderMode(process.env, APP_CONFIG), "openai-sdk");
   // The route owns the single safe retry; disable nested SDK retries within the 25s budget.
   const client = new OpenAI({ apiKey, maxRetries: 0 });
   const args = { model, systemPrompt, recentHistory, question, maxTokens, signal };
@@ -1011,6 +1238,7 @@ async function streamOpenAIResponse({ apiKey, model, systemPrompt, recentHistory
 }
 
 async function streamOpenRouterResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens, onUsage, onChunk }) {
+  assertLiveTransportAllowed(resolveProviderMode(process.env, APP_CONFIG), "openrouter-sdk");
   // OpenRouter is API-compatible with OpenAI but uses openrouter.ai as base URL
   const client = new OpenAI({
     apiKey,
@@ -1053,6 +1281,7 @@ async function streamOpenRouterResponse({ apiKey, model, systemPrompt, recentHis
 }
 
 async function streamClaudeResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens, onUsage, onChunk }) {
+  assertLiveTransportAllowed(resolveProviderMode(process.env, APP_CONFIG), "anthropic-sdk");
   // Use Anthropic's Claude API
   const client = new Anthropic({
     apiKey: apiKey || process.env.ANTHROPIC_API_KEY,
@@ -1095,6 +1324,7 @@ async function streamClaudeResponse({ apiKey, model, systemPrompt, recentHistory
 }
 
 async function streamGroqResponse({ apiKey, model, systemPrompt, recentHistory, question, res, signal, maxTokens, onUsage, onChunk }) {
+  assertLiveTransportAllowed(resolveProviderMode(process.env, APP_CONFIG), "groq-sdk");
   // Groq is OpenAI-compatible but uses groq.com as base URL
   const client = new OpenAI({
     apiKey,
@@ -1148,6 +1378,7 @@ function setSSEHeaders(res) {
   }
 }
 
+
 export default async function handler(req, res) {
   // Log startup diagnostics once per process
   logStartupDiagnostics();
@@ -1186,7 +1417,7 @@ export default async function handler(req, res) {
   // Falls back to the configured default (OPENAI_MODEL) when the client doesn't
   // specify one — lets provider/model be set purely through env vars for deployments
   // not driven by the Settings dialog, without any code change.
-  const model = requestedModel || APP_CONFIG?.llm?.defaultModel;
+  const model = requestedModel || APP_CONFIG?.llm?.defaultModel || "gpt-4o";
   const responseLength = ["concise", "medium", "lengthy"].includes(String(requestedResponseLength || "").trim().toLowerCase())
     ? String(requestedResponseLength).trim().toLowerCase()
     : "medium";
@@ -1197,6 +1428,26 @@ export default async function handler(req, res) {
     });
   }
 
+  // V2 Principal Architect engine (default ON): in-memory KB + gold boost + streaming gpt-4o.
+  // System Audio auto-submit and typed Ask both hit this same /api/chat route.
+  // Set USE_V2_ENGINE=0 to fall back to the legacy V1 pipeline.
+  if (isV2EngineEnabled()) {
+    const envApiKey = APP_CONFIG?.llm?.apiKeys?.openai || process.env.OPENAI_API_KEY || "";
+    const handled = await serveV2Chat(req, res, {
+      question,
+      apiKey: clientApiKey || envApiKey,
+      model,
+      logger
+    });
+    if (handled) return;
+  }
+
+  // Resolve provider mode before any answer short-circuit so mock/live always share one
+  // knowledge-grounded generation path (banks / verified / procedure are evidence, not substitutes).
+  const providerMode = resolveProviderMode(process.env, APP_CONFIG);
+  resetProviderStats(providerMode);
+  const llmMustGenerate = providerMode === "mock" || providerMode === "live";
+
   let turn = { decision: "ANSWER", route: "GENERATION", reason: "admission-failed-open", scriptAnswer: "" };
   try {
     turn = decideInterviewTurn({ question, history });
@@ -1205,6 +1456,23 @@ export default async function handler(req, res) {
   }
   if (turn.normalizedQuestion) {
     question = String(turn.normalizedQuestion);
+  }
+  // V2.3: Q&A bank / prepared-script hits are not production answer substitutes when a
+  // provider can generate. Files remain for regression / explicit rehearsal workflows.
+  if (
+    llmMustGenerate
+    && turn.decision === "ANSWER"
+    && (turn.route === "ANSWER_BANK" || turn.route === "PREPARED_SCRIPT")
+  ) {
+    turn = {
+      ...turn,
+      route: "GENERATION",
+      reason: "knowledge-grounded-llm",
+      scriptId: null,
+      scriptAnswer: "",
+      confidence: 0,
+      via: undefined
+    };
   }
   const persistIncomingTimeline = (text, answer = "") => {
     try {
@@ -1259,6 +1527,7 @@ export default async function handler(req, res) {
         if (!setSSEHeaders(res)) {
           return res.status(500).json({ error: "Failed to initialize streaming response." });
         }
+        layer7Early.clarificationPrompt = sanitizeSpokenAnswer(layer7Early.clarificationPrompt);
         writeSSEEvent(res, "admission", {
           decision: "ANSWER",
           route: "CLARIFY",
@@ -1318,7 +1587,11 @@ export default async function handler(req, res) {
         }
       }
       if (turn.route === "PREPARED_SCRIPT" && turn.scriptAnswer) {
-        turn.scriptAnswer = shapeSpokenContract(turn.scriptAnswer);
+        const preparedFinal = finalizeSpokenAnswerForDisplay({
+          question,
+          answer: shapeSpokenContract(turn.scriptAnswer)
+        });
+        turn.scriptAnswer = preparedFinal.answer;
         writeSSEChunk(res, turn.scriptAnswer);
         try {
           if (interviewSessionId) {
@@ -1335,7 +1608,9 @@ export default async function handler(req, res) {
                 scriptId: turn.scriptId || "",
                 disposition: "ANSWER",
                 evidenceMode: turn.evidenceMode || "",
-                latencyMs: 0
+                latencyMs: 0,
+                integrityRecovered: Boolean(preparedFinal.recovered),
+                answerKind: preparedFinal.answerKind || "prepared_script"
               }
             );
           }
@@ -1343,8 +1618,13 @@ export default async function handler(req, res) {
           logger?.error?.("Prepared script session write failed:", recordError);
         }
       }
-      // Answer-bank text is authored and must stream verbatim (no spoken-contract reshape).
+      // Answer-bank text is authored but still must pass integrity (no heading/metric leakage).
       if (turn.route === "ANSWER_BANK" && turn.scriptAnswer) {
+        const bankFinal = finalizeSpokenAnswerForDisplay({
+          question,
+          answer: turn.scriptAnswer
+        });
+        turn.scriptAnswer = bankFinal.answer;
         writeSSEChunk(res, turn.scriptAnswer);
         try {
           if (interviewSessionId) {
@@ -1361,7 +1641,9 @@ export default async function handler(req, res) {
                 scriptId: turn.scriptId || "",
                 disposition: "ANSWER",
                 evidenceMode: turn.evidenceMode || "",
-                latencyMs: 0
+                latencyMs: 0,
+                integrityRecovered: Boolean(bankFinal.recovered),
+                answerKind: bankFinal.answerKind || "answer_bank"
               }
             );
           }
@@ -1387,6 +1669,11 @@ export default async function handler(req, res) {
       if (!setSSEHeaders(res)) {
         return res.status(500).json({ error: "Failed to initialize streaming response." });
       }
+      const timelineFinal = finalizeSpokenAnswerForDisplay({
+        question,
+        answer: timelinePolicy
+      });
+      const timelineSpoken = timelineFinal.answer;
       writeSSEEvent(res, "admission", {
         decision: "ANSWER",
         route: "RETRIEVED_PROCEDURE",
@@ -1395,8 +1682,8 @@ export default async function handler(req, res) {
         confidence: 1,
         evidenceMode: null
       });
-      writeSSEChunk(res, timelinePolicy);
-      persistIncomingTimeline(question, timelinePolicy);
+      writeSSEChunk(res, timelineSpoken);
+      persistIncomingTimeline(question, timelineSpoken);
       try {
         if (interviewSessionId) {
           appendQa(
@@ -1404,7 +1691,7 @@ export default async function handler(req, res) {
             { model, company: String(company || "").slice(0, 80), source: "live-interview" },
             {
               question,
-              answerShown: timelinePolicy,
+              answerShown: timelineSpoken,
               status: "completed",
               model,
               source: "timeline-policy",
@@ -1467,9 +1754,11 @@ export default async function handler(req, res) {
     return;
   }
 
+  // Verified workflows: when mock/live, keep as later prompt evidence — do not skip LLM generation.
+  // When disabled (no provider), still serve verified local knowledge as an authoritative route.
   try {
     const verified = selectVerifiedWorkflow(question);
-    if (verified?.answer) {
+    if (verified?.answer && !llmMustGenerate) {
       let spoken = finalizeSpokenAnswer(
         fitSpokenLength(shapeSpokenContract(verified.answer), responseLength, question),
         { behavioralStarMode: false, question }
@@ -1487,6 +1776,11 @@ export default async function handler(req, res) {
           spoken = `I would not claim that as a completed implementation.\n\n${verified.answer}`;
         }
       }
+      const verifiedFinal = finalizeSpokenAnswerForDisplay({
+        question,
+        answer: spoken
+      });
+      spoken = verifiedFinal.answer;
       if (!setSSEHeaders(res)) {
         return res.status(500).json({ error: "Failed to initialize streaming response." });
       }
@@ -1495,6 +1789,7 @@ export default async function handler(req, res) {
         route: "VERIFIED_WORKFLOW",
         reason: "verified-procedure",
         scriptId: verified.id,
+        sourceFiles: verified.sourceFiles || [],
         confidence: 1,
         evidenceMode: null
       });
@@ -1512,6 +1807,7 @@ export default async function handler(req, res) {
               source: "verified-workflow",
               route: "VERIFIED_WORKFLOW",
               scriptId: verified.id || "",
+              sourceFiles: verified.sourceFiles || [],
               disposition: "ANSWER",
               latencyMs: 0
             }
@@ -1541,6 +1837,7 @@ export default async function handler(req, res) {
   logger?.info?.({
     event: 'interview.request',
     executionMode: validationMode,
+    providerMode,
     model,
     isProduction,
     isRetrievalOnly,
@@ -1580,13 +1877,20 @@ export default async function handler(req, res) {
     // environment can't silently hijack requests meant for OpenAI.
     envApiKey = APP_CONFIG?.llm?.apiKeys?.openai || APP_CONFIG?.llm?.apiKeys?.openrouter;
   }
-  const apiKey = clientApiKey || envApiKey || "";
-  const forceLocalFallback = process.env.LIVE_RELIABILITY_FORCE_FALLBACK === "1"
+  let apiKey = clientApiKey || envApiKey || "";
+  // Body forceLocalFallback is only honored in live mode. Mock/disabled never escalate to live SDKs.
+  const forceLocalFallback = providerMode === "live" && (
+    process.env.LIVE_RELIABILITY_FORCE_FALLBACK === "1"
     || String(req.body?.forceLocalFallback || "") === "1"
-    || String(req.body?.forceLocalFallback || "").toLowerCase() === "true";
+    || String(req.body?.forceLocalFallback || "").toLowerCase() === "true"
+  );
+  // In mock/disabled mode, strip keys so live transport is never selected from client BYOK.
+  if (providerMode === "mock" || providerMode === "disabled") {
+    apiKey = "";
+  }
 
   // Missing keys must not crash the live UI — continue and serve local KB fallback at generation time.
-  if (isProduction && !apiKey && !forceLocalFallback) {
+  if (isProduction && !apiKey && !forceLocalFallback && providerMode === "live") {
     let provider = "openai";
     if (isClaudeModel(model)) provider = "anthropic";
     else if (isGeminiModel(model)) provider = "gemini";
@@ -1610,12 +1914,61 @@ export default async function handler(req, res) {
   let recordedAnswer = "";
   let tokenUsage = null;
   const qaStartedMs = Date.now();
+  const traceId = createTraceId();
+  const stageTimer = createStageTimer(traceId);
+  const stageTiming = { startedAt: qaStartedMs, firstTokenMs: null, streamEndMs: null, stages: {}, traceId, budgets: BUDGETS_MS };
   let qaRecorded = false;
   let interviewContext = null;
+  const markStage = (name) => {
+    try {
+      const ms = stageTimer.mark(name);
+      stageTiming.stages[name] = ms;
+    } catch {
+      // Timing is diagnostic only.
+    }
+  };
+  let lastPromptFingerprint = null;
   const recordLiveQa = (fields) => {
     if (qaRecorded) return;
     try {
       if (!interviewSessionId) return;
+      // Incomplete / early-terminated streams must never become valid conversation context.
+      const status = String(fields?.status || "");
+      const safeFields = { ...fields };
+      if (status === "partial" || status === "empty" || status === "aborted") {
+        safeFields.excludeFromContext = true;
+        safeFields.answerShown = "";
+        safeFields.contextAnswer = "";
+      }
+      // Fix 3 — attach diagnosable provenance without storing full prompts or KB bodies.
+      if (!safeFields.provenance) {
+        try {
+          const preferMeta = safeFields.procedurePrefer || null;
+          safeFields.provenance = buildAnswerProvenance({
+            questionId: req.body?.questionId || null,
+            route: safeFields.route || "",
+            status: safeFields.status || "completed",
+            model: safeFields.model || model || "",
+            scriptId: safeFields.scriptId || preferMeta?.scriptId || null,
+            promptPolicyVersion: PROMPT_POLICY_VERSION,
+            promptFingerprint: lastPromptFingerprint
+              || fingerprintPromptPolicy(safeFields.promptFingerprintBasis || PROMPT_POLICY_VERSION),
+            evidence: safeFields.retrieval || [],
+            procedurePrefer: preferMeta,
+            answerKind: safeFields.answerKind || safeFields.usage?.answerKind || "",
+            recovered: Boolean(safeFields.recovered || safeFields.usage?.recovered),
+            finishReason: safeFields.finishReason || safeFields.usage?.finish_reason || null,
+            contentQualityFlags: Array.isArray(safeFields.usage?.contentQualityFlags)
+              ? safeFields.usage.contentQualityFlags
+              : [],
+            answerFinalEmitted: safeFields.answerFinalEmitted,
+            validationPassed: status === "completed"
+          });
+        } catch {
+          safeFields.provenance = null;
+        }
+      }
+      delete safeFields.promptFingerprintBasis;
       const result = appendQa(
         interviewSessionId,
         {
@@ -1624,7 +1977,16 @@ export default async function handler(req, res) {
           model,
           source: "live-interview"
         },
-        fields
+        {
+          ...safeFields,
+          finishReason: fields?.usage?.finish_reason || fields?.finishReason || null,
+          stageTiming: {
+            firstTokenMs: stageTiming.firstTokenMs,
+            streamEndMs: stageTiming.streamEndMs,
+            stages: { ...stageTiming.stages },
+            totalMs: Date.now() - qaStartedMs
+          }
+        }
       );
       if (result.ok) qaRecorded = true;
     } catch {
@@ -1770,9 +2132,14 @@ export default async function handler(req, res) {
     }
     abortIfTimedOut();
     const knowledgeContext = knowledgeResult.text;
-    const lowRelevanceFallback = knowledgeResult.lowRelevanceFallback === true;
+    const lowRelevanceFallback = knowledgeResult.lowRelevanceFallback === true
+      || knowledgeResult.knowledgeCoverage?.status === COVERAGE.NO_RELEVANT_KNOWLEDGE
+      || knowledgeResult.knowledgeCoverage?.status === COVERAGE.IRRELEVANT_RETRIEVAL;
     const lowRelevanceDirective = String(knowledgeResult.lowRelevanceDirective || "").trim();
     interviewContext.retrievalEvidence = knowledgeResult.evidence;
+    interviewContext.knowledgeCoverage = knowledgeResult.knowledgeCoverage || null;
+    const safeModeOn = isSafeModeEnabled(req.body);
+    const profileSlug = String(req.body?.profileSlug || process.env.INTERVIEW_PROFILE_SLUG || DEFAULT_PROFILE_SLUG);
 
     // Engineering Memory Platform integration (docs/EXPERIENCE_ACQUISITION_ENGINE_DESIGN.md
     // section 9) -- additive, new prompt section, does not touch CANDIDATE BACKGROUND's
@@ -1814,7 +2181,8 @@ export default async function handler(req, res) {
         })
         : knowledgeContext,
       // Prompt-only; never stream this string to the UI as answer text.
-      lowRelevanceDirective: (!behavioralStarMode && lowRelevanceFallback) ? lowRelevanceDirective : "",
+      // Pass coverage / comparison directives whenever present (partial, absent, or irrelevant).
+      lowRelevanceDirective: (!behavioralStarMode && lowRelevanceDirective) ? lowRelevanceDirective : "",
       engineeringJudgmentContext,
       behavioralStarMode,
       sessionPrep,
@@ -1827,13 +2195,21 @@ export default async function handler(req, res) {
     if (customInstructions?.trim()) promptPayload.customInstructions = customInstructions.trim();
     // Anti-hallucination: always reinforce T-code plane boundaries (SM20≠purge, etc.).
     try {
-      const { TCODE_VERIFICATION_RULE, OUTPUT_SANITIZER_RULE } = require("../../lib/turnDecision.js");
+      const {
+        TCODE_VERIFICATION_RULE,
+        OUTPUT_SANITIZER_RULE,
+        SPOKEN_CANDIDATE_VOICE_RULE
+      } = require("../../lib/turnDecision.js");
       const rule = String(turn?.tcodeVerificationRule || TCODE_VERIFICATION_RULE || "").trim();
       const sanitizerRule = String(turn?.outputSanitizerRule || OUTPUT_SANITIZER_RULE || "").trim();
+      const spokenVoiceRule = String(
+        turn?.spokenCandidateVoiceRule || SPOKEN_CANDIDATE_VOICE_RULE || ""
+      ).trim();
       const artifactRule = String(
         buildMasterArchitectDirective(effectiveQuestion || question) || TECH_ARTIFACT_FIRST_RULE || ""
       ).trim();
-      const combined = [rule, sanitizerRule, artifactRule].filter(Boolean).join("\n\n");
+      // Spoken-candidate voice + meta-talk ban ride with every generation (sanitizer is defense-in-depth).
+      const combined = [rule, spokenVoiceRule, sanitizerRule, artifactRule].filter(Boolean).join("\n\n");
       if (combined) {
         promptPayload.customInstructions = promptPayload.customInstructions
           ? `${promptPayload.customInstructions}\n\n${combined}`
@@ -1929,41 +2305,267 @@ export default async function handler(req, res) {
       }
     };
 
+    // Grounded safe routes only (prepared / verified / procedure / conceptual knowledge).
+    // Thin RAG must CONTINUE into hybrid LLM generation — never serve meta-refusal text.
+    const GROUNDED_SAFE_ROUTES = new Set([
+      "PREPARED_PACK",
+      "VERIFIED_WORKFLOW",
+      "RETRIEVED_PROCEDURE",
+      "CONCEPTUAL_KNOWLEDGE"
+    ]);
+    if (safeModeOn && !behavioralStarMode && !scenarioTurn.promptBlock) {
+      try {
+        markStage("safe_mode_resolve");
+        const seniorityHint = [jobDescription, company, sessionPreparationText, STATED_PROFILE]
+          .filter(Boolean)
+          .join(" ");
+        const safe = resolveSafeModeAnswer({
+          question: effectiveQuestion || question,
+          profileSlug,
+          knowledgeText: knowledgeContext,
+          answerScope: interviewContext.answerScope,
+          seniority: seniorityHint
+        });
+        if (safe.served !== false && GROUNDED_SAFE_ROUTES.has(safe.route)) {
+          let spoken = sanitizeSpokenAnswer(String(safe.answer || "").trim());
+          // Verified workflows are pre-authored baselines — do not strip their T-codes
+          // merely because the live retrieval context is thin.
+          if (safe.route !== "VERIFIED_WORKFLOW") {
+            spoken = stripUngroundedSapEntities(spoken, knowledgeContext || "");
+          }
+          const coherence = postStripCoherenceCheck(safe.answer, spoken);
+          if (!coherence.ok || isMetaRefusalText(spoken) || looksIncompleteSpokenAnswer(spoken)) {
+            // Do not block the turn — fall through to generative completion.
+            markStage("safe_mode_continue_generation");
+          } else {
+            const safeFinal = finalizeSpokenAnswerForDisplay({
+              question: effectiveQuestion || question,
+              answer: spoken,
+              interviewContext
+            });
+            spoken = safeFinal.answer;
+            streamStarted = true;
+            recordedAnswer = spoken;
+            writeSSEEvent(res, "admission", {
+              decision: "ANSWER",
+              route: safe.route,
+              reason: safe.reason,
+              safeMode: true,
+              traceId,
+              profileSlug,
+              confidence: 1,
+              responseLength
+            });
+            writeSSEEvent(res, "generation", {
+              finish_reason: "stop",
+              safeMode: true,
+              traceId,
+              route: safe.route,
+              firstTokenMs: stageTimer.snapshot().firstTokenMs,
+              streamEndMs: Date.now() - qaStartedMs,
+              budgets: BUDGETS_MS
+            });
+            writeSSEAnswer(res, spoken);
+            persistScenarioTimeline(spoken);
+            markStage("safe_mode_served");
+            recordLiveQa({
+              question,
+              questionRaw: question,
+              questionResolved: effectiveQuestion,
+              interviewContext,
+              answerShown: spoken,
+              status: "completed",
+              model: "safe-mode",
+              source: req.body?.source,
+              route: safe.route,
+              disposition: "ANSWER",
+              evidenceMode: "safe-mode",
+              latencyMs: Date.now() - qaStartedMs,
+              finishReason: "stop",
+              usage: { finish_reason: "stop", safeMode: true, traceId, meta: safe.meta || null }
+            });
+            if (res?.writable) {
+              res.write("data: [DONE]\n\n");
+              res.end();
+            }
+            return;
+          }
+        }
+      } catch (safeError) {
+        logger?.error?.("Safe mode resolve failed (continuing):", safeError);
+      }
+    }
+
     let retrievedProcedureAnswer = "";
+    let procedurePreferMeta = null;
     // Low-relevance turns must go through the LLM fluent-prose path — never stream empty/fallback prose.
     // Also refuse first-person canned Fiori stubs that used to leak from the knowledge index.
     const looksLikeHardcodedStub = (text) => /If the server is on premise,\s*I would follow the ABAP Fiori path/i.test(String(text || ""))
       || /LOW-RELEVANCE RETRIEVAL FALLBACK/i.test(String(text || ""))
-      || /INTERNAL RETRIEVAL NOTE/i.test(String(text || ""));
+      || /INTERNAL RETRIEVAL NOTE/i.test(String(text || ""))
+      // Shallow s4hana-fiori "Implementation Activities" checklist spoken as RETRIEVED_PROCEDURE.
+      || /First, maintain OData service authorization for standard and custom Fiori apps/i.test(String(text || ""));
+    const seniorityHint = [jobDescription, company, sessionPreparationText, STATED_PROFILE]
+      .filter(Boolean)
+      .join(" ");
     if (!lowRelevanceFallback
       && !behavioralStarMode
       && !scenarioTurn.promptBlock
       && !promptPayload.expectedSpokenAnswer
       && !/\b(?:have you|did you|your experience|tell me about a time|walk me through a time)\b/i.test(question)) {
       try {
+        markStage("procedure_prefer_start");
         const procedureQuestion = questionProcedureIntent(question, interviewContext.answerScope)
           ? question
           : (effectiveQuestion || question);
-        const steps = authoritativeProcedure(procedureQuestion, knowledgeResult.procedureText || knowledgeContext, interviewContext.answerScope)
-          || [];
-        const alignedSteps = steps.length ? steps : authoritativeProcedure(
-          procedureQuestion,
-          alignedProcedureText(procedureQuestion, knowledgeResult.procedurePool),
-          interviewContext.answerScope
-        );
-        if (alignedSteps.length >= 3) {
+        const primaryKnowledge = knowledgeResult.procedureText || knowledgeContext;
+        const pool = knowledgeResult.procedurePool || [];
+        const seedChunks = (knowledgeResult.evidence || [])
+          .map((row) => pool.find((chunk) => String(chunk.id || chunk.chunkId || "") === String(row.id || ""))
+            || pool.find((chunk) => String(chunk.heading || chunk.section || "") === String(row.label || "")))
+          .filter(Boolean);
+        let preferDecision = shouldPreferRetrievedProcedure({
+          question: procedureQuestion,
+          knowledgeText: primaryKnowledge,
+          answerScope: interviewContext.answerScope,
+          seniority: seniorityHint,
+          procedurePool: pool,
+          seedChunks: seedChunks.length ? seedChunks : pool.slice(0, 3)
+        });
+        if (!preferDecision.prefer) {
+          const aligned = alignedProcedureText(procedureQuestion, pool);
+          if (aligned) {
+            preferDecision = shouldPreferRetrievedProcedure({
+              question: procedureQuestion,
+              knowledgeText: aligned,
+              answerScope: interviewContext.answerScope,
+              seniority: seniorityHint,
+              procedurePool: pool,
+              seedChunks: seedChunks.length ? seedChunks : pool.slice(0, 3)
+            });
+          }
+        }
+        // Keep spoken for in-process D2 recovery only — do not put full prose on SSE admission.
+        procedurePreferMeta = {
+          prefer: Boolean(preferDecision.prefer),
+          reason: preferDecision.reason || null,
+          wrapMode: preferDecision.wrapMode || null,
+          stepCount: preferDecision.stepCount || 0,
+          sourceTag: preferDecision.sourceTag || null,
+          workflowBackboneAsk: Boolean(preferDecision.workflowBackboneAsk),
+          retrievalGap: preferDecision.retrievalGap || preferDecision.enrichment?.gap || null,
+          enrichmentReason: preferDecision.enrichment?.reason || null,
+          // Fix 3 — retain selection/eligibility evidence for provenance (not spoken prose).
+          taskFit: preferDecision.taskFit || preferDecision.enrichment?.taskFit || null,
+          alignment: preferDecision.alignment || null,
+          enrichment: preferDecision.enrichment
+            ? {
+              enriched: Boolean(preferDecision.enrichment.enriched),
+              gap: preferDecision.enrichment.gap || null,
+              sourceFile: preferDecision.enrichment.sourceFile || null,
+              heading: preferDecision.enrichment.heading || null,
+              chunkIds: Array.isArray(preferDecision.enrichment.chunkIds)
+                ? preferDecision.enrichment.chunkIds.slice(0, 8)
+                : [],
+              reason: preferDecision.enrichment.reason || null
+            }
+            : null
+        };
+        if (preferDecision.spoken) {
+          procedurePreferMeta._spoken = preferDecision.spoken;
+        }
+        if (preferDecision.prefer && preferDecision.spoken) {
           const candidate = fitSpokenLength(
-            renderSpokenProcedure(effectiveQuestion, alignedSteps),
+            preferDecision.spoken,
             responseLength,
             procedureQuestion
           );
           if (!looksLikeHardcodedStub(candidate)) {
-            retrievedProcedureAnswer = candidate;
-            promptPayload.expectedSpokenAnswer = retrievedProcedureAnswer;
+            // Provenance: KB-backed procedure candidates must ground against their own source
+            // text plus retrieval context. Never strip identifiers that appear in the candidate
+            // itself when that candidate is the retrieved procedure (PFCG Q1 defect). This
+            // branch only cleans prefer seeds — not arbitrary LLM self-grounding.
+            const groundedKnowledge = [
+              primaryKnowledge,
+              knowledgeContext,
+              preferDecision.spoken,
+              candidate
+            ].filter(Boolean).join("\n");
+            let cleaned = stripUngroundedSapEntities(candidate, groundedKnowledge);
+            const coherence = postStripCoherenceCheck(candidate, cleaned);
+            const stripDestroyedMeaning = isDestructiveEntityStripResult(candidate, cleaned);
+            if (
+              !coherence.ok
+              || stripDestroyedMeaning
+              || isMetaRefusalText(cleaned)
+              || !String(cleaned || "").trim()
+            ) {
+              // Procedure text is already source-backed — keep the candidate rather than
+              // hollowed "Review table for…" output.
+              cleaned = (!isMetaRefusalText(candidate) && String(candidate || "").trim().length > 40)
+                ? candidate
+                : "";
+              procedurePreferMeta.coherenceFallback = stripDestroyedMeaning
+                ? "destructive-entity-strip"
+                : (coherence.reason || "meta-or-incoherent");
+            }
+            // V2.3: when a provider can generate, retrieved procedure is evidence for the LLM —
+            // never a RETRIEVED_PROCEDURE short-circuit that skips generation.
+            if (cleaned && cleaned.trim()) {
+              if (llmMustGenerate || preferDecision.wrapMode === "senior-backbone") {
+                promptPayload.expectedSpokenAnswer = cleaned;
+                promptPayload.procedureBackbone = true;
+                promptPayload.speakExpectedAnswer = false;
+                procedurePreferMeta.servedAs = llmMustGenerate
+                  ? "kb-evidence-backbone"
+                  : "senior-backbone";
+              } else {
+                retrievedProcedureAnswer = cleaned;
+                promptPayload.expectedSpokenAnswer = retrievedProcedureAnswer;
+                procedurePreferMeta.servedAs = "direct-procedure";
+              }
+            }
           }
         }
+        markStage("procedure_prefer_end");
       } catch (error) {
         logger?.error?.("Retrieved procedure retention failed (non-fatal):", error);
+      }
+    }
+    // Late verified playbook only when selectVerifiedWorkflow already applies — do not force
+    // an MSMP BRF workflow onto a generic BRFplus question (Fix 1 task-fit).
+    if (!retrievedProcedureAnswer && !promptPayload.procedureBackbone) {
+      try {
+        const qLate = effectiveQuestion || question;
+        const brfGenericBlocked = /\bBRF(?:\+|plus)(?!\w)/i.test(qLate) && !asksMsmpScopedBrf(qLate);
+        if (!brfGenericBlocked) {
+          const verifiedLate = selectVerifiedWorkflow(qLate);
+          if (verifiedLate?.answer) {
+            const verifiedSpoken = fitSpokenLength(
+              shapeSpokenContract(verifiedLate.answer),
+              responseLength,
+              qLate
+            );
+            procedurePreferMeta = {
+              ...(procedurePreferMeta || {}),
+              prefer: true,
+              reason: "verified-workflow-backbone",
+              stepCount: Math.max(Number(procedurePreferMeta?.stepCount) || 0, 3),
+              servedAs: llmMustGenerate ? "kb-evidence-backbone" : "verified-workflow",
+              scriptId: verifiedLate.id || null,
+              sourceFiles: verifiedLate.sourceFiles || []
+            };
+            promptPayload.expectedSpokenAnswer = verifiedSpoken;
+            if (llmMustGenerate) {
+              promptPayload.procedureBackbone = true;
+              promptPayload.speakExpectedAnswer = false;
+            } else {
+              retrievedProcedureAnswer = verifiedSpoken;
+            }
+          }
+        }
+      } catch (verifiedLateError) {
+        logger?.error?.("Late verified workflow backbone failed:", verifiedLateError);
       }
     }
     if (jobDescription?.trim()) promptPayload.jobDescription = jobDescription.trim();
@@ -1971,28 +2573,62 @@ export default async function handler(req, res) {
     if (company?.trim()) promptPayload.company = company.trim();
 
     // A model paraphrase is not a safe final authority when the current question has
-    // one coherent, product-scoped procedure in the retrieved evidence. Live checks
-    // showed the model replacing IPS Job Logs and MSMP configuration steps with
-    // neighboring generic advice even though those steps were supplied as its answer
-    // anchor. Speak the verified sequence directly; experience questions and turns
-    // without a coherent procedure continue through the normal single-pass model path.
-    if (!retrievedProcedureAnswer && promptPayload.speakExpectedAnswer && promptPayload.expectedSpokenAnswer) {
+    // one coherent, product-scoped procedure in the retrieved evidence — unless senior
+    // wrap mode keeps the procedure as backbone for a single constrained generation pass.
+    if (!retrievedProcedureAnswer && promptPayload.speakExpectedAnswer && promptPayload.expectedSpokenAnswer
+      && !promptPayload.procedureBackbone) {
       retrievedProcedureAnswer = promptPayload.expectedSpokenAnswer;
     }
     if (retrievedProcedureAnswer) {
       streamStarted = true;
-      retrievedProcedureAnswer = sanitizeSpokenAnswer(retrievedProcedureAnswer);
+      const procedureFinal = finalizeSpokenAnswerForDisplay({
+        question: effectiveQuestion || question,
+        answer: retrievedProcedureAnswer,
+        interviewContext
+      });
+      retrievedProcedureAnswer = procedureFinal.answer;
       recordedAnswer = retrievedProcedureAnswer;
+      const procedureRoute = procedurePreferMeta?.servedAs === "verified-workflow"
+        ? "VERIFIED_WORKFLOW"
+        : "RETRIEVED_PROCEDURE";
+      const procedureSourceFiles = sourceFilesFromEvidence(
+        knowledgeResult.evidence,
+        procedurePreferMeta?.sourceFiles || []
+      );
+      const procedurePreferPublic = procedurePreferMeta
+        ? {
+          prefer: procedurePreferMeta.prefer,
+          reason: procedurePreferMeta.reason,
+          wrapMode: procedurePreferMeta.wrapMode,
+          stepCount: procedurePreferMeta.stepCount,
+          servedAs: procedurePreferMeta.servedAs || null,
+          sourceTag: procedurePreferMeta.sourceTag || null,
+          scriptId: procedurePreferMeta.scriptId || null
+        }
+        : undefined;
       writeSSEEvent(res, "admission", {
         decision: "ANSWER",
-        route: "RETRIEVED_PROCEDURE",
-        reason: "coherent-source-procedure",
+        route: procedureRoute,
+        reason: procedurePreferMeta?.reason || "coherent-source-procedure",
+        scriptId: procedurePreferMeta?.scriptId || null,
         confidence: 1,
         evidenceMode: null,
-        responseLength
+        responseLength,
+        procedurePrefer: procedurePreferPublic,
+        sourceFiles: procedureSourceFiles
+      });
+      writeSSEEvent(res, "answer_final", {
+        text: retrievedProcedureAnswer,
+        answerKind: procedureFinal.answerKind || "validated",
+        recovered: Boolean(procedureFinal.recovered),
+        flag: procedureFinal.recovered ? "integrity_gate" : null,
+        replacesStream: false,
+        bufferedPreDisplay: true,
+        route: procedureRoute
       });
       writeSSEAnswer(res, retrievedProcedureAnswer);
       persistScenarioTimeline(retrievedProcedureAnswer);
+      markStage("retrieved_procedure_served");
       recordLiveQa({
         question,
         questionRaw: question,
@@ -2002,10 +2638,19 @@ export default async function handler(req, res) {
         status: "completed",
         model,
         source: req.body?.source,
-        route: "RETRIEVED_PROCEDURE",
+        route: procedureRoute,
+        scriptId: procedurePreferMeta?.scriptId || "",
+        sourceFiles: procedureSourceFiles,
         disposition: "ANSWER",
-        evidenceMode: "knowledge-procedure",
-        latencyMs: Date.now() - qaStartedMs
+        evidenceMode: procedureRoute === "VERIFIED_WORKFLOW" ? "verified-workflow" : "knowledge-procedure",
+        latencyMs: Date.now() - qaStartedMs,
+        usage: { finish_reason: "stop", procedurePrefer: procedurePreferMeta },
+        procedurePrefer: procedurePreferMeta || undefined,
+        retrieval: knowledgeResult.evidence,
+        answerKind: procedureRoute === "VERIFIED_WORKFLOW" ? "verified_workflow" : "retrieved_procedure",
+        recovered: false,
+        answerFinalEmitted: false,
+        promptFingerprintBasis: PROMPT_POLICY_VERSION
       });
       if (res?.writable) {
         res.write("data: [DONE]\n\n");
@@ -2015,6 +2660,12 @@ export default async function handler(req, res) {
     }
 
     const systemPrompt = buildSapInterviewPrompt(promptPayload);
+    // Fix 3 — fingerprint only (never persist systemPrompt body on the session record).
+    try {
+      lastPromptFingerprint = fingerprintPromptPolicy(systemPrompt);
+    } catch {
+      lastPromptFingerprint = fingerprintPromptPolicy(PROMPT_POLICY_VERSION);
+    }
     // Opt-in diagnostic (off by default, zero effect unless DEBUG_DUMP_PROMPT is set): dumps
     // the exact raw prompt sent to the model to a file, so information-flow questions ("is X
     // actually in the prompt, and where") can be answered by observation instead of inferred
@@ -2046,12 +2697,14 @@ export default async function handler(req, res) {
 
     if (interviewContext.retrievalDecision === "clarify") {
       streamStarted = true;
-      recordedAnswer = String(interviewContext.clarificationPrompt || "").trim()
+      const clarifyRaw = String(interviewContext.clarificationPrompt || "").trim()
         || clarificationRequired(
           interviewContext.questionTopic === "General"
             ? "The question is incomplete. Could you please repeat or rephrase it with the specific SAP product and deployment context?"
             : `Could you finish that question about ${interviewContext.questionTopic} with the specific product or deployment context needed?`
         );
+      // Clarifications are control utterances — still sanitize; do not run technical concept contracts.
+      recordedAnswer = sanitizeSpokenAnswer(clarifyRaw);
       writeSSEEvent(res, "admission", {
         decision: "ANSWER",
         route: "CLARIFY",
@@ -2089,14 +2742,20 @@ export default async function handler(req, res) {
         tokenUsage = { ...(tokenUsage || {}), ...usage };
       },
       onChunk: (text) => {
+        if (String(text || "").length) {
+          const ft = stageTimer.markFirstToken();
+          stageTiming.firstTokenMs = ft;
+        }
         recordedAnswer += text;
       }
     };
 
-    // STAR employer safety: buffer tokens, then emit one anonymized complete answer.
-    // Live streaming would otherwise flash CV employer brands before post-processing.
+    // Pre-display integrity: buffer ALL provider tokens server-side. Do not expose
+    // candidate-facing text until sanitization + relevance validation complete.
+    // STAR employer anonymization uses the same buffered path.
     const starBufferEmployers = behavioralStarMode && !starMayNameEmployer(effectiveQuestion || question);
-    if (starBufferEmployers) {
+    const bufferBeforeDisplay = true;
+    if (bufferBeforeDisplay || starBufferEmployers) {
       streamOptions.res = { writable: false };
     }
 
@@ -2152,9 +2811,55 @@ export default async function handler(req, res) {
       let generationRoute = "GENERATION";
       let generationModel = model;
 
-      const shouldSkipRemoteLlm = forceLocalFallback || !apiKey;
+      const shouldSkipRemoteLlm = forceLocalFallback || (!apiKey && providerMode === "live");
 
-      if (shouldSkipRemoteLlm) {
+      if (providerMode === "disabled") {
+        recordDisabledBlocked();
+        logger?.warn?.({
+          event: "interview.provider_disabled",
+          providerMode,
+          model
+        });
+        // Prefer permitted local knowledge when available; otherwise controlled unavailable text.
+        const fallback = streamLocalKnowledgeFallback(res, effectiveQuestion || question, {
+          knowledgeContext,
+          evidence: knowledgeResult.evidence || interviewContext?.retrievalEvidence || [],
+          behavioralStarMode,
+          interviewContext,
+          emit: false
+        });
+        const localAnswer = String(fallback?.answer || "").trim();
+        fullAnswerText = localAnswer.length >= 40 ? localAnswer : DISABLED_GENERATION_MESSAGE;
+        recordedAnswer = fullAnswerText;
+        generationRoute = localAnswer.length >= 40
+          ? (behavioralStarMode ? "STAR_LOCAL_FALLBACK" : "LOCAL_KNOWLEDGE_FALLBACK")
+          : "PROVIDER_DISABLED";
+        generationModel = "disabled";
+      } else if (providerMode === "mock") {
+        logger?.info?.({
+          event: "interview.mock_provider",
+          providerMode,
+          model
+        });
+        // Prefer KB / procedure backbone as the deterministic mock "LLM" output when present;
+        // otherwise buildDeterministicMockAnswer (non-SAP questions must not get SAP-plane prose).
+        const mockSeed = String(promptPayload.expectedSpokenAnswer || "").trim();
+        const mockGrounding = [knowledgeContext, mockSeed].filter(Boolean).join("\n\n");
+        const mockText = await streamMockProviderResponse({
+          question: effectiveQuestion || question,
+          res: streamOptions.res,
+          onChunk: streamOptions.onChunk,
+          answerText: mockSeed,
+          knowledgeContext: mockGrounding
+        });
+        fullAnswerText = finalizeSpokenAnswer(mockText || "", {
+          behavioralStarMode,
+          question: effectiveQuestion || question
+        });
+        recordedAnswer = fullAnswerText;
+        generationRoute = "GENERATION";
+        generationModel = "mock-deterministic";
+      } else if (shouldSkipRemoteLlm) {
         logger?.warn?.({
           event: "interview.local_knowledge_fallback",
           reason: forceLocalFallback ? "forced" : "missing-api-key",
@@ -2163,7 +2868,10 @@ export default async function handler(req, res) {
         const fallback = streamLocalKnowledgeFallback(res, effectiveQuestion || question, {
           knowledgeContext,
           evidence: knowledgeResult.evidence || interviewContext?.retrievalEvidence || [],
-          behavioralStarMode
+          behavioralStarMode,
+          interviewContext,
+          // Buffer only — integrity gate below is the sole emission point.
+          emit: false
         });
         fullAnswerText = fallback.answer;
         recordedAnswer = fallback.answer;
@@ -2214,9 +2922,7 @@ export default async function handler(req, res) {
             question: effectiveQuestion || question
           });
           recordedAnswer = fullAnswerText;
-          if (starBufferEmployers && fullAnswerText) {
-            writeSSEChunk(res, fullAnswerText);
-          }
+          // Buffered path: do not write provider text yet — integrity gate emits after validation.
           generationModel = reliable.model || model;
           if (reliable.usedFailover) {
             logger?.info?.({
@@ -2228,52 +2934,390 @@ export default async function handler(req, res) {
           }
         } catch (llmError) {
           if (recordedAnswer.length > 0) {
+            // Partial tokens already on the wire — do not invent a second answer; mark incomplete later.
             throw llmError;
           }
           logger?.warn?.({
-            event: "interview.local_knowledge_fallback",
+            event: "interview.answer_fallback_ladder",
             reason: llmError?.code || llmError?.name || "llm-failed",
-            message: String(llmError?.message || "").slice(0, 200)
+            message: String(llmError?.message || "").slice(0, 200),
+            traceId
           });
-          const fallback = streamLocalKnowledgeFallback(res, effectiveQuestion || question, {
+          const ladder = runAnswerFallbackLadder(effectiveQuestion || question, {
             knowledgeContext,
-            evidence: knowledgeResult.evidence || interviewContext?.retrievalEvidence || [],
-            behavioralStarMode
+            evidence: knowledgeResult.evidence || interviewContext?.retrievalEvidence || []
           });
-          fullAnswerText = fallback.answer;
-          recordedAnswer = fallback.answer;
-          generationRoute = behavioralStarMode ? "STAR_LOCAL_FALLBACK" : "LOCAL_KNOWLEDGE_FALLBACK";
+          // Buffer ladder text — never emit before integrity finalization below.
+          fullAnswerText = ladder.answer;
+          recordedAnswer = ladder.answer;
+          generationRoute = ladder.route || "LADDER_PRINCIPLE";
         }
       }
 
       abortIfTimedOut();
-      if (res?.writable && generationRoute === "GENERATION") {
+      stageTiming.streamEndMs = Date.now() - qaStartedMs;
+      markStage("stream_end");
+      // G1/G2 content gates — strip ungrounded entities, coherence check, then incompleteness.
+      // Incomplete / early-ended streams must not be treated as valid final outputs or context.
+      let effectiveFinishReason = tokenUsage?.finish_reason || null;
+      let contentQualityFlags = [];
+      let strippedEntityCount = 0;
+      // Every buffered generation route must finalize before client delivery — including
+      // PROVIDER_DISABLED (operational message) and STAR local fallback.
+      const routeNeedsIntegrityGate = generationRoute === "GENERATION"
+        || generationRoute === "RETRIEVED_PROCEDURE"
+        || generationRoute === "LOCAL_KNOWLEDGE_FALLBACK"
+        || generationRoute === "STAR_LOCAL_FALLBACK"
+        || generationRoute === "PROVIDER_DISABLED"
+        || String(generationRoute || "").startsWith("LADDER_");
+      if (routeNeedsIntegrityGate) {
+        let spokenForGate = String(fullAnswerText || recordedAnswer || "");
+        // Operational disabled text: finalize without concept/technical recovery rewrites.
+        if (
+          generationRoute === "PROVIDER_DISABLED"
+          || isProviderDisabledOperationalMessage(spokenForGate)
+        ) {
+          const disabledFinal = finalizeSpokenAnswerForDisplay({
+            question: effectiveQuestion || question,
+            answer: spokenForGate || DISABLED_GENERATION_MESSAGE,
+            interviewContext
+          });
+          spokenForGate = disabledFinal.answer || DISABLED_GENERATION_MESSAGE;
+          recordedAnswer = spokenForGate;
+          fullAnswerText = spokenForGate;
+          contentQualityFlags.push("answer_kind:provider_disabled");
+          if (res?.writable && String(spokenForGate || "").trim()) {
+            writeSSEEvent(res, "answer_final", {
+              text: spokenForGate,
+              answerKind: "provider_disabled",
+              recovered: false,
+              flag: "provider_disabled",
+              replacesStream: false,
+              bufferedPreDisplay: true
+            });
+            writeSSEAnswer(res, spokenForGate);
+          }
+        } else {
+        const beforeStrip = spokenForGate;
+        // Observability: preserve pre-sanitizer LIVE completion for audit harnesses.
+        // Client UI still receives only post-integrity answer_final text.
+        if (res?.writable && String(beforeStrip || "").trim()) {
+          try {
+            writeSSEEvent(res, "provider_raw", {
+              text: beforeStrip,
+              source: "pre_strip_llm_or_procedure_backbone",
+              chars: String(beforeStrip).length
+            });
+          } catch (rawEmitErr) {
+            console.error("provider_raw SSE emit failed (non-fatal):", rawEmitErr);
+          }
+        }
+        // Include procedure backbone so strip does not gut identifiers retrieved as generation evidence.
+        const stripGrounding = [
+          knowledgeContext,
+          promptPayload?.expectedSpokenAnswer,
+          knowledgeResult?.procedureText
+        ].filter(Boolean).join("\n");
+        spokenForGate = stripUngroundedSapEntities(spokenForGate, stripGrounding || "");
+        if (isDestructiveEntityStripResult(beforeStrip, spokenForGate)) {
+          // Prefer keeping pre-strip text when strip hollowed grammar; recovery still
+          // re-validates ungrounded claims against knowledge (no self-grounding pass-through).
+          contentQualityFlags.push("destructive_entity_strip_reverted");
+          spokenForGate = beforeStrip;
+        }
+        try {
+          const usagePlane = sanitizeUsageVsAssignmentPlanes(
+            effectiveQuestion || question,
+            spokenForGate
+          );
+          if (usagePlane.changed && usagePlane.text) {
+            spokenForGate = usagePlane.text;
+            contentQualityFlags.push(`usage_assignment_plane_sanitized:${usagePlane.removed}`);
+          }
+        } catch (usagePlaneError) {
+          logger?.error?.("Usage vs assignment plane sanitize failed:", usagePlaneError);
+        }
+        const coherence = postStripCoherenceCheck(beforeStrip, spokenForGate);
+        if (!coherence.ok || isMetaRefusalText(spokenForGate)) {
+          // Prefer keeping stripped spoken content or local KB — never a meta-refusal disclaimer.
+          if (!spokenForGate.trim() || isMetaRefusalText(spokenForGate) || spokenForGate.trim().length < 40) {
+            try {
+              const local = buildLocalKnowledgeFallback(effectiveQuestion || question, {
+                prefetchedText: knowledgeContext,
+                evidence: knowledgeResult.evidence || []
+              });
+              if (String(local?.answer || "").trim() && !isMetaRefusalText(local.answer)) {
+                spokenForGate = local.answer;
+                contentQualityFlags.push(`coherence_local_kb:${coherence.reason || "meta"}`);
+              } else if (!isMetaRefusalText(beforeStrip) && beforeStrip.trim().length > 40) {
+                spokenForGate = stripUngroundedSapEntities(beforeStrip, stripGrounding || "");
+                contentQualityFlags.push(`coherence_keep_stripped:${coherence.reason || "meta"}`);
+              } else {
+                spokenForGate = buildPrincipleLevelFallback(effectiveQuestion || question);
+                contentQualityFlags.push(`coherence_spoken_recovery:${coherence.reason || "meta"}`);
+              }
+            } catch {
+              spokenForGate = buildPrincipleLevelFallback(effectiveQuestion || question);
+              contentQualityFlags.push(`coherence_spoken_recovery:${coherence.reason || "meta"}`);
+            }
+          } else {
+            contentQualityFlags.push(`coherence_keep:${coherence.reason}`);
+          }
+        }
+        if (isMetaRefusalText(spokenForGate)) {
+          spokenForGate = buildPrincipleLevelFallback(effectiveQuestion || question);
+          contentQualityFlags.push("meta_refusal_replaced");
+        }
+
+        // D2 — never leave the UI with an empty answer after strip/coherence.
+        let localKbAnswer = "";
+        try {
+          localKbAnswer = String(buildLocalKnowledgeFallback(effectiveQuestion || question, {
+            prefetchedText: knowledgeContext,
+            evidence: knowledgeResult.evidence || []
+          })?.answer || "");
+        } catch {
+          localKbAnswer = "";
+        }
+        const procedureSpoken = String(
+          promptPayload.expectedSpokenAnswer
+          || procedurePreferMeta?._spoken
+          || ""
+        );
+        // Recompute procedure spoken if prefer had steps but we only stored meta.
+        let procedureFallback = procedureSpoken;
+        if (!procedureFallback.trim() && (procedurePreferMeta?.stepCount || 0) >= 3) {
+          try {
+            const steps = authoritativeProcedure(
+              effectiveQuestion || question,
+              knowledgeResult.procedureText || knowledgeContext || "",
+              interviewContext.answerScope
+            ) || [];
+            procedureFallback = renderSpokenProcedure(effectiveQuestion || question, steps) || "";
+          } catch {
+            procedureFallback = "";
+          }
+        }
+        if (!procedureFallback.trim() && isWorkflowBackboneAsk(effectiveQuestion || question)) {
+          try {
+            const verifiedRecover = selectVerifiedWorkflow(effectiveQuestion || question);
+            if (verifiedRecover?.answer) procedureFallback = verifiedRecover.answer;
+          } catch {
+            // non-fatal
+          }
+        }
+        const recovered = recoverNonEmptySpokenAnswer({
+          question: effectiveQuestion || question,
+          spoken: spokenForGate,
+          beforeStrip,
+          procedureSpoken: procedureFallback,
+          localKnowledgeAnswer: localKbAnswer,
+          knowledgeText: knowledgeContext || knowledgeResult.procedureText || ""
+        });
+        spokenForGate = recovered.answer;
+        const answerKind = recovered.answerKind || (recovered.recovered ? "recovered_principle" : "validated");
+        if (recovered.recovered && recovered.flag) {
+          contentQualityFlags.push(recovered.flag);
+          contentQualityFlags.push(`answer_kind:${answerKind}`);
+          if (recovered.rejectedProcedureReason) {
+            contentQualityFlags.push(`procedure_recovery_reject:${recovered.rejectedProcedureReason}`);
+          }
+          if (recovered.rejectedPreStripReason) {
+            contentQualityFlags.push(`prestrip_reject:${recovered.rejectedPreStripReason}`);
+          }
+        } else {
+          contentQualityFlags.push(`answer_kind:${answerKind}`);
+        }
+
+        strippedEntityCount = (beforeStrip.match(/\b(?:transaction|table|authorization object|service)\b/gi) || []).length
+          - (spokenForGate.match(/\b(?:transaction|table|authorization object|service)\b/gi) || []).length;
+        if (/not confirmed in supporting knowledge/i.test(spokenForGate) && !/not confirmed in supporting knowledge/i.test(beforeStrip)) {
+          strippedEntityCount = Math.max(strippedEntityCount, 1);
+        }
+        spokenForGate = sanitizeSpokenAnswer(spokenForGate);
+        // Defense: recovered text must not reintroduce unsupported T-codes from beforeStrip.
+        const leakGrounding = [
+          knowledgeContext,
+          promptPayload?.expectedSpokenAnswer,
+          knowledgeResult?.procedureText
+        ].filter(Boolean).join("\n");
+        const leakCheck = findUngroundedTransactionClaims(spokenForGate, leakGrounding || "");
+        if (leakCheck.length && recovered.recovered) {
+          spokenForGate = buildDirectTechnicalFallback(effectiveQuestion || question)
+            || buildPrincipleLevelFallback(effectiveQuestion || question);
+          contentQualityFlags.push(`recovery_leak_blocked:${leakCheck.join(",")}`);
+        }
+
+        // Phase 2.1 — question-to-answer relevance + V2.2 pre-display integrity gate.
+        // At most ONE recovery. Rejected text never reaches the UI (stream was buffered).
+        try {
+          let conceptGate = evaluateAnswerConceptCoverage({
+            question: effectiveQuestion || question,
+            answer: spokenForGate
+          });
+          if (!conceptGate.ok && conceptGate.reason === "data-assessment-instead-of-transition-paths") {
+            spokenForGate = buildTransitionPathComparisonFallback(effectiveQuestion || question);
+            contentQualityFlags.push("concept_coverage_repaired:transition-paths");
+            conceptGate = evaluateAnswerConceptCoverage({
+              question: effectiveQuestion || question,
+              answer: spokenForGate
+            });
+          }
+          const detailGate = evaluateUnsupportedTechnicalDetail({
+            answer: spokenForGate,
+            knowledgeText: knowledgeContext || knowledgeResult.procedureText || ""
+          });
+          if (!detailGate.ok && (knowledgeResult.knowledgeCoverage?.status === COVERAGE.NO_RELEVANT_KNOWLEDGE
+            || knowledgeResult.knowledgeCoverage?.status === COVERAGE.IRRELEVANT_RETRIEVAL
+            || lowRelevanceFallback)) {
+            contentQualityFlags.push(`unsupported_detail:${(detailGate.claims || []).slice(0, 6).join(",")}`);
+          }
+
+          const integrity = validateAndRecoverSpokenAnswer({
+            question: effectiveQuestion || question,
+            answer: spokenForGate,
+            interviewContext,
+            recoveryAnswer: buildDirectTechnicalFallback(effectiveQuestion || question)
+              || (conceptGate.reason === "data-assessment-instead-of-transition-paths"
+                ? buildTransitionPathComparisonFallback(effectiveQuestion || question)
+                : "")
+          });
+          spokenForGate = integrity.answer;
+          if (integrity.recovered) {
+            contentQualityFlags.push(`integrity_recovered:${integrity.answerKind}`);
+            contentQualityFlags.push(...(integrity.priorGate?.reasons || integrity.gate?.reasons || []).map((r) => `integrity_prior:${r}`));
+          }
+          // Score concept coverage on the FINAL displayed text (post-recovery), not a stale pre-recovery miss.
+          conceptGate = evaluateAnswerConceptCoverage({
+            question: effectiveQuestion || question,
+            answer: spokenForGate
+          });
+          if (!conceptGate.ok) {
+            contentQualityFlags.push(`concept_coverage_fail:${conceptGate.reason || "missing"}`);
+            contentQualityFlags.push(`missing_concepts:${(conceptGate.missingConceptIds || []).join(",")}`);
+          }
+          if (integrity.rejected || isMetaProcedureResponse(spokenForGate)) {
+            contentQualityFlags.push("integrity_inability");
+          }
+        } catch (gateError) {
+          console.error("Concept/integrity coverage gate failed (non-fatal):", gateError);
+        }
+
+        fullAnswerText = spokenForGate;
+        recordedAnswer = spokenForGate;
+        const ungrounded = findUngroundedTransactionClaims(spokenForGate, knowledgeContext || "");
+        if (ungrounded.length) {
+          contentQualityFlags.push(`ungrounded_tcodes:${ungrounded.join(",")}`);
+        }
+        // Incomplete only when still empty/unusable after recovery.
+        if (!String(spokenForGate || "").trim() || (looksIncompleteSpokenAnswer(spokenForGate) && !recovered.recovered)) {
+          contentQualityFlags.push("incomplete_spoken_tail");
+          effectiveFinishReason = "incomplete_content";
+        } else if (looksIncompleteSpokenAnswer(spokenForGate) && recovered.recovered) {
+          contentQualityFlags.push("incomplete_recovered");
+          effectiveFinishReason = tokenUsage?.finish_reason || "stop";
+        }
+
+        // Pre-display validation complete: emit only the accepted answer.
+        // Provider tokens were buffered (res.writable false), so the client stream is empty
+        // until answer_final / writeSSEAnswer. Never leak rejected first-pass text.
+        if (res?.writable && String(spokenForGate || "").trim()) {
+          const integrityRecovered = contentQualityFlags.some((f) => String(f).startsWith("integrity_recovered"));
+          writeSSEEvent(res, "answer_final", {
+            text: spokenForGate,
+            answerKind,
+            recovered: Boolean(recovered.recovered || integrityRecovered),
+            flag: recovered.flag || (integrityRecovered ? "integrity_gate" : null),
+            replacesStream: false,
+            bufferedPreDisplay: true
+          });
+          writeSSEAnswer(res, spokenForGate);
+        }
+        } // end else (non-provider-disabled integrity path)
+      }
+      if (contentQualityFlags.length) {
+        tokenUsage = {
+          ...(tokenUsage || {}),
+          finish_reason: effectiveFinishReason,
+          contentQualityFlags,
+          strippedEntityCount,
+          procedurePrefer: procedurePreferMeta || undefined,
+          firstTokenMs: stageTiming.firstTokenMs,
+          streamEndMs: stageTiming.streamEndMs
+        };
+      } else {
+        tokenUsage = {
+          ...(tokenUsage || {}),
+          finish_reason: effectiveFinishReason,
+          strippedEntityCount,
+          procedurePrefer: procedurePreferMeta || undefined,
+          firstTokenMs: stageTiming.firstTokenMs,
+          streamEndMs: stageTiming.streamEndMs
+        };
+      }
+      if (res?.writable && (
+        generationRoute === "GENERATION"
+        || generationRoute === "PROVIDER_DISABLED"
+        || generationRoute === "LOCAL_KNOWLEDGE_FALLBACK"
+        || generationRoute === "STAR_LOCAL_FALLBACK"
+      )) {
+        const providerStats = getProviderStats();
         writeSSEEvent(res, "generation", {
-          finish_reason: tokenUsage?.finish_reason || null,
+          finish_reason: effectiveFinishReason,
           maxTokens,
           prompt_tokens: tokenUsage?.prompt_tokens ?? null,
           completion_tokens: tokenUsage?.completion_tokens ?? null,
-          total_tokens: tokenUsage?.total_tokens ?? null
+          total_tokens: tokenUsage?.total_tokens ?? null,
+          contentQualityFlags: contentQualityFlags.length ? contentQualityFlags : undefined,
+          strippedEntityCount,
+          firstTokenMs: stageTiming.firstTokenMs,
+          streamEndMs: stageTiming.streamEndMs,
+          procedurePrefer: procedurePreferMeta || undefined,
+          providerMode,
+          providerImplementation: providerStats.lastImplementation || generationModel || null,
+          mockInvocations: providerStats.mockInvocations,
+          liveTransportInvocations: providerStats.liveTransportInvocations,
+          route: generationRoute
         });
       }
-      persistScenarioTimeline(recordedAnswer);
+      const hasSpeakableAnswer = String(recordedAnswer || "").trim().length >= 40;
+      // Fix 2: recovered speakable answers are completed (with answerKind flags), not empty.
+      // Truncated streams without a speakable recovery remain partial and are excluded from context.
+      const answerIncomplete = isIncompleteGeneration(effectiveFinishReason) && !hasSpeakableAnswer;
+      const answerKindFlag = (contentQualityFlags.find((f) => String(f).startsWith("answer_kind:")) || "")
+        .replace(/^answer_kind:/, "") || (hasSpeakableAnswer ? "validated" : "empty");
+      if (hasSpeakableAnswer) {
+        persistScenarioTimeline(recordedAnswer);
+      }
+      const generationSourceFiles = sourceFilesFromEvidence(knowledgeResult.evidence);
       recordLiveQa({
         question,
         questionRaw: question,
         questionResolved: effectiveQuestion,
         interviewContext,
-        answerShown: recordedAnswer,
-        status: isIncompleteGeneration(tokenUsage?.finish_reason) ? "partial" : (recordedAnswer.trim() ? "completed" : "empty"),
+        answerShown: hasSpeakableAnswer ? recordedAnswer : "",
+        status: answerIncomplete ? "partial" : (hasSpeakableAnswer ? "completed" : "empty"),
         model: generationModel,
         retryCount: Number(clientRetryCount) || 0,
         latencyMs: Date.now() - qaStartedMs,
-        usage: tokenUsage,
+        usage: {
+          ...(tokenUsage || {}),
+          answerKind: answerKindFlag,
+          recovered: contentQualityFlags.some((f) => String(f).startsWith("empty_fallback"))
+        },
         source: req.body?.source,
         route: generationRoute,
         disposition: "ANSWER",
         evidenceMode: generationRoute === "LOCAL_KNOWLEDGE_FALLBACK" ? "local-knowledge" : (promptPayload.evidenceMode || "full"),
         retrieval: knowledgeResult.evidence,
-        errorCode: isIncompleteGeneration(tokenUsage?.finish_reason) ? "incomplete" : null
+        sourceFiles: generationSourceFiles,
+        procedurePrefer: procedurePreferMeta || undefined,
+        answerKind: answerKindFlag,
+        recovered: contentQualityFlags.some((f) => String(f).startsWith("empty_fallback")),
+        answerFinalEmitted: contentQualityFlags.some((f) => String(f).startsWith("answer_kind:")),
+        errorCode: answerIncomplete ? "incomplete" : null,
+        excludeFromContext: answerIncomplete,
+        finishReason: effectiveFinishReason || (hasSpeakableAnswer ? "stop" : null)
       });
 
       // Post-answer evaluation: pure heuristics, no LLM call, runs only after every
@@ -2282,7 +3326,7 @@ export default async function handler(req, res) {
       try {
         if (generationRoute === "LOCAL_KNOWLEDGE_FALLBACK") {
           // Fallback answers are already grounded; skip incomplete-token signaling.
-        } else if (isIncompleteGeneration(tokenUsage?.finish_reason)) {
+        } else if (isIncompleteGeneration(effectiveFinishReason)) {
           res.write("data: [DONE]\n\n");
           return;
         } else {
@@ -2336,7 +3380,9 @@ export default async function handler(req, res) {
         const fallback = streamLocalKnowledgeFallback(res, question, {
           knowledgeContext: "",
           evidence: interviewContext?.retrievalEvidence || [],
-          behavioralStarMode: starMode
+          behavioralStarMode: starMode,
+          interviewContext,
+          emit: true
         });
         recordedAnswer = fallback.answer;
         recordLiveQa({

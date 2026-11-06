@@ -86,10 +86,11 @@
     // these invalidates every previously-embedded chunk and forces a full reindex (see
     // priorChunksByDocument in knowledgeIndexService.js).
     schemaVersion: '1.0.0',
-    parserVersion: 'a5fdef3073fe',
-    chunkVersion: '59c1e5914015',
+    // Bumped 2026-11-02: interview-bank body sanitization (Q-heading/Validate strip) + ara/mitigation refresh.
+    parserVersion: 'v22-bank-sanitize-20261102',
+    chunkVersion: 'v22-bank-sanitize-20261102',
     embeddingModel: 'Xenova/all-MiniLM-L6-v2',
-    indexVersion: parseInt(process.env.KNOWLEDGE_INDEX_VERSION) || 1,
+    indexVersion: parseInt(process.env.KNOWLEDGE_INDEX_VERSION) || 2,
     chunking: {
       strategy: process.env.CHUNKING_STRATEGY || 'semantic',
       maxChunkSizeTokens: parseInt(process.env.MAX_CHUNK_TOKENS) || 1024,
@@ -357,9 +358,19 @@
     // MUST be explicitly configured; defaults to 'full' for production safety
     validationMode: process.env.LLM_VALIDATION_MODE || 'full',
 
+    // Server-side provider isolation (never trust browser body for this):
+    // mock | disabled | live. Unknown → disabled. Unset → live unless INTERVIEW_ACCEPTANCE_LOCK=1.
+    providerMode: (() => {
+      const raw = String(process.env.LLM_PROVIDER_MODE || process.env.INTERVIEW_PROVIDER_MODE || "").trim().toLowerCase();
+      if (raw === "mock" || raw === "disabled" || raw === "live") return raw;
+      if (raw) return "disabled";
+      if (String(process.env.INTERVIEW_ACCEPTANCE_LOCK || "") === "1") return "disabled";
+      return "live";
+    })(),
+
     // LLM provider configuration
     provider: process.env.LLM_PROVIDER || 'openai',
-    defaultModel: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+    defaultModel: process.env.OPENAI_MODEL || 'gpt-4o',
 
     // API keys - client-supplied key takes priority (BYOK design)
     // Server-side keys are optional fallbacks for shared deployments

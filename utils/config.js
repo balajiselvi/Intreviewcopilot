@@ -5,8 +5,8 @@ export const builtInModelGroups = [
       { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
       { value: "gpt-4", label: "GPT-4" },
       { value: "gpt-4-turbo-preview", label: "GPT-4 Turbo Preview" },
-      { value: "gpt-4o-mini", label: "GPT-4o mini (recommended for live interview)" },
-      { value: "gpt-4o", label: "GPT-4o (Omni)" },
+      { value: "gpt-4o", label: "GPT-4o (recommended — V2 Principal Architect)" },
+      { value: "gpt-4o-mini", label: "GPT-4o mini (faster / lower cost)" },
     ]
   },
   {
@@ -28,7 +28,7 @@ export const TARGET_JOB_DESCRIPTION = `Chalhoub Group — Lead, Identity Securit
 const defaultConfig = {
   openaiKey: '',
   geminiKey: '',
-  aiModel: 'gpt-4o-mini',
+  aiModel: 'gpt-4o',
   silenceTimerDuration: 1.2, 
   responseLength: 'medium',
   gptSystemPrompt: `You are the candidate's live SAP interview assistant. Answer the interviewer's question from verified SAP knowledge. Pasted background can add a personal detail; it does not limit a technical answer. Do not invent an employer, customer, date, or metric.`,
@@ -60,8 +60,8 @@ export function getConfig() {
     if (!parsed.jobDescription || !String(parsed.jobDescription).trim()) {
       parsed.jobDescription = TARGET_JOB_DESCRIPTION;
     }
-    if (!parsed.aiModel || parsed.aiModel === "gpt-3.5-turbo") {
-      parsed.aiModel = "gpt-4o-mini";
+    if (!parsed.aiModel || parsed.aiModel === "gpt-3.5-turbo" || parsed.aiModel === "gpt-4o-mini") {
+      parsed.aiModel = "gpt-4o";
     }
 
     return { ...defaultConfig, ...parsed };

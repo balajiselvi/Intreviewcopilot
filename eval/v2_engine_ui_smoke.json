@@ -1,0 +1,19 @@
+{
+  "pass": true,
+  "mustOk": true,
+  "masterHit": true,
+  "retrievalMs": 4,
+  "ttftMs": 1440,
+  "totalMs": 3865,
+  "corpusSize": 175,
+  "hits": [
+    "00_master_architect_boundaries.md",
+    "security/pfcg.md",
+    "s4hana/s4hana-business-roles.md",
+    "security/composite-roles.md",
+    "security/derived-roles.md",
+    "02_s4hana_public_private_and_fiori_security.md"
+  ],
+  "knowledgeRoot": "D:\\My Projects\\InterviewCopilot_V2\\knowledge",
+  "answerPreview": "When building PFCG roles, I start by clearly defining the role's purpose and scope, which includes deciding whether it will be a single role, a master/derived role for organizational inheritance, or a composite role for bundling purposes. The naming convention is crucial here, as it should reflect the process and organizational scope, and the role owner should be assigned before the build begins.\n"
+}
