@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { buildPrincipleLevelFallback, classifyGenerationFailure, looksIncompleteSpokenAnswer } from '../lib/generationGuard';
-import { buildAskRecoveryText, normalizeRequestQuestion } from '../lib/askOpenAIRequestScope';
+import { classifyGenerationFailure } from '../lib/generationGuard';
+import { normalizeRequestQuestion } from '../lib/askOpenAIRequestScope';
 import { applyRecognitionEvent } from '../lib/speechRecognitionAdapter';
 import { consumeChatStream } from '../lib/chatStream';
 import { buildBoundedHistory, isClearlyIncompleteFragment, isTruncatedScenarioSetup, removeSubmittedSnapshot } from '../lib/interviewContext';
@@ -1123,8 +1123,7 @@ export default function InterviewPage() {
         model: "gpt-4o",
         question: text,
         history: conversationHistoryForAPI,
-        responseLength: currentConfig.responseLength || "medium",
-        customInstructions: currentConfig.gptSystemPrompt,
+        responseLength: "medium",
         candidateResume: currentConfig.candidateResume,
         jobDescription: currentConfig.jobDescription,
         sessionPreparation: formatSessionPreparation(sessionPrep),
@@ -1253,18 +1252,6 @@ export default function InterviewPage() {
           classified: classifyGenerationFailure({ message: "empty generation" })
         });
       }
-      // V2: never overwrite streamed / answer_final text with principle-level recovered fallback.
-      if (!answerFinalLocked && streamedResponse.trim().length < 40 && looksIncompleteSpokenAnswer(streamedResponse)) {
-        const recovered = buildAskRecoveryText({
-          streamedResponse,
-          requestQuestion,
-          looksIncomplete: looksIncompleteSpokenAnswer,
-          buildFallback: buildPrincipleLevelFallback
-        });
-        if (recovered.ok && recovered.text && streamedResponse.trim().length < 40) {
-          streamedResponse = recovered.text;
-        }
-      }
       if (throttledDispatchSetAIResponseRef.current && typeof throttledDispatchSetAIResponseRef.current.cancel === "function") {
         throttledDispatchSetAIResponseRef.current.cancel();
       }
@@ -1294,42 +1281,33 @@ export default function InterviewPage() {
       if (aborted && superseded) {
         return;
       }
-      // V2: keep substantial streamed / answer_final text. Never replace with principle fallback.
+      // NUCLEAR: never replace LLM output with canned recovered fallback. Keep stream or ask retry.
       const streamKeep = String(streamedResponse || "").trim();
-      const keepReal = answerFinalLocked || streamKeep.length >= 80;
-      let recoveryText = streamKeep;
-      if (!keepReal) {
-        const recovered = buildAskRecoveryText({
-          streamedResponse,
-          requestQuestion,
-          looksIncomplete: () => true,
-          buildFallback: buildPrincipleLevelFallback
-        });
-        recoveryText = recovered.ok && recovered.text
-          ? recovered.text
-          : (streamKeep || "I could not finish that answer — please retry the question.");
-      }
+      const keepReal = answerFinalLocked || streamKeep.length >= 40;
+      const finalText = keepReal
+        ? streamKeep
+        : "Generation was interrupted before a complete answer arrived. Please retry the question.";
       if (throttledDispatchSetAIResponseRef.current && typeof throttledDispatchSetAIResponseRef.current.cancel === "function") {
         throttledDispatchSetAIResponseRef.current.cancel();
       }
-      dispatch(setAIResponse(recoveryText));
+      dispatch(setAIResponse(finalText));
       commitHistory({
         type: "response",
-        text: recoveryText,
+        text: finalText,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         answerId: `a_${Date.now()}`,
         questionId,
         retryCount,
         source: "copilot",
         status: "completed",
-        metrics: { ...responseMetrics(), recovered: keepReal ? false : true },
+        metrics: { ...responseMetrics(), recovered: false },
         analysis: null,
-        recovery: keepReal ? false : true
+        recovery: false
       });
       pendingAnalysisRef.current = null;
       pendingContextRef.current = null;
-      setGenerationError(null);
-      if (!keepReal) showSnackbar("Recovered with a complete spoken answer.", "info");
+      setGenerationError(keepReal ? null : { retryable: true, userMessage: "Please retry the question.", question: requestQuestion, source });
+      if (!keepReal) showSnackbar("Answer incomplete — please retry.", "warning");
       return;
     } finally {
       disarmTimeout();
@@ -1529,7 +1507,7 @@ export default function InterviewPage() {
             <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
               {item.metrics.firstTextMs != null ? `First text ${(item.metrics.firstTextMs / 1000).toFixed(1)}s · ` : ''}
               Answer in {(item.metrics.totalMs / 1000).toFixed(1)}s
-              {item.recovery ? " · recovered" : ""}
+              
             </Typography>
           )}
           {item.analysis && <AnswerQualityPanel analysis={item.analysis} />}
