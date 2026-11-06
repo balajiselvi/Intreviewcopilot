@@ -920,6 +920,18 @@ export default function InterviewPage() {
     }
     recentSubmitRef.current = { key: submissionKey(text), at: submittedAt };
     if (isProcessingRef.current) {
+      // Auto speech turns must queue, not drop — silence finalize must not lose the question.
+      if (meta.utteranceId && !meta.manual && source !== "typed") {
+        const parked = {
+          text,
+          utteranceId: meta.utteranceId,
+          source,
+          manual: false
+        };
+        pendingSpeechQueueRef.current = [...pendingSpeechQueueRef.current, parked].slice(-8);
+        setQueuedTurnCount(pendingSpeechQueueRef.current.length);
+        return;
+      }
       showSnackbar('Please wait for the current response to finish.', 'info');
       return;
     }
@@ -960,26 +972,20 @@ export default function InterviewPage() {
     } catch (gateError) {
       console.error("Question admission failed:", gateError);
     }
-    if (turn.normalizedQuestion) {
-      // Prefer original interrogative wording over "Regarding …" rewrites.
-      const normalized = String(turn.normalizedQuestion);
-      const originalText = String(text || "").trim();
-      if (
-        /^(?:what|how|why|when|where|which|who|explain|describe|compare)\b/i.test(originalText)
-        && /^regarding\b/i.test(normalized)
-      ) {
-        /* keep originalText */
-      } else {
-        text = normalized;
-      }
+    // Preserve raw recognized speech verbatim — never rewrite to "Regarding …".
+    const originalSpeech = String(text || "").trim();
+    const autoSpeechTurn = Boolean(meta.utteranceId) && !meta.manual && source !== "typed";
+    if (autoSpeechTurn) {
+      text = originalSpeech;
+    } else if (turn.normalizedQuestion) {
+      const normalized = String(turn.normalizedQuestion).trim();
+      text = /^regarding\b/i.test(normalized) ? originalSpeech : (normalized || originalSpeech);
     }
 
-    // System Audio / mic auto-submit: do not park technical questions as DEFER.
-    const autoSpeechTurn = Boolean(meta.utteranceId) && !meta.manual && source !== "typed";
-    const technicalEnough = /\b(?:SAP|BTP|SCP|IAG|IAS|IPS|GRC|PFCG|Fiori|S\/?4|HANA|SoD|XSUAA)\b/i.test(text)
-      || /\b(?:difference|components?|configure|implement|architecture|security)\b/i.test(text);
-    if (autoSpeechTurn && turn.decision === "DEFER" && technicalEnough && String(text || "").trim().split(/\s+/).length >= 4) {
-      turn = { ...turn, decision: "ANSWER", route: "GENERATION", reason: "auto-submit-technical-override" };
+    // System Audio / mic auto-submit: silence finalize with >= 3 words must ANSWER (never park as waiting).
+    const wordCount = String(text || "").trim().split(/\s+/).filter(Boolean).length;
+    if (autoSpeechTurn && turn.decision === "DEFER" && wordCount >= 3) {
+      turn = { ...turn, decision: "ANSWER", route: "GENERATION", reason: "auto-submit-silence-override" };
     }
 
     if (turn.decision !== "ANSWER") {
@@ -1281,9 +1287,9 @@ export default function InterviewPage() {
       if (aborted && superseded) {
         return;
       }
-      // NUCLEAR: never replace LLM output with canned recovered fallback. Keep stream or ask retry.
+      // Keep ANY accumulated stream text as a completed answer — never discard live tokens.
       const streamKeep = String(streamedResponse || "").trim();
-      const keepReal = answerFinalLocked || streamKeep.length >= 40;
+      const keepReal = streamKeep.length > 0;
       const finalText = keepReal
         ? streamKeep
         : "Generation was interrupted before a complete answer arrived. Please retry the question.";
@@ -1299,15 +1305,19 @@ export default function InterviewPage() {
         questionId,
         retryCount,
         source: "copilot",
-        status: "completed",
+        status: keepReal ? "completed" : "error",
         metrics: { ...responseMetrics(), recovered: false },
         analysis: null,
         recovery: false
       });
       pendingAnalysisRef.current = null;
       pendingContextRef.current = null;
-      setGenerationError(keepReal ? null : { retryable: true, userMessage: "Please retry the question.", question: requestQuestion, source });
-      if (!keepReal) showSnackbar("Answer incomplete — please retry.", "warning");
+      if (keepReal) {
+        setGenerationError(null);
+      } else {
+        setGenerationError({ retryable: true, userMessage: "Please retry the question.", question: requestQuestion, source });
+        showSnackbar("Answer incomplete — please retry.", "warning");
+      }
       return;
     } finally {
       disarmTimeout();

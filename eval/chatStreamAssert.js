@@ -39,8 +39,10 @@ async function main() {
   }
   const held = await read([encoder.encode('data: {"text":"Done"}\n\ndata: [DONE]\n\n')], { open: true });
   assert.equal(held.res.wasCancelled(), true, "DONE must stop without waiting for socket EOF");
+  // finish_reason length/max_tokens must NOT abort — client keeps streamed text.
   for (const reason of ["length", "max_tokens", "MAX_TOKENS", "content_filter", "SAFETY"]) {
-    await assert.rejects(read([encoder.encode(`data: {"text":"Partial"}\n\nevent: generation\ndata: ${JSON.stringify({ finish_reason: reason })}\n\ndata: [DONE]\n\n`)]), e => e.classified?.code === "incomplete");
+    const kept = await read([encoder.encode(`data: {"text":"Partial"}\n\nevent: generation\ndata: ${JSON.stringify({ finish_reason: reason })}\n\ndata: [DONE]\n\n`)]);
+    assert.equal(kept.text, "Partial", `must keep text for finish_reason=${reason}`);
     checks++;
   }
   for (const wire of [
