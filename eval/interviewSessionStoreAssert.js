@@ -12,6 +12,7 @@ const r1 = appendQa(a, { model: "gpt-4o-mini", source: "test" }, {
   answerShown: "Answer one",
   status: "completed",
   source: "system",
+  sourceFiles: ["knowledge/fiori/fiori-security.md", "knowledge/fiori/catalogs.md"],
   interviewContext: {
     questionIntent: "CORRECTION",
     questionTopic: "GRC",
@@ -45,6 +46,7 @@ assert.strictEqual(sessA.schemaVersion, 2);
 assert.strictEqual(sessA.qa[0].questionRaw, "No, Q1");
 assert.strictEqual(sessA.qa[0].questionIntent, "CORRECTION");
 assert.strictEqual(sessA.qa[0].source, "system");
+assert.deepStrictEqual(sessA.qa[0].sourceFiles, ["knowledge/fiori/fiori-security.md", "knowledge/fiori/catalogs.md"]);
 assert.strictEqual(sessA.qa[0].candidateTranscript, undefined);
 assert.doesNotMatch(JSON.stringify(sessA), /must not persist/);
 assert.strictEqual(sessA.qa[1].retryCount, 1);

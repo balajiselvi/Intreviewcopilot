@@ -83,10 +83,7 @@ When a user opens their Fiori launchpad, the system determines which app tiles t
 
 ## Implementation Activities
 
-- Design Fiori catalog/group or space/page structure aligned with business role definitions
-- Maintain OData service authorization for standard and custom Fiori apps
-- Validate backend authorization content is complete for every app granted launchpad access
-- Test the full app experience end to end, not just launchpad visibility
+Confirm the deployment before configuring launchpad content. On Public Edition, assign business catalogs, IAM apps, and spaces/pages from Maintain Business Roles, then assign the business role in Maintain Business Users. On Private Edition or on-premise, maintain business catalogs in /UI2/FLPCM_CUST and technical catalogs, tiles, and target mappings in /UI2/FLPAM where the release supports it, then assign the catalog and space or legacy group through PFCG. Identify OData version before activation: use /IWFND/MAINT_SERVICE for applicable OData V2 services, or /IWFND/V4_ADMIN service-group publishing for OData V4. Treat launchpad visibility, navigation, service access, and backend business authorization as separate layers — S_SERVICE alone is not proof of business access. Validate with an entitled business user completing the intended app action and a negative-access check.
 
 ## Migration Activities
 

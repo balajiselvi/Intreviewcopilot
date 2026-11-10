@@ -21,9 +21,31 @@ assert.strictEqual(isNoiseOnly("How do you configure MSMP?"), false);
 assert.match(normalizePhonetics("how do you fix splitation of duties"), /Segregation of Duties \(SoD\)/i);
 assert.match(normalizePhonetics("configure fee-ori launchpad roles"), /SAP Fiori/i);
 assert.match(normalizePhonetics("open m-s-m-p workflow"), /MSMP Workflow/i);
+assert.match(normalizePhonetics("stuck in MSMP?"), /stuck in MSMP\?/i);
+assert.doesNotMatch(normalizePhonetics("stuck in MSMP?"), /Workflow Workflow/i);
+assert.doesNotMatch(normalizePhonetics("stuck in MSMP?"), /\bMSMP Workflow\b/i);
+assert.equal(
+  normalizePhonetics(normalizePhonetics("open m-s-m-p workflow")),
+  normalizePhonetics("open m-s-m-p workflow"),
+  "MSMP phonetic normalization must be idempotent"
+);
+assert.equal(
+  normalizePhonetics("How did you handle an MSMP request with no approver"),
+  "How did you handle an MSMP request with no approver"
+);
 assert.match(normalizePhonetics("check su twenty four proposals"), /SU24/i);
 assert.match(normalizePhonetics("run st-auth-trace"), /STAUTHTRACE/i);
 assert.match(normalizePhonetics("use x-s-u-a-a scopes"), /XSUAA/i);
+
+const msmpStuck = prepareLiveTranscript("How do you troubleshoot an access request stuck in MSMP?");
+assert.equal(msmpStuck.normalized, "How do you troubleshoot an access request stuck in MSMP?");
+assert.doesNotMatch(msmpStuck.normalized, /Workflow Workflow/i);
+const msmpStuckTurn = decideInterviewTurn({ question: "How do you troubleshoot an access request stuck in MSMP?" });
+assert.equal(msmpStuckTurn.route, "ANSWER_BANK");
+assert.equal(msmpStuckTurn.scriptId, "SAPSC-042");
+const msmpScenarioTurn = decideInterviewTurn({ question: "How did you handle an MSMP request with no approver" });
+assert.equal(msmpScenarioTurn.route, "ANSWER_BANK");
+assert.equal(msmpScenarioTurn.scriptId, "SAPSCN-005");
 
 const reconstructed = reconstructIncompleteAsk(
   "handle customer-maintained modifications in SU24 proposals without widening Production roles"

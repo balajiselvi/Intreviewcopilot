@@ -82,10 +82,14 @@ cases.push("unnamed user count is methodology");
 
 cases.push("years question does not invent a total");
 {
+  // PROFILE_FACTS is authoritative: "12+ years hands-on enterprise SAP Security / GRC Access Control"
+  // and confirmed ITIL V4 Foundation — do not require the older "12+ years of SAP GRC Security" phrase
+  // or treat ITIL as contradictory.
   const text = expectMode("How many years of experience do you have?", "", "profile", null);
   present(text, /17\+ years of overall IT experience/, "confirmed IT years");
-  present(text, /12\+ years of SAP GRC Security/, "confirmed SAP years");
-  absent(text, /15\+ years|10\+ years|ITIL/, "contradictory years");
+  present(text, /12\+\s*years\s+hands-on\s+enterprise\s+SAP Security\s*\/\s*GRC Access Control/, "confirmed SAP years");
+  present(text, /ITIL V4 Foundation/, "confirmed ITIL");
+  absent(text, /15\+ years|10\+ years/, "contradictory years");
 }
 
 cases.push("client geography stays labelled");
@@ -162,9 +166,11 @@ cases.push("two named programmes are not merged");
 
 cases.push("confirmed years and certification survive a short cv");
 {
+  // Align to PROFILE_FACTS wording (hands-on SAP Security / GRC Access Control + PMP; ITIL confirmed).
   const text = expectMode("How many years of SAP GRC experience do you have, and are you PMP certified?", "", "profile", null);
-  present(text, /12\+ years of SAP GRC Security/, "confirmed years");
-  present(text, /PMP certified/, "confirmed certification");
+  present(text, /12\+\s*years\s+hands-on\s+enterprise\s+SAP Security\s*\/\s*GRC Access Control/, "confirmed years");
+  present(text, /\bPMP\b/, "confirmed certification");
+  present(text, /ITIL V4 Foundation/, "confirmed ITIL");
   absent(text, /8,700|Dover Corporation/, "employer volume");
 }
 

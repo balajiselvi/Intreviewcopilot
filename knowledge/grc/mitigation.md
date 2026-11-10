@@ -38,6 +38,19 @@ This is also exactly what auditors specifically test for — not whether a mitig
 - Approval: formal sign-off, typically by the risk owner, activating the control
 - Execution record: documented evidence the control was actually performed on schedule
 
+## Operational Mitigation Control Lifecycle
+
+SAP Access Control does not publish a single product feature named "Mitigation Lifecycle." In practice, organizations operate mitigating controls through a governed lifecycle:
+
+1. Define the control, monitoring activity, evidence expectations, and expiry or review cadence.
+2. Assign owner and independent monitor accountability.
+3. Link the control to the specific risk and to the user, role, or request scope policy allows.
+4. Approve activation so residual-risk reporting treats the conflict as managed rather than open.
+5. Execute the review on schedule and retain evidence.
+6. Expire, renew, or remediate before ownership and residual-risk reporting drift from what audit expects.
+
+Mitigation is not remediation. It is also not automatically Process Control, though a Process Control control can be referenced when that integration is in scope.
+
 ## Runtime Flow
 
 When ARA flags a conflict that can't be remediated, a mitigating control is proposed, typically as part of the ARM approval flow when a risk owner reviews the flagged conflict. The risk owner approves the control, formally linking it to the user and risk. From that point, the control's execution is a recurring operational activity — the assigned monitor performs the defined review on schedule and records evidence of that execution. Periodic risk analysis continues to flag the underlying conflict as existing, but with the active, approved mitigating control attached, showing it as a managed risk rather than an unaddressed one.

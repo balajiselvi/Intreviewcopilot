@@ -14,14 +14,22 @@ const surfaces = {
   settings
 };
 
+// PROFILE_FACTS is the authoritative certification/years source. Other surfaces must not
+// contradict confirmed years/PMP; they are not required to restate ITIL on every UI string.
 for (const [name, text] of Object.entries(surfaces)) {
   assert.doesNotMatch(text, /15\+\s*years/i, `${name} still says 15+ years`);
   assert.doesNotMatch(text, /10\+\s*years/i, `${name} still says 10+ years`);
-  assert.doesNotMatch(text, /ITIL/i, `${name} still claims ITIL`);
   assert.match(text, /17\+ years of overall IT|17\+ years overall IT/, `${name} missing 17+ IT`);
-  assert.match(text, /12\+ years of SAP GRC|12\+ years SAP GRC/, `${name} missing 12+ SAP`);
+  assert.match(text, /12\+\s*years.*(?:SAP GRC|GRC Access Control|SAP Security)/i, `${name} missing 12+ SAP`);
   assert.match(text, /PMP/, `${name} missing PMP`);
 }
+assert.match(PROFILE_FACTS, /ITIL V4 Foundation/i, "PROFILE_FACTS must retain confirmed ITIL V4 Foundation");
+assert.match(PROFILE_FACTS, /PMP/, "PROFILE_FACTS must retain confirmed PMP");
+assert.match(
+  PROFILE_FACTS,
+  /12\+\s*years\s+hands-on\s+enterprise\s+SAP Security\s*\/\s*GRC Access Control/,
+  "PROFILE_FACTS must keep the confirmed SAP Security / GRC Access Control years wording"
+);
 
 (async () => {
   const { register } = require("node:module");
@@ -33,10 +41,12 @@ for (const [name, text] of Object.entries(surfaces)) {
     analysis: { category: "General", secondaryCategories: [] },
     responseLength: "medium"
   });
-  assert.match(prompt, /17\+ years of overall IT experience/);
-  assert.match(prompt, /12 years of SAP GRC Security|more than 12 years of SAP GRC Security/);
+  // Without an injected resume, years/certs appear via MASTER HANDS-ON BANK / profile baseline text.
+  assert.match(prompt, /17\+ years(?: of)? overall IT/);
+  assert.match(prompt, /12\+\s*years\s+(?:hands-on\s+enterprise\s+)?(?:SAP Security|enterprise SAP Security).*GRC|12\+\s*years enterprise SAP Security\/GRC/i);
   assert.match(prompt, /PMP/);
-  assert.doesNotMatch(prompt, /15\+\s*years|10\+\s*years|ITIL/i);
+  assert.match(prompt, /ITIL V4 Foundation/i);
+  assert.doesNotMatch(prompt, /15\+\s*years|10\+\s*years/i);
 
   const concise = buildSapInterviewPrompt({
     question: "How would you decide which security risk to accept when the test window is full?",

@@ -209,7 +209,7 @@ function personalHistory(question = "") {
 
 function matchingDomains(question = "") {
   const domains = [
-    ["grc", /\b(grc|sod|segregation|access control|access[- ]risk|business role|firefighter|ara|arm|eam|brm)\b/i],
+    ["grc", /\b(grc|sod|segregation|access control|access[- ]risk|business role|firefighter|ara|arm|eam|brm|mitigation|mitigating control|critical actions?|critical permissions?|critical access|rule\s*sets?)\b/i],
     ["security", /\b(security|authorization|authorisation|pfcg|role design)\b/i],
     ["presales", /\bpre[-\s]?sales\b/i],
     ["identity", /\b(\bias\b|\bips\b|\biag\b|\biam\b|sso|mfa)\b/i]
@@ -235,9 +235,27 @@ function renderProfile() {
 }
 
 function scopeCareerEvidence(question = "", priorQuestion = "") {
+  let allowsExperience = true;
+  let conceptualAsk = false;
+  try {
+    const { allowsCandidateExperienceInjection, isConceptualTechnicalQuestion } = require("../../lib/experienceEligibility.js");
+    allowsExperience = allowsCandidateExperienceInjection(question);
+    conceptualAsk = isConceptualTechnicalQuestion(question);
+  } catch {
+    // Eligibility helper missing — fall through to legacy scoping.
+  }
+
   const named = namedProgrammes(question);
-  const priorNamed = named.length || widensScope(question) ? [] : namedProgrammes(priorQuestion);
+  // Conceptual / definition asks never inherit prior-turn programme metrics. Only an
+  // explicit named programme (or personal cue) on THIS question may open CV facts.
+  const priorNamed = (conceptualAsk || named.length || widensScope(question))
+    ? []
+    : namedProgrammes(priorQuestion);
   const selected = named.length ? named : priorNamed;
+
+  if (conceptualAsk && !named.length && !personalCue(question)) {
+    return { mode: "technical", programmeId: null, text: TECHNICAL_EVIDENCE };
+  }
   if (selected.length === 1) {
     return {
       mode: "programme",
@@ -280,7 +298,11 @@ function scopeCareerEvidence(question = "", priorQuestion = "") {
   if (personalCue(question)) {
     return { mode: "profile", programmeId: null, text: renderProfile() };
   }
-  if (selectedDomains.length || /\bwhat(?:'s| is| are)\b|\b(which|where)\b/i.test(question)) {
+  if (selectedDomains.length || /\bwhat(?:'s| is| are)\b|\b(which|where)\b|\bexplain\b|\bdefine\b/i.test(question)) {
+    return { mode: "technical", programmeId: null, text: TECHNICAL_EVIDENCE };
+  }
+  // Never dump the full CV for residual unclassified technical asks when experience is ineligible.
+  if (!allowsExperience) {
     return { mode: "technical", programmeId: null, text: TECHNICAL_EVIDENCE };
   }
   return { mode: "full", programmeId: null, text: DEFAULT_CAREER_BACKGROUND };

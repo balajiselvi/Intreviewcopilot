@@ -78,3 +78,11 @@ Never answer a Public Edition question with “open PFCG and derive org levels�
 - **Mechanism:** Draw the path for a joiner: HR → IPS → IAS → ERP role/business role → Fiori app → object check. State edition. State where SoD is analyzed. State where secrets for interfaces live (PAM).
 - **Governance:** No plane is asked to do another’s job (e.g., IAS groups alone are not ERP SoD control).
 - **Validation:** End-to-end joiner test; SoD simulation; app trace; leaver revocation across planes within SLA.
+
+## Q11: Describe the security architect’s owned activities in an S/4HANA security transformation
+
+- **Decision:** Own the authorization workstream end-to-end: as-is role assessment, target concept (task-based singles + Fiori catalogs), SoD simulation before transport, build/assign, test gates, cutover provisioning controls, and hypercare defect triage — not a lift-and-shift of ECC composites.
+- **Mechanism:** Mine usage (`ST03N`/`STAD`) against assignment (`AGR_*`); redesign roles for S/4 and Fiori; maintain `SU24`/`SU25` where Private Edition applies; bind business catalogs; run ARA/IAG simulations; negative-test toxic pairs; cut over with access-control go/no-go criteria.
+- **Experience grounding:** Personal metrics, employers, and programme counts only from CANDIDATE BACKGROUND / CV — never invent landscape sizes. When CV facts exist (role counts, catalog counts, SoD conflicts cleared), couple them only to questions that ask for owned transformation experience.
+- **Governance:** Clean Core preference for extensions; SOX ITGC evidence on role transport, SoD, and firefighter/PAM; business owner sign-off on process personas.
+- **Validation:** UAT personas complete critical processes; SoD residual risk accepted only with mitigations; hypercare access defects trend down without widening roles blindly.

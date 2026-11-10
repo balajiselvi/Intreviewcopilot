@@ -75,9 +75,38 @@ assert.deepEqual(
 );
 assert.deepEqual(
   productKnowledgeFolders("How would you deliver a programme with SAP Activate?"),
-  ["project-management", "rise"],
-  "SAP Activate uses the project and RISE lanes"
+  ["project-management"],
+  "SAP Activate methodology uses its project-management lane without assuming a RISE engagement"
 );
+const projectDeliveryScopeCases = [
+  {
+    question: "How would you apply the SAP Activate implementation methodology?",
+    expected: ["project-management"],
+    excluded: ["rise", "cutover", "hypercare"]
+  },
+  {
+    question: "How would you lead a RISE with SAP transformation?",
+    expected: ["rise", "s4hana"],
+    excluded: ["project-management", "cutover", "hypercare"]
+  },
+  {
+    question: "How do you prepare SAP Activate cutover and hypercare?",
+    expected: ["project-management", "cutover", "hypercare"],
+    excluded: ["rise"]
+  },
+  {
+    question: "How do you govern risks and milestones in an SAP project?",
+    expected: ["project-management"],
+    excluded: ["rise", "cutover", "hypercare"]
+  }
+];
+for (const item of projectDeliveryScopeCases) {
+  const folders = productKnowledgeFolders(item.question);
+  assert.deepEqual(folders, item.expected, item.question);
+  for (const excludedFolder of item.excluded) {
+    assert.ok(!folders.includes(excludedFolder), `${item.question}: excludes ${excludedFolder}`);
+  }
+}
 assert.deepEqual(
   productKnowledgeFolders("How do you choose between a greenfield new implementation and a system conversion?"),
   ["project-types", "project-management", "cutover", "hypercare", "rise"],
@@ -102,16 +131,52 @@ const gatewayCandidates = [
   { sourceFolder: "fiori", heading: "Public Edition app opens but authorization fails" },
   { sourceFolder: "fiori", heading: "Failing authorization: on-premise and Private Edition Gateway" }
 ];
-assert.deepEqual(
-  selectProductScopedChunks("In S/4HANA Cloud Public Edition, a user cannot see a Fiori app.", editionCandidates).map((c) => c.heading),
-  ["Public Edition: user cannot see a Fiori app", "Public Edition troubleshooting: app is missing"],
-  "single-edition answers exclude the opposite edition's procedure"
-);
-assert.deepEqual(
-  selectProductScopedChunks("Compare the Fiori app assignment in S/4HANA Cloud Public Edition and Private Edition.", editionCandidates).map((c) => c.heading),
-  editionCandidates.map((c) => c.heading),
-  "an explicit edition comparison retains both edition lanes"
-);
+{
+  // Contract is edition retention — Public procedure + Public troubleshooting — not frozen
+  // input-array order. Opposite-edition Private headings must stay excluded.
+  const publicMissingAppHeadings = selectProductScopedChunks(
+    "In S/4HANA Cloud Public Edition, a user cannot see a Fiori app.",
+    editionCandidates
+  ).map((c) => c.heading);
+  assert.equal(publicMissingAppHeadings.length, 2, "single-edition answers keep both Public procedure lanes");
+  assert.ok(
+    publicMissingAppHeadings.includes("Public Edition: user cannot see a Fiori app"),
+    "single-edition answers retain the Public Edition assignment procedure"
+  );
+  assert.ok(
+    publicMissingAppHeadings.includes("Public Edition troubleshooting: app is missing"),
+    "single-edition answers retain the Public Edition troubleshooting procedure"
+  );
+  assert.ok(
+    !publicMissingAppHeadings.some((h) => /Private Edition/i.test(h)),
+    "single-edition answers exclude the opposite edition's procedure"
+  );
+}
+{
+  // Contract is lane retention for an explicit Public vs Private comparison — not
+  // a frozen input-array order. Ranking may promote troubleshooting headings first.
+  const compareHeadings = selectProductScopedChunks(
+    "Compare the Fiori app assignment in S/4HANA Cloud Public Edition and Private Edition.",
+    editionCandidates
+  ).map((c) => c.heading);
+  const expectedHeadings = editionCandidates.map((c) => c.heading);
+  assert.equal(
+    compareHeadings.length,
+    expectedHeadings.length,
+    "an explicit edition comparison retains every edition-lane candidate"
+  );
+  for (const heading of expectedHeadings) {
+    assert.ok(
+      compareHeadings.includes(heading),
+      `an explicit edition comparison retains both edition lanes (missing: ${heading})`
+    );
+  }
+  assert.ok(
+    compareHeadings.some((h) => /Public Edition/i.test(h))
+      && compareHeadings.some((h) => /Private Edition/i.test(h)),
+    "an explicit edition comparison retains both edition lanes"
+  );
+}
 assert.deepEqual(
   productKnowledgeFolders("An on-premise Fiori app returns HTTP 403 from OData. What do I check?"),
   ["fiori", "s4hana"],
@@ -127,7 +192,49 @@ assert.deepEqual(
   ["sac"],
   "SAC diagnosis must not retrieve Public Edition launchpad troubleshooting"
 );
-assert.deepEqual(productKnowledgeFolders("How do you troubleshoot SuccessFactors employee data access?"), ["idm"]);
+// SuccessFactors intent-sensitive scope: RBP/employee-data ≠ IDM; JML/provisioning adds IPS plane.
+const sfEmployeeDataFolders = productKnowledgeFolders("How do you troubleshoot SuccessFactors employee data access?");
+assert.ok(sfEmployeeDataFolders.includes("successfactors"),
+  "SF employee data access uses the SuccessFactors RBP lane");
+assert.ok(!sfEmployeeDataFolders.includes("idm"),
+  "SF employee data access must not require standalone IDM scope");
+assert.ok(!sfEmployeeDataFolders.includes("iag"),
+  "SF employee data access must not open IAG");
+
+const sfRbpFolders = productKnowledgeFolders("How do you configure SuccessFactors role-based permissions?");
+assert.ok(sfRbpFolders.includes("successfactors"), "SF RBP configure stays on successfactors");
+assert.ok(!sfRbpFolders.includes("idm"), "SF RBP configure must not pull standalone IDM");
+assert.ok(!sfRbpFolders.includes("iag"), "SF RBP configure must not open IAG");
+
+const sfIdmFolders = productKnowledgeFolders("How do you integrate SuccessFactors with SAP IDM?");
+assert.ok(sfIdmFolders.includes("successfactors") && sfIdmFolders.includes("idm"),
+  "explicit SF–IDM integration retrieves both domains");
+
+const sfJmlEcFolders = productKnowledgeFolders("How do you provision joiners from SuccessFactors Employee Central?");
+assert.ok(sfJmlEcFolders.includes("successfactors"), "SF EC joiner provisioning keeps the SF source lane");
+assert.ok(sfJmlEcFolders.includes("btp") && sfJmlEcFolders.includes("cloud"),
+  "SF EC joiner provisioning opens the IPS identity-provisioning plane (btp/cloud)");
+assert.ok(!sfJmlEcFolders.includes("iag"), "SF EC joiner provisioning must not open IAG");
+
+const sfJmlFolders = productKnowledgeFolders("How do you provision joiners from SuccessFactors?");
+assert.ok(sfJmlFolders.includes("successfactors"), "SF joiner provisioning keeps the SF source lane");
+assert.ok(sfJmlFolders.includes("btp") && sfJmlFolders.includes("cloud"),
+  "SF joiner provisioning opens the IPS plane even when plurals omit explicit IPS/IDM names");
+assert.ok(!sfJmlFolders.includes("iag"), "SF joiner provisioning must not open IAG");
+
+const sfIdmProvisionFolders = productKnowledgeFolders("How do you troubleshoot SAP IDM provisioning from SuccessFactors?");
+assert.ok(sfIdmProvisionFolders.includes("idm") && sfIdmProvisionFolders.includes("successfactors"),
+  "SF→IDM provisioning troubleshooting retrieves IDM and SuccessFactors");
+assert.ok(!sfIdmProvisionFolders.includes("btp") && !sfIdmProvisionFolders.includes("cloud"),
+  "explicit IDM provisioning must not synonymize IPS (btp/cloud) into the scope");
+assert.ok(!sfIdmProvisionFolders.includes("iag"),
+  "SF→IDM provisioning must not open IAG");
+
+const idmOnlyFolders = productKnowledgeFolders("How do you troubleshoot SAP IDM itself?");
+assert.ok(idmOnlyFolders.includes("idm"), "IDM-only troubleshooting retrieves IDM");
+assert.ok(!idmOnlyFolders.includes("successfactors"),
+  "IDM-only troubleshooting must not force SuccessFactors");
+
 const auditEvidenceFolders = productKnowledgeFolders("How do I prepare role and SoD evidence for a SOX ITGC audit?");
 assert.ok(auditEvidenceFolders.includes("grc") && auditEvidenceFolders.includes("audit") && auditEvidenceFolders.includes("compliance"),
   "SOX/ITGC questions retain both product-risk and audit-evidence sources");

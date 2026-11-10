@@ -75,3 +75,11 @@ Spoken architect style: fluent Senior Principal Architect paragraphs — lead wi
 - **Mechanism:** Provide architecture diagram; job catalog; sample joiner/mover/leaver logs; reconcile reports; access to identity store change history; RACI.
 - **Governance:** Control testing samples pulled from Production logs, not DEV. Residual manual steps documented.
 - **Validation:** Walkthrough one joiner and one leaver with end-to-end artifacts across IDM and targets; orphan report current; no standing Domain Admin for IDM service account.
+
+## Q11: Explain the identity provisioning lifecycle on SAP IDM 7.2/8.0 without collapsing into Cloud IPS
+
+- **Decision:** Lead with the product plane. On SAP IDM, provisioning lifecycle means Identity Center orchestration — not IPS JSON connector sync and not IAG Access Request.
+- **Mechanism:** Authoritative HR or directory change lands in an identity store entry (commonly `MX_PERSON`). Event tasks or scheduled jobs evaluate attribute deltas (hire, org move, terminate). Tasks call repository connectors (ABAP, LDAP/AD, and others) with mappings and optional JavaScript/SQL logic maintained in Developer Studio. The Runtime Engine / dispatchers execute passes; job logs record success, retry, and failed entities. Reconciliation jobs detect orphans. Deprovisioning disables or removes target entitlements on leaver events under SLA.
+- **Contrast (spoken, when needed):** Cloud IPS uses source/target/proxy systems and SCIM-oriented JSON transformations without IDM's stateful Identity Center workflow model. IAG governs access risk and requests; it does not replace IDM Runtime jobs.
+- **Governance:** Same-day privileged leaver SLA; dual-control for Production schema/job changes; secrets never hardcoded in scripts.
+- **Validation:** Joiner creates correct ABAP/AD accounts; mover updates org-driven roles; leaver disables within SLA; reconcile shows no unexpected orphans; job log RC success.

@@ -8,13 +8,23 @@ A Principal Architect separates five planes. Mixing them is the fastest way to f
 |---|---|---|
 | Identity source | SuccessFactors / HR | Employment status, org, job, company code, manager |
 | Authentication | IAS / corporate IdP | Who the user is: federation, MFA, SSO, session, trust |
-| Provisioning | IPS / SAP IDM | Create/update/disable accounts and assignments from source to target |
+| Provisioning | **SAP IDM 7.2/8.0** *or* **Cloud IPS** (different products — never collapse) | Create/update/disable accounts and assignments from source to target |
 | Governance | IAG / GRC AC | Whether access is appropriate: request, SoD, certification, PAM |
 | Enforcement | Target application | What the user can execute: PFCG, SF RBP, RSECADMIN, XSUAA role collections, Ariba groups |
 
+## SAP IDM vs Cloud IPS vs IAG — plane separation
+
+**SAP Identity Management 7.2 / 8.0 (on-premise)** is a stateful identity orchestration platform: Identity Center, Developer Studio, Runtime Engine, identity stores and entry types (for example `MX_PERSON`), repositories, jobs, tasks, event tasks, ABAP/LDAP connectors, and JavaScript or SQL provisioning logic. Joiner–mover–leaver is expressed as event-driven tasks and ordered job chains with dispatcher execution and job-log evidence.
+
+**SAP Cloud Identity Services — Identity Provisioning (IPS)** is a cloud-native synchronization engine. It connects source, target, and proxy systems, applies read/write JSON transformations and filters, and provisions over SCIM or supported connectors on a schedule or on demand. It does **not** replace IDM's heavy workflow/orchestration model, and it does **not** authenticate users.
+
+**SAP IAG** is cloud access governance (Access Analysis, Access Request, Certification, Role Design, Privileged Access Management). It may trigger or consume provisioning outcomes, but it is not Identity Center and it is not IPS transformation design.
+
+When an interviewer says "identity provisioning lifecycle" without naming a product, I state the plane first: if the landscape is classic IDM, I speak Identity Center mechanics; if the landscape is BTP/CIS, I speak IPS source→transform→target; I never describe IPS JSON sync as if it were IDM event tasks.
+
 ## Interview Summary
 
-Identity source is not authentication. Authentication is not provisioning. Provisioning is not approval. Approval is not enforcement. BTP role collections live on XSUAA in the subaccount, not in IAS. SoD lives in IAG Access Analysis or GRC ARA, not in IPS transformations.
+Identity source is not authentication. Authentication is not provisioning. Provisioning is not approval. Approval is not enforcement. BTP role collections live on XSUAA in the subaccount, not in IAS. SoD lives in IAG Access Analysis or GRC ARA, not in IPS transformations. SAP IDM and Cloud IPS both provision, but they are different products with different runtime artifacts.
 
 ## 30 Second Interview Answer
 

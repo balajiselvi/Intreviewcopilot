@@ -30,6 +30,11 @@ const NAMED_SOURCE_PATTERNS = Object.freeze([
   ["datasphere", /\bdatasphere\b/i],
   ["sac", /\b(?:sac|analytics cloud)\b/i],
   ["process-control", /\b(?:SAP GRC )?Process Control\b/i],
+  ["brm", /\b(?:\bbrm\b|business role management)\b/i],
+  ["pfcg", /\b(?:\bpfcg\b|profile generator)\b/i],
+  ["ara", /\b(?:\bara\b|access risk analysis)\b/i],
+  ["msmp", /\bmsmp\b/i],
+  ["firefighter", /\b(?:firefighter|eam)\b/i],
   ["cutover", /\bcutover\b/i],
   ["hypercare", /\bhypercare\b/i]
 ]);
@@ -71,7 +76,16 @@ function deliveryProcedureAdjustment(question, chunk = {}, analysis = {}) {
   const asksConfigure = /\b(how (?:do|would|to)\b.{0,40}\bconfigur|configur(?:e|ation|ing)\b|integrat(?:e|ion|ing)\b|attach|link|route|set up|implement)\b/i.test(q)
     || /configur|implement/i.test(intent)
     || /configuration|implementation/i.test(category);
-  if (!asksTrouble && !asksDelivery && !asksConfigure) return 0;
+  // Central vs decentral EAM / Firefighter deploy (and central-GRC failover) must rank even
+  // when the ask is conceptual/comparison — those questions never set configure/trouble intent.
+  const asksEamDeploy = (
+    /\b(?:central(?:ized)?|decentral(?:ized)?)\b/i.test(q)
+    && /\b(?:eam|firefighter|ff\s*ids?|emergency access)\b/i.test(q)
+  ) || (
+    /\b(?:unavailable|offline|outage|failover)\b/i.test(q)
+    && /\b(?:(?:central\s+)?grc|eam|firefighter|ff\s*ids?)\b/i.test(q)
+  );
+  if (!asksTrouble && !asksDelivery && !asksConfigure && !asksEamDeploy) return 0;
   const wrapperHeading = /\b(what makes|common interview|red flags|hidden expectations|keywords|tough follow|interview summary|\d+ second interview answer)\b/i.test(heading);
   const procedureHeading = asksTrouble
     ? /\b(troubleshoot|troubleshooting|diagnos|diagnostic|investigation|triage|failing authorization|service not active|symptom|problem|missing app|failed entities)\b/i.test(heading)
@@ -101,11 +115,51 @@ function deliveryProcedureAdjustment(question, chunk = {}, analysis = {}) {
   if (asksDelivery && /\barchitecture\b/i.test(heading) && !deliveryBody) delta -= 0.16;
   // Keep MSMP workflow how-tos on MSMP configure/troubleshoot sections rather than
   // neighboring BRF agent-rule essays when the question did not ask for BRF+.
-  const asksMsmp = /\bMSMP\b/i.test(q);
+  const asksMsmp = /\bMSMP\b|\bGRFNMW_CONFIGURE\b|\bstuck (?:approval )?workflow\b|\bno approver\b/i.test(q);
   const asksBrf = /\bBRF\+?\b|\bBRFplus\b|\bBRF\s*plus\b/i.test(q);
   if (asksConfigure && asksMsmp && !asksBrf && /^configure an msmp\b/i.test(heading)) delta += 0.22;
   if (asksConfigure && asksMsmp && !asksBrf && /\b(?:agent rule|initiator rule)\b/i.test(heading)) delta -= 0.28;
   if (asksConfigure && asksBrf && /\b(?:agent rule|initiator rule|brf)\b/i.test(heading)) delta += 0.22;
+
+  // Capability-aware GRC ranking: SoD / ARA / business-risk-report asks must not lose to
+  // MSMP "troubleshooting" headings merely because deliveryProcedureAdjustment rewards
+  // the word troubleshooting (+0.28) and demotes headings without it (-0.20).
+  const asksAraCapability = !asksMsmp && /\b(?:ARA|access risk analysis|SoD|segregation of duties|risk violations?|excessive (?:SoD |sod )?violations?|business reports?.{0,40}(?:sod|violation|risk)|GRAC_BATCH_RISK_ANALYSIS|ruleset)\b/i.test(q);
+  const asksEamCapability = /\b(?:EAM|firefighter|ff\s*ids?|emergency access|fflog|GRACFFLOG)\b/i.test(q)
+    && !asksMsmp
+    && !asksAraCapability;
+  const headingMsmpOnly = /\b(?:msmp|grfnmw|workflow|approver|initiator rule|agent rule)\b/i.test(heading)
+    && !/\b(?:ara|sod|risk analysis|risk violation|business report|ruleset)\b/i.test(heading);
+  const headingAra = /\b(?:ara|sod|risk analysis|risk violation|business report|ruleset|GRAC_BATCH|access risk)\b/i.test(heading);
+  const headingEam = /\b(?:eam|firefighter|ff\s*id|emergency access|fflog|GRACFF)\b/i.test(heading);
+  if (asksAraCapability) {
+    if (headingAra) delta += 0.42;
+    if (headingMsmpOnly) delta -= 0.55;
+    // Do not let a generic "troubleshooting" label outweigh ARA technical relevance.
+    if (asksTrouble && /\btroubleshoot/i.test(heading) && headingMsmpOnly) delta -= 0.28;
+  }
+  if (asksEamCapability) {
+    if (headingEam) delta += 0.42;
+    if (headingMsmpOnly && !headingEam) delta -= 0.45;
+  }
+  if (asksMsmp && !asksAraCapability) {
+    if (/\b(?:msmp|grfnmw|initiator|agent rule|workflow path)\b/i.test(heading)) delta += 0.22;
+    if (headingAra && !/\b(?:msmp|workflow|arm|access request)\b/i.test(heading)) delta -= 0.25;
+  }
+
+  // Prefer Q109-class headings over GRAC_SPM interview answers, connector groups, or sync ops.
+  if (asksEamDeploy) {
+    if (/central vs\.?\s*decentralized emergency access|q109|centralized|decentralized|firefighting/i.test(heading)) {
+      delta += 0.42;
+    }
+    if (wrapperHeading || /\b(?:red flags|what makes|connector groups?|repository sync)\b/i.test(heading)) {
+      delta -= 0.35;
+    }
+    if (/\b(?:repository sync|connector groups?)\b/i.test(heading)
+      && !/\b(?:firefighter|eam|emergency|central|decentral)\b/i.test(heading)) {
+      delta -= 0.4;
+    }
+  }
   return delta;
 }
 

@@ -142,10 +142,16 @@ const {
     selectVerifiedWorkflow("How would you baseline SoD risks for a new role set before provisioning?"),
     null
   );
-  assert.equal(
-    selectVerifiedWorkflow("How do you configure an MSMP workflow for access requests?"),
-    null
+  const msmpConfiguration = selectVerifiedWorkflow("How do you configure an MSMP workflow for access requests?");
+  assert.equal(msmpConfiguration?.workflowId, "grc-msmp-access-request-config");
+  assert.match(msmpConfiguration.answer, /Maintain MSMP Workflows/i);
+  // Contract: validation names path, stage, and approver evidence. Prefer the
+  // Access Control term "Approvers of Selected Path" over a brittle paraphrase.
+  assert.match(
+    msmpConfiguration.answer,
+    /(?:path,\s*stage,\s*Approvers of Selected Path|selected path,\s*stage,\s*approver)/i
   );
+  assert.doesNotMatch(msmpConfiguration.answer, /GRAC_RULE_BUILD|GRACRISKT|Firefighter/i);
   assert.equal(
     selectVerifiedWorkflow(
       "How do you design an SAP Access Control access request from submission through target provisioning?"

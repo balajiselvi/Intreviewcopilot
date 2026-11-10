@@ -39,6 +39,16 @@ The part that determines whether ARA actually catches real risk is ruleset quali
 - Simulation: evaluates a proposed request before approval
 - Mitigation: a documented compensating control applied when a conflict can't be avoided
 
+## Critical Actions, Critical Permissions, and SoD Risks
+
+ARA rulesets distinguish segregation-of-duties Risks from Critical Access Risks.
+
+- A segregation-of-duties Risk requires conflicting Functions held together (for example create vendor plus post payment).
+- A Critical Action Risk flags a single sensitive executable on its own — typically a transaction, Web Dynpro application, Fiori UI5 application, or service that is privileged even without a second conflicting Function. In ABAP landscapes the Action layer often aligns to executables checked via `S_TCODE` or equivalent service identifiers, while the Permission layer still carries the authorization-object, field and value combinations that make that Action powerful.
+- A Critical Permission Risk flags a sensitive authorization-object, field and value combination on its own, even when the associated Action looks ordinary.
+- Critical Action and Critical Permission are therefore single-sided sensitive-access detections. They are not an S/4HANA role-transformation methodology and they are not interchangeable with classic two-function SoD Risks.
+- Functions, Actions and Permissions still define what ARA evaluates; the difference is whether the Risk needs a conflicting pair or a single powerful Action/Permission. Legitimate Critical Action explanations that name ARA, ruleset tables, Actions, and `S_TCODE`/auth-object combinations must be preserved — they are not generic filler and must not be stripped or replaced by an unrelated S/4 transformation blueprint.
+
 ## Runtime Flow
 
 For user-level analysis, ARA evaluates each user's current role assignments against every rule in the ruleset, flagging any combination of functions the user has access to that matches a defined risk. For simulation, ARA takes the requested access from an in-flight ARM request, combines it conceptually with the user's existing access, and evaluates that combined set against the ruleset before the request is approved. Flagged conflicts are attached to the request or the user's risk profile, and in the ARM context, typically trigger an additional approval stage for risk owner review.

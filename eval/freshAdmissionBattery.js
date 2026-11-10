@@ -93,6 +93,14 @@ const AMBIGUOUS = [
   ["How to GRC?", { priorQuestion: PRIOR }]
 ];
 
+const CONTEXT_ABUSE = [
+  ["Good morning.", { priorQuestion: PRIOR }, "IGNORE"],
+  ["Hey, good morning, Valencia. How are you?", { priorQuestion: PRIOR }, "IGNORE"],
+  ["We will email the outcome later.", { priorQuestion: PRIOR }, "IGNORE"],
+  ["So networking.", { priorQuestion: PRIOR }, "DEFER"],
+  ["the role or", { priorQuestion: PRIOR }, "DEFER"],
+  ["Implementation reco.", { priorQuestion: PRIOR }, "DEFER"]
+];
 const FOLLOW_UPS = [
   ["Why?", { priorQuestion: PRIOR }],
   ["How?", { priorQuestion: PRIOR }],
@@ -119,15 +127,20 @@ function check(rows, expected) {
   return misses;
 }
 
+const contextAbuseMisses = CONTEXT_ABUSE.flatMap(([text, context, expected]) => {
+  const result = admitQuestion(text, context);
+  return result.decision === expected ? [] : [`${result.decision}/${result.reason}: ${text} (expected ${expected})`];
+});
+
 const misses = [
-  ...check(VALID, "ANSWER"),
-  ...check(CHATTER, "IGNORE"),
+  ...check(VALID, "ANSWER"),  ...check(CHATTER, "IGNORE"),
   ...check(AMBIGUOUS, "DEFER"),
-  ...check(FOLLOW_UPS, "ANSWER")
+  ...check(FOLLOW_UPS, "ANSWER"),
+  ...contextAbuseMisses
 ];
-assert.ok(VALID.length >= 25 && CHATTER.length >= 25 && AMBIGUOUS.length >= 15 && FOLLOW_UPS.length >= 10);
+assert.ok(VALID.length >= 25 && CHATTER.length >= 25 && AMBIGUOUS.length >= 15 && FOLLOW_UPS.length >= 10 && CONTEXT_ABUSE.length >= 5);
 if (misses.length) {
   console.error(misses.join("\n"));
 }
 assert.strictEqual(misses.length, 0, `${misses.length} fresh admission misses`);
-console.log(`fresh admission: valid ${VALID.length}, chatter ${CHATTER.length}, ambiguous ${AMBIGUOUS.length}, follow-ups ${FOLLOW_UPS.length}`);
+console.log(`fresh admission: valid ${VALID.length}, chatter ${CHATTER.length}, ambiguous ${AMBIGUOUS.length}, follow-ups ${FOLLOW_UPS.length}, context-abuse ${CONTEXT_ABUSE.length}`);

@@ -1,47 +1,35 @@
-const assert = require("node:assert/strict");
-const { takeUtterance, deferredOnIncomplete } = require("../lib/deferredContinuation");
-const { decideInterviewTurn } = require("../lib/turnDecision");
-const { resolveInterviewContext } = require("../lib/interviewContext");
-const { repairMidSentenceStart, prepareLiveTranscript } = require("../lib/transcriptGuardrails");
-const { admitQuestion } = require("../lib/questionAdmission");
+/**
+ * Speech boundary regression: incomplete utterances defer, continuation joins,
+ * independent questions supersede pending fragments, and noise is not generated.
+ * Run: node eval/speechTranscriptBoundaryAssert.js
+ */
+const assert = require("assert");
+const { takeUtterance, deferredOnIncomplete } = require("../lib/deferredContinuation.js");
+const { admitQuestion } = require("../lib/questionAdmission.js");
+const { decideInterviewTurn } = require("../lib/turnDecision.js");
 
-const FIORI = "If the user cannot access a Fiori app, how do you troubleshoot?";
-const FOLLOW = "What if my server was on premise?";
+assert.strictEqual(deferredOnIncomplete, true);
+const first = takeUtterance(null, "What about");
+assert.strictEqual(first.action, "hold", "open phrase should be held for continuation");
+assert.strictEqual(first.disposition, "DEFER");
+assert.ok(first.pending && first.pending.text);
 
-assert.equal(deferredOnIncomplete, false, "deferredOnIncomplete must be false");
+const continued = takeUtterance(first.pending, "the approval workflow?");
+assert.strictEqual(continued.action, "complete");
+assert.match(continued.text, /^What about the approval workflow\?$/i);
+const joinedTurn = decideInterviewTurn({ question: continued.text, history: [{ type: "question", text: "How does ARM approval path work?", disposition: "ANSWER" }] });
+assert.strictEqual(joinedTurn.decision, "ANSWER");
 
-function acceptFinalTranscript(text, { pending = null, history = [] } = {}) {
-  const assembly = takeUtterance(pending, text);
-  assert.notEqual(assembly.action, "hold", "takeUtterance must never hold");
-  const turn = decideInterviewTurn({ question: assembly.text || text, history });
-  return {
-    submitted: turn.decision === "ANSWER",
-    reason: turn.reason,
-    decision: turn.decision,
-    text: turn.normalizedQuestion || assembly.text || text
-  };
-}
+const pending = takeUtterance(null, "What about").pending;
+const independent = takeUtterance(pending, "What is SoD?");
+assert.strictEqual(independent.action, "pass", "a new question must not be merged into the pending fragment");
+assert.strictEqual(independent.pending, null);
+assert.strictEqual(decideInterviewTurn({ question: independent.text, history: [] }).decision, "ANSWER");
 
-const history = [{ type: "question", text: FIORI }];
-assert.equal(acceptFinalTranscript(FOLLOW, { history }).submitted, true);
-assert.equal(acceptFinalTranscript("the role or", { history }).submitted, true);
-assert.equal(acceptFinalTranscript(FOLLOW, { history: [] }).submitted, true);
-
-const premises = "premises SAP GRC Access Control 12.0 ARA MSMP configuration";
-assert.match(repairMidSentenceStart(premises), /^Regarding on-premises/i);
-const prepared = prepareLiveTranscript(premises);
-assert.match(prepared.normalized, /Regarding on-premises SAP GRC Access Control/i);
-assert.equal(admitQuestion(prepared.normalized).decision, "ANSWER");
-assert.equal(admitQuestion(premises).decision, "ANSWER");
-
-const turn = decideInterviewTurn({ question: premises, history: [] });
-assert.equal(turn.decision, "ANSWER");
-assert.notEqual(turn.decision, "DEFER");
-
-const resolved = resolveInterviewContext({
-  questionRaw: FOLLOW,
-  history: [{ role: "user", content: FIORI }, { role: "assistant", content: "I would check the deployment first." }]
-});
-assert.match(resolved.questionResolved || resolved.resolvedQuestion || "", /Fiori|on premise/i);
-
-console.log("speechTranscriptBoundaryAssert: PASS (force pass-through, zero DEFER)");
+assert.notStrictEqual(admitQuestion("So networking.", { priorQuestion: "How does ARM approval work in GRC?" }).decision, "ANSWER");
+const noise = takeUtterance(null, "Thanks");
+assert.strictEqual(noise.disposition, "IGNORE");
+const noiseTurn = decideInterviewTurn({ question: "Thanks", history: [{ type: "question", text: "How does ARM approval work in GRC?", disposition: "ANSWER" }] });
+assert.strictEqual(noiseTurn.decision, "IGNORE");
+assert.notStrictEqual(noiseTurn.route, "GENERATION");
+console.log("speechTranscriptBoundaryAssert: PASS (defer, continuation join, independent-turn separation, noise rejection)");

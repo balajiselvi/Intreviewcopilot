@@ -492,15 +492,31 @@ function sourceContracts() {
   check("define-structure-what-it-is", /define: "Structure: what it is/.test(prompt), "MODE_STRUCTURES.define missing what-it-is");
   check("simple-definition-diagnostic-boundary", /diagnostic tool, define exactly what evidence it displays/.test(prompt) && /not an invented validation procedure/.test(prompt), "simple factual diagnostic answer lacks an explicit evidence boundary");
   check("impl-su53-not-simulation", /not a simulation of the role/.test(prompt) && /not proof that access succeeded/.test(prompt), "IMPLEMENTATION_WALKTHROUGH missing SU53 distinction");
-  check("artifact-type-in-prompt", /a table is not a transaction/.test(prompt) && /tables AGR_USERS/.test(prompt), "prompt does not distinguish role tables from transactions");
+  // V2.1 prompt keeps the table≠transaction distinction with capital-A wording and AGR_USERS examples.
+  check("artifact-type-in-prompt", /a table is not a transaction/i.test(prompt) && /tables AGR_USERS/.test(prompt), "prompt does not distinguish role tables from transactions");
   check("cutover-su53-not-proof", /clean SU53 is not cutover proof/i.test(prompt) && /does not store a passed check/.test(prompt), "Cutover template still allows SU53 as success evidence");
   check("derive-from-role-in-prompt", /Derive from Role/.test(prompt) && /independent copy is not derivation/.test(prompt), "role-design prompt still allows Copy Role as derivation");
   check("composites-not-forbidden", /do not state them as generally forbidden/.test(planner), "design contract missing composite conditionality");
   check("finish-reason-captured", /finish_reason/.test(chat), "stream does not record finish_reason");
   check("generation-sse", /writeSSEEvent\(res, "generation"/.test(chat), "generation metadata event missing");
   check("concept-no-cv-first", /This is a concept question\. Reason from the product mechanism/.test(prompt), "concept still selects CV engagement first");
-  check("delivery-artifacts-in-prompt", /project-delivery artifacts and controls/.test(prompt) && /must name only the relevant verified/.test(prompt), "delivery and technical mechanism instructions are not both present");
-  check("spoken-style-in-prompt", /speak one continuous answer the candidate can say aloud/.test(prompt) && /Do not use Markdown headings/.test(prompt), "prompt still requests report headings");
+  // Delivery vs technical: V2.1 uses "project-delivery artifacts" for delivery asks and
+  // "Name only plane-correct artifacts" for technical asks (replacing the retired
+  // "must name only the relevant verified" phrase).
+  check(
+    "delivery-artifacts-in-prompt",
+    /project-delivery artifacts and controls/.test(prompt)
+      && (/Name only plane-correct artifacts/.test(prompt) || /must name only the relevant verified/.test(prompt)),
+    "delivery and technical mechanism instructions are not both present"
+  );
+  // Spoken interview cadence: ban report headings; Markdown-heading ban retained.
+  check(
+    "spoken-style-in-prompt",
+    /Do not use Markdown headings/.test(prompt)
+      && /NEVER output Decision:\/Mechanism:\/Governance:\/Validation:/.test(prompt)
+      && !/\* \*\*Decision:\*\*/.test(prompt),
+    "prompt still requests report headings"
+  );
   const deliveryAnswer = [
     "I would recover the slip by resequencing only the work the critical path can release.",
     "The controls are the integrated workplan, the RAID register, the accountable owner, the change-control record, and the quality gate.",

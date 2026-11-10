@@ -15,6 +15,7 @@ const {
   deriveOperatorState,
   nextResetSnapshot,
   enqueueSpeechTurn,
+  planManualSubmit,
   armGenerationTimeout,
   CLIENT_GENERATION_TIMEOUT_MS,
   MAX_QUEUED_SPEECH_TURNS,
@@ -51,6 +52,23 @@ assert.notStrictEqual(createLiveSessionId(1, () => 0.1), createLiveSessionId(2, 
 assert.strictEqual(canStartTurn({ isProcessing: false }), true);
 assert.strictEqual(canStartTurn({ isProcessing: true }), false);
 assert.strictEqual(canStartTurn({ isProcessing: true, manual: true }), false);
+
+const manualIdle = planManualSubmit({
+  text: "How do you investigate an SAP GRC Access Risk Analysis false positive?",
+  isProcessing: false,
+  queue: []
+});
+assert.strictEqual(manualIdle.action, "submit");
+const manualBusy = planManualSubmit({
+  text: "How do you configure an MSMP workflow in SAP GRC Access Control?",
+  isProcessing: true,
+  queue: [],
+  utteranceId: "manual_assert_1",
+  source: "system"
+});
+assert.strictEqual(manualBusy.action, "queue");
+assert.strictEqual(manualBusy.queue[0].manual, true);
+assert.strictEqual(planManualSubmit({ text: "   ", isProcessing: false }).action, "reject");
 
 assert.strictEqual(shouldReuseQuestionRow({
   retry: true,
@@ -145,7 +163,8 @@ assert.match(interview, /historyForGeneration/);
 assert.match(interview, /shouldReuseQuestionRow/);
 assert.match(interview, /findRetryTarget/);
 assert.match(interview, /historyBeforeQuestion/);
-assert.match(interview, /onClick=\{\(\) => retryQuestionFromResponse\(item\)\}/);
+assert.match(interview, /retryQuestionFromResponse\s*=/);
+assert.match(interview, /onClick=\{retryLastAsk\}/);
 assert.match(interview, /rotateLiveSessionId/);
 assert.match(interview, /canStartTurn/);
 assert.match(interview, /deriveOperatorState/);
@@ -155,6 +174,11 @@ assert.match(interview, /queuedTurnCount/);
 assert.match(interview, /retry:\s*true/);
 assert.match(interview, /armGenerationTimeout/);
 assert.match(interview, /enqueueSpeechTurn/);
+assert.match(interview, /planManualSubmit/);
+assert.doesNotMatch(
+  interview,
+  /handleKeyPress[\s\S]{0,180}if \(isProcessingRef\.current\) return;/
+);
 assert.match(interview, /UNANSWERED/);
 assert.match(interview, /sessionPreparation/);
 assert.match(interview, /activeRequestRef.current !== requestController/);
@@ -163,7 +187,10 @@ assert.match(interview, /acceptCapturedTurn/);
 assert.match(interview, /shouldAutoSubmitSource/);
 assert.match(interview, /CLIENT_GENERATION_TIMEOUT_MS/);
 assert.match(interview, /current_streaming/);
-assert.match(interview, /The answer may be incomplete/);
+assert.match(interview, /buildPrincipleLevelFallback/);
+assert.match(interview, /Recovered with a complete spoken answer/);
+assert.doesNotMatch(interview, /I would answer this at principle level while the live path recovers/);
+assert.doesNotMatch(interview, /status:\s*["']Interrupted["']/);
 assert.match(chatSrc, /writeSSEError\(res, errorMessage\)/);
 assert.doesNotMatch(chatSrc, /else if \(!streamStarted\)/);
 assert.match(historySlice, /clearHistory/);

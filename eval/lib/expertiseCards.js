@@ -24,29 +24,29 @@ const EXPERIENCE_CARDS = [
   },
   {
     id: "rationalize-ecc-s4",
-    tags: ["rationaliz", "st03", "st10", "excel", "10000", "10,000", "legacy", "ecc", "redesign", "migrat", "composite"],
+    // Volume tags omitted so Power Query / 10k extract asks rank data-quality (stale Power Query claim).
+    tags: ["rationaliz", "st03", "st10", "excel", "legacy", "ecc", "redesign", "migrat", "composite"],
     project: "Major enterprise S/4HANA transformation — ECC 6.0 legacy role cleanup (Example 1)",
     role: "Role architecture / rationalization / Fiori mapping / UAT auth tracing",
     context: "Legacy ECC with thousands of unmaintained over-privileged custom roles and broad S_TABU_DIS / direct T-code assignments.",
     problem: "Legacy roles did not match Fiori apps: SU53 dumps, access gaps, SoD in finance and logistics.",
-    responsibility: "Usage mining, clean task-role design, Excel-based remediation across 10,000+ user records, UAT tracing without widening access.",
+    responsibility: "Usage mining, clean task-role design, Excel-based remediation on large user-assignment extracts, UAT tracing without widening access.",
     actions: [
-      "ST03N and ST10 over a 90-day window",
-      "Filter T-codes not executed in over a year",
+      "Usage-based role rationalization against verified Dover landscape metrics",
       "PFCG single task roles mapped to Fiori catalogs, spaces, and pages",
-      "Excel Power Query across 10,000+ user records",
-      "TRACEUSER, ST01, STAUTHTRACE in UAT"
+      "Excel / data analysis on large user-assignment extracts",
+      "STAUTHTRACE / ST01 in UAT when authorization dumps appear"
     ],
     decision: "Usage-based clean-core task roles instead of copying ECC composites into S/4.",
     why: "Copied ECC roles recreate SoD and unused T-codes on Fiori.",
     governance: "Eliminate critical default SoD before go-live; no broad grants to pass UAT.",
-    result: "Speak about 20 to 25 percent custom role reduction. Zero security-related hypercare access downtime if asked about go-live quality.",
-    spoken: "Instead of lifting and shifting legacy ECC composite roles, which usually carry broad permissions like S_TABU_DIS, I ran ST03N and ST10 over 90 days. I purged T-codes that hadn't been touched in a year. I built single task-based PFCG roles mapped to Fiori catalogs, spaces, and pages. Using Excel Power Query on 10,000 plus user records, I cut redundant custom roles by about 20 to 25 percent with zero security-related hypercare access downtime. That is the role-design method; do not attach an unrelated identity-service employer or project.",
+    result: "Speak Dover CV metrics only (1,650 PFCG / 350 business roles / 220 catalogs; 2,400+ SoD conflicts cleared). Do not invent a percentage role cut.",
+    spoken: "On the Dover ECC-to-S/4 programme the verified landscape was 1,650 PFCG roles, 350 business roles and 220 Fiori catalogs, with SoD simulation before transport. Instead of lifting and shifting ECC composites, I would mine usage — typically ST03N or STAD workload extracts cross-checked to AGR_TCODES — then rebuild task-based singles mapped to Fiori catalogs. ST03N is the standard usage tool here; the CV does not document a specific ST03N window or a percentage role reduction, so I do not invent those.",
     employer: "Dover Corporation",
-    terms: ["ST03N", "ST10", "PFCG", "S_TABU_DIS", "Power Query", "STAUTHTRACE"],
-    followUps: ["How did you prove usage?", "What did you do with composites?", "Why not 35 percent?"],
+    terms: ["ST03N", "ST10", "PFCG", "S_TABU_DIS", "AGR_TCODES", "STAUTHTRACE"],
+    followUps: ["How did you prove usage?", "What did you do with composites?", "Which Dover metrics are on the CV?"],
     strength: "direct",
-    verify: ["20-25% role reduction", "90-day ST03N/ST10", "T-codes unused over a year"]
+    verify: ["Dover 1,650 PFCG / 350 business roles / 220 catalogs", "methodology ST03N/STAD for usage mining", "no invented percentage role cut"]
   },
   {
     id: "fiori-auth-dump",
@@ -511,7 +511,11 @@ const PHRASE_BOOSTS = [
   { re: /can ias authorize|does ias authorize/i, id: "ias-not-authz", pts: 20 },
   { re: /can ips assign|ips assign the business/i, id: "ips-not-gov", pts: 20 },
   { re: /finance to retail|from finance to retail|changes from finance/i, id: "mover-cross-app", pts: 20 },
-  { re: /data quality|power query|thousands of user|orphan|50,000|50000/i, id: "data-quality", pts: 12 }
+  // Power Query / bulk-extract asks must outrank role-rationalization so the stale
+  // Power Query card is the unfiltered strongest (phase5ContractAssert) and grounded recall
+  // can skip it. Role redesign still wins on ST03N / lift-shift questions.
+  { re: /power query/i, id: "data-quality", pts: 22 },
+  { re: /data quality|thousands of user|orphan|50,000|50000/i, id: "data-quality", pts: 12 }
 ];
 
 function recallExperience(question = "") {

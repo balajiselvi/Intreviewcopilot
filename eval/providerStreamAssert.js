@@ -2,7 +2,10 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { publicLlmError } = require("../lib/generationGuard");
+const { runWithExponentialRetry, MAX_RETRIES, isRetryableLlmError } = require("../lib/liveReliability");
 const source = fs.readFileSync(path.join(__dirname, "../pages/api/chat.js"), "utf8");
+assert.match(source, /runWithExponentialRetry/, "production chat.js must reference runWithExponentialRetry");
+assert.match(source, /require\("\.\.\/\.\.\/lib\/liveReliability\.js"\)/, "production chat.js must import liveReliability");
 const functions = source.slice(source.indexOf("async function streamGeminiResponse"), source.indexOf("function setSSEHeaders"));
 let checks = 0;
 
@@ -14,8 +17,35 @@ function harness(events, { failAfter = false, failFirst = false } = {}) {
   class OpenAI { constructor(opts) { options.push(opts); this.chat = { completions: { create } }; } }
   class Anthropic { constructor(opts) { options.push(opts); this.messages = { create }; } }
   class GoogleGenerativeAI { getGenerativeModel() { return { startChat() { return { async sendMessageStream() { return { stream: await create() }; } }; } }; } }
-  const api = new Function("OpenAI", "Anthropic", "GoogleGenerativeAI", "publicLlmError", "stripStreamMarkdown", "writeSSEChunk", `${functions}; return { runProviderStreamWithRetry, streamOpenAIResponse, streamOpenRouterResponse, streamGroqResponse, streamClaudeResponse, streamGeminiResponse };`)(
-    OpenAI, Anthropic, GoogleGenerativeAI, publicLlmError, t => String(t || "").replace(/\*/g, ""), (res, t) => res.chunks.push(t)
+  // Inject production retry symbols the extracted chat.js closure closes over.
+  // Provider-mode guards are live-allowed here — this harness unit-tests stream parsing only.
+  const api = new Function(
+    "OpenAI",
+    "Anthropic",
+    "GoogleGenerativeAI",
+    "publicLlmError",
+    "stripStreamMarkdown",
+    "writeSSEChunk",
+    "runWithExponentialRetry",
+    "MAX_RETRIES",
+    "isRetryableLlmError",
+    "assertLiveTransportAllowed",
+    "resolveProviderMode",
+    "APP_CONFIG",
+    `${functions}; return { runProviderStreamWithRetry, streamOpenAIResponse, streamOpenRouterResponse, streamGroqResponse, streamClaudeResponse, streamGeminiResponse };`
+  )(
+    OpenAI,
+    Anthropic,
+    GoogleGenerativeAI,
+    publicLlmError,
+    t => String(t || "").replace(/\*/g, ""),
+    (res, t) => res.chunks.push(t),
+    runWithExponentialRetry,
+    MAX_RETRIES,
+    isRetryableLlmError,
+    () => {},
+    () => "live",
+    { llm: { providerMode: "live" } }
   );
   return { api, options, calls: () => calls };
 }

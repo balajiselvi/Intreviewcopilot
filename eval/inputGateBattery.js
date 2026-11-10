@@ -1,62 +1,40 @@
 /**
- * Admission battery — force pass-through: non-empty → ANSWER; never DEFER.
- * node eval/inputGateBattery.js
+ * Admission gate regression battery.
+ * Confirms real questions pass, chatter is ignored, fragments defer, and prior
+ * context helps only recognized follow-up forms. Run: node eval/inputGateBattery.js
  */
 const assert = require("assert");
 const { admitQuestion, deferredOnIncomplete } = require("../lib/questionAdmission.js");
 const { decideInterviewTurn } = require("../lib/turnDecision.js");
 const { repairMidSentenceStart, prepareLiveTranscript } = require("../lib/transcriptGuardrails.js");
 
-assert.equal(deferredOnIncomplete, false);
-
+assert.strictEqual(deferredOnIncomplete, true, "incomplete questions should remain deferrable");
 const PRIOR = "How does ARM approval work in GRC?";
 
-const MUST_ANSWER = [
-  "What is PFCG?",
-  "How do you design an SoD ruleset?",
-  "Why?",
-  "How?",
-  "And the approval workflow?",
-  "So networking.",
-  "Or Qatar?",
-  "post selling is different",
-  "Identify customer",
-  "Implementation reco.",
-  "based in Dubai or",
-  "Just the ruleset.",
-  "How how how did that start with the decision",
-  "premises SAP GRC Access Control 12.0",
-  "the role or",
-  "Good morning.",
-  "Tell me about your GRC implementation experience."
-];
-
-let failed = 0;
-for (const text of MUST_ANSWER) {
-  const result = admitQuestion(text, { priorQuestion: PRIOR });
-  if (result.decision !== "ANSWER") {
-    failed += 1;
-    console.error("EXPECTED ANSWER", result.decision, result.reason, text);
-  }
-  if (result.decision === "DEFER") {
-    failed += 1;
-    console.error("DEFER FORBIDDEN", text);
-  }
+for (const text of ["What is PFCG?", "How do you design an SoD ruleset?", "Tell me about your GRC implementation experience.", "premises SAP GRC Access Control 12.0"]) {
+  assert.strictEqual(admitQuestion(text).decision, "ANSWER", `expected clear technical prompt to answer: ${text}`);
 }
-
-assert.equal(admitQuestion("").decision, "IGNORE");
-assert.equal(admitQuestion("   ").decision, "IGNORE");
+for (const text of ["Good morning.", "How are you doing?", "Thanks, that's all from me.", "We will email the outcome later."]) {
+  assert.strictEqual(admitQuestion(text, { priorQuestion: PRIOR }).decision, "IGNORE", `context must not admit chatter: ${text}`);
+}
+for (const text of ["So networking.", "the role or", "Implementation reco.", "How to IAG?"]) {
+  assert.strictEqual(admitQuestion(text, { priorQuestion: PRIOR }).decision, "DEFER", `context must not admit an incomplete fragment: ${text}`);
+}
+for (const text of ["Why?", "How?", "And the approval workflow?", "What about SoD?", "Which object?", "What if the app is missing from the launchpad?"]) {
+  assert.strictEqual(admitQuestion(text, { priorQuestion: PRIOR }).decision, "ANSWER", `expected contextual follow-up: ${text}`);
+}
+assert.strictEqual(admitQuestion("").decision, "IGNORE");
+assert.strictEqual(admitQuestion("   ").decision, "IGNORE");
 
 const repaired = repairMidSentenceStart("premises SAP GRC Access Control 12.0 ARA");
 assert.match(repaired, /^Regarding on-premises/i);
-
 const prepared = prepareLiveTranscript("premises SAP GRC Access Control 12.0");
-assert.equal(prepared.ignoreNoise, false);
+assert.strictEqual(prepared.ignoreNoise, false);
 assert.match(prepared.normalized, /Regarding on-premises/i);
 
-const turn = decideInterviewTurn({ question: "premises SAP GRC Access Control 12.0", history: [] });
-assert.equal(turn.decision, "ANSWER");
-assert.notEqual(turn.decision, "DEFER");
-
-assert.strictEqual(failed, 0, `${failed} admission cases failed`);
-console.log(`input gate: force pass-through OK (${MUST_ANSWER.length} non-empty → ANSWER, defer abolished)`);
+const technicalTurn = decideInterviewTurn({ question: "premises SAP GRC Access Control 12.0", history: [] });
+assert.strictEqual(technicalTurn.decision, "ANSWER");
+const greetingTurn = decideInterviewTurn({ question: "Good morning.", history: [{ type: "question", text: PRIOR, disposition: "ANSWER" }] });
+assert.strictEqual(greetingTurn.decision, "IGNORE");
+assert.notStrictEqual(greetingTurn.route, "GENERATION");
+console.log("input gate: PASS (technical prompts, chatter rejection, contextual follow-ups, deferred fragments)");

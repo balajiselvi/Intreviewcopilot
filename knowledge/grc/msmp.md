@@ -2,7 +2,7 @@
 
 ## Overview
 
-MSMP, Multi-Step Multi-Process, is the workflow engine behind GRC Access Control's approval processes. It defines the stages a request moves through, the fallback and escalation behavior at each stage, and works together with BRF+ to determine who actually approves at each step.
+MSMP, Multi-Stage Multi-Path, is the workflow engine behind GRC Access Control's approval processes. It defines the stages a request moves through, the fallback and escalation behavior at each stage, and works together with BRF+ to determine who actually approves at each step.
 
 ## Interview Summary
 
@@ -14,7 +14,7 @@ MSMP is the workflow engine that defines how an access request moves through app
 
 ## 60 Second Interview Answer
 
-MSMP stands for Multi-Step Multi-Process, and it's the workflow engine underneath GRC Access Control's request approvals. You configure it through process IDs, each representing a specific workflow — a new access request might use a different MSMP process than a termination request.
+MSMP stands for Multi-Stage Multi-Path, and it's the workflow engine underneath GRC Access Control's request approvals. You configure it through process IDs, each representing a specific workflow — a new access request might use a different MSMP process than a termination request.
 
 Within a process, you define stages, and each stage has configuration for things like escalation timing, what happens if an approver doesn't respond within a set period, and whether the stage is mandatory or can be skipped under certain conditions. MSMP handles the sequencing and the process logic — it decides that a request needs manager approval, then role owner approval, then possibly risk owner approval if there's a flagged conflict.
 
@@ -22,7 +22,7 @@ What MSMP explicitly does not do is determine who the approver actually is at ea
 
 ## 90 Second Interview Answer
 
-MSMP, Multi-Step Multi-Process, is the workflow engine that governs how access requests move through approval in GRC Access Control. It's configured around process IDs — each request type, new access, a role change, a termination, typically maps to its own MSMP process, since the approval logic genuinely differs between them.
+MSMP, Multi-Stage Multi-Path, is the workflow engine that governs how access requests move through approval in GRC Access Control. It's configured around process IDs — each request type, new access, a role change, a termination, typically maps to its own MSMP process, since the approval logic genuinely differs between them.
 
 Inside a process, you define a sequence of stages. Each stage carries its own configuration: how long before it escalates if the approver doesn't respond, whether it's a mandatory stage or conditionally skipped, and what the fallback behavior is if no valid approver is found. A typical stage sequence might be manager approval, then role or application owner approval, then a risk owner stage that only activates if the request was flagged with a segregation of duties conflict during risk simulation.
 
@@ -59,15 +59,26 @@ A request is submitted and matched to the appropriate MSMP process based on its 
 
 ## Technical Configuration Sequence
 
-For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. GRFNMW_CONFIGURE is the expert transaction documented for Access Control 10.0, 10.1, and 12.0; NWBC is a work-center shell, not that transaction. Select the Access Request Approval process, then configure its initiator, routing, paths, stages, and timeout/escalation behavior. Link each stage to its BRF+ agent-determination rule and map each BRF+ RULE_RESULT to the intended MSMP path. Test a request and verify the selected path, stage, approver, and audit log in Request Status > Instance Status. Use provisioning logs only if an approved request fails during target assignment.
+For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. GRFNMW_CONFIGURE (and GRFNMW_CONFIGURE_WD where the Web Dynpro entry is used) is the expert transaction documented for Access Control 10.0, 10.1, and 12.0; NWBC is a work-center shell, not that transaction. Pair Maintain MSMP Workflows with Define Workflow-Related MSMP Rules for BRF+ flat-rule shell generation, then open the BRF+ workbench with BRFPLUS (or BRF+) to maintain decision tables before returning to MSMP to declare RULE_RESULT values and regenerate the version.
+
+Senior Architect MSMP sequence (Access Request Approval process, e.g. SAP_GRAC_ACCESS_REQUEST):
+1. Process Global Settings / Process ID — select or confirm the delivered Access Request Approval process before inventing a parallel process.
+2. Maintain Rules — declare initiator / agent / routing / notification rules and every RULE_RESULT that path mapping will consume; generate new BRF+ flat-rule shells in Define Workflow-Related MSMP Rules when a custom initiator or agent rule is required.
+3. Maintain Agents — bind stage agents to the BRF+ agent results (manager, role owner, risk owner, and custom agents as designed).
+4. Maintain Variables and Templates — notification variables and email templates for stage events.
+5. Maintain Paths and Stages — path structure, stage order, timeout / escalation / rejection behaviour.
+6. Maintain Route Mapping — map each initiator RULE_RESULT to the correct path.
+7. Generate Version — regenerate the MSMP version after every structural change; ungenerated changes are not runtime-active.
+
+Select the Access Request Approval process, then walk the seven stages above. Link each stage to its BRF+ agent-determination rule and map each BRF+ RULE_RESULT to the intended MSMP path. Authorization for workflow administration sits on the Access Control admin roles and related authorization objects on the GRC system; target provisioning still depends on connector configuration (Integration Framework / SM59) and target-system enforcement (PFCG / S_SERVICE on ABAP targets). Test a request in NWBC and verify the selected path, stage, Approvers of Selected Path, and audit log in Request Status > Instance Status. Use provisioning logs only if an approved request fails during target assignment. Do not invent speculative MSMP transactions; prefer GRFNMW_CONFIGURE, Define Workflow-Related MSMP Rules, and BRFPLUS as the verified entry trio.
 
 ### Source basis
 
-SAP Help: Maintaining Tasks and Authorizations for Request Approvers; SAP KBA 2050802 (expert transaction scope); SAP Support Content: BRF plus Flat Rule - SAP Access Control Integration.
+SAP Help: Maintaining Tasks and Authorizations for Request Approvers; SAP KBA 2050802 (expert transaction scope); SAP Support Content: BRF plus Flat Rule - SAP Access Control Integration; SAP Community MSMP Workflow Configuration for Access Control 12.0.
 
 ## Configure an MSMP workflow for an access request
 
-I would first check whether the delivered Access Request Approval workflow already covers the request type before I change Maintain MSMP Workflows. If it does, I would reuse that process and only change the initiator, paths, stages, agents, and route mapping that the business requires. If a new path is required, I would generate the BRF+ initiator or routing rule in Define Workflow-Related MSMP Rules before changing MSMP. In Maintain MSMP Workflows I would set the process global settings, declare the rule and every RULE_RESULT, maintain agents for each stage, create the paths and stages, map each rule result to a path, then generate the MSMP version. I would validate with a test request and confirm the selected path, stage, approver, and audit log in Request Status Instance Status. I would open provisioning logs only after the request is approved and the target assignment fails. Source checked 2026-10-21: SAP Help Maintain MSMP Workflows; SAP Support Content BRF plus Flat Rule integration; SAP Community MSMP Workflow Configuration for Access Control 12.0.
+To configure MSMP for an access request on Access Control 12.0, I enter Maintain MSMP Workflows with GRFNMW_CONFIGURE or GRFNMW_CONFIGURE_WD and first check whether the delivered Access Request Approval process already covers the request type before I invent a parallel process. If a new initiator or agent rule is required, I generate the BRF+ flat-rule shell in Define Workflow-Related MSMP Rules, maintain the decision table in BRFPLUS, then return to MSMP. I walk the seven stages in order: Process Global Settings and Process ID, Maintain Rules with every RULE_RESULT declared, Maintain Agents, Variables and Templates, Paths and Stages with timeout and escalation, Route Mapping from each RULE_RESULT to the intended path, and Generate Version so the change is runtime-active. Connector readiness still depends on the Integration Framework and SM59; target enforcement remains PFCG with S_SERVICE on ABAP targets. I validate in NWBC Request Status, Instance Status by confirming path, stage, Approvers of Selected Path, and the audit log, and I open provisioning logs only after approval when the target assignment itself fails. Source checked 2026-10-21: SAP Help Maintain MSMP Workflows; SAP Support Content BRF plus Flat Rule integration; SAP Community MSMP Workflow Configuration for Access Control 12.0.
 
 ## Troubleshoot an MSMP access request with no approver
 
@@ -193,7 +204,7 @@ An average answer says MSMP is the GRC workflow engine. A 10/10 answer explains 
 
 ## Keywords
 
-MSMP, Multi-Step Multi-Process, workflow, process ID, stage, escalation, BRF+, agent determination, approval routing
+MSMP, Multi-Stage Multi-Path, workflow, process ID, stage, escalation, BRF+, agent determination, approval routing
 
 ## Related Topics
 

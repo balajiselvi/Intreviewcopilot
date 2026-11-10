@@ -74,8 +74,43 @@ function splitLargeParagraph(text) {
   return pieces;
 }
 
+/**
+ * Interview-bank Qn sections: keep the question text as heading metadata only.
+ * Strip the duplicated heading line and evaluation coaching (Validate / Red Flags / Keywords)
+ * from the spoken-eligible body so retrieval cannot feed them into answers.
+ */
+function isInterviewBankDocument(document = {}) {
+  const name = String(document.fileName || document.sourceFile || "");
+  return /interview-bank|architect-bank|interview-questions/i.test(name);
+}
+
+function sanitizeChunkBody(document, heading, rawContent) {
+  let content = String(rawContent || "").trim();
+  if (!content) return content;
+
+  // Drop a leading markdown/Q heading line that duplicates chunk.heading.
+  content = content.replace(/^(?:#{1,6}\s*)?Q\d+\s*:\s*[^\n]+\n+/i, "");
+  if (heading && heading.length > 12) {
+    const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    content = content.replace(new RegExp(`^(?:#{1,6}\\s*)?${escaped}\\s*\\n+`, "i"), "");
+  }
+
+  if (isInterviewBankDocument(document)) {
+    // Interview-bank coaching only — do not strip legitimate procedure prose such as
+    // "Validate each boundary independently…" in ordinary SAP reference documents.
+    content = content
+      .replace(/(?:^|\n)\s*Validate\b[^\n]*/gi, "\n")
+      .replace(/(?:^|\n)\s*(?:Red flags?|Hidden expectations?|Keywords?|Interviewer expectations?)\s*:?[^\n]*/gi, "\n");
+  }
+
+  return content.replace(/\n{3,}/g, "\n\n").trim();
+}
+
 function createChunk(document, content, chunkIndex, heading) {
-  const chunkChecksum = sha256(content);
+  const spokenBody = sanitizeChunkBody(document, heading, content);
+  // Empty after sanitize (heading-only / coaching-only) — skip; do not fail the document.
+  if (!spokenBody) return null;
+  const chunkChecksum = sha256(spokenBody);
   const chunkId = `chunk_${sha256(
     `${document.documentId}:${chunkIndex}:${chunkChecksum}`
   )}`;
@@ -88,7 +123,7 @@ function createChunk(document, content, chunkIndex, heading) {
     extension: document.extension,
     chunkNumber: chunkIndex,
     section: heading,
-    content,
+    content: spokenBody,
 
     // Canonical metadata for incremental processing and future embedding reuse.
     chunkId,
@@ -96,7 +131,7 @@ function createChunk(document, content, chunkIndex, heading) {
     chunkIndex,
     heading,
     pageNumber: null,
-    tokenEstimate: estimateTokens(content),
+    tokenEstimate: estimateTokens(spokenBody),
     checksum: chunkChecksum,
     metadata: {
   chunkId,
@@ -109,9 +144,10 @@ function createChunk(document, content, chunkIndex, heading) {
   heading,
   sourceFile: document.fileName,
   sourceFolder: document.sourceFolder,
+  interviewBank: isInterviewBankDocument(document),
 
   sapKeywords: (
-    content.match(/\b(GRAC_[A-Z_]+|AGR_[A-Z_]+|USR\d*|PFCG|SU24|SU53|SLG1|SM37|ST22|MSMP|BRF\+|ARA|ARM|BRM|EAM|IAS|IPS|IAG|Fiori|Repository Sync|Provisioning)\b/gi) || []
+    spokenBody.match(/\b(GRAC_[A-Z_]+|AGR_[A-Z_]+|USR\d*|PFCG|SU24|SU53|SLG1|SM37|ST22|MSMP|BRF\+|ARA|ARM|BRM|EAM|IAS|IPS|IAG|Fiori|Repository Sync|Provisioning)\b/gi) || []
   )
 }
   };
@@ -146,8 +182,11 @@ function semanticChunkDocuments(documents) {
 
     function pushChunk() {
       if (!content.trim()) return;
-      chunks.push(createChunk(document, content.trim(), chunkIndex, heading));
-      chunkIndex += 1;
+      const created = createChunk(document, content.trim(), chunkIndex, heading);
+      if (created) {
+        chunks.push(created);
+        chunkIndex += 1;
+      }
       content = "";
     }
 
@@ -164,8 +203,11 @@ function semanticChunkDocuments(documents) {
       if (paragraph.length > MAX_CHUNK_SIZE) {
         pushChunk();
         splitLargeParagraph(paragraph).forEach((piece) => {
-          chunks.push(createChunk(document, piece, chunkIndex, heading));
-          chunkIndex += 1;
+          const created = createChunk(document, piece, chunkIndex, heading);
+          if (created) {
+            chunks.push(created);
+            chunkIndex += 1;
+          }
         });
         return;
       }

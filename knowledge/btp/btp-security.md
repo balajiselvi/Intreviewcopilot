@@ -4,22 +4,36 @@
 
 Beyond identity and role collections covered in the BTP overview, BTP security includes connectivity security — how BTP applications reach on-premise and other cloud systems — through the Cloud Connector and destination services, plus subaccount-level security configuration like trust settings and API access control.
 
+## Complete BTP authentication and authorization chain
+
+When an interviewer asks for authentication and authorization architecture on BTP, I walk the chain in order — I do not collapse it into “IAS plus roles.”
+
+1. **Global account → directory → subaccount** — commercial and isolation boundary; entitlements and security controls attach at subaccount scope.
+2. **Trust configuration** — the subaccount trusts SAP IAS (or a corporate IdP) via OIDC or SAML so authentication happens outside the application.
+3. **Application security descriptor (`xs-security.json`)** — declares scopes, attributes, and role templates the application understands.
+4. **XSUAA / SAP Authorization and Trust Management** — issues tokens; App Router enforces authentication and forwards the JWT.
+5. **Scopes → attributes → role templates → roles → role collections** — scopes are the fine-grained permissions in the token; role templates package scopes; roles instantiate templates in the subaccount; **role collections** are what you assign to users or map from IdP groups.
+6. **IdP group mapping** — IAS (or corporate IdP) groups map to role collections so joiner/mover/leaver can be driven from identity, not manual Cockpit clicks alone.
+7. **Destination Service** — outbound calls use OAuth2SAMLBearerAssertion (user propagation), OAuth2 client credentials (technical client), or other supported types. Destination auth is **not** a substitute for application role collections.
+
+IAS answers **who you are**. XSUAA role collections answer **what the BTP app allows**. IPS may provision users/groups into that model; IPS does not authenticate. Successful SSO without the right role collection still yields authorization failure — that is expected, not a bug.
+
 ## Role collection assignment
 
 Cloud Foundry authorization is not PFCG.
 
-1. The application already declares its role templates and scopes.
+1. The application already declares its role templates and scopes in `xs-security.json`.
 2. In the subaccount, create the role from that template if it is not already there.
 3. Create a role collection and add the role. The collection is the object you assign.
 4. The subaccount trust must already point at IAS or the corporate identity provider.
 5. Assign the role collection to the user, or to the IAS group that is mapped to that collection.
 6. The user needs a new logon. An existing token does not gain the collection.
 
-A destination's authentication type is a separate choice: principal propagation, OAuth2 client credentials, or a technical user. Do not treat the destination user as the business user's role collection.
+A destination's authentication type is a separate choice: OAuth2SAMLBearerAssertion / principal propagation, OAuth2 client credentials, or a technical user. Do not treat the destination user as the business user's role collection.
 
 ## Interview Summary
 
-BTP security extends past authentication and authorization into connectivity: the Cloud Connector provides a secure tunnel from BTP to on-premise systems without opening inbound firewall ports, and destinations define how an application actually reaches a target system, including which authentication method to use for that specific connection.
+When interviewers ask for the core pillars of BTP security, I answer the security control planes rather than a marketing capability inventory: global account / directory / subaccount structure; IAS trust (SAML 2.0 or OIDC) into the subaccount; role templates and custom role collections assigned to users or IdP groups; XSUAA scopes and JWT enforcement at the application; destinations and Cloud Connector encrypted outbound tunnels with principal propagation only when a hybrid on-premise call is required; and IPS for identity provisioning into those collections — never PFCG.
 
 ## 30 Second Interview Answer
 

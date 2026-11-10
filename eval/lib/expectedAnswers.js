@@ -32,9 +32,9 @@ const EXPECTED_ANSWERS = [
   },
   {
     id: "what-is-grc",
-    // Exclude connector/ARA/ARM/MSMP/EAM/BRM-specific prompts so product-capability
-    // questions are not stolen by the generic GRC overview script.
-    re: /\b(what is|explain|describe)(?!.{0,40}\bdifference\b)(?!.{0,48}\b(?:connector|ARA|ARM|MSMP|BRF\+?|EAM|BRM|firefighter|ruleset)\b).{0,30}(sap )?grc\b(?!\s+connector)|\bwhy (would|should) a customer buy grc\b|\bgrc access control architecture\b|\bwalk me through (sap )?grc\b(?!\s+connector)/i,
+    // Exclude connector/ARA/ARM/MSMP/EAM/BRM/Process Control–specific prompts and
+    // GRC↔S/4 (or other) integration asks so this Access Control overview is not stolen.
+    re: /\b(what is|explain|describe)(?!.{0,40}\bdifference\b)(?!.{0,64}\b(?:connector|ARA|ARM|MSMP|BRF\+?|EAM|BRM|firefighter|ruleset|process\s*control|process-control|continuous control monitoring|CCM|integrat\w*)\b).{0,30}(sap )?grc\b(?!\s+(?:connector|process\s*control)|.{0,48}\bintegrat\w*)|\bwhy (would|should) a customer buy grc\b|\bgrc access control architecture\b|\bwalk me through (sap )?grc\b(?!\s+(?:connector|process\s*control)|.{0,48}\bintegrat\w*)/i,
     answer: "I explain SAP GRC Access Control as the governance layer over SAP access. Security controls what a user can do. GRC covers who should have it, who approves it, what risk exists, how it is mitigated, and how it is monitored. Four capabilities: ARA identifies SoD, critical actions, and critical permissions. ARM runs the request, approval, risk check, and provisioning. EAM controls emergency or firefighter access, including logs and review. BRM governs the business-role lifecycle. Those sit above ECC and S/4 authorization and can connect to identity services. I would not position GRC as only an SoD report."
   },
   {
@@ -79,7 +79,9 @@ const EXPECTED_ANSWERS = [
   },
   {
     id: "eam",
-    re: /\b(explain|what is|describe).{0,20}(eam|firefighter)\b|\bemergency access\b|\bis firefighter pam\b/i,
+    // Generic EAM/Firefighter definition only. Central vs decentral deployment, architecture,
+    // and central-GRC failover are Q109 / retrieval tasks — not this overview script (P0.2).
+    re: /\b(explain|what is|describe)(?!.{0,48}\b(?:central(?:ized)?|decentral(?:ized)?)\b).{0,20}(eam|firefighter)\b(?!.{0,40}\b(?:central(?:ized)?|decentral(?:ized)?|architecture|failover|unavailable)\b)|\bemergency access\b(?!.{0,40}\b(?:central(?:ized)?|decentral(?:ized)?)\b)|\bis firefighter pam\b/i,
     answer: "EAM is controlled temporary elevated access, not a standing SAP_ALL. The controls are assignment approval, a reason, logging, log review, and an independent controller. The cybersecurity problem it solves is standing privilege. It supports the SAP privileged-access use case. It does not replace an enterprise PAM platform that also covers infrastructure and databases. At Dover I ran EAM end to end for 95 firefighter owners, with reason codes and controller sign-off."
   },
   {
@@ -150,7 +152,7 @@ const EXPECTED_ANSWERS = [
   {
     id: "ias-ips",
     re: /\b(ias).{0,25}(ips)\b|\b(ips).{0,25}(ias)\b|\bcloud identity services\b/i,
-    answer: "IAS is the identity provider or proxy IdP for SAML 2.0 or OpenID Connect SSO and MFA; it authenticates, but does not provision or run SoD. IPS reads identity data from a source, applies transformations, and writes to target systems. In a hybrid landscape, Cloud Connector provides the controlled path to on-premise systems. IAG governs requests and risk, while BTP role collections provide the target authorization assignments."
+    answer: "IAS is Identity Authentication: the identity provider or proxy IdP for SAML 2.0 or OpenID Connect SSO and MFA. It authenticates users and issues tokens; it is not the dedicated cross-system provisioning engine and it does not run SoD. IPS is Identity Provisioning: it reads identities and groups from a source system, applies attribute transformations, synchronizes changes, and writes to target systems. Use IAS for how users sign in; use IPS for how accounts and attributes are created, updated, and removed. They complement each other — IPS can use IAS as a source or target — but the planes stay distinct."
   },
   {
     id: "authn-authz",
@@ -246,7 +248,10 @@ const EXPECTED_ANSWERS = [
   },
   {
     id: "grc-vs-detection",
-    re: /\b(grc).{0,40}(threat detection|siem)\b|\b(threat detection).{0,30}(grc)\b|\bvulnerability management\b/i,
+    // Comparison / complementarity only — bare "What is Vulnerability Management?" must not match.
+    // Do NOT treat every "difference … GRC" ask (e.g. central vs decentral Firefighter in SAP GRC)
+    // as GRC-versus-threat-detection; the difference arm requires the second plane explicitly.
+    re: /\b(grc).{0,40}(threat detection|siem|vulnerabilit\w*)\b|\b(threat detection|vulnerabilit\w*).{0,40}(grc)\b|\b(?:difference|differ|versus|vs\.?|compared|compare|complement\w*).{0,120}\b(?:vulnerability management|threat detection|siem)\b|\b(?:grc|threat detection|vulnerability management).{0,80}\b(?:versus|vs\.?|compared?\s+with|and).{0,50}\b(?:threat(?:\s+detection)?|vulnerabilit\w*|siem)\b|\b(?:threat detection|vulnerability management|siem).{0,80}\b(?:versus|vs\.?|compared?\s+with|and).{0,50}\bgrc\b/i,
     answer: "GRC asks who should have access and whether that access creates risk. Threat detection asks what is happening and whether it looks suspicious. Vulnerability management asks whether the system, software, or configuration can be exploited. A patched system can still have excessive privilege. A clean role model does not patch a vulnerability. I need all three, and I would not call them the same product."
   },
   {

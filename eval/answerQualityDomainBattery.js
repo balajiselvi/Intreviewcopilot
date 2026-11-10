@@ -12,6 +12,16 @@ const { evaluateAnswerQuality } = require("./lib/answerQualityContract.js");
 const SEED = Number(process.env.EVAL_SEED || 20261022);
 const API_BASE_URL = process.env.EVAL_APP_BASE_URL || "";
 const API_TIMEOUT_MS = Number(process.env.EVAL_API_TIMEOUT_MS || 90000);
+const MAX_LIVE_REQUESTS = Number(process.env.EVAL_MAX_LIVE_REQUESTS || 37);
+const RATE_LIMIT_DELAY_MS = Number(process.env.EVAL_RATE_LIMIT_DELAY_MS || 1000);
+const MAX_SPEND_USD = Number(process.env.EVAL_MAX_SPEND_USD || 0);
+const PRIOR_UNMETERED_PROVIDER_ATTEMPTS = Number(process.env.EVAL_PRIOR_UNMETERED_PROVIDER_ATTEMPTS || 0);
+const MODEL = "gpt-4o-mini";
+const MODEL_CONTEXT_TOKENS = 128000;
+const MAX_OUTPUT_TOKENS = 2048;
+const INPUT_USD_PER_MILLION_TOKENS = 0.15;
+const OUTPUT_USD_PER_MILLION_TOKENS = 0.6;
+const MAX_PROVIDER_RETRIES = Number(process.env.EVAL_PROVIDER_RETRIES ?? 3);
 
 const DOMAIN_BANK = [
   { domain: "SAP-Security-PFCG", questions: [
@@ -109,6 +119,9 @@ function pickTwo(domainEntry, rand) {
 function parseStream(raw) {
   let answer = "";
   let admission = null;
+  let generation = null;
+  let context = null;
+  let analysis = null;
   for (const block of String(raw || "").split(/\r?\n\r?\n/)) {
     const event = block.match(/^event:\s*(.+)$/m)?.[1] || "message";
     const line = block.split(/\r?\n/).find((row) => row.startsWith("data: "));
@@ -116,21 +129,32 @@ function parseStream(raw) {
     try {
       const payload = JSON.parse(line.slice(6));
       if (event === "admission") admission = payload;
+      if (event === "generation") generation = payload;
+      if (event === "context") context = payload;
+      if (event === "analysis") analysis = payload;
       if (payload?.text) answer += payload.text;
     } catch {
       answer += line.slice(6);
     }
   }
-  return { answer: answer.trim(), admission, terminated: String(raw).includes("data: [DONE]") };
+  return {
+    answer: answer.trim(),
+    admission,
+    generation,
+    context,
+    analysis,
+    terminated: String(raw).includes("data: [DONE]")
+  };
 }
 
 async function requestLive(question) {
+  const startedAt = Date.now();
   const response = await fetch(`${API_BASE_URL}/api/chat`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
       question,
-      model: "gpt-4o-mini",
+      model: MODEL,
       history: [],
       responseLength: "concise",
       debug: true
@@ -138,11 +162,39 @@ async function requestLive(question) {
     signal: AbortSignal.timeout(API_TIMEOUT_MS)
   });
   const raw = await response.text();
-  return { status: response.status, ...parseStream(raw) };
+  return {
+    status: response.status,
+    responseLatencyMs: Date.now() - startedAt,
+    ...parseStream(raw)
+  };
 }
 
 function expectedFor(domain, question) {
   const q = question.toLowerCase();
+  if (domain === "Fiori-Gateway" && /authorize a custom fiori app/.test(q)) {
+    return {
+      requiredPoints: [],
+      forbiddenClaims: [],
+      expectedWorkflow: null,
+      expectedLiveRoute: "GENERATION"
+    };
+  }
+  if (domain === "IAS-IPS-IAG-Architecture") {
+    return {
+      requiredPoints: [
+        /\bIAS\b/i,
+        /\bIPS\b/i,
+        /\bIAG\b/i,
+        /authentication|federation|SSO/i,
+        /provisioning|synchronization|transformation/i,
+        /governance|Access Analysis|Access Request|certification/i,
+        /target application|target system/i
+      ],
+      forbiddenClaims: [],
+      expectedWorkflow: null,
+      expectedLiveRoute: "GENERATION"
+    };
+  }
   if (domain === "IAG" && /build roles/.test(q)) {
     return {
       requiredPoints: [/Role Designer/i],
@@ -225,7 +277,7 @@ function expectedFor(domain, question) {
     return { requiredPoints: [], forbiddenClaims: [], expectedWorkflow: null };
   }
   if (domain === "GRC-ARM-MSMP" && /configure an MSMP/i.test(question)) {
-    return { requiredPoints: [/MSMP|GRFNMW|Maintain MSMP/i], expectedWorkflow: null };
+    return { requiredPoints: [/MSMP|GRFNMW|Maintain MSMP/i], expectedWorkflow: "grc-msmp-access-request-config" };
   }
   return { requiredPoints: [], forbiddenClaims: [] };
 }
@@ -234,65 +286,248 @@ async function main() {
   const rand = mulberry32(SEED);
   const rows = [];
   let failed = 0;
-  for (const entry of DOMAIN_BANK) {
-    for (const question of pickTwo(entry, rand)) {
-      const expect = expectedFor(entry.domain, question);
-      const verified = selectVerifiedWorkflow(question);
-      const topics = explicitProductTopics(question);
-      const routingPass = Object.prototype.hasOwnProperty.call(expect, "expectedWorkflow")
-        ? (expect.expectedWorkflow
-          ? verified?.workflowId === expect.expectedWorkflow
-          : !verified)
-        : true;
-      let live = null;
-      let quality = null;
-      if (API_BASE_URL) {
-        try {
-          live = await requestLive(question);
-          quality = evaluateAnswerQuality({
-            question,
-            answer: live.answer,
-            requiredPoints: expect.requiredPoints,
-            forbiddenClaims: expect.forbiddenClaims,
-            route: live.admission?.route || null
-          });
-        } catch (error) {
-          live = { error: error.message };
-          quality = { pass: false, findings: [{ severity: "CRITICAL", code: "LIVE_ERROR", detail: error.message }] };
+  let requestsSent = 0;
+  let estimatedSpendUsd = 0;
+  let unmeteredProviderAttempts = 0;
+  let unmeteredSpendUpperBoundUsd = 0;
+  let stopReason = null;
+  const cases = DOMAIN_BANK.flatMap((entry) => pickTwo(entry, rand).map((question) => {
+    const expect = expectedFor(entry.domain, question);
+    const verified = selectVerifiedWorkflow(question);
+    return {
+      domain: entry.domain,
+      question,
+      expect,
+      verified,
+      topics: explicitProductTopics(question)
+    };
+  })).concat([{
+    domain: "IAS-IPS-IAG-Architecture",
+    question: "What is the role of SAP IAS (Identity Authentication) and IPS (Identity Provisioning) when deploying SAP Cloud SAP Cloud IAG?",
+    expect: expectedFor(
+      "IAS-IPS-IAG-Architecture",
+      "What is the role of SAP IAS (Identity Authentication) and IPS (Identity Provisioning) when deploying SAP Cloud SAP Cloud IAG?"
+    ),
+    verified: selectVerifiedWorkflow(
+      "What is the role of SAP IAS (Identity Authentication) and IPS (Identity Provisioning) when deploying SAP Cloud SAP Cloud IAG?"
+    ),
+    topics: explicitProductTopics(
+      "What is the role of SAP IAS (Identity Authentication) and IPS (Identity Provisioning) when deploying SAP Cloud SAP Cloud IAG?"
+    )
+  }]);
+  const potentialProviderCases = cases.filter((testCase) => !testCase.verified?.answer).length;
+  const maxProviderAttempts = potentialProviderCases
+    + PRIOR_UNMETERED_PROVIDER_ATTEMPTS
+    + (potentialProviderCases ? MAX_PROVIDER_RETRIES : 0);
+  const maxAttemptCostUsd = (
+    MODEL_CONTEXT_TOKENS * INPUT_USD_PER_MILLION_TOKENS
+    + MAX_OUTPUT_TOKENS * OUTPUT_USD_PER_MILLION_TOKENS
+  ) / 1_000_000;
+  const worstCaseSpendUsd = maxProviderAttempts * maxAttemptCostUsd;
+
+  if (API_BASE_URL) {
+    let target;
+    try {
+      target = new URL(API_BASE_URL);
+    } catch {
+      throw new Error("EVAL_APP_BASE_URL must be a valid local development-server URL.");
+    }
+    if (!["localhost", "127.0.0.1", "[::1]"].includes(target.hostname)) {
+      throw new Error("Live evaluation is restricted to localhost; refusing to send questions to a remote host.");
+    }
+    if (!Number.isInteger(MAX_LIVE_REQUESTS) || MAX_LIVE_REQUESTS < cases.length) {
+      throw new Error(`EVAL_MAX_LIVE_REQUESTS must allow all ${cases.length} battery cases.`);
+    }
+    if (!Number.isFinite(MAX_SPEND_USD) || MAX_SPEND_USD <= 0) {
+      throw new Error("Set EVAL_MAX_SPEND_USD to an explicit positive USD cap before live evaluation.");
+    }
+    if (!Number.isInteger(PRIOR_UNMETERED_PROVIDER_ATTEMPTS) || PRIOR_UNMETERED_PROVIDER_ATTEMPTS < 0) {
+      throw new Error("EVAL_PRIOR_UNMETERED_PROVIDER_ATTEMPTS must be a non-negative integer.");
+    }
+    if (!Number.isFinite(RATE_LIMIT_DELAY_MS) || RATE_LIMIT_DELAY_MS < 0) {
+      throw new Error("EVAL_RATE_LIMIT_DELAY_MS must be a non-negative number.");
+    }
+    if (!Number.isInteger(MAX_PROVIDER_RETRIES) || MAX_PROVIDER_RETRIES < 0) {
+      throw new Error("EVAL_PROVIDER_RETRIES must be a non-negative integer.");
+    }
+    if (worstCaseSpendUsd > MAX_SPEND_USD) {
+      throw new Error(
+        `Preflight refused: worst-case provider spend is $${worstCaseSpendUsd.toFixed(4)}, above the $${MAX_SPEND_USD.toFixed(2)} cap.`
+      );
+    }
+  }
+
+  for (const [index, testCase] of cases.entries()) {
+    const { domain, question, expect, verified, topics } = testCase;
+    const routingPass = Object.prototype.hasOwnProperty.call(expect, "expectedWorkflow")
+      ? (expect.expectedWorkflow
+        ? verified?.workflowId === expect.expectedWorkflow
+        : !verified)
+      : true;
+    let live = null;
+    let quality = null;
+    if (API_BASE_URL) {
+      if (requestsSent >= MAX_LIVE_REQUESTS) {
+        stopReason = `Live request cap reached at ${MAX_LIVE_REQUESTS}.`;
+        break;
+      }
+      if (requestsSent > 0 && RATE_LIMIT_DELAY_MS > 0) {
+        await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAY_MS));
+      }
+      requestsSent += 1;
+      try {
+        live = await requestLive(question);
+        const promptTokens = Number(live.generation?.prompt_tokens);
+        const completionTokens = Number(live.generation?.completion_tokens);
+        if (Number.isFinite(promptTokens) && Number.isFinite(completionTokens)) {
+          live.estimatedCostUsd = (
+            promptTokens * INPUT_USD_PER_MILLION_TOKENS
+            + completionTokens * OUTPUT_USD_PER_MILLION_TOKENS
+          ) / 1_000_000;
+          estimatedSpendUsd += live.estimatedCostUsd;
         }
-      } else if (verified?.answer) {
         quality = evaluateAnswerQuality({
           question,
-          answer: verified.answer,
+          answer: live.answer,
           requiredPoints: expect.requiredPoints,
           forbiddenClaims: expect.forbiddenClaims,
-          route: "VERIFIED_WORKFLOW",
-          sourceFiles: verified.sourceFiles || []
+          route: live.admission?.route || null,
+          sourceFiles: live.admission?.sourceFiles || []
         });
-      } else {
-        quality = {
-          pass: true,
-          findings: [],
-          note: "No verified workflow; live answer not requested. Routing-only row."
-        };
+      } catch (error) {
+        live = { error: error.message };
+        quality = { pass: false, findings: [{ severity: "CRITICAL", code: "LIVE_ERROR", detail: error.message }] };
+        if (!verified?.answer) {
+          unmeteredProviderAttempts += 1;
+          unmeteredSpendUpperBoundUsd += maxAttemptCostUsd;
+        }
+        stopReason = `Stopped after request error for ${domain}: ${String(error.message || error).slice(0, 180)}`;
       }
-
-      const pass = routingPass && (quality?.pass !== false);
-      if (!pass) failed += 1;
-      rows.push({
-        domain: entry.domain,
+    } else if (verified?.answer) {
+      quality = evaluateAnswerQuality({
         question,
-        topics,
-        verifiedWorkflowId: verified?.workflowId || null,
-        expectedWorkflow: expect.expectedWorkflow || null,
-        routingPass,
-        liveStatus: live?.status ?? null,
-        liveRoute: live?.admission?.route || null,
-        answerPreview: (live?.answer || verified?.answer || "").slice(0, 240),
-        quality,
-        pass
+        answer: verified.answer,
+        requiredPoints: expect.requiredPoints,
+        forbiddenClaims: expect.forbiddenClaims,
+        route: "VERIFIED_WORKFLOW",
+        sourceFiles: verified.sourceFiles || []
       });
+    } else {
+      quality = {
+        pass: true,
+        findings: [],
+        note: "No verified workflow; live answer not requested. Routing-only row."
+      };
     }
+
+    const route = live?.admission?.route || null;
+    const liveRoutePass = !API_BASE_URL || !expect.expectedLiveRoute || route === expect.expectedLiveRoute;
+    const finishReason = live?.generation?.finish_reason || null;
+    const generationRoute = route === "GENERATION";
+    const truncated = generationRoute && !finishReason
+      ? null
+      : ["length", "max_tokens", "max_output_tokens"].includes(String(finishReason).toLowerCase());
+    const transportComplete = Boolean(
+      live?.terminated
+      && live?.answer
+      && Number.isFinite(live?.status)
+      && live.status >= 200
+      && live.status < 300
+    );
+    const complete = transportComplete && truncated !== true;
+    const completionStatus = !transportComplete
+      ? "incomplete"
+      : truncated
+      ? "truncated"
+      : generationRoute && !finishReason
+      ? "transport-complete-unverified"
+      : "complete";
+    const generationUsageAvailable = live?.generation?.prompt_tokens != null
+      && live?.generation?.completion_tokens != null
+      && Number.isFinite(Number(live.generation.prompt_tokens))
+      && Number.isFinite(Number(live.generation.completion_tokens));
+    let rowSpendUpperBoundUsd = live?.estimatedCostUsd || 0;
+    if (API_BASE_URL && !live?.error
+      && ["GENERATION", "LOCAL_KNOWLEDGE_FALLBACK"].includes(route)
+      && !generationUsageAvailable) {
+      unmeteredProviderAttempts += 1;
+      unmeteredSpendUpperBoundUsd += maxAttemptCostUsd;
+      rowSpendUpperBoundUsd = maxAttemptCostUsd;
+    } else if (API_BASE_URL && live?.error && !verified?.answer) {
+      rowSpendUpperBoundUsd = maxAttemptCostUsd;
+    }
+    const retrievedEvidence = live?.context?.retrieval?.evidence || [];
+    const sourceFiles = live?.admission?.sourceFiles || [];
+    const citationGrounding = {
+      provenanceAvailable: sourceFiles.length > 0 || retrievedEvidence.length > 0,
+      sourceFiles,
+      retrievedEvidence,
+      inlineCitationCount: (live?.answer?.match(/\[\d+\]|\((?:source|cite):[^)]+\)/gi) || []).length
+    };
+    const livePass = !API_BASE_URL || (
+      live !== null
+      && Number.isFinite(live.status)
+      && live.status >= 200
+      && live.status < 300
+      && typeof live.answer === "string"
+      && live.answer.trim().length > 0
+      && complete
+      && quality !== null
+      && quality?.pass === true
+    );
+
+    const pass = routingPass && livePass && liveRoutePass;
+    if (!pass) failed += 1;
+    rows.push({
+      domain,
+      question,
+      topics,
+      verifiedWorkflowId: verified?.workflowId || null,
+      expectedWorkflow: expect.expectedWorkflow || null,
+      expectedLiveRoute: expect.expectedLiveRoute || null,
+      routingPass,
+      liveRoutePass,
+      liveStatus: live?.status ?? null,
+      liveRoute: route,
+      responseLatencyMs: live?.responseLatencyMs ?? null,
+      completionStatus: API_BASE_URL ? completionStatus : "not-run",
+      finishReason,
+      truncated,
+      tokenUsage: live?.generation ? {
+        promptTokens: live.generation.prompt_tokens ?? null,
+        completionTokens: live.generation.completion_tokens ?? null,
+        totalTokens: live.generation.total_tokens ?? null
+      } : null,
+      estimatedCostUsd: live?.estimatedCostUsd ?? null,
+      estimatedCostUpperBoundUsd: API_BASE_URL ? Number(rowSpendUpperBoundUsd.toFixed(6)) : null,
+      generationUsageAvailable: API_BASE_URL ? generationUsageAvailable : null,
+      postAnswerAnalysisAvailable: API_BASE_URL ? Boolean(live?.analysis) : null,
+      citationGrounding,
+      answerText: live?.answer || verified?.answer || "",
+      answerPreview: (live?.answer || verified?.answer || "").slice(0, 240),
+      quality,
+      pass
+    });
+
+    if (API_BASE_URL && !stopReason) {
+      if (!live || live.error) {
+        stopReason = `Stopped after an error for ${domain}.`;
+      } else if (route === "LOCAL_KNOWLEDGE_FALLBACK") {
+        stopReason = `Stopped after local fallback for ${domain}; provider retry cost could not be measured.`;
+      } else {
+        const remainingProviderCases = cases.slice(index + 1)
+          .filter((remainingCase) => !remainingCase.verified?.answer).length;
+        const projectedUpperBoundUsd = estimatedSpendUsd
+          + unmeteredSpendUpperBoundUsd
+          + PRIOR_UNMETERED_PROVIDER_ATTEMPTS * maxAttemptCostUsd
+          + remainingProviderCases * maxAttemptCostUsd;
+        if (projectedUpperBoundUsd > MAX_SPEND_USD) {
+          stopReason = `Stopped before the next request; projected upper bound $${projectedUpperBoundUsd.toFixed(4)} exceeds the $${MAX_SPEND_USD.toFixed(2)} cap.`;
+        }
+      }
+    }
+    if (stopReason) break;
+    if (index === cases.length - 1) break;
   }
 
   const report = {
@@ -300,8 +535,22 @@ async function main() {
     seed: SEED,
     mode: API_BASE_URL ? "live-http-and-routing" : "routing-and-verified-workflow-only",
     baseUrl: API_BASE_URL || null,
-    domainCount: DOMAIN_BANK.length,
+    model: API_BASE_URL ? MODEL : null,
+    domainCount: new Set(cases.map((testCase) => testCase.domain)).size,
     totalCases: rows.length,
+    plannedCases: cases.length,
+    requestsSent,
+    maxLiveRequests: API_BASE_URL ? MAX_LIVE_REQUESTS : 0,
+    rateLimitDelayMs: API_BASE_URL ? RATE_LIMIT_DELAY_MS : 0,
+    maxSpendUsd: API_BASE_URL ? MAX_SPEND_USD : null,
+    worstCaseSpendUsd: API_BASE_URL ? worstCaseSpendUsd : null,
+    estimatedSpendUsd: API_BASE_URL ? Number(estimatedSpendUsd.toFixed(6)) : null,
+    priorUnmeteredProviderAttempts: API_BASE_URL ? PRIOR_UNMETERED_PROVIDER_ATTEMPTS : null,
+    unmeteredProviderAttempts: API_BASE_URL ? unmeteredProviderAttempts : null,
+    estimatedSpendUpperBoundUsd: API_BASE_URL
+      ? Number((estimatedSpendUsd + unmeteredSpendUpperBoundUsd + PRIOR_UNMETERED_PROVIDER_ATTEMPTS * maxAttemptCostUsd).toFixed(6))
+      : null,
+    stopReason,
     failed,
     completed: rows.length - failed,
     rows
@@ -316,10 +565,14 @@ async function main() {
     seed: SEED,
     mode: report.mode,
     totalCases: report.totalCases,
+    plannedCases: report.plannedCases,
+    requestsSent: report.requestsSent,
+    estimatedSpendUsd: report.estimatedSpendUsd,
+    stopReason: report.stopReason,
     completed: report.completed,
     failed: report.failed
   }, null, 2));
-  if (failed) process.exitCode = 1;
+  if (failed || stopReason) process.exitCode = 1;
 }
 
 main().catch((error) => {
