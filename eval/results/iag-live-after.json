@@ -1,0 +1,162 @@
+[
+  {
+    "id": "iag-workflow",
+    "question": "How do you configure the IAG workflow?",
+    "ms": 14923,
+    "status": 200,
+    "modelCalls": 1,
+    "must": true,
+    "mustNot": true,
+    "text": "To configure the IAG workflow, first, access the IAG launchpad and navigate to Administration, then Configuration, and select Business Rule. Here, you will choose the project named IAGWorkflowBusinessRule. The decision table called RequestTypeRule maps specific request types to pre-delivered workflow paths. If you need to add a new request type, simply add a row in this table and specify the corresponding workflow path. After making your changes, activate the rules and deploy the workflow version.\n\nNext, ensure that the necessary master data setup, such as business processes and risks, is configured beforehand, as this is essential for the workflow to function correctly. The connectivity from IAG to on-premise systems for risk analysis and provisioning must also be established through BTP-based connectivity.\n\nTo validate the configuration, confirm that users can access the Access Request feature, search within policy, and submit requests. This ensures that the authorization to start a request is functioning as intended. The user must exist in IAS, and the appropriate BTP role collection should be mapped to the IAS user group to allow access. Finally, check that the SCI User Group Sync Job has run successfully, enabling managers to be selectable on requests. This end-to-end validation confirms that the workflow is correctly configured and operational."
+  },
+  {
+    "id": "iag-template",
+    "question": "What is a workflow template in IAG?",
+    "ms": 3325,
+    "status": 200,
+    "modelCalls": 1,
+    "must": true,
+    "mustNot": true,
+    "text": "A workflow template in IAG is a predefined structure that governs the access request process, determining how requests are routed and approved. It matters because it ensures consistent handling of access requests, aligning with governance policies. The mechanism works by mapping request types to specific workflow paths through business rules, which are activated and deployed to manage the approval flow effectively. For example, a request for a firefighter ID might follow a different path than a standard role request, ensuring appropriate oversight and compliance."
+  },
+  {
+    "id": "iag-ruleset",
+    "question": "How do you upload or update a ruleset in IAG?",
+    "ms": 3573,
+    "status": 200,
+    "modelCalls": 1,
+    "must": false,
+    "mustNot": true,
+    "text": "To upload or update a ruleset in IAG, you start by accessing the IAG application and navigating to the Ruleset Management section. From there, you can either create a new ruleset or select an existing one to update. The process involves defining the rules and conditions that govern access requests, which can include specifying risk rules and mitigation controls. Once the ruleset is configured, you activate and deploy it to ensure it takes effect in the access governance process. This mechanism is crucial for maintaining appropriate access controls and ensuring compliance with governance policies."
+  },
+  {
+    "id": "iag-policy",
+    "question": "What does authorization policy mean in IAG Access Request?",
+    "ms": 3412,
+    "status": 200,
+    "modelCalls": 1,
+    "must": false,
+    "mustNot": true,
+    "text": "In IAG Access Request, the authorization policy defines the rules and criteria that govern how access requests are evaluated and approved. It determines which roles or permissions can be requested based on user attributes, organizational structure, and predefined business rules. \n\nThe process typically involves configuring the Access Request workflow, including setting up decision tables that filter requests based on specific criteria. For instance, a request might be filtered by user role, department, or the type of access being requested. This ensures that only valid requests are processed, aligning with the organization's security and compliance requirements. \n\nValidation of the authorization policy is crucial; it involves testing the workflow to ensure that it correctly enforces the defined rules and that access is granted appropriately without introducing security risks."
+  },
+  {
+    "id": "iag-search",
+    "question": "Explain search and trigger in IAG.",
+    "ms": 3301,
+    "status": 200,
+    "modelCalls": 1,
+    "must": true,
+    "mustNot": true,
+    "text": "In IAG, search refers to the lookup process within the Access Request module, where the access-request policy filters the systems, roles, and users visible to the requestor. This ensures that users only see relevant options based on their entitlements and the defined governance rules.\n\nTrigger, on the other hand, initiates the workflow. This can occur when a request is submitted, which starts the defined workflow path. Additionally, changes in IAS groups are detected by the SCI User Group Sync Job, which is scheduled to run and can trigger provisioning actions. These two components work together to ensure that access requests are processed efficiently and in compliance with governance policies."
+  },
+  {
+    "id": "iag-pam",
+    "question": "How do you set up privileged access in IAG?",
+    "ms": 24,
+    "status": 200,
+    "modelCalls": 0,
+    "must": false,
+    "mustNot": true,
+    "text": "Privileged access can change the system or a sensitive business outcome. I minimize standing privilege: approval, time bound, logging, and an independent review. Emergency need goes through EAM or Firefighter, not a permanent SAP_ALL."
+  },
+  {
+    "id": "iag-pamid",
+    "question": "How do you create a PAM ID for a team in IAG?",
+    "ms": 5895,
+    "status": 200,
+    "modelCalls": 1,
+    "must": true,
+    "mustNot": true,
+    "text": "To create a PAM ID for a team in IAG, first, you would access the Maintain Privileged Access application. In this application, you configure the PAM ID by defining the necessary attributes and settings for the team. This includes specifying the team members who will have access and any relevant approval workflows.\n\nNext, you would engage stakeholders, such as team managers and security officers, to ensure that the access aligns with their requirements and governance policies. It's important to clarify that while IAG decides on the entitlement, the provisioning of the PAM ID is executed through the Provisioning job, which pushes the ID to the target system.\n\nOne trade-off to consider is balancing the technical correctness of the access configuration with the urgency of business needs. If there is pressure to expedite the process, you may need to streamline some approval steps, which could introduce risk.\n\nAfter configuring the PAM ID, you would verify its creation by checking the logs and ensuring that the ID is correctly provisioned to the target system. The outcome of this process is that the team can now utilize the PAM ID for emergency access, with the assurance that it has been properly governed and documented."
+  },
+  {
+    "id": "iag-vs-grc",
+    "question": "How is an IAG PAM ID created compared with a GRC firefighter ID?",
+    "ms": 4746,
+    "status": 200,
+    "modelCalls": 1,
+    "must": true,
+    "mustNot": true,
+    "text": "An IAG PAM ID is created in the Maintain Privileged Access application, where the request is initiated and processed. The Provisioning job then pushes the PAM ID to the target system. This process involves using Access Request, where the request-type mapping is typically set to managerrolesecuritypath. The approver list for the PAM ID includes individuals from the IAS group IAG_WF_MANAGER, which is populated after running the SCI User Group Sync Job.\n\nIn contrast, a GRC firefighter ID is created directly on the target system and is then synchronized back into GRC Emergency Access Management (EAM). The firefighter ID requires a reason code and ticket ID before activation, ensuring that session activity is logged and reviewed.\n\nThe key distinction lies in their lifecycle and governance: the PAM ID is managed through IAG with a focus on privileged access governance, while the firefighter ID is more about emergency access control within GRC. For example, I would use a PAM ID when needing to grant temporary elevated access for a specific task that requires approval, whereas a firefighter ID would be used in situations where immediate access is needed to resolve critical issues, with subsequent logging and review to ensure compliance."
+  },
+  {
+    "id": "iag-owners",
+    "question": "Who are the PAM owners and controllers in IAG?",
+    "ms": 4132,
+    "status": 200,
+    "modelCalls": 1,
+    "must": true,
+    "mustNot": true,
+    "text": "In IAG, the PAM owners and controllers are the individuals assigned as approvers and reviewers for privileged access management. Specifically, those who need to appear as managers or workflow approvers must be included in the IAG_WF_MANAGER group within IAS. This group is synchronized to ensure that the appropriate personnel can manage and oversee privileged access requests effectively. The PAM ID is created in the Maintain Privileged Access section and is pushed to the target systems by the provisioning job, ensuring that access governance is maintained throughout the process."
+  },
+  {
+    "id": "iag-roleowner",
+    "question": "How does role owner mapping work in IAG?",
+    "ms": 3336,
+    "status": 200,
+    "modelCalls": 1,
+    "must": true,
+    "mustNot": true,
+    "text": "Role owner mapping in IAG involves defining business roles within the Role Designer, where each role is assigned an Assignment Approver and a Content Approver. The mapping process begins with the SCI User Group Sync Job, which ensures that the approvers are linked to their respective IAS groups. When an access request is submitted for a business role, the role-owner stage utilizes the assignment stored on that role to determine the appropriate approvers. This configuration is essential for ensuring that access requests are properly governed and that the right individuals are involved in the approval process."
+  },
+  {
+    "id": "iag-requestor",
+    "question": "How do you allow a user to raise an access request in IAG?",
+    "ms": 4089,
+    "status": 200,
+    "modelCalls": 1,
+    "must": true,
+    "mustNot": true,
+    "text": "To allow a user to raise an access request in IAG, first ensure the user exists in IAS and is mapped to the appropriate BTP role collection that exposes the Access Request functionality. Assign this role collection to the user group and schedule the SCI User Group Sync Job to ensure IAG recognizes the group. \n\nThe user must also have a manager selected from the IAS group IAG_WF_MANAGER, which requires the sync to have run. Once these steps are completed, the user can open Access Request, search within policy, and submit their request. This process does not involve creating the user in IPS or an ARM provisioning workflow; it strictly governs the access request mechanism."
+  },
+  {
+    "id": "iag-workflow-repeat",
+    "question": "How do you configure the IAG workflow?",
+    "ms": 4708,
+    "status": 200,
+    "modelCalls": 1,
+    "must": true,
+    "mustNot": true,
+    "text": "To configure the IAG workflow, first, open the IAG launchpad and navigate to Administration, then Configuration, and select Business Rule. From there, choose the project IAGWorkflowBusinessRule. The decision table on RequestTypeRule maps specific request types to pre-delivered workflow paths. If a request type requires a different path, add a new row to the table. After making your changes, activate the rules and deploy the workflow version.\n\nIt's important to note that the workflow templates and paths are pre-delivered, so you won't create a workflow from scratch. To ensure everything is set up correctly, verify that the necessary business processes and risks are configured beforehand, as this underpins the workflow's effectiveness. \n\nOnce the workflow is deployed, you can validate it by checking that users can initiate requests based on the configured rules. They should be able to search within policy and submit requests successfully. This confirms that the workflow is functioning as intended and that the necessary authorizations are in place for users to access the workflow features."
+  },
+  {
+    "id": "s4-public",
+    "question": "How do you maintain a business role in S/4HANA Public Cloud?",
+    "ms": 3553,
+    "status": 200,
+    "modelCalls": 1,
+    "must": true,
+    "mustNot": true,
+    "text": "In S/4HANA Public Cloud, maintaining a business role involves using the \"Maintain Business Roles\" application. You define the role by selecting the relevant business catalogs, which include the Fiori apps users need access to, and set any necessary restrictions. Unlike on-premise systems, there is no PFCG or SU24 involved in this process. User assignments are managed through the \"Maintain Business Users\" application, ensuring that the roles align with the business requirements and security policies. This approach allows for a streamlined and user-centric role management process in the cloud environment."
+  },
+  {
+    "id": "sf-rbp",
+    "question": "How do you grant SuccessFactors role-based permissions?",
+    "ms": 3773,
+    "status": 200,
+    "modelCalls": 1,
+    "must": true,
+    "mustNot": true,
+    "text": "To grant SuccessFactors role-based permissions, first, access the Admin Center and open the \"Manage Permission Roles\" section. Here, you create or modify a permission role by granting only the specific permissions that the persona requires. Next, create a permission group that identifies the users who will receive this role. \n\nThen, set the target population, which defines whose employee data the role can access. It's important to note that the permission group and the target population are distinct objects. After that, assign the permission role to the permission group. \n\nFinally, sign in as a user within that group to confirm they can see the intended data, while ensuring that users outside the target population do not have access. This process ensures that the role-based permissions are effectively managed and that sensitive HR data is protected while still allowing appropriate access for users."
+  },
+  {
+    "id": "btp-rc",
+    "question": "How do you assign a BTP role collection?",
+    "ms": 5295,
+    "status": 200,
+    "modelCalls": 1,
+    "must": true,
+    "mustNot": true,
+    "text": "To assign a BTP role collection, first, ensure that the Identity Authentication Service (IAS) is configured as the identity provider for your BTP subaccount. This involves setting up trust configuration using SAML 2.0 or OIDC, which allows the BTP environment to authenticate users based on their identity attributes.\n\nNext, navigate to the BTP cockpit and access the role collections section. Here, you can create or select an existing role collection. A role collection is a grouping of roles that define what users can access within the BTP landscape. Assign the necessary roles to the collection, ensuring they align with the intended access requirements.\n\nAfter that, you will assign the role collection to users or user groups. This can be done through the user management section in the BTP cockpit, where you can specify which users or groups should have access to the role collection. \n\nFinally, verify the assignment by checking the user’s access rights through the BTP audit logs or by testing the user’s access to the applications associated with the role collection. This ensures that the roles are correctly enforced and that users have the appropriate permissions."
+  },
+  {
+    "id": "grc-ff",
+    "question": "How does a user start a firefighter session in GRC?",
+    "ms": 3568,
+    "status": 200,
+    "modelCalls": 1,
+    "must": true,
+    "mustNot": true,
+    "text": "To start a firefighter session in GRC, the user must first log in to the GRC Access Control system and navigate to the Emergency Access Management (EAM) module. They will select the appropriate Firefighter ID, which requires entering a mandatory reason code and a ticket ID to justify the access request. Once the session is activated, all activities performed during this elevated access are logged for auditing purposes. After the session, a designated secondary supervisor must review and sign off on the session logs within 24 hours to ensure compliance and governance. This structured process helps maintain oversight and accountability for emergency access."
+  }
+]

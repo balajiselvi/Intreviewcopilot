@@ -1,0 +1,37 @@
+{
+  "id": "senior-manager-security-depth",
+  "seniority": "manager|senior-manager|director",
+  "verification_status": "NEEDS_REVIEW",
+  "retrieved_on": "2026-10-29",
+  "notes": "Data checklist for verifier — not prompt hard-coding. Security-focused questions or security role profiles only.",
+  "by_question_type": {
+    "configure": [
+      "business objective and control owner",
+      "product/edition plane",
+      "configuration sequence grounded in retrieved or verified cards",
+      "integration handoffs (identity, governance, enforcement)",
+      "validation evidence and negative test",
+      "governance / change control"
+    ],
+    "troubleshoot": [
+      "symptom to plane mapping",
+      "first diagnostic artifact",
+      "isolation steps",
+      "remediation vs workaround",
+      "evidence for audit/hypercare"
+    ],
+    "architecture": [
+      "trust boundaries",
+      "identity vs provisioning vs governance vs enforcement",
+      "trade-offs",
+      "operational ownership"
+    ],
+    "integration": [
+      "source system",
+      "target system",
+      "protocol or connector class only if sourced",
+      "failure modes (authn vs authz)",
+      "monitoring"
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "id": "cloud-identity-ias-ips-iag",
+  "domain": "cloud-identity",
+  "product": "SAP Cloud Identity Services / SAP Cloud Identity Access Governance",
+  "version_scope": "Current Cloud Identity Services + Cloud IAG — confirm edition wording",
+  "claims": [
+    {
+      "id": "ias-role",
+      "text": "IAS provides authentication and federation (IdP / proxy patterns such as SAML/OIDC), MFA and related sign-in policy capabilities as documented for Cloud Identity Services.",
+      "kind": "definition"
+    },
+    {
+      "id": "ips-role",
+      "text": "IPS provides identity provisioning and synchronization (commonly SCIM-oriented jobs, transformations, source/target systems) — not access-request governance.",
+      "kind": "definition"
+    },
+    {
+      "id": "iag-role",
+      "text": "Cloud IAG provides cloud access governance capabilities (access analysis, access request, certification, privileged access management, role design) distinct from on-premise GRC Access Control MSMP/BRFplus paths.",
+      "kind": "definition"
+    },
+    {
+      "id": "plane-separation",
+      "text": "IAS authenticates; IPS provisions; IAG governs; the target application enforces authorization.",
+      "kind": "integration"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://help.sap.com/",
+      "section": "SAP Cloud Identity Services / SAP Cloud Identity Access Governance (verify each product page)",
+      "retrieved_on": "2026-10-29"
+    }
+  ],
+  "verification_status": "NEEDS_REVIEW",
+  "reviewer": null,
+  "verified_on": null,
+  "expiry": null,
+  "recheck_date": "2026-11-30",
+  "spoken_answer": null,
+  "conflicts": [
+    "Avoid unverified vendor phrases such as calling IAG a 'microservice' unless SAP documentation uses that wording"
+  ],
+  "notes": "Draft plane separation for interview answers; mark VERIFIED only after Help Portal check."
+}

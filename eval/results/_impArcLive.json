@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-10-21T07:14:18.969Z",
+  "rows": [
+    {
+      "id": "IMP-06",
+      "finish": null,
+      "words": 166,
+      "answer": "### 1. Direct Answer\nUse transaction PFCG to create the single role, add the required transactions on the Menu tab, and maintain organizational levels on the Authorizations tab.\n\n### 2. Technical Mechanism and Exact Artifacts\nGenerate the authorization profile in PFCG after that authorization data is complete, because the generated profile is what the user buffer checks. Assign the role on the PFCG User tab or in transaction SU01, then run user comparison so the profile enters the user buffer. Review table AGR_USERS for the user assignment and table AGR_1251 for authorization values, and do not treat AGR_USERS as a transaction. Transport the released role change with the Change and Transport System and import it in the target system.\n\n### 3. Validation and Operational Boundary\nValidate the result by having the assigned user complete the business transaction for the maintained organizational value. Use transaction SU53 only to read the last failed authorization check, and do not treat that display as proof that the business action succeeded."
+    },
+    {
+      "id": "ARC-04",
+      "finish": null,
+      "words": 135,
+      "answer": "### 1. Direct Answer\nUse Maintain Business Roles to assign business catalogs, spaces, and pages on SAP S/4HANA Cloud Public Edition, then assign that business role in Maintain Business Users.\n\n### 2. Technical Mechanism and Exact Artifacts\nPublic Edition does not use PFCG, SU53, or /UI2/FLPCM_CUST. Maintain the catalog and target mapping in /UI2/FLPCM_CUST or /UI2/FLPCM_CONF on Private Edition and on-premise, and assign the catalog and space in the PFCG role. Inspect Display Authorization Trace on Public Edition only after the app opens and a check fails. Use transaction SU53 on an ABAP system only to read the last failed authorization check, and do not treat that display as proof that access succeeded.\n\n### 3. Validation and Operational Boundary\nValidate the design by having the assigned user complete the intended business task in the app."
+    }
+  ]
+}

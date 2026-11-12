@@ -1,0 +1,163 @@
+{
+  "cases": {
+    "A": {
+      "ok": true,
+      "question": "What are Critical Actions?",
+      "route": "GENERATION",
+      "admission": {
+        "decision": "ANSWER",
+        "route": "GENERATION",
+        "reason": "well-formed-question-or-technical-issue",
+        "scriptId": null,
+        "evidenceMode": "technical",
+        "responseLength": "medium"
+      },
+      "answerFinal": {
+        "text": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive executable — typically a transaction, Web Dynpro, Fiori app, or service — as high risk on its own. It is not an S/4HANA role-transformation methodology and it is not the same as a segregation-of-duties Risk, which needs conflicting Functions together. Critical Action differs from Critical Permission: the Action layer checks the executable; Critical Permission checks a powerful authorization-object, field and value combination even when the Action itself looks ordinary. I keep Critical Action rules aligned to privileged operations the business cares about and triage those findings separately from SoD noise.",
+        "answerKind": "validated",
+        "recovered": true,
+        "flag": "integrity_gate",
+        "replacesStream": false,
+        "bufferedPreDisplay": true
+      },
+      "mockUser": "What are Critical Actions?",
+      "substantivePreview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive executable — typically a transaction, Web Dynpro, Fiori app, ",
+      "events": [
+        "admission",
+        "answer_final",
+        "data",
+        "generation",
+        "analysis",
+        "done"
+      ],
+      "elapsedMs": 724
+    },
+    "B": {
+      "ok": true,
+      "recovered": true,
+      "answerKind": "validated",
+      "substantivePreview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive executable — typically a transaction, Web Dynpro, Fiori app, ",
+      "events": [
+        "admission",
+        "answer_final",
+        "data",
+        "generation",
+        "analysis",
+        "done"
+      ]
+    },
+    "C": {
+      "ok": true,
+      "answerKind": "validated",
+      "substantivePreview": "I do not have a reliable technical answer I can defend for that question right now (What are Critical Actions?). I would rather qualify the gap and verify the product, release and ",
+      "events": [
+        "admission",
+        "answer_final",
+        "data",
+        "generation",
+        "analysis",
+        "done"
+      ],
+      "note": "Recovery forced shallow via test-only buildDirectTechnicalFallback patch"
+    },
+    "D": {
+      "ok": true,
+      "route": "PREPARED_SCRIPT",
+      "substantivePreview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive executable — typically a transaction, Web Dynpro, Fiori app, ",
+      "events": [
+        "admission",
+        "data",
+        "done"
+      ],
+      "note": "Bad prepared payload injected via test-only resolvePreparedScript patch"
+    },
+    "E": {
+      "ok": true,
+      "route": "GENERATION",
+      "mockCalls": 0,
+      "substantivePreview": "In GRC Access Control, mitigating controls are the governed exception path when a risk cannot be removed by changing access. Operationally I treat the control lifecycle as define t",
+      "events": [
+        "admission",
+        "admission",
+        "answer_final",
+        "data",
+        "done"
+      ]
+    },
+    "F": {
+      "ok": true,
+      "textAPreview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive e",
+      "textBPreview": "In SAP GRC Access Control Access Risk Analysis, Risk, Function, Action and Permission form the ruleset hierarchy rather ",
+      "eventsA": [
+        "admission",
+        "answer_final",
+        "data",
+        "generation",
+        "analysis",
+        "done"
+      ],
+      "eventsB": [
+        "admission",
+        "answer_final",
+        "data",
+        "generation",
+        "analysis",
+        "done"
+      ]
+    },
+    "G": {
+      "ok": true,
+      "admission": {
+        "decision": "DEFER",
+        "route": "NONE",
+        "reason": "ambiguous-fragment",
+        "scriptId": null,
+        "confidence": 0,
+        "evidenceMode": null,
+        "normalizedQuestion": "What if"
+      },
+      "decision": "DEFER",
+      "substantivePreview": "",
+      "events": [
+        "admission",
+        "done"
+      ],
+      "statusCode": 200
+    }
+  },
+  "prompts": {
+    "A": {
+      "path": "D:\\My Projects\\InterviewCopilot\\eval\\results\\_acceptance\\prompt-A-critical-actions.txt",
+      "chars": 63865,
+      "route": "GENERATION",
+      "metricCouplingForbids": true,
+      "has1650": false,
+      "hasDoverInPrompt": true
+    },
+    "B": {
+      "path": "D:\\My Projects\\InterviewCopilot\\eval\\results\\_acceptance\\prompt-B-after-dover.txt",
+      "chars": 63865,
+      "route": "GENERATION",
+      "metricCouplingForbids": true,
+      "has1650": false,
+      "hasDoverInPrompt": true,
+      "historyContainedDover": true,
+      "note": "Prior history may mention Dover; active METRIC COUPLING must remain conceptual-forbid"
+    },
+    "C": {
+      "path": "D:\\My Projects\\InterviewCopilot\\eval\\results\\_acceptance\\prompt-C-dover-experience.txt",
+      "chars": 77831,
+      "question": "How did you approach SoD remediation and critical-access design on the Dover S/4HANA transformation?",
+      "route": "GENERATION",
+      "allowsExperience": true,
+      "metricCouplingForbids": false
+    },
+    "C_prepared_overview": {
+      "question": "Tell me about your Dover S/4HANA transformation project.",
+      "route": "PREPARED_SCRIPT",
+      "substantivePreview": "Dover was the complex one: ECC to S/4, 11 countries, 28 legal entities, more than 8,700 users, three phased go-lives. I led GRC Access Control 12.0 across ARA, ",
+      "note": "PREPARED_SCRIPT/PACK may exit before LLM prompt assembly; experience still served"
+    }
+  },
+  "startedAt": "2026-11-02T17:30:05.651Z"
+}

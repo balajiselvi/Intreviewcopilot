@@ -1,0 +1,489 @@
+{
+  "documentsProcessed": 166,
+  "documentsSkipped": 0,
+  "documentsUpdated": 88,
+  "chunksCreated": 873,
+  "elapsedSeconds": 42.88,
+  "errors": [
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      23,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      24,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_a147e7464b509ec596b041c3ad9859eb6c3cd49b431562d12626f5381cef194d",
+      "fileName": "access-review.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      26,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      27,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_98880c30f84bf600589f88652f7e02fd99ea381e16663af231afcb824a58fc07",
+      "fileName": "audit-support.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      27,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      28,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_3377225511791fff0568d0013614a6e8d858c5fe83e981014303a6e058992ba7",
+      "fileName": "sox.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      22,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      23,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_7dceaa7c8b7758155cec6f3eb41173021015a1c7ccf21222769feb7da3c4c99d",
+      "fileName": "communication.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      22,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      23,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_b77809e55e75b71632bd2ed2dbc0cb2dd63fce5b6115af9378cac022f55d4698",
+      "fileName": "conflict-resolution.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      25,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      26,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_242481b4d1f6fe8d836a339d1b6fe89c15d3f664205aee26a95999aa95d20a70",
+      "fileName": "leadership.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      22,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      23,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_242c4b38d185fb42a83d3717365f68d637fa2910eb67362324d498a999d04926",
+      "fileName": "self-introduction.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      16,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      19,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      29,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_9cacd26c8cdb4c41519ad57a42a01fd4068ca883b093cf44006ba867e904a956",
+      "fileName": "btp-overview.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      18,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      21,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      32,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_361f85f28b7925739ae98a7f9f3648fb66c9aed82c7654bd0a9164cd5516686e",
+      "fileName": "btp-security.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      33,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      34,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_972d971460b81eae4c9be0cb1cbb2603d233e486091b9b35bc3cddb92b5d0d89",
+      "fileName": "cloud-connector.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      35,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      36,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_af4c2acecb7ea08613e27131ecd8a0519ae36f2549555ba3c90b49a2dd5e37a1",
+      "fileName": "cloud-identity.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      35,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      36,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_765fac2674451862f4731a1552bda46b3aaa06d973507e2b1d68bb559e36a8f5",
+      "fileName": "ias.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      38,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      39,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_ed98a6b02239fd7c459af1ad4e7fbe14e94096b4b1914e87f269e5225d74a6f2",
+      "fileName": "ips.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      19,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      20,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_1d80a01d5f76142c59d3854cd2b764e2c68ebc21f89fb51b422fb763a893de7c",
+      "fileName": "bw-security.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      29,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_f06fe721568e909c0f12f7f7370c724bc273cb2892a440532439f13cd8ce2484",
+      "fileName": "sod.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      29,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_7b206f157bae0e9be37b2fa7061b45f2f85b1d90268a746b94b1fa59a01a798d",
+      "fileName": "fiori-security.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      18,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      21,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      32,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_7bdea8694573febf861a0de4acaf152b5f0ac7fa6ec4c2b9fcfd982539ace413",
+      "fileName": "ara.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      23,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      26,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      36,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      37,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_d6d72770ceba81df6966890b9d276173915399525b9bf9d415d2a67eeab0ba65",
+      "fileName": "arm.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      17,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      20,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_f350512e3f89217ebf278db6786c06112d7aa14749d47ce9c8a774f7caeedf26",
+      "fileName": "authorization-sync.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      21,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      24,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      34,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      35,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_07cc3752c487150ff1b64852eaadb75ab620563a70bfbc06287b57d93794be32",
+      "fileName": "brf-plus.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      19,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      22,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      32,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      33,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_32889aed405e1828073fcd12f675bd9912db5f920cc0088f6275d2756aad2687",
+      "fileName": "brm.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      18,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      21,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      32,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      33,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_acc69681dde0ecef42cd555b23ef5f7e560c9c3a26f0607fa9c373b2527216c8",
+      "fileName": "connectors.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      17,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      20,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_1375deb2ee0b90b2baed5486a7929d56ce46f41ad615e986de29b833bf179661",
+      "fileName": "eam.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      17,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      20,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_ab8ef25ee40262809155eda0584f7c389ab4adf329bd44b51d094e44f32615f7",
+      "fileName": "firefighter.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      18,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      21,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      35,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_f677bb8158bb8541a80f7fb9fd41de44111f2df6a398a6d995939e40278c3049",
+      "fileName": "grc-overview.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      18,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      21,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      32,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_efd81b66087b5be2b258e76427cbcd5f4f50e113a50a8520a07f39bbf2d1ce7a",
+      "fileName": "mitigation.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      28,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      41,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      42,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_7a89d6476570bcbd850358a7b7d9aa7281d8d5dbc8d93544d9f55c5c32d7557f",
+      "fileName": "msmp.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      17,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      20,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_e930edac2f9f8e63db91c511d7df4572e5a7bf29ee929fb1e3598c460cd666b7",
+      "fileName": "repository-sync.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      18,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      21,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      32,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_6b2cbbe01f7ffc0be8690dff32dfe21ac3f724e8c9dc61c68448159dd6acc960",
+      "fileName": "risk-analysis.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      18,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      21,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      32,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_bbf4358f2f0ee8f7e497f83cb6585cf15a98f8f58f154397d4fcf2f1c5a4014f",
+      "fileName": "rulesets.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      17,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      20,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_1cd8bd486db4125349d020f6855a3828a06cec493f0912d8789e9f4f17397d41",
+      "fileName": "user-sync.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      17,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      18,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_0ef7484a3a91e7aaeeb6cdbd17dd99305a04d8a36a2ca1aa03982e39ea9af1e5",
+      "fileName": "hana-authorization.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      16,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      17,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_6f51c8a8ebd2854fcddba208ad5f49083db9db5c2ed9b00a5e7ac5d3d010dac6",
+      "fileName": "iag-overview.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_8a54d113ea8034004afb476bc3d076e4f9d00787c7f3f6edd0b5031ff33ff35b",
+      "fileName": "architecture.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      22,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      23,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_b964b4976a223027699b09b6c7bc993f37cf15445030a3b697bf9861e52ed1fa",
+      "fileName": "difference-questions.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      29,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_ff280c42427050dafdf0ab214ab5981e2af1a1c69607c479029071eb35295d5a",
+      "fileName": "real-project-questions.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_fe97e7df2390a180ecc4f97ace6c118e02e13f3db299ed0356672e73005b1b00",
+      "fileName": "scenario-based.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      28,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      29,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_945a5e18d2a9a2380ce34399ef915c171ac88aef1e11c85b40e1240274da5fbb",
+      "fileName": "troubleshooting.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      44,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      45,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_a8ef9715c44a645b95c8bfeccfc72a62377be545fc9eafe0ff1da02b9ff42c9d",
+      "fileName": "blueprinting.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      33,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      34,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_68e9bec14baef07b9bb5e401d6c961863d8f4b864065fc9f6416eeb948a2bd70",
+      "fileName": "change-management.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      24,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      25,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_e45acca99cf44d5c486c962ba4ba3a1eb04e9057ab1992f3c264b4513c8cc2fb",
+      "fileName": "fit-gap-analysis.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      27,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      28,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_7a8f8476d17da96ed77a2bc10dc19e10045718ee48a5c50a41f44f4a5da17b27",
+      "fileName": "project-governance.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_170646938f6ffbfa35169080c88de2449403360e73fb672c951deec54a4b22ca",
+      "fileName": "project-lifecycle.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      24,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      25,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_851c83a23d4f424bf5755509fb4948d27957cd54ff3a4e48288292049c96bd57",
+      "fileName": "raid-log.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      26,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      27,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_26db0f28711050f6fd4230f0451c83a2095c8f42d216d9f6a3568208bc3837bb",
+      "fileName": "release-management.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      24,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      25,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_b1f31bb3ac7e393085dca0a9eee00cb7c104b026616e4e66826573a56d47dddc",
+      "fileName": "requirement-gathering.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      26,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      27,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_2aab6a41ca13d364888ef1ae9420f628e0c97bd6f18ad4e0c6efffaeb9ae1e7b",
+      "fileName": "resource-planning.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      25,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      26,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_2baec7d7d25250e5423ad2fcff7064cbd2b14969439af145939ae0651676c3c7",
+      "fileName": "risk-management.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      29,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_57c25c7a1d49d2331af839ff56eb50475e98731ef433ff7026f61dd0f7f07aee",
+      "fileName": "stakeholder-management.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      26,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      27,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_ad0b63686fb5d7744099e7a988b8d0f960f3b9de0f544bf3b40ecbe9ddd0645f",
+      "fileName": "bluefield.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      26,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      27,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_a4f316f192e12693de5ae3fa268f5a7bd06cc107dc45eba904b78fb4df2b30e5",
+      "fileName": "brownfield.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      32,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_6a659f9ae62e0b60c27997953a1b766779d70f0d05ffe7181027e80cca5d00c8",
+      "fileName": "enhancement.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      26,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      27,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_74dfbe7f8bed952eb8446ac2da10fb1d7a4a1b8a367fd19bb97cb58270c05fd9",
+      "fileName": "greenfield.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_5cef0d44aec7a8bc10362cb522aebee15128bfb8e92bc852bf57df8ba9a881b3",
+      "fileName": "implementation.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      27,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      28,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_6ecc825f7028892e20f42141446631687ac060150e9506e3b7dcf9eda4764189",
+      "fileName": "migration.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_d4d0fdd87b7aaac00c04163844759c0fa9520e1d891bb04594edb6f6ac52b1df",
+      "fileName": "rollout.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      32,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_698be6f35aa2ed64562c1e6c6e0b06235bf49805cdacf6ba2503b6042de2f066",
+      "fileName": "support.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      27,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      28,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_cee0c9e2f29b8a7fee4e5fb0affd6cbdf2bfa1a0cfdd055f8882630e1071cccb",
+      "fileName": "upgrade.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      32,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      33,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_266b3c5d957e6d5f8a05ea53b933bcdaaf3efd737bead5092df403a7d8106c8e",
+      "fileName": "clean-core.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      28,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      29,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_8e0cd051b51a65a6eee35e6772520b47de6db42c23a41271313d3f02a0bfa848",
+      "fileName": "cloud-alm.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      50,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      51,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_bea0f60e5629f4dfc7ab6779eaf7e1dfec6f84b09abd34025056ec6214afd7bb",
+      "fileName": "rise-migration.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      38,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      39,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_3f0b1de83b75b5904f48e414db6a47d68884e296aba49b6aa68e8d4d5526bed4",
+      "fileName": "rise-overview.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      51,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      52,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_b0518521ca3f62e5b7bc53a7b67d3b7aea835db2723f5346d941d35eb867bbc9",
+      "fileName": "rise-project.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      54,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      55,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_8c68c72152f0fadab72eb17f34daf63108833bf2c62911564ea0f01157825cf9",
+      "fileName": "rise-security.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      17,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      20,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_514eb60f1cfcc499a0a952a1e381ea463135414a156605c3acf0075dc3293e70",
+      "fileName": "s4hana-business-roles.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      28,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      41,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      42,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_ad559be7c2305f5d4c8e939c3e58fed63f352802ae0e55ce82ef8bcdebe84cc0",
+      "fileName": "s4hana-fiori.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      19,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      22,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      32,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      33,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_e0e273c9f0f2130bc654461120285e43efad648cda37aac03adf5f89632185f1",
+      "fileName": "s4hana-migration.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      23,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      26,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      36,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      37,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_0fabf0f263dd21dda398a86e5840468c31f803c1f7bfc3f89b39acea115d53c7",
+      "fileName": "s4hana-security.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      16,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      17,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_6b2b3ce786dfa1d1e5df5a784335f3ca6895f3331ea1590940e5f845f792c11a",
+      "fileName": "sac-security.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      15,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      18,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      27,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      28,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_3dec6fbcab639894ba2d4ac40e32a9bcc2139bea2e754ac40ae24723bae1d177",
+      "fileName": "authorization-objects.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      16,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      19,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      29,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_f95ec9672b4806a68cdbd574278e38ba9b6b1fe0817b225079cb193a295d9374",
+      "fileName": "composite-roles.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      18,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      21,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      32,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_6b5b32b0d392360a316807dff94efaf773efca457bb0a99542d029c9cd946d75",
+      "fileName": "derived-roles.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      16,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      19,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      28,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      29,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_ccceaacc92e7ecc2329dc6bdfe17c97e6b45a235d432a48daedcd373642d4b8d",
+      "fileName": "pfcg.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      16,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      19,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      29,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_47ba3fa8755f97695298bb142d39178b64d139cd8b205cf2e799447e569f292c",
+      "fileName": "role-design.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      16,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      19,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      28,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      29,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_c31814becfd3070f09b7291cf0408bb386b1baae5bd4b61a52cbaa56ec6b6120",
+      "fileName": "sap-security.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      16,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      19,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      29,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_909d11e76ec2ddb30379997022883413b816a92fba039b1454b4689a7d37c406",
+      "fileName": "su24.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      18,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      21,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      31,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      32,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_3081a18a37f55c8ae18af9dae4163e60f5b93077baa9c9cf9a4f3fd5641c4415",
+      "fileName": "su25.md"
+    },
+    {
+      "stage": "document-parse",
+      "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      16,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      19,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      29,\n      \"content\"\n    ]\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 1 character(s)\",\n    \"path\": [\n      30,\n      \"content\"\n    ]\n  }\n]",
+      "documentId": "doc_8dca39d9167cb344b948a2190a669b9848fdd486cc4538c794d0964fc91398ed",
+      "fileName": "user-administration.md"
+    }
+  ],
+  "warnings": [
+    {
+      "stage": "document-skip",
+      "message": "Unsupported file type: .json",
+      "fileName": "stats.json"
+    },
+    {
+      "stage": "document-skip",
+      "message": "Unsupported file type: .json",
+      "fileName": "state.json"
+    }
+  ]
+}

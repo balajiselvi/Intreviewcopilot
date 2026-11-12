@@ -1,0 +1,33 @@
+{
+  "id": "acronym-brfplus",
+  "domain": "grc-ac",
+  "product": "SAP Business Rule Framework plus / Access Control",
+  "version_scope": "Confirm workbench transaction naming per system (BRFplus / BRF+ / BRFPLUS)",
+  "claims": [
+    {
+      "id": "brfplus-name",
+      "text": "BRFplus (Business Rule Framework plus) is SAP's rules engine; in Access Control it is commonly used for MSMP initiator and agent determination via decision tables.",
+      "kind": "definition"
+    },
+    {
+      "id": "brfplus-workbench",
+      "text": "Workbench access is commonly described with transaction BRFplus / BRFPLUS; confirm on the target system. Do not invent alternate T-codes.",
+      "kind": "procedure"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://help.sap.com/",
+      "section": "Business Rule Framework plus / Access Control flat rule integration (verify)",
+      "retrieved_on": "2026-10-29"
+    }
+  ],
+  "verification_status": "NEEDS_REVIEW",
+  "reviewer": null,
+  "verified_on": null,
+  "expiry": null,
+  "recheck_date": "2026-11-30",
+  "spoken_answer": null,
+  "conflicts": [],
+  "notes": "Existing knowledge/grc/brf-plus.md cites BRFplus workbench naming; still NEEDS_REVIEW vs Help Portal."
+}

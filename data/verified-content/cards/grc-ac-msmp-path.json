@@ -1,0 +1,60 @@
+{
+  "id": "grc-ac-msmp-path",
+  "domain": "grc-ac",
+  "product": "SAP Access Control",
+  "version_scope": "Distinguish GRC 10.x vs 12.0 — confirm each transaction per release",
+  "claims": [
+    {
+      "id": "candidate-tx-standard",
+      "text": "Candidate identifier to verify for standard MSMP maintenance: GRFNMW_CONFIGURE_WD",
+      "kind": "procedure"
+    },
+    {
+      "id": "candidate-tx-expert",
+      "text": "Candidate identifier to verify for expert MSMP maintenance: GRFNMW_CONFIGURE",
+      "kind": "procedure"
+    },
+    {
+      "id": "candidate-tx-rules",
+      "text": "Candidate identifier to verify for rule generation: GRFNMW_DEV_RULES",
+      "kind": "procedure"
+    },
+    {
+      "id": "candidate-tx-brfplus",
+      "text": "Candidate identifier to verify for BRFplus workbench: BRFPLUS / BRFplus",
+      "kind": "procedure"
+    },
+    {
+      "id": "candidate-tx-monitor",
+      "text": "Candidate identifier to verify for MSMP debug/monitor: GRFNMW_DBGMONITOR_WD",
+      "kind": "procedure"
+    },
+    {
+      "id": "candidate-spro",
+      "text": "Candidate IMG path to verify: Access Control > Workflow for Access Control (exact SPRO nodes per release)",
+      "kind": "procedure"
+    },
+    {
+      "id": "anti-hallucination",
+      "text": "Do not invent Access Control transactions. Identifiers absent from verified sources or retrieved knowledge must not be spoken as fact (example class: fabricated codes such as GRFCP2).",
+      "kind": "definition"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://help.sap.com/",
+      "section": "SAP Access Control — Maintain MSMP Workflows / Workflow for Access Control (verify 10.x vs 12.0)",
+      "retrieved_on": "2026-10-29"
+    }
+  ],
+  "verification_status": "NEEDS_REVIEW",
+  "reviewer": null,
+  "verified_on": null,
+  "expiry": null,
+  "recheck_date": "2026-11-30",
+  "spoken_answer": null,
+  "conflicts": [
+    "Standard WD vs expert transaction preference must state which option is recommended for normal use after Help Portal verification"
+  ],
+  "notes": "All transaction codes listed are candidates pending verification — not approved facts."
+}

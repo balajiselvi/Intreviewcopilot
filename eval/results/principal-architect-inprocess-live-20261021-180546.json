@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-10-21T12:38:49.417Z",
+  "mode": "live",
+  "status": "running",
+  "live": true,
+  "partial": true,
+  "counts": {
+    "total": 96,
+    "completed": 2
+  },
+  "liveFailures": [
+    {
+      "question": "What is SoD?",
+      "mode": "concept",
+      "relevantResponseContract": "CON-01",
+      "actualAnswer": "",
+      "failureCategory": "live generation",
+      "owningLayer": "runtime",
+      "evidence": "timeout",
+      "proposedGeneralizedFix": "Investigate /api/chat availability; do not treat as a wording defect."
+    },
+    {
+      "question": "What exactly is SoD?",
+      "mode": "concept",
+      "relevantResponseContract": "CON-02",
+      "actualAnswer": "",
+      "failureCategory": "live generation",
+      "owningLayer": "runtime",
+      "evidence": "timeout",
+      "proposedGeneralizedFix": "Investigate /api/chat availability; do not treat as a wording defect."
+    }
+  ],
+  "liveRows": [
+    {
+      "id": "CON-01",
+      "q": "What is SoD?",
+      "family": "concept",
+      "words": 0,
+      "incomplete": true,
+      "finish_reason": null,
+      "maxTokens": null,
+      "completion_tokens": null,
+      "error": "timeout",
+      "latencyMs": 0,
+      "answer": ""
+    },
+    {
+      "id": "CON-02",
+      "q": "What exactly is SoD?",
+      "family": "concept",
+      "words": 0,
+      "incomplete": true,
+      "finish_reason": null,
+      "maxTokens": null,
+      "completion_tokens": null,
+      "error": "timeout",
+      "latencyMs": 0,
+      "answer": ""
+    }
+  ]
+}

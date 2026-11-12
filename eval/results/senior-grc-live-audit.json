@@ -1,0 +1,462 @@
+{
+  "generatedAt": "2026-10-21T11:16:15.630Z",
+  "failures": [],
+  "rows": [
+    {
+      "id": "msmp_config",
+      "question": "How do you configure an MSMP workflow for access requests?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "route": "RETRIEVED_PROCEDURE",
+      "responseLength": "medium",
+      "intent": null,
+      "answerScope": null,
+      "words": 113,
+      "heading": false,
+      "opening": "For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Contro",
+      "answer": "For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. GRFNMW_CONFIGURE is the expert transaction documented for Access Control 10.0, 10.1, and 12.0; NWBC is a work-center shell, not that transaction. Select the Access Request Approval process, then configure its initiator, routing, paths, stages, and timeout/escalation behavior. Link each stage to its BRF+ agent-determination rule and map each BRF+ RULE_RESULT to the intended MSMP path. Test a request and verify the selected path, stage, approver, and audit log in Request Status > Instance Status. Use provisioning logs only if an approved request fails during target assignment.",
+      "topSources": [
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "30 Second Interview Answer",
+          "score": 0.646,
+          "excerpt": "## 30 Second Interview Answer\n\nMSMP is the workflow engine that defines how an access request moves through approval stages in GRC. You configure the process ID, the initiator, how many stages there are, and what happens"
+        },
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "MSMP Workflow",
+          "score": 0.639,
+          "excerpt": "# MSMP Workflow"
+        },
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "Configure an MSMP workflow for an access request",
+          "score": 0.6353,
+          "excerpt": "I would first check whether the delivered Access Request Approval workflow already covers the request type before I change Maintain MSMP Workflows. If it does, I would reuse that process and only change the initiator, pa"
+        },
+        {
+          "file": "arm.md",
+          "folder": "grc",
+          "heading": "No Approver MSMP BRFplus",
+          "score": 0.6122,
+          "excerpt": "Verified diagnostic sequence for SAP Access Control ARM (12.0 documentation):\n1. In Request Status, select the request and open Instance Status. Inspect Path Status, Approvers of Selected Path, and the Audit Log to estab"
+        },
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "60 Second Interview Answer",
+          "score": 0.6103,
+          "excerpt": "## 60 Second Interview Answer\n\nMSMP stands for Multi-Step Multi-Process, and it's the workflow engine underneath GRC Access Control's request approvals. You configure it through process IDs, each representing a specific "
+        },
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "Technical Configuration Sequence",
+          "score": 0.6087,
+          "excerpt": "For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. GRFNMW_CONFIGURE is the expert transaction document"
+        },
+        {
+          "file": "grc-overview.md",
+          "folder": "grc",
+          "heading": "Runtime Flow",
+          "score": 0.6001,
+          "excerpt": "## Runtime Flow\n\nA user or manager submits an access request through ARM. The request triggers a risk simulation against the ARA ruleset, flagging any segregation of duties conflicts. MSMP routes the request through its "
+        },
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "Common Interview Questions",
+          "score": 0.586,
+          "excerpt": "1. What does MSMP stand for and what does it do?\n2. How does MSMP relate to BRF+?\n3. What is a process ID in MSMP?\n4. How do you configure a stage in MSMP?\n5. What happens when an approver doesn't respond within the conf"
+        }
+      ]
+    },
+    {
+      "id": "msmp_trouble",
+      "question": "How do you troubleshoot an MSMP workflow that is stuck?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "route": "RETRIEVED_PROCEDURE",
+      "responseLength": "medium",
+      "intent": null,
+      "answerScope": null,
+      "words": 142,
+      "heading": false,
+      "opening": "I would open the stuck access request in Request Status and inspect Instance Status for the path, stage, and Approvers of Selected Path, the",
+      "answer": "I would open the stuck access request in Request Status and inspect Instance Status for the path, stage, and Approvers of Selected Path, then read the audit log to see where processing stopped. If no path was selected, I would inspect Maintain MSMP Workflows for the process, initiator, route mapping, and whether the MSMP version was generated after the last change. If the expected path is present but no approver appears, I would treat that as an agent-determination failure and inspect the stage BRF+ agent rule against the request attributes, then confirm the RULE_RESULT still maps to that stage. If the approver is present but the request never moves, I would check timeout and escalation settings and the background jobs that evaluate MSMP timeouts. I would not diagnose an Access Control MSMP stuck request with BW analysis authorizations or IAG manager groups.",
+      "topSources": [
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "MSMP Workflow",
+          "score": 0.6851,
+          "excerpt": "# MSMP Workflow"
+        },
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "90 Second Interview Answer",
+          "score": 0.6059,
+          "excerpt": "The practical failure mode that shows up in production is a well-designed MSMP process where the BRF+ rule for a given stage doesn't resolve to a valid agent — maybe because of missing master data or an edge case the rul"
+        },
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "Troubleshoot an MSMP access request with no approver",
+          "score": 0.5733,
+          "excerpt": "I would open the stuck access request in Request Status and inspect Instance Status for the path, stage, and Approvers of Selected Path, then read the audit log to see where processing stopped. If no path was selected, I"
+        },
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "Red Flags",
+          "score": 0.5653,
+          "excerpt": "## Red Flags\n\n- Describing MSMP as if it also determines who approves\n- Not knowing the difference between MSMP's role and BRF+'s role\n- No mention of escalation or timeout behavior\n- Treating a stuck request as automati"
+        },
+        {
+          "file": "arm.md",
+          "folder": "grc",
+          "heading": "No Approver MSMP BRFplus",
+          "score": 0.5493,
+          "excerpt": "Verified diagnostic sequence for SAP Access Control ARM (12.0 documentation):\n1. In Request Status, select the request and open Instance Status. Inspect Path Status, Approvers of Selected Path, and the Audit Log to estab"
+        },
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "30 Second Interview Answer",
+          "score": 0.5468,
+          "excerpt": "## 30 Second Interview Answer\n\nMSMP is the workflow engine that defines how an access request moves through approval stages in GRC. You configure the process ID, the initiator, how many stages there are, and what happens"
+        },
+        {
+          "file": "arm.md",
+          "folder": "grc",
+          "heading": "No Approver MSMP BRFplus",
+          "score": 0.5322,
+          "excerpt": "3. If MSMP selected the expected path but no approver appears, inspect that stage's BRF+ agent-determination rule against the request's actual attributes. Verify that the rule result maps to the intended MSMP route and t"
+        },
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "Common Interview Questions",
+          "score": 0.532,
+          "excerpt": "18. How do you handle MSMP configuration during a GRC upgrade?\n19. What's the relationship between MSMP stages and risk owner approval?\n20. How would you redesign an MSMP process that's causing requests to move too slowl"
+        }
+      ]
+    },
+    {
+      "id": "brf_agent",
+      "question": "How do you configure BRF+ agent determination and integrate it with MSMP?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "route": "RETRIEVED_PROCEDURE",
+      "responseLength": "medium",
+      "intent": null,
+      "answerScope": null,
+      "words": 126,
+      "heading": false,
+      "opening": "I would first confirm whether the change is an initiator rule or an agent rule before changing anything. The initiator rule selects the MSMP",
+      "answer": "I would first confirm whether the change is an initiator rule or an agent rule before changing anything. The initiator rule selects the MSMP path from request attributes. For an agent rule I would generate the BRF+ flat rule shell in Define Workflow-Related MSMP Rules for process SAP_GRAC_ACCESS_REQUEST with rule kind Agent Rule, then open BRF+ and maintain the decision table so each realistic attribute combination returns the intended agent result. I would activate the application, function, and decision table, declare that rule in Maintain MSMP Workflows Maintain Rules, attach it to the stage that needs agent determination, and regenerate the MSMP version. I would test with a request that matches the decision-table row and confirm the Approvers of Selected Path in Request Status Instance Status.",
+      "topSources": [
+        {
+          "file": "brf-plus.md",
+          "folder": "grc",
+          "heading": "Red Flags",
+          "score": 0.7181,
+          "excerpt": "## Red Flags\n\n- Describing BRF+ as part of MSMP rather than a separate, integrated engine\n- Not knowing what a decision table is\n- No mention of the risk of rules not matching any condition\n- Treating BRF+ as GRC-specifi"
+        },
+        {
+          "file": "brf-plus.md",
+          "folder": "grc",
+          "heading": "Runtime Flow",
+          "score": 0.6925,
+          "excerpt": "## Runtime Flow\n\nWhen an MSMP stage requires agent determination, it calls the linked BRF+ function, passing in relevant request data as input. BRF+ evaluates its configured rules, most commonly a decision table, against"
+        },
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "Interviewer's Hidden Expectations",
+          "score": 0.6684,
+          "excerpt": "## Interviewer's Hidden Expectations\n\nInterviewers want to hear that you understand MSMP and BRF+ as a paired system, not MSMP in isolation. They're listening for whether you can diagnose a stuck request by reasoning abo"
+        },
+        {
+          "file": "brf-plus.md",
+          "folder": "grc",
+          "heading": "30 Second Interview Answer",
+          "score": 0.6378,
+          "excerpt": "## 30 Second Interview Answer\n\nBRF+ is the rules engine that determines who approves at each stage of an MSMP workflow. You build rules, often as decision tables, that take request data like organizational unit or role t"
+        },
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "Runtime Flow",
+          "score": 0.632,
+          "excerpt": "## Runtime Flow\n\nA request is submitted and matched to the appropriate MSMP process based on its type. MSMP evaluates the first stage, calling out to BRF+ to determine the agent for that stage. Once that agent approves, "
+        },
+        {
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "Common Mistakes",
+          "score": 0.6264,
+          "excerpt": "## Common Mistakes\n\n- Designing MSMP stages without coordinating with BRF+ agent rule design\n- Setting escalation timing too long, causing requests to sit unnoticed\n- Making every stage mandatory even when conditional lo"
+        },
+        {
+          "file": "arm.md",
+          "folder": "grc",
+          "heading": "Configuration",
+          "score": 0.6184,
+          "excerpt": "## Configuration\n\n- Configure request types and the data fields each type requires\n- Build MSMP workflows defining the approval stages for each request type\n- Configure BRF+ rules for agent determination at each stage\n- "
+        },
+        {
+          "file": "arm.md",
+          "folder": "grc",
+          "heading": "90 Second Interview Answer",
+          "score": 0.6176,
+          "excerpt": "MSMP then routes the request through its configured stages. A typical flow might include the requester's manager, the role or application owner, and — if a conflict was flagged — a risk owner who has to review and either"
+        }
+      ]
+    },
+    {
+      "id": "sox",
+      "question": "How do you prepare SAP Security for a SOX ITGC audit?",
+      "topics": [],
+      "folders": [
+        "audit",
+        "compliance",
+        "grc"
+      ],
+      "route": "PREPARED_SCRIPT",
+      "responseLength": null,
+      "intent": null,
+      "answerScope": null,
+      "words": 131,
+      "heading": false,
+      "opening": "I would start from the in-scope financial processes and the ITGCs the auditors will test: access provisioning and deprovisioning, access app",
+      "answer": "I would start from the in-scope financial processes and the ITGCs the auditors will test: access provisioning and deprovisioning, access approval, segregation of duties, privileged and emergency access, periodic user and role certification, and change management for roles and transports. For Access Control I would show the connector landscape, risk analysis results, mitigated versus open conflicts, access-request history, Firefighter logs with controller review, and completed access reviews. I would retain transport, profile generation, and user-comparison evidence where PFCG applies, plus business sign-off that the user can complete the intended financial task. Process Control can document and test related controls when it is in the library, but a Process Control process is not a mitigation control. Installing GRC does not make the organization SOX compliant; auditors test operating effectiveness over the period.",
+      "topSources": [
+        {
+          "file": "sox.md",
+          "folder": "compliance",
+          "heading": "Interview Summary",
+          "score": 0.7868,
+          "excerpt": "I would prepare SAP Security for a SOX ITGC audit by showing how joiner-mover-leaver, approvals, SoD, privileged access, access reviews, and change evidence operate for in-scope financial systems. I would not claim that "
+        },
+        {
+          "file": "iso27001.md",
+          "folder": "compliance",
+          "heading": "Support an ISO 27001 ISMS with SAP security controls",
+          "score": 0.6127,
+          "excerpt": "I would confirm the ISMS scope and policy that include the SAP landscape, then review the risk assessment for access and identity risks on those systems. I would assign risk-treatment measures that SAP Security and GRC c"
+        },
+        {
+          "file": "sox.md",
+          "folder": "compliance",
+          "heading": "Overview",
+          "score": 0.6044,
+          "excerpt": "The Sarbanes–Oxley Act of 2002 is a United States statute. Section 404 requires management assessment of internal control over financial reporting (ICFR) and an accompanying auditor attestation for the issuers that the s"
+        },
+        {
+          "file": "audit-support.md",
+          "folder": "audit",
+          "heading": "60 Second Interview Answer",
+          "score": 0.5949,
+          "excerpt": "## 60 Second Interview Answer\n\n**Scenario: Annual SOX 404 Internal Control Assessment for GRC**\n\n**Challenge:** Financial controls include authorization (who can post GL?), segregation of duties (who can approve what?). "
+        },
+        {
+          "file": "audit-support.md",
+          "folder": "audit",
+          "heading": "SAP Transactions",
+          "score": 0.586,
+          "excerpt": "## SAP Transactions\n\n- **PFCG:** Profile Generator (role management, SoD rule enforcement)\n- **SUIM:** User Information System (queries, reports on user access)\n- **SU01:** User master (user-role assignments)\n- **SU24:**"
+        },
+        {
+          "file": "sod.md",
+          "folder": "compliance",
+          "heading": "SAP Transactions",
+          "score": 0.5783,
+          "excerpt": "## SAP Transactions\n\n- **PFCG:** Profile Generator (role design, SoD enforcement)\n- **SU24:** Authorization object proposals (SoD conflict rules, GGBS maintenance)\n- **GGBS:** SoD conflict rule table (where conflicts def"
+        },
+        {
+          "file": "audit-support.md",
+          "folder": "audit",
+          "heading": "Related Topics",
+          "score": 0.5767,
+          "excerpt": "## Related Topics\n\n- [Access Review & User Management Audit](access-review.md)\n- [SOX & Regulatory Compliance](sox.md)\n- [Access Risk Analysis (ARA)](../grc/ara.md)\n- [Segregation of Duties (SoD)](../compliance/sod.md)"
+        },
+        {
+          "file": "rulesets.md",
+          "folder": "grc",
+          "heading": "Configuration",
+          "score": 0.5734,
+          "excerpt": "## Configuration\n\n- Start from the SAP-delivered standard ruleset as a baseline\n- Build custom functions for organization-specific and custom Z-transactions\n- Define custom risks reflecting organization-specific process "
+        }
+      ]
+    },
+    {
+      "id": "gdpr",
+      "question": "How would you design SAP Security controls to support GDPR?",
+      "topics": [],
+      "folders": [
+        "audit",
+        "compliance",
+        "grc"
+      ],
+      "route": "PREPARED_SCRIPT",
+      "responseLength": null,
+      "intent": null,
+      "answerScope": null,
+      "words": 121,
+      "heading": false,
+      "opening": "I would review the SAP authorization and role configuration that can expose personal data, then assign only the permission needed for a docu",
+      "answer": "I would review the SAP authorization and role configuration that can expose personal data, then assign only the permission needed for a documented purpose. I would maintain joiner-mover-leaver and access-request workflow evidence so every personal-data privilege change is traceable. I would review privileged and Firefighter access that can read or change personal data, use the Security Audit Log or the approved application log as evidence, and confirm retention or deletion configuration against the organisation schedule. I would validate the configuration by confirming who holds the permission, when the workflow approved it, what log evidence exists, and that a leaver no longer holds that privilege. Technical controls alone do not establish legal compliance, and I would not invent a jurisdiction-specific notification deadline.",
+      "topSources": [
+        {
+          "file": "gdpr.md",
+          "folder": "compliance",
+          "heading": "Explain GDPR principles without claiming technology equals compliance",
+          "score": 0.7323,
+          "excerpt": "I would explain the Article 5 principles in business language and then show which SAP controls support each one. Purpose limitation and data minimisation drive role design that avoids broad display or extract access. Int"
+        },
+        {
+          "file": "grc-overview.md",
+          "folder": "grc",
+          "heading": "Overview",
+          "score": 0.6367,
+          "excerpt": "## Overview\n\nSAP GRC, specifically Access Control, is the governance layer sitting on top of standard SAP authorization management. It automates access requests, enforces segregation of duties analysis, manages emergency"
+        },
+        {
+          "file": "gdpr.md",
+          "folder": "compliance",
+          "heading": "Interview Summary",
+          "score": 0.6085,
+          "excerpt": "I would map GDPR principles to SAP access design, privileged-access review, logging, and retention-aligned processes, and I would refuse to claim that PFCG or GRC alone makes the organisation GDPR compliant."
+        },
+        {
+          "file": "gdpr.md",
+          "folder": "compliance",
+          "heading": "Design SAP Security to support GDPR access control and accountability",
+          "score": 0.6055,
+          "excerpt": "I would review the SAP authorization and role configuration that can expose personal data, then assign only the permission needed for a documented purpose. I would maintain joiner-mover-leaver and access-request workflow"
+        },
+        {
+          "file": "gdpr.md",
+          "folder": "compliance",
+          "heading": "Overview",
+          "score": 0.5997,
+          "excerpt": "The EU General Data Protection Regulation (Regulation (EU) 2016/679) sets principles and obligations for processing personal data. The seven principles in Article 5 are lawfulness, fairness and transparency; purpose limi"
+        },
+        {
+          "file": "process-control.md",
+          "folder": "grc",
+          "heading": "Access Control and Process Control",
+          "score": 0.5985,
+          "excerpt": "SAP Access Control and SAP Process Control are related GRC applications with different jobs. Access Control analyzes access risk, routes access requests, manages business roles, controls emergency access, and certifies a"
+        },
+        {
+          "file": "grc-overview.md",
+          "folder": "grc",
+          "heading": "Interview Summary",
+          "score": 0.5913,
+          "excerpt": "## Interview Summary\n\nSAP GRC Access Control has four core components: Access Risk Analysis for segregation of duties checking, Access Request Management for governed provisioning, Business Role Management for role lifec"
+        },
+        {
+          "file": "iso27001.md",
+          "folder": "compliance",
+          "heading": "Support an ISO 27001 ISMS with SAP security controls",
+          "score": 0.589,
+          "excerpt": "I would confirm the ISMS scope and policy that include the SAP landscape, then review the risk assessment for access and identity risks on those systems. I would assign risk-treatment measures that SAP Security and GRC c"
+        }
+      ]
+    },
+    {
+      "id": "iso",
+      "question": "How does SAP Security support an ISO 27001 ISMS?",
+      "topics": [],
+      "folders": [
+        "audit",
+        "compliance",
+        "grc"
+      ],
+      "route": "PREPARED_SCRIPT",
+      "responseLength": null,
+      "intent": null,
+      "answerScope": null,
+      "words": 122,
+      "heading": false,
+      "opening": "I would confirm the ISMS scope and policy that include the SAP landscape, then review the risk assessment for access and identity risks on t",
+      "answer": "I would confirm the ISMS scope and policy that include the SAP landscape, then review the risk assessment for access and identity risks on those systems. I would assign risk-treatment measures that SAP Security and GRC can maintain or evidence, such as role configuration, privileged access, logging, change control, and supplier access, and I would maintain a Statement of Applicability that justifies those choices. I would use approved role configuration, access-request workflow history, SoD analysis and mitigation, Firefighter review, transport records, and critical-authorization monitoring as evidence. I would validate the configuration by tracing one treated risk to the SAP control, the retained log or workflow evidence, the owner, and the review cadence. Configuring a control is not proof of ISO/IEC 27001 certification.",
+      "topSources": [
+        {
+          "file": "iso27001.md",
+          "folder": "compliance",
+          "heading": "Overview",
+          "score": 0.7641,
+          "excerpt": "ISO/IEC 27001:2022 is the requirements standard for an information security management system (ISMS). Edition 3 was published in October 2022 and has amendment ISO/IEC 27001:2022/Amd 1:2024. The standard requires an orga"
+        },
+        {
+          "file": "iso27001.md",
+          "folder": "compliance",
+          "heading": "Distinguish ISMS conformity from certification",
+          "score": 0.6834,
+          "excerpt": "I would say conformity means the organisation’s ISMS meets ISO/IEC 27001 requirements. Certification means an accredited body has assessed that ISMS and issued a certificate to a stated version such as ISO/IEC 27001:2022"
+        },
+        {
+          "file": "iso27001.md",
+          "folder": "compliance",
+          "heading": "Support an ISO 27001 ISMS with SAP security controls",
+          "score": 0.6459,
+          "excerpt": "I would confirm the ISMS scope and policy that include the SAP landscape, then review the risk assessment for access and identity risks on those systems. I would assign risk-treatment measures that SAP Security and GRC c"
+        },
+        {
+          "file": "iso27001.md",
+          "folder": "compliance",
+          "heading": "Interview Summary",
+          "score": 0.6071,
+          "excerpt": "I would explain how SAP access controls and GRC evidence support risk treatment inside an ISMS, and I would refuse to treat a PFCG role or GRC workflow as ISO certification."
+        },
+        {
+          "file": "connectors.md",
+          "folder": "grc",
+          "heading": "Architecture",
+          "score": 0.5308,
+          "excerpt": "## Architecture\n\n- RFC connector: standard connection type for SAP-to-SAP integration\n- Web-service connector: integration pattern for non-SAP target systems\n- Technical user: the dedicated, scoped account authenticating"
+        },
+        {
+          "file": "connectors.md",
+          "folder": "grc",
+          "heading": "Configuration",
+          "score": 0.5265,
+          "excerpt": "## Configuration\n\n- Configure RFC connections for each SAP target system with a properly scoped technical user\n- Configure web-service integrations for non-SAP target systems based on their available APIs\n- Set appropria"
+        },
+        {
+          "file": "grc-overview.md",
+          "folder": "grc",
+          "heading": "Architecture",
+          "score": 0.512,
+          "excerpt": "## Architecture\n\n- Access Risk Analysis: segregation of duties checking against a ruleset\n- Access Request Management: provisioning workflow built on MSMP and BRF+\n- Business Role Management: lifecycle management for bus"
+        },
+        {
+          "file": "compliance.md",
+          "folder": "compliance",
+          "heading": "Overview",
+          "score": 0.5114,
+          "excerpt": "SAP Security and GRC interviews often ask how technology supports SOX ICFR, GDPR, ISO/IEC 27001, and related assurance frameworks. The frameworks are not interchangeable. SOX Section 404 addresses internal control over f"
+        }
+      ]
+    }
+  ]
+}

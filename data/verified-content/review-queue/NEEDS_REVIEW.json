@@ -1,0 +1,16 @@
+{
+  "generated_on": "2026-10-29",
+  "policy": "Cursor drafts only. Human sets VERIFIED. Do not serve regulatory/numeric/company facts from NEEDS_REVIEW entries as fact.",
+  "entries": [
+    { "id": "acronym-msmp", "priority": 1, "reason": "Expansion conflict Path vs Process" },
+    { "id": "acronym-brfplus", "priority": 1, "reason": "Workbench transaction naming" },
+    { "id": "acronym-xsuaa", "priority": 1, "reason": "Expansion vs official product name" },
+    { "id": "grc-ac-msmp-path", "priority": 1, "reason": "Candidate T-codes pending Help Portal" },
+    { "id": "cloud-identity-ias-ips-iag", "priority": 1, "reason": "Plane wording vs SAP docs" },
+    { "id": "btp-security-depth", "priority": 2, "reason": "Pillar dating + security topic set" },
+    { "id": "enumeration-btp-five-pillars-sap-learning", "priority": 1, "reason": "Dated SAP Learning five-pillar framing vs four-pillar+foundation scope" },
+    { "id": "enumeration-btp-capability-framing", "priority": 2, "reason": "Undated five-pillar caution; cross-check against dated SAP Learning card" },
+    { "id": "acronym-scim-role-collection-template", "priority": 2, "reason": "SCIM/role model wording" },
+    { "id": "senior-manager-security-depth", "priority": 2, "reason": "Depth checklist approval", "path": "depth-checklists/senior-manager-security.json" }
+  ]
+}

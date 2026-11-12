@@ -1,0 +1,37 @@
+{
+  "cases": [
+    {
+      "question": "What if Firefighter Logs are Not Generated?",
+      "decision": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "procedureIntent": "troubleshoot",
+      "admitOk": true,
+      "intentOk": true
+    },
+    {
+      "question": "Why are Firefighter logs not generated?",
+      "decision": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "procedureIntent": "troubleshoot",
+      "admitOk": true,
+      "intentOk": true
+    },
+    {
+      "question": "Firefighter logs are missing — how do you troubleshoot?",
+      "decision": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "procedureIntent": "troubleshoot",
+      "admitOk": true,
+      "intentOk": true
+    },
+    {
+      "question": "What do you check when EAM firefighter session logs are not created?",
+      "decision": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "procedureIntent": "troubleshoot",
+      "admitOk": true,
+      "intentOk": true
+    }
+  ],
+  "pass": true
+}

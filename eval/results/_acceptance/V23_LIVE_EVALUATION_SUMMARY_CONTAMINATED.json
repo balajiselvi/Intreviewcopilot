@@ -1,0 +1,713 @@
+{
+  "at": "2026-11-03T11:55:15.669Z",
+  "totals": {
+    "rows": 141,
+    "historical": 128,
+    "defect": 3,
+    "benchmark": 10,
+    "byClass": {
+      "IRRELEVANT": 15,
+      "CORRECT_BUT_INCOMPLETE": 125,
+      "PARTIALLY_INCORRECT": 1
+    },
+    "principleFallbackLike": 62,
+    "malformedPhrase": 0,
+    "operationalPathPhrase": 0,
+    "shortCircuits": [
+      {
+        "runId": "h_live_mvt4dz46_5fcq9n4o_16",
+        "route": "PREPARED_SCRIPT",
+        "question": "Regarding Difference Between SAP Cloud Identity Services (SAP Cloud Identity Services (IAS/IPS))?"
+      },
+      {
+        "runId": "h_live_mvt4dz46_5fcq9n4o_43",
+        "route": "PREPARED_SCRIPT",
+        "question": "Explain SAP GRC Integration with SAP Cloud Identity Services (SAP Cloud Identity Services (IAS/IPS))"
+      },
+      {
+        "runId": "h_live_mvt4dz46_5fcq9n4o_47",
+        "route": "PREPARED_SCRIPT",
+        "question": "Explain your SAP GRC Health Check Approach?"
+      },
+      {
+        "runId": "h_live_mvt4dz46_5fcq9n4o_64",
+        "route": "PREPARED_SCRIPT",
+        "question": "What is the Security Team's role in an S/4HANA implementation?"
+      },
+      {
+        "runId": "h_live_mvt4dz46_5fcq9n4o_72",
+        "route": "PREPARED_SCRIPT",
+        "question": "Explain how SAP GRC Integration with SAP Cloud Identity Services (SAP Cloud Identity Services (IAS/I"
+      },
+      {
+        "runId": "bench_btp",
+        "route": "PREPARED_SCRIPT",
+        "question": "Explain authentication and authorization architecture."
+      },
+      {
+        "runId": "bench_s4_experience",
+        "route": "PREPARED_SCRIPT",
+        "question": "Describe your role in an S/4HANA security transformation and the key authorization activities you pe"
+      }
+    ]
+  },
+  "defectProbes": [
+    {
+      "runId": "defect_pfcg_use",
+      "question": "Explain how do you use PFCG?",
+      "route": "GENERATION",
+      "liveInv": 1,
+      "classification": "IRRELEVANT",
+      "scores": {
+        "technical": 0,
+        "completeness": 0,
+        "relevance": 0,
+        "evidence": 2,
+        "usability": 1
+      },
+      "notes": [
+        "generic-principle-fallback",
+        "pfcg-missing"
+      ],
+      "answer": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I claim a configuration path."
+    },
+    {
+      "runId": "defect_pfcg_configure",
+      "question": "How do you configure PFCG?",
+      "route": "GENERATION",
+      "liveInv": 1,
+      "classification": "IRRELEVANT",
+      "scores": {
+        "technical": 0,
+        "completeness": 0,
+        "relevance": 0,
+        "evidence": 2,
+        "usability": 1
+      },
+      "notes": [
+        "generic-principle-fallback",
+        "pfcg-missing"
+      ],
+      "answer": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "defect_st03n_export",
+      "question": "How do you export all the T-codes used by a user?",
+      "route": "GENERATION",
+      "liveInv": 1,
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "scores": {
+        "technical": 2,
+        "completeness": 2,
+        "relevance": 2,
+        "evidence": 2,
+        "usability": 2
+      },
+      "notes": [],
+      "answer": "Inventory `S_RS_AUTH` values via `SUIM` / role export; replace `0BI_ALL` with named analysis auths per persona (Finance controller, Plant analyst). Generate from query only as a starting point, then strip excess characteristics/values. Separate BI admin analysis auths from business consumer auths. `0BI_ALL` is full analytical access—treat it as privileged, equivalent in spirit to standing wide data access, not a developer shortcut in Production. Automated or periodic SoD/critical access check flags `0BI_ALL` in business roles as audit finding. Exception requires risk acceptance with expiry."
+    }
+  ],
+  "benchmarks": [
+    {
+      "runId": "bench_brm",
+      "question": "Why do organizations implement BRM?",
+      "route": "GENERATION",
+      "shortCircuit": null,
+      "liveInv": 1,
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "scores": {
+        "technical": 1,
+        "completeness": 0,
+        "relevance": 1,
+        "evidence": 2,
+        "usability": 1
+      },
+      "notes": [
+        "generic-principle-fallback",
+        "brm-principle-only"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "bench_pfcg",
+      "question": "Explain how do you use PFCG?",
+      "route": "GENERATION",
+      "shortCircuit": null,
+      "liveInv": 1,
+      "classification": "IRRELEVANT",
+      "scores": {
+        "technical": 0,
+        "completeness": 0,
+        "relevance": 0,
+        "evidence": 2,
+        "usability": 1
+      },
+      "notes": [
+        "generic-principle-fallback",
+        "pfcg-missing"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I claim a configuration path."
+    },
+    {
+      "runId": "bench_su24_su25",
+      "question": "Explain the difference between SU24 and SU25.",
+      "route": "GENERATION",
+      "shortCircuit": null,
+      "liveInv": 1,
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "scores": {
+        "technical": 1,
+        "completeness": 0,
+        "relevance": 1,
+        "evidence": 2,
+        "usability": 1
+      },
+      "notes": [
+        "generic-principle-fallback",
+        "su24-su25-principle"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I claim a configuration path."
+    },
+    {
+      "runId": "bench_msmp",
+      "question": "Explain MSMP architecture.",
+      "route": "GENERATION",
+      "shortCircuit": null,
+      "liveInv": 1,
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "scores": {
+        "technical": 1,
+        "completeness": 0,
+        "relevance": 1,
+        "evidence": 2,
+        "usability": 1
+      },
+      "notes": [
+        "generic-principle-fallback",
+        "msmp-principle-only"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I claim a configuration path."
+    },
+    {
+      "runId": "bench_critical_actions",
+      "question": "Explain critical actions and their significance.",
+      "route": "GENERATION",
+      "shortCircuit": null,
+      "liveInv": 1,
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "scores": {
+        "technical": 2,
+        "completeness": 2,
+        "relevance": 2,
+        "evidence": 2,
+        "usability": 2
+      },
+      "notes": [],
+      "answerPreview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive executable — typically a transaction, Web Dynpro, Fiori app, or service — as high risk on its own. It is not an S/4HANA role-transformation methodology and it is not the same as a segregation-of-duties Risk, which needs conflicting Functions together. Critical Action differs from "
+    },
+    {
+      "runId": "bench_bw",
+      "question": "Explain analysis authorizations.",
+      "route": "GENERATION",
+      "shortCircuit": null,
+      "liveInv": 1,
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "scores": {
+        "technical": 1,
+        "completeness": 0,
+        "relevance": 1,
+        "evidence": 2,
+        "usability": 1
+      },
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I claim a configuration path."
+    },
+    {
+      "runId": "bench_idm",
+      "question": "Explain the identity provisioning lifecycle.",
+      "route": "GENERATION",
+      "shortCircuit": null,
+      "liveInv": 1,
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "scores": {
+        "technical": 2,
+        "completeness": 2,
+        "relevance": 2,
+        "evidence": 2,
+        "usability": 2
+      },
+      "notes": [],
+      "answerPreview": "Identity provisioning lifecycle is the governed path that moves workforce or partner identity attributes from an authoritative source into target accounts and entitlements. Operationally I treat it as source readiness, transformation and mapping rules, target connector write, full versus delta sync cadence, failed-entity handling, and reconciliation evidence that the target matches the intended st"
+    },
+    {
+      "runId": "bench_btp",
+      "question": "Explain authentication and authorization architecture.",
+      "route": "PREPARED_SCRIPT",
+      "shortCircuit": "PREPARED_SCRIPT",
+      "liveInv": 0,
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "scores": {
+        "technical": 2,
+        "completeness": 2,
+        "relevance": 2,
+        "evidence": 2,
+        "usability": 2
+      },
+      "notes": [
+        "production-short-circuit:PREPARED_SCRIPT"
+      ],
+      "answerPreview": "Authentication answers who you are. Authorization answers what you may do. IAS or Entra ID can authenticate. SAP roles, authorization objects, and BTP role collections decide what that user can execute. Successful SSO is not application access."
+    },
+    {
+      "runId": "bench_s4_experience",
+      "question": "Describe your role in an S/4HANA security transformation and the key authorization activities you personally owned.",
+      "route": "PREPARED_SCRIPT",
+      "shortCircuit": "PREPARED_SCRIPT",
+      "liveInv": 0,
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "scores": {
+        "technical": 2,
+        "completeness": 2,
+        "relevance": 2,
+        "evidence": 2,
+        "usability": 2
+      },
+      "notes": [
+        "production-short-circuit:PREPARED_SCRIPT"
+      ],
+      "answerPreview": "Six stages. Assess current roles, users, SoD, critical access, and the process. Design the target authorization concept for S/4 and Fiori, including catalogs, OData, and GRC connectivity. Build the roles and connect GRC. Validate with authorization testing, SoD simulation, negative testing, and the business owner. Cut over with provisioning and access-control gates. Hypercare for access defects, e"
+    },
+    {
+      "runId": "bench_oauth",
+      "question": "Explain how OAuth 2.0 authorization code flow works in cloud integrations.",
+      "route": "GENERATION",
+      "shortCircuit": null,
+      "liveInv": 1,
+      "classification": "PARTIALLY_INCORRECT",
+      "scores": {
+        "technical": 1,
+        "completeness": 2,
+        "relevance": 2,
+        "evidence": 2,
+        "usability": 2
+      },
+      "notes": [
+        "oauth-missing-flow"
+      ],
+      "answerPreview": "I would register the application as an OpenID Connect or OAuth client against Identity Authentication or the BTP authorization server that owns the trust, with the correct redirect URI and required scopes. For service-to-service calls I would choose whether the call must propagate the logged-in user or run as a technical client. I would keep approval, SoD, and audit evidence on the governance plan"
+    }
+  ],
+  "criticalSample": [
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_1",
+      "suite": "historical",
+      "question": "what are the 5 pillars of BTP?",
+      "classification": "IRRELEVANT",
+      "notes": [
+        "btp-pillars-wrong-content",
+        "non-spoken-format"
+      ],
+      "answerPreview": "- `PrincipalPropagation`: Cloud Connector materializes the cloud principal (commonly short-lived X.509) toward on-premise HTTPS/RFC resources under SCC Access Control. Choose the . Document per-destination auth type + ow"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_2",
+      "suite": "historical",
+      "question": "how to configure MSMP?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback",
+        "msmp-principle-only"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_3",
+      "suite": "historical",
+      "question": "what are the 5 pillars of btp?",
+      "classification": "IRRELEVANT",
+      "notes": [
+        "btp-pillars-wrong-content",
+        "non-spoken-format"
+      ],
+      "answerPreview": "- `PrincipalPropagation`: Cloud Connector materializes the cloud principal (commonly short-lived X.509) toward on-premise HTTPS/RFC resources under SCC Access Control. Choose the . Document per-destination auth type + ow"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_4",
+      "suite": "historical",
+      "question": "what are the 5 pillars of btp?",
+      "classification": "IRRELEVANT",
+      "notes": [
+        "btp-pillars-wrong-content",
+        "non-spoken-format"
+      ],
+      "answerPreview": "- `PrincipalPropagation`: Cloud Connector materializes the cloud principal (commonly short-lived X.509) toward on-premise HTTPS/RFC resources under SCC Access Control. Choose the . Document per-destination auth type + ow"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_5",
+      "suite": "historical",
+      "question": "how to configure MSMP?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback",
+        "msmp-principle-only"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_6",
+      "suite": "historical",
+      "question": "How to configure BRF+?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_7",
+      "suite": "historical",
+      "question": "explain MSMP?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback",
+        "msmp-principle-only"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I cla"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_8",
+      "suite": "historical",
+      "question": "How would you lead an SAP GRC Access Control implementation from requirements workshops through production hypercare?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_9",
+      "suite": "historical",
+      "question": "How would you configure and move a Process Control change through development, quality and production?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_11",
+      "suite": "historical",
+      "question": "What is SAP Fiori Security?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I cla"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_12",
+      "suite": "historical",
+      "question": "What is SAP Fiori Security?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I cla"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_16",
+      "suite": "historical",
+      "question": "Regarding Difference Between SAP Cloud Identity Services (SAP Cloud Identity Services (IAS/IPS))?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "production-short-circuit:PREPARED_SCRIPT"
+      ],
+      "answerPreview": "IAS is Identity Authentication: the identity provider or proxy IdP for SAML 2.0 or OpenID Connect SSO and MFA. It authenticates users and issues tokens; it is not the dedicated cross-system provisioning engine and it doe"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_21",
+      "suite": "historical",
+      "question": "How do you users are created successfully in SAP S/4HANA but not in Active Directory. How would you troubleshoot?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_28",
+      "suite": "historical",
+      "question": "Okay, actually Balaji, your video is breaking, so I will turn off my camera to save my bandwidth, OK?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_30",
+      "suite": "historical",
+      "question": "OK, OK. I think that's the reason there is there is a lot of video like Balaji. So you are in which city currently?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_34",
+      "suite": "historical",
+      "question": "How do you restrict by CCS in production system? There is an audit observation. Auditor is saying this is restricted deb",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_35",
+      "suite": "historical",
+      "question": "What is the authorization object that will give Bug Bug Galaxy's forensic usually in your master?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_36",
+      "suite": "historical",
+      "question": "Regarding OK, no worries. I want to know the answer usage on user in an SAP system. How? How there are 4 to 5 options to",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_39",
+      "suite": "historical",
+      "question": "what are the 5 pillars of BTP?",
+      "classification": "IRRELEVANT",
+      "notes": [
+        "btp-pillars-wrong-content",
+        "non-spoken-format"
+      ],
+      "answerPreview": "- `PrincipalPropagation`: Cloud Connector materializes the cloud principal (commonly short-lived X.509) toward on-premise HTTPS/RFC resources under SCC Access Control. Choose the . Document per-destination auth type + ow"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_42",
+      "suite": "historical",
+      "question": "What is the difference between centralized and decentralized Firefighter ID in SAP GRC?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I cla"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_43",
+      "suite": "historical",
+      "question": "Explain SAP GRC Integration with SAP Cloud Identity Services (SAP Cloud Identity Services (IAS/IPS)).?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "production-short-circuit:PREPARED_SCRIPT"
+      ],
+      "answerPreview": "IAS is Identity Authentication: the identity provider or proxy IdP for SAML 2.0 or OpenID Connect SSO and MFA. It authenticates users and issues tokens; it is not the dedicated cross-system provisioning engine and it doe"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_44",
+      "suite": "historical",
+      "question": "Explain GRC Connector Architecture?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I cla"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_46",
+      "suite": "historical",
+      "question": "how to troubleshoot Business Reports Excessive SoD Violations ?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_47",
+      "suite": "historical",
+      "question": "Explain your SAP GRC Health Check Approach?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "production-short-circuit:PREPARED_SCRIPT"
+      ],
+      "answerPreview": "I explain SAP GRC Access Control as the governance layer over SAP access. Security controls what a user can do. GRC covers who should have it, who approves it, what risk exists, how it is mitigated, and how it is monitor"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_55",
+      "suite": "historical",
+      "question": "How do you design Fiori Roles?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_57",
+      "suite": "historical",
+      "question": "Regarding A Fiori app takes 40 seconds to load. Security team is blamed. What would you investigate?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_62",
+      "suite": "historical",
+      "question": "What are the major security differences between ECC and S/4HANA?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I cla"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_64",
+      "suite": "historical",
+      "question": "What is the Security Team's role in an S/4HANA implementation?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "production-short-circuit:PREPARED_SCRIPT"
+      ],
+      "answerPreview": "I do not have a reliable technical answer I can defend for that question right now (What is the Security Team's role in an S/4HANA implementation?). I would rather qualify the gap and verify the product, release and cont"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_65",
+      "suite": "historical",
+      "question": "What is the Security Scope of an S/4HANA Project?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I cla"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_67",
+      "suite": "historical",
+      "question": "What are the biggest security challenges in S/4HANA?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I cla"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_68",
+      "suite": "historical",
+      "question": "How do you support Security during Cutover?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I cla"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_71",
+      "suite": "historical",
+      "question": "what are the 5 ways to collect the user transactions?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I cla"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_72",
+      "suite": "historical",
+      "question": "Explain how SAP GRC Integration with SAP Cloud Identity Services (SAP Cloud Identity Services (IAS/IPS))?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "production-short-circuit:PREPARED_SCRIPT"
+      ],
+      "answerPreview": "IAS is Identity Authentication: the identity provider or proxy IdP for SAML 2.0 or OpenID Connect SSO and MFA. It authenticates users and issues tokens; it is not the dedicated cross-system provisioning engine and it doe"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_73",
+      "suite": "historical",
+      "question": "Explain GRC Connector Architecture?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I cla"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_74",
+      "suite": "historical",
+      "question": "Explain GRC Connector Architecture?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I cla"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_77",
+      "suite": "historical",
+      "question": "Regarding The business asks you to migrate all ECC roles directly into S/4HANA to save time. What would you recommend?\"",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_89",
+      "suite": "historical",
+      "question": "Who approves Mitigation Controls?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_93",
+      "suite": "historical",
+      "question": "Explain the MSMP Architecture?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback",
+        "msmp-principle-only"
+      ],
+      "answerPreview": "I would define the control at the correct identity or authorization plane, name the mechanism that actually enforces it, and qualify any version-dependent identifier I cannot verify from supporting knowledge before I cla"
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_94",
+      "suite": "historical",
+      "question": "can you please Explain the MSMP Architecture?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback",
+        "msmp-principle-only"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    },
+    {
+      "runId": "h_live_mvt4dz46_5fcq9n4o_95",
+      "suite": "historical",
+      "question": "What is a Process ID?",
+      "classification": "CORRECT_BUT_INCOMPLETE",
+      "notes": [
+        "generic-principle-fallback"
+      ],
+      "answerPreview": "I would confirm the product and deployment plane, walk the grounded configuration sequence available for this ask, and validate with a positive and negative test before claiming completion."
+    }
+  ]
+}

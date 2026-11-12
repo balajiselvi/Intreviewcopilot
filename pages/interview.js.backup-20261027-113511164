@@ -1,0 +1,2064 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { classifyGenerationFailure } from '../lib/generationGuard';
+import { applyRecognitionEvent } from '../lib/speechRecognitionAdapter';
+import { consumeChatStream } from '../lib/chatStream';
+import { buildBoundedHistory, isClearlyIncompleteFragment, isTruncatedScenarioSetup, removeSubmittedSnapshot } from '../lib/interviewContext';
+import {
+  armGenerationTimeout,
+  canStartTurn,
+  CLIENT_GENERATION_TIMEOUT_MS,
+  deriveOperatorState,
+  enqueueSpeechTurn,
+  acceptCapturedTurn,
+  findRetryTarget,
+  historyBeforeQuestion,
+  shouldAutoSubmitSource,
+  streamChunkBelongsToTurn,
+  GENERATION_WATCHDOG_GRACE_MS,
+  getOrCreateLiveSessionId,
+  historyForGeneration,
+  nextResetSnapshot,
+  rotateLiveSessionId,
+  shouldReuseQuestionRow
+} from '../lib/liveSessionOperator';
+import {
+  attachLiveSessionErrorShield,
+  invokeSpeechCallback,
+  safeCloseAudioConfig,
+  safeDisposeRecognizer,
+  stopMediaTracks
+} from '../lib/speechSessionGuard';
+import { createSpeechTurnDetector, looksLikeContinuationShape } from '../lib/speechTurnDetector';
+import { decideInterviewTurn } from '../lib/turnDecision';
+import { shouldIgnoreDuplicateSubmit, submissionKey } from '../lib/submitIdempotency';
+import { takeUtterance } from '../lib/deferredContinuation';
+import {
+  formatSessionPreparation,
+  readSessionPreparation,
+  writeSessionPreparation
+} from '../lib/sessionPreparation';
+
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useDispatch, useSelector } from 'react-redux';
+
+// MUI Components
+import {
+  Alert,
+  AppBar,
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Checkbox,
+  Chip,
+  CircularProgress,
+  Container,
+  Divider,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  Snackbar,
+  Switch,
+  TextField,
+  Toolbar,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
+
+// MUI Icons
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import HearingIcon from '@mui/icons-material/Hearing';
+import MicIcon from '@mui/icons-material/Mic';
+import MicOffIcon from '@mui/icons-material/MicOff';
+import PersonIcon from '@mui/icons-material/Person';
+import PictureInPictureAltIcon from '@mui/icons-material/PictureInPictureAlt';
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import ScreenShareIcon from '@mui/icons-material/ScreenShare';
+import SendIcon from '@mui/icons-material/Send';
+import SettingsIcon from '@mui/icons-material/Settings';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import SpeakerNotesIcon from '@mui/icons-material/SpeakerNotes';
+import StopIcon from '@mui/icons-material/Stop';
+import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
+import SwapVertIcon from '@mui/icons-material/SwapVert';
+
+// Third-party Libraries
+import hljs from 'highlight.js';
+import 'highlight.js/styles/atom-one-dark.css';
+import throttle from 'lodash.throttle';
+import * as SpeechSDK from 'microsoft-cognitiveservices-speech-sdk';
+import ReactMarkdown from 'react-markdown';
+import ScrollToBottom from 'react-scroll-to-bottom';
+
+// Local Imports
+import SettingsDialog from '../components/SettingsDialog';
+import AnswerQualityPanel from '../components/AnswerQualityPanel';
+import { setAIResponse } from '../redux/aiResponseSlice';
+import { addToHistory, clearHistory, updateLatestQuestion } from '../redux/historySlice';
+import { clearTranscription, setTranscription } from '../redux/transcriptionSlice';
+import { getConfig, setConfig as saveConfig } from '../utils/config';
+
+function debounce(func, timeout = 100) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
+  };
+}
+
+function recordAdmissionTurn(question, disposition, reason) {
+  try {
+    const sessionId = getLiveInterviewSessionId();
+    fetch("/api/interview-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        interviewSessionId: sessionId,
+        question,
+        disposition,
+        reason
+      })
+    }).catch((error) => {
+      console.error("Failed to record an admission turn:", error);
+    });
+  } catch (error) {
+    console.error("Failed to record an admission turn:", error);
+  }
+}
+
+function getLiveInterviewSessionId() {
+  try {
+    if (typeof sessionStorage === "undefined") {
+      return `live_${Date.now().toString(36)}_nosess`;
+    }
+    return getOrCreateLiveSessionId(sessionStorage);
+  } catch {
+    return `live_${Date.now().toString(36)}_nosess`;
+  }
+}
+
+export default function InterviewPage() {
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const transcriptionFromStore = useSelector(state => state.transcription);
+  const aiResponseFromStore = useSelector(state => state.aiResponse);
+  const history = useSelector(state => state.history);
+  const theme = useTheme();
+
+  const initialConfig = useRef(getConfig()).current;
+
+  const [systemRecognizer, setSystemRecognizer] = useState(null);
+  const [micRecognizer, setMicRecognizer] = useState(null);
+  const systemRecognizerRef = useRef(null);
+  const micRecognizerRef = useRef(null);
+  const stopInFlightRef = useRef({ system: false, microphone: false });
+  const [systemAutoMode, setSystemAutoMode] = useState(initialConfig.systemAutoMode !== undefined ? initialConfig.systemAutoMode : true);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [isMicrophoneActive, setIsMicrophoneActive] = useState(false);
+  const [isSystemAudioActive, setIsSystemAudioActive] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('info');
+  const [selectedQuestions, setSelectedQuestions] = useState([]);
+  const [isManualMode, setIsManualMode] = useState(initialConfig.isManualMode !== undefined ? initialConfig.isManualMode : false);
+  const [micTranscription, setMicTranscription] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [generationError, setGenerationError] = useState(null);
+  const [turnDisposition, setTurnDisposition] = useState(null);
+  const [queuedTurnCount, setQueuedTurnCount] = useState(0);
+  const [autoScroll, setAutoScroll] = useState(true);
+  const [aiResponseSortOrder, setAiResponseSortOrder] = useState('newestAtTop');
+  const [isPipWindowActive, setIsPipWindowActive] = useState(false);
+  const [debugEnabled, setDebugEnabled] = useState(false);
+  const [debugContext, setDebugContext] = useState(null);
+  const [sessionPrep, setSessionPrep] = useState(() => readSessionPreparation(
+    typeof sessionStorage !== "undefined" ? sessionStorage : null,
+    getLiveInterviewSessionId()
+  ));
+
+  const pipWindowRef = useRef(null);
+  const documentPipWindowRef = useRef(null);
+  const documentPipIframeRef = useRef(null);
+  const systemInterimTranscription = useRef('');
+  const micInterimTranscription = useRef('');
+  const finalTranscript = useRef({ system: '', microphone: '' });
+  const isManualModeRef = useRef(isManualMode);
+  const systemAutoModeRef = useRef(systemAutoMode);
+  const systemAudioActiveRef = useRef(false);
+  const throttledDispatchSetAIResponseRef = useRef(null);
+  const activeRequestRef = useRef(null);
+  const isProcessingRef = useRef(false);
+  const recentSubmitRef = useRef(null);
+  const generationStartedAtRef = useRef(0);
+  const historyRef = useRef(history);
+  const pendingAnalysisRef = useRef(null);
+  const pendingAdmissionRef = useRef(null);
+  const pendingFragmentRef = useRef(null);
+  const pendingContextRef = useRef(null);
+  const lastAskRef = useRef({ text: "", source: "microphone" });
+  const sessionEpochRef = useRef(0);
+  const speechTurnsRef = useRef({ system: null, microphone: null });
+  const pendingSpeechQueueRef = useRef([]);
+  const surfaceTurnRef = useRef(() => {});
+  const drainQueuedSpeechTurnRef = useRef(() => {});
+  const askOpenAIRef = useRef(null);
+  const ingestSpeechRef = useRef(null);
+  const debugEnabledRef = useRef(false);
+  const speechLogRef = useRef([]);
+
+  const showSnackbar = useCallback((message, severity = 'info') => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  }, []);
+
+  const handleSettingsSaved = () => {
+    const newConfig = getConfig();
+    setSystemAutoMode(newConfig.systemAutoMode !== undefined ? newConfig.systemAutoMode : true);
+    setIsManualMode(newConfig.isManualMode !== undefined ? newConfig.isManualMode : false);
+  };
+
+  useEffect(() => { isManualModeRef.current = isManualMode; }, [isManualMode]);
+  useEffect(() => { systemAudioActiveRef.current = isSystemAudioActive; }, [isSystemAudioActive]);
+  useEffect(() => { systemAutoModeRef.current = systemAutoMode; }, [systemAutoMode]);
+  useEffect(() => { historyRef.current = history; }, [history]);
+  useEffect(() => {
+    if (router.isReady) setDebugEnabled(router.query.debug === "1");
+  }, [router.isReady, router.query.debug]);
+  useEffect(() => { debugEnabledRef.current = debugEnabled; }, [debugEnabled]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    if (!debugEnabled) {
+      try {
+        delete window.__interviewIngestSpeech;
+        delete window.__interviewSpeechDebug;
+        delete window.__interviewSpeechLog;
+      } catch { /* ignore */ }
+      return undefined;
+    }
+    window.__interviewIngestSpeech = (kind, text, source) => ingestSpeechRef.current?.(kind, text, source);
+    window.__interviewSpeechDebug = (source = "microphone") => speechTurnsRef.current[source]?._debug?.() || null;
+    window.__interviewSpeechLog = speechLogRef.current;
+    return () => {
+      try {
+        delete window.__interviewIngestSpeech;
+        delete window.__interviewSpeechDebug;
+        delete window.__interviewSpeechLog;
+      } catch { /* ignore */ }
+    };
+  }, [debugEnabled]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (!isProcessingRef.current) return;
+      const started = generationStartedAtRef.current;
+      if (!started) return;
+      if (Date.now() - started < CLIENT_GENERATION_TIMEOUT_MS + GENERATION_WATCHDOG_GRACE_MS) return;
+      try { activeRequestRef.current?.abort(); } catch { /* ignore */ }
+      activeRequestRef.current = null;
+      isProcessingRef.current = false;
+      generationStartedAtRef.current = 0;
+      setIsProcessing(false);
+      pendingSpeechQueueRef.current = [];
+      setQueuedTurnCount(0);
+      const classified = classifyGenerationFailure({ name: "AbortError", message: "The answer timed out." });
+      setGenerationError(classified);
+      showSnackbar(classified.userMessage, "error");
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    throttledDispatchSetAIResponseRef.current = throttle((payload) => {
+      dispatch(setAIResponse(payload));
+    }, 250, { leading: true, trailing: true });
+
+    return () => {
+      if (throttledDispatchSetAIResponseRef.current && typeof throttledDispatchSetAIResponseRef.current.cancel === 'function') {
+        throttledDispatchSetAIResponseRef.current.cancel();
+      }
+    };
+  }, [dispatch]);
+
+  useEffect(() => attachLiveSessionErrorShield((error) => {
+    console.error('Live session non-fatal error:', error);
+  }), []);
+
+  useEffect(() => () => {
+    try { speechTurnsRef.current.system?.reset(); } catch { /* ignore */ }
+    try { speechTurnsRef.current.microphone?.reset(); } catch { /* ignore */ }
+    activeRequestRef.current?.abort();
+    try {
+      stopMediaTracks(systemRecognizerRef.current?._sourceMediaStream);
+      if (typeof systemRecognizerRef.current?._audioCleanup === 'function') {
+        systemRecognizerRef.current._audioCleanup();
+      }
+    } catch (error) {
+      console.error('System audio unmount cleanup failed:', error);
+    }
+    try {
+      stopMediaTracks(micRecognizerRef.current?._sourceMediaStream);
+      if (typeof micRecognizerRef.current?._audioCleanup === 'function') {
+        micRecognizerRef.current._audioCleanup();
+      }
+    } catch (error) {
+      console.error('Microphone unmount cleanup failed:', error);
+    }
+  }, []);
+
+  const handleSnackbarClose = () => setSnackbarOpen(false);
+
+  const stopRecording = async (source) => {
+    if (stopInFlightRef.current[source]) return;
+    stopInFlightRef.current[source] = true;
+    const recognizer = source === 'system' ? systemRecognizerRef.current : micRecognizerRef.current;
+    try {
+      if (recognizer && typeof recognizer.stopContinuousRecognitionAsync === 'function') {
+        await invokeSpeechCallback(recognizer.stopContinuousRecognitionAsync, recognizer, {
+          swallowError: true,
+          timeoutMs: 8000
+        });
+      }
+      if (recognizer?.audioConfig?.privSource?.privStream instanceof MediaStream) {
+        stopMediaTracks(recognizer.audioConfig.privSource.privStream);
+      }
+      stopMediaTracks(recognizer?._sourceMediaStream);
+      if (typeof recognizer?._audioCleanup === 'function') {
+        try {
+          recognizer._audioCleanup();
+        } catch (cleanupError) {
+          console.error(`Error cleaning ${source} audio pipeline:`, cleanupError);
+        }
+      }
+      await safeCloseAudioConfig(recognizer?.audioConfig);
+      await safeDisposeRecognizer(recognizer);
+    } catch (error) {
+      console.error(`Error stopping ${source} recognition:`, error);
+      showSnackbar(`${source === 'system' ? 'Tab audio' : 'Microphone'} stopped. You can start it again.`, 'warning');
+    } finally {
+      if (source === 'system') {
+        systemRecognizerRef.current = null;
+        setIsSystemAudioActive(false);
+        setSystemRecognizer(null);
+      } else {
+        micRecognizerRef.current = null;
+        setIsMicrophoneActive(false);
+        setMicRecognizer(null);
+      }
+      stopInFlightRef.current[source] = false;
+      try { speechTurnsRef.current[source]?.stopPending(); } catch { /* ignore */ }
+    }
+  };
+
+  const handleClearSystemTranscription = () => {
+    finalTranscript.current.system = '';
+    systemInterimTranscription.current = '';
+    speechTurnsRef.current.system?.reset();
+    dispatch(clearTranscription());
+  };
+
+  const handleClearMicTranscription = () => {
+    finalTranscript.current.microphone = '';
+    micInterimTranscription.current = '';
+    speechTurnsRef.current.microphone?.reset();
+    setMicTranscription('');
+  };
+
+  const syncTranscriptDisplay = (source, text, finalText) => {
+    const spoken = String(text || "").trim();
+    const committedFinal = String(finalText || "").trim();
+    finalTranscript.current[source] = committedFinal ? `${committedFinal} ` : '';
+    if (source === 'system') {
+      systemInterimTranscription.current = spoken.slice(committedFinal.length).trim();
+      dispatch(setTranscription(spoken));
+    } else {
+      micInterimTranscription.current = spoken.slice(committedFinal.length).trim();
+      setMicTranscription(spoken);
+    }
+  };
+
+  const pushSpeechLog = (event) => {
+    if (!debugEnabledRef.current) return;
+    const row = { ...event };
+    speechLogRef.current.push(row);
+    if (speechLogRef.current.length > 80) speechLogRef.current.splice(0, speechLogRef.current.length - 80);
+    try {
+      console.debug("[speech-turn]", row.type, {
+        utteranceId: row.utteranceId,
+        reason: row.reason,
+        waitMs: row.waitMs,
+        text: row.text || row.finalText
+      });
+    } catch { /* ignore */ }
+  };
+
+  const getTurnDetector = (source) => {
+    if (speechTurnsRef.current[source]) return speechTurnsRef.current[source];
+    const detector = createSpeechTurnDetector({
+      shouldHold: (text) => isClearlyIncompleteFragment(text) || isTruncatedScenarioSetup(text, {}) || looksLikeContinuationShape(text),
+      onDiagnostic: pushSpeechLog,
+      onTranscript(text) {
+        syncTranscriptDisplay(source, text, detector.getFinalText());
+      },
+      onFinalize({ text, utteranceId }) {
+        const planned = acceptCapturedTurn({
+          text,
+          utteranceId,
+          source,
+          isProcessing: isProcessingRef.current,
+          queue: pendingSpeechQueueRef.current
+        });
+        if (planned.action === "ignore") {
+          surfaceTurnRef.current({
+            text,
+            utteranceId,
+            source,
+            disposition: "IGNORE",
+            reason: planned.reason
+          });
+          detector.reset();
+          return;
+        }
+        if (planned.action === "queue") {
+          pendingSpeechQueueRef.current = planned.queue;
+          setQueuedTurnCount(pendingSpeechQueueRef.current.length);
+          pushSpeechLog({ type: "queue-while-busy", utteranceId, text, source, kept: planned.queue.length });
+          planned.overflow.forEach((dropped) => {
+            surfaceTurnRef.current({
+              text: dropped.text,
+              utteranceId: dropped.utteranceId,
+              source: dropped.source || source,
+              disposition: "UNANSWERED",
+              reason: "queue-overflow"
+            });
+          });
+          return;
+        }
+        lastAskRef.current = { ...(lastAskRef.current || {}), utteranceId, text, source };
+        askOpenAIRef.current?.(text, source, { utteranceId });
+      },
+      onRevoked({ utteranceId, wasCommitted }) {
+        pendingSpeechQueueRef.current = pendingSpeechQueueRef.current.filter(
+          (item) => item.utteranceId !== utteranceId
+        );
+        setQueuedTurnCount(pendingSpeechQueueRef.current.length);
+        if (lastAskRef.current?.utteranceId !== utteranceId) return;
+        lastAskRef.current = { ...lastAskRef.current, revoked: true };
+        if (wasCommitted) {
+          dispatch(updateLatestQuestion({ utteranceId, status: "superseded" }));
+        }
+        const controller = activeRequestRef.current;
+        if (!controller) {
+          isProcessingRef.current = false;
+          setIsProcessing(false);
+          drainQueuedSpeechTurnRef.current();
+          return;
+        }
+        activeRequestRef.current = null;
+        try { controller.abort(); } catch (abortError) {
+          console.error(`Failed to abort superseded ${source} request:`, abortError);
+        }
+        isProcessingRef.current = false;
+        setIsProcessing(false);
+        drainQueuedSpeechTurnRef.current();
+      }
+    });
+    speechTurnsRef.current[source] = detector;
+    return detector;
+  };
+
+  const ingestSpeech = (kind, text, source) => {
+    const detector = getTurnDetector(source);
+    detector.setBaseSilenceMs((Number(getConfig().silenceTimerDuration) || 1.2) * 1000);
+    const auto = shouldAutoSubmitSource({
+      source,
+      systemAutoMode: systemAutoModeRef.current,
+      manualMode: isManualModeRef.current,
+      systemAudioActive: systemAudioActiveRef.current
+    });
+    detector.setAutoSubmit(auto);
+    applyRecognitionEvent(detector, kind, text);
+  };
+  ingestSpeechRef.current = ingestSpeech;
+
+  const drainQueuedSpeechTurn = () => {
+    const queued = pendingSpeechQueueRef.current[0];
+    if (!queued?.text) return;
+    pushSpeechLog({ type: "drain-queued-turn", utteranceId: queued.utteranceId, text: queued.text, source: queued.source });
+    queueMicrotask(() => {
+      if (isProcessingRef.current) return;
+      if (pendingSpeechQueueRef.current[0]?.utteranceId !== queued.utteranceId) return;
+      pendingSpeechQueueRef.current.shift();
+      setQueuedTurnCount(pendingSpeechQueueRef.current.length);
+      askOpenAIRef.current?.(queued.text, queued.source, { utteranceId: queued.utteranceId });
+    });
+  };
+  drainQueuedSpeechTurnRef.current = drainQueuedSpeechTurn;
+
+  const handleManualInputChange = (value, source) => {
+    if (source === 'system') {
+      dispatch(setTranscription(value));
+      finalTranscript.current.system = value;
+    } else {
+      setMicTranscription(value);
+      finalTranscript.current.microphone = value;
+    }
+  };
+
+  const handleManualSubmit = (source) => {
+    const textToSubmit = source === 'system' ? transcriptionFromStore : micTranscription;
+    if (!textToSubmit.trim()) {
+      showSnackbar('Input is empty.', 'warning');
+      return;
+    }
+    if (!canStartTurn({ isProcessing: isProcessingRef.current })) {
+      const parked = enqueueSpeechTurn(pendingSpeechQueueRef.current, {
+        text: textToSubmit.trim(),
+        utteranceId: `manual_${Date.now().toString(36)}`,
+        source
+      });
+      pendingSpeechQueueRef.current = parked.queue;
+      setQueuedTurnCount(pendingSpeechQueueRef.current.length);
+      parked.overflow.forEach((dropped) => {
+        surfaceTurnRef.current({
+          text: dropped.text,
+          utteranceId: dropped.utteranceId,
+          source: dropped.source || source,
+          disposition: "UNANSWERED",
+          reason: "queue-overflow"
+        });
+      });
+      showSnackbar('Queued. It will be answered when the current response finishes.', 'info');
+      return;
+    }
+    if (textToSubmit.trim()) {
+      const detector = speechTurnsRef.current[source];
+      if (detector) {
+        detector.setAutoSubmit(false);
+        detector.stopPending();
+      }
+      pendingSpeechQueueRef.current = pendingSpeechQueueRef.current.filter((item) => item.source !== source);
+      setQueuedTurnCount(pendingSpeechQueueRef.current.length);
+      askOpenAI(textToSubmit.trim(), source, { utteranceId: detector?.getUtteranceId() || null, manual: true });
+    } else {
+      showSnackbar('Input is empty.', 'warning');
+    }
+  };
+
+  const handleKeyPress = (e, source) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (isProcessingRef.current) return;
+      handleManualSubmit(source);
+    }
+  };
+
+  const handleCombineAndSubmit = () => {
+    if (!canStartTurn({ isProcessing: isProcessingRef.current })) {
+      showSnackbar('Please wait for the current response to finish.', 'info');
+      return;
+    }
+    if (selectedQuestions.length === 0) {
+      showSnackbar('No questions selected to combine.', 'warning');
+      return;
+    }
+    const questionHistory = history.filter(e => e.type === 'question').slice().reverse();
+    const questionTexts = selectedQuestions.map(selectedIndexInReversedArray => {
+      return questionHistory[selectedIndexInReversedArray]?.text;
+    }).filter(text => text);
+
+    if (questionTexts.length === 0) {
+      showSnackbar('Could not retrieve selected question texts.', 'warning');
+      return;
+    }
+
+    const combinedText = questionTexts.join('\n\n---\n\n');
+    askOpenAI(combinedText, 'combined');
+    if (isProcessingRef.current) setSelectedQuestions([]);
+  };
+
+  // Converts a MediaStream into an Azure Speech SDK push-stream AudioConfig by downmixing to
+  // mono 16kHz 16-bit PCM via the Web Audio API. Passing a raw MediaStream straight into
+  // SpeechSDK.AudioConfig.fromStreamInput() is only reliable for microphone-shaped (mono)
+  // input -- getDisplayMedia's tab/system audio is commonly stereo and/or a different sample
+  // rate, which the SDK fails to recognize from SILENTLY (no error thrown, no transcription
+  // ever produced) rather than raising an error, which is why this looked like "not listening"
+  // with no diagnostic to go on.
+  const createSystemAudioConfig = (mediaStream) => {
+    const pushStream = SpeechSDK.AudioInputStream.createPushStream(
+      SpeechSDK.AudioStreamFormat.getWaveFormatPCM(16000, 16, 1)
+    );
+
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    const audioContext = new AudioContextCtor();
+    const sourceNode = audioContext.createMediaStreamSource(mediaStream);
+    const processorNode = audioContext.createScriptProcessor(4096, 1, 1);
+    // ScriptProcessorNode only reliably fires onaudioprocess once connected through to the
+    // destination in some browsers -- route through a silent (gain=0) node so nothing is
+    // actually played back, which would otherwise create an audio feedback loop with the
+    // shared tab's own sound.
+    const silentGain = audioContext.createGain();
+    silentGain.gain.value = 0;
+
+    const inputSampleRate = audioContext.sampleRate;
+    const targetSampleRate = 16000;
+    const ratio = inputSampleRate / targetSampleRate;
+
+    processorNode.onaudioprocess = (event) => {
+      const inputData = event.inputBuffer.getChannelData(0);
+      const outputLength = Math.floor(inputData.length / ratio);
+      const output = new Int16Array(outputLength);
+      for (let i = 0; i < outputLength; i++) {
+        const sample = inputData[Math.floor(i * ratio)];
+        const clamped = Math.max(-1, Math.min(1, sample));
+        output[i] = clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff;
+      }
+      pushStream.write(output.buffer);
+    };
+
+    sourceNode.connect(processorNode);
+    processorNode.connect(silentGain);
+    silentGain.connect(audioContext.destination);
+
+    const cleanup = () => {
+      try {
+        processorNode.disconnect();
+        sourceNode.disconnect();
+        silentGain.disconnect();
+        pushStream.close();
+        audioContext.close();
+      } catch (cleanupError) {
+        console.error('Error cleaning up system audio pipeline:', cleanupError);
+      }
+    };
+
+    return { audioConfig: SpeechSDK.AudioConfig.fromStreamInput(pushStream), cleanup };
+  };
+
+  const createRecognizer = async (mediaStream, source) => {
+    const currentConfig = getConfig();
+    if (!currentConfig.azureToken || !currentConfig.azureRegion) {
+      showSnackbar('Azure Speech credentials missing. Please set them in Settings.', 'error');
+      stopMediaTracks(mediaStream);
+      return null;
+    }
+
+    let audioConfig;
+    let audioCleanup = null;
+    try {
+      if (source === 'system') {
+        const converted = createSystemAudioConfig(mediaStream);
+        audioConfig = converted.audioConfig;
+        audioCleanup = converted.cleanup;
+      } else {
+        audioConfig = SpeechSDK.AudioConfig.fromStreamInput(mediaStream);
+      }
+    } catch (configError) {
+      console.error(`Error creating AudioConfig for ${source}:`, configError);
+      showSnackbar(`Error setting up audio for ${source}. You can try again.`, 'error');
+      stopMediaTracks(mediaStream);
+      return null;
+    }
+
+    const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(currentConfig.azureToken, currentConfig.azureRegion);
+    speechConfig.speechRecognitionLanguage = currentConfig.azureLanguage;
+
+    // Phrase segmentation, not turn-end. Azure emits a FINAL after this much silence
+    // inside one human question; lib/speechTurnDetector.js is the turn boundary.
+    speechConfig.setProperty("Speech_SegmentationSilenceTimeoutMs", "500");
+    speechConfig.setProperty("SpeechServiceConnection_InitialSilenceTimeoutMs", "3000");
+
+    const recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+    // Vocabulary bias only. Turn boundaries stay in lib/speechTurnDetector.js.
+    // Do not rewrite recognized text after the fact.
+    try {
+      const phraseList = SpeechSDK.PhraseListGrammar.fromRecognizer(recognizer);
+      [
+        "IAG",
+        "controllers",
+        "Privileged Access",
+        "Maintain Business Rules",
+        "Access Request",
+        "Role Designer",
+        "workflow template",
+        "ruleset"
+      ].forEach((phrase) => phraseList.addPhrase(phrase));
+    } catch (phraseError) {
+      console.error("IAG phrase list was not applied:", phraseError);
+    }
+    // Referenced by stopRecording() -- the source stream and the (system-audio-only) Web
+    // Audio pipeline cleanup aren't reachable through the SDK's own audioConfig internals
+    // once the push-stream conversion is in play.
+    recognizer._sourceMediaStream = mediaStream;
+    recognizer._audioCleanup = audioCleanup;
+
+    recognizer.recognizing = (s, e) => {
+      try {
+        if (e.result.reason === SpeechSDK.ResultReason.RecognizingSpeech) {
+          ingestSpeech('interim', e.result.text, source);
+        }
+      } catch (eventError) {
+        console.error(`recognizing handler failed for ${source}:`, eventError);
+      }
+    };
+
+    recognizer.recognized = (s, e) => {
+      try {
+        if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech && e.result.text) {
+          ingestSpeech('final', e.result.text, source);
+        }
+      } catch (eventError) {
+        console.error(`recognized handler failed for ${source}:`, eventError);
+      }
+    };
+
+    recognizer.speechStartDetected = () => {
+      try {
+        ingestSpeech('start', '', source);
+      } catch (eventError) {
+        console.error(`speechStartDetected handler failed for ${source}:`, eventError);
+      }
+    };
+
+    recognizer.speechEndDetected = () => {
+      try {
+        ingestSpeech('end', '', source);
+      } catch (eventError) {
+        console.error(`speechEndDetected handler failed for ${source}:`, eventError);
+      }
+    };
+
+    recognizer.canceled = (s, e) => {
+      console.log(`CANCELED: Reason=${e.reason} for ${source}`);
+      if (e.reason === SpeechSDK.CancellationReason.Error) {
+        console.error(`CANCELED: ErrorCode=${e.errorCode}`);
+        console.error(`CANCELED: ErrorDetails=${e.errorDetails}`);
+        showSnackbar(`Speech recognition error for ${source}. Capture stopped; you can start it again.`, 'error');
+      }
+      if (!stopInFlightRef.current[source]) {
+        stopRecording(source);
+      }
+    };
+
+    recognizer.sessionStopped = (s, e) => {
+      console.log(`Session stopped event for ${source}.`);
+      if (!stopInFlightRef.current[source]) {
+        stopRecording(source);
+      }
+    };
+
+    try {
+      await invokeSpeechCallback(recognizer.startContinuousRecognitionAsync, recognizer, { timeoutMs: 15000 });
+      return recognizer;
+    } catch (error) {
+      console.error(`Error starting ${source} continuous recognition:`, error);
+      showSnackbar(`Failed to start ${source} recognition. You can try again.`, 'error');
+      try {
+        if (typeof audioCleanup === 'function') audioCleanup();
+      } catch (cleanupError) {
+        console.error(`Error cleaning ${source} audio after start failure:`, cleanupError);
+      }
+      await safeCloseAudioConfig(audioConfig);
+      await safeDisposeRecognizer(recognizer);
+      stopMediaTracks(mediaStream);
+      return null;
+    }
+  };
+
+  const startSystemAudioRecognition = async () => {
+    try {
+      if (isSystemAudioActive) {
+        await stopRecording('system');
+        return;
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+        showSnackbar('Screen sharing is not supported by your browser.', 'error');
+        setIsSystemAudioActive(false);
+        return;
+      }
+
+      const mediaStream = await navigator.mediaDevices.getDisplayMedia({
+        audio: true,
+        video: {
+          displaySurface: 'browser',
+          logicalSurface: true
+        }
+      });
+
+      const audioTracks = mediaStream.getAudioTracks();
+      if (audioTracks.length === 0) {
+        showSnackbar('No audio track detected. Please ensure you share a tab with audio.', 'warning');
+        stopMediaTracks(mediaStream);
+        return;
+      }
+
+      if (systemRecognizerRef.current) {
+        await stopRecording('system');
+      }
+
+      const recognizerInstance = await createRecognizer(mediaStream, 'system');
+      if (recognizerInstance) {
+        systemRecognizerRef.current = recognizerInstance;
+        setSystemRecognizer(recognizerInstance);
+        setIsSystemAudioActive(true);
+        showSnackbar('System audio recording started.', 'success');
+        mediaStream.getTracks().forEach(track => {
+          track.onended = () => {
+            showSnackbar('Tab sharing ended.', 'info');
+            stopRecording('system').catch((stopError) => {
+              console.error('Error after tab sharing ended:', stopError);
+            });
+          };
+        });
+      } else {
+        stopMediaTracks(mediaStream);
+      }
+    } catch (error) {
+      console.error('System audio capture error:', error);
+      if (error.name === "NotAllowedError") {
+        showSnackbar('Permission denied for screen recording. Please allow access.', 'error');
+      } else if (error.name === "NotFoundError") {
+        showSnackbar('No suitable tab/window found to share.', 'error');
+      } else if (error.name === "NotSupportedError") {
+        showSnackbar('System audio capture not supported by your browser.', 'error');
+      } else {
+        showSnackbar('Failed to start tab audio capture. You can try again.', 'error');
+      }
+      setIsSystemAudioActive(false);
+    }
+  };
+
+  const startMicrophoneRecognition = async () => {
+    try {
+      if (isMicrophoneActive) {
+        await stopRecording('microphone');
+        return;
+      }
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (micRecognizerRef.current) await stopRecording('microphone');
+
+      const recognizerInstance = await createRecognizer(mediaStream, 'microphone');
+      if (recognizerInstance) {
+        micRecognizerRef.current = recognizerInstance;
+        setMicRecognizer(recognizerInstance);
+        setIsMicrophoneActive(true);
+        showSnackbar('Microphone recording started.', 'success');
+      } else {
+        stopMediaTracks(mediaStream);
+      }
+    } catch (error) {
+      console.error('Microphone capture error:', error);
+      if (error.name === "NotAllowedError" || error.name === "NotFoundError") {
+        showSnackbar('Permission denied for microphone. Please allow access.', 'error');
+      } else {
+        showSnackbar('Failed to access microphone. You can try again.', 'error');
+      }
+      setIsMicrophoneActive(false);
+    }
+  };
+
+  const commitHistory = (item) => {
+    dispatch(addToHistory(item));
+    historyRef.current = [...historyRef.current, item];
+  };
+
+  const surfaceTurn = (row) => {
+    const text = String(row?.text || "").trim();
+    if (!text) return;
+    commitHistory({
+      type: "question",
+      text,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      source: row.source || "system",
+      questionId: `q_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      utteranceId: row.utteranceId || null,
+      status: "completed",
+      disposition: row.disposition || "IGNORE",
+      admissionReason: row.reason || ""
+    });
+    setTurnDisposition({ decision: row.disposition || "IGNORE", route: "NONE", reason: row.reason || "" });
+    recordAdmissionTurn(text, row.disposition || "IGNORE", row.reason || "");
+    if (row.disposition === "UNANSWERED") {
+      showSnackbar("A waiting question could not stay queued. It is in the log — use Answer this.", "warning");
+    }
+  };
+  surfaceTurnRef.current = surfaceTurn;
+
+  const askOpenAI = async (text, source, meta = {}) => {
+    if (!text.trim()) {
+      showSnackbar('No input text to process.', 'warning');
+      speechTurnsRef.current[source]?.releaseFinalize();
+      return;
+    }
+    const submittedAt = Date.now();
+    if (shouldIgnoreDuplicateSubmit({
+      previous: recentSubmitRef.current,
+      text,
+      now: submittedAt,
+      retry: Boolean(meta.retry)
+    })) {
+      return;
+    }
+    recentSubmitRef.current = { key: submissionKey(text), at: submittedAt };
+    if (isProcessingRef.current) {
+      showSnackbar('Please wait for the current response to finish.', 'info');
+      return;
+    }
+
+    if (meta.retry) {
+      pendingFragmentRef.current = null;
+    } else {
+      let assembly = { action: "pass", text, pending: pendingFragmentRef.current };
+      try {
+        assembly = takeUtterance(pendingFragmentRef.current, text);
+      } catch (assemblyError) {
+        console.error("Deferred continuation failed:", assemblyError);
+        assembly = { action: "pass", text, pending: null };
+      }
+      // Zero-drop transcript policy: never park incomplete speech. If a hold slips through,
+      // force-pass the fragment into generation instead of showing "Deferred — incomplete".
+      if (assembly.action === "hold") {
+        pendingFragmentRef.current = null;
+        text = String(assembly.recordText || assembly.text || text).trim() || text;
+        assembly = { action: "pass", pending: null, text, recordText: text, disposition: null, generates: true };
+      } else {
+        pendingFragmentRef.current = assembly.pending;
+      }
+      if (assembly.text) text = assembly.text;
+    }
+
+    const retryContextQuestionId = meta.retryTarget?.questionId || "";
+    const turnHistory = retryContextQuestionId
+      ? historyBeforeQuestion(historyRef.current, retryContextQuestionId)
+      : historyRef.current;
+    let turn = { decision: "ANSWER", route: "GENERATION", reason: "admission-failed-open" };
+    try {
+      turn = decideInterviewTurn({ question: text, history: turnHistory });
+    } catch (gateError) {
+      console.error("Question admission failed:", gateError);
+    }
+    if (turn.normalizedQuestion) {
+      text = String(turn.normalizedQuestion);
+    }
+    // Zero-drop / force pass-through: never block non-empty transcripts (DEFER or otherwise).
+    // Pure empty stays ignored; noise token still short-circuits below via scriptAnswer.
+    if (String(text || "").trim() && turn.decision !== "ANSWER") {
+      const noise = turn.reason === "ignore-noise" || String(turn.scriptAnswer || "") === "[IGNORE_NOISE]";
+      if (!noise) {
+        turn = {
+          ...turn,
+          decision: "ANSWER",
+          reason: "zero-drop-admit",
+          route: turn.route && turn.route !== "NONE" ? turn.route : "GENERATION"
+        };
+      }
+    }
+    if (turn.decision !== "ANSWER") {
+      const detector = speechTurnsRef.current[source];
+      if (!meta.manual && detector && meta.utteranceId) {
+        try {
+          detector.acknowledgeCommit(meta.utteranceId);
+          detector.notifyGenerationSettled(meta.utteranceId);
+        } catch (settleError) {
+          console.error("Failed to settle a non-question turn:", settleError);
+        }
+      }
+      const ignoreNoise = turn.reason === "ignore-noise" || String(turn.scriptAnswer || "") === "[IGNORE_NOISE]";
+      commitHistory({
+        type: "question",
+        text,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        source,
+        questionId: `q_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        utteranceId: meta.utteranceId || null,
+        status: "completed",
+        disposition: turn.decision,
+        admissionReason: turn.reason
+      });
+      if (ignoreNoise) {
+        commitHistory({
+          type: "answer",
+          text: "[IGNORE_NOISE]",
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          source: "admission",
+          status: "completed",
+          disposition: "IGNORE"
+        });
+      }
+      setTurnDisposition({ decision: turn.decision, route: "NONE", reason: turn.reason });
+      recordAdmissionTurn(text, turn.decision, turn.reason);
+      return;
+    }
+
+    const currentConfig = getConfig();
+    const isGeminiModel = currentConfig.aiModel?.toLowerCase().startsWith('gemini');
+    const apiKey = isGeminiModel ? currentConfig.geminiKey : currentConfig.openaiKey;
+
+    const previousAsk = lastAskRef.current || {};
+    const retryTarget = meta.retryTarget || (meta.retry ? previousAsk : null);
+    const retryQuestionId = retryTarget?.questionId || previousAsk.questionId;
+    const utteranceId = meta.utteranceId || retryTarget?.utteranceId || previousAsk.utteranceId || null;
+    const continuing = Boolean(utteranceId && previousAsk.utteranceId === utteranceId && previousAsk.revoked);
+    const reuseQuestion = shouldReuseQuestionRow({
+      retry: Boolean(meta.retry),
+      continuing,
+      utteranceId,
+      lastUtteranceId: previousAsk.utteranceId,
+      lastQuestionId: retryQuestionId
+    });
+    if (!meta.manual && (source === 'system' || source === 'microphone')) {
+      const detector = speechTurnsRef.current[source];
+      if (detector && utteranceId) detector.acknowledgeCommit(utteranceId);
+    }
+
+    const requestEpoch = sessionEpochRef.current;
+    isProcessingRef.current = true;
+    generationStartedAtRef.current = Date.now();
+    setIsProcessing(true);
+    setTurnDisposition(null);
+    setGenerationError(null);
+    const retryCount = meta.retry
+      ? (Number(retryTarget?.retryCount ?? (retryQuestionId === previousAsk.questionId ? previousAsk.retryCount : 0)) || 0) + 1
+      : (continuing ? (Number(previousAsk.retryCount) || 0) : 0);
+    const questionId = reuseQuestion && retryQuestionId
+      ? retryQuestionId
+      : `q_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    lastAskRef.current = {
+      text,
+      source,
+      retryCount,
+      utteranceId,
+      revoked: false,
+      questionId
+    };
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const submittedSnapshot = text;
+    let streamedResponse = '';
+    const requestStartedAt = performance.now();
+    let firstTextMs = null;
+    let generationMetadata = null;
+    const responseMetrics = () => ({
+      firstTextMs,
+      totalMs: Math.round(performance.now() - requestStartedAt),
+      finishReason: generationMetadata?.finish_reason || null
+    });
+
+    if (continuing) {
+      dispatch(updateLatestQuestion({ utteranceId, text, status: "completed" }));
+      historyRef.current = historyRef.current.map((item) => (
+        item.type === "question" && item.utteranceId === utteranceId
+          ? { ...item, text, status: "completed" }
+          : item
+      ));
+    } else if (!reuseQuestion) {
+      commitHistory({ type: 'question', text, timestamp, source, questionId, utteranceId, status: 'completed' });
+    }
+    dispatch(setAIResponse(''));
+
+    let requestController;
+    let disarmTimeout = () => {};
+    try {
+      const conversationEvents = historyBeforeQuestion(historyRef.current, questionId);
+      const conversationHistoryForAPI = buildBoundedHistory(historyForGeneration(conversationEvents));
+      activeRequestRef.current?.abort();
+      requestController = new AbortController();
+      activeRequestRef.current = requestController;
+      disarmTimeout = armGenerationTimeout(requestController, CLIENT_GENERATION_TIMEOUT_MS);
+      const chatBody = JSON.stringify({
+        apiKey,
+        model: currentConfig.aiModel,
+        question: text,
+        history: conversationHistoryForAPI,
+        responseLength: currentConfig.responseLength || "medium",
+        customInstructions: currentConfig.gptSystemPrompt,
+        candidateResume: currentConfig.candidateResume,
+        jobDescription: currentConfig.jobDescription,
+        sessionPreparation: formatSessionPreparation(sessionPrep),
+        sessionPrep: {
+          role: sessionPrep.role || "",
+          seniority: sessionPrep.seniority || "",
+          round: sessionPrep.round || "",
+          focus: sessionPrep.focus || "",
+          style: sessionPrep.style || ""
+        },
+        company: currentConfig.company,
+        interviewSessionId: getLiveInterviewSessionId(),
+        source,
+        questionId,
+        debug: debugEnabled,
+        retryCount: lastAskRef.current?.retryCount || 0,
+      });
+      const postChat = () => fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: requestController.signal,
+        body: chatBody,
+      });
+      const classifyHttpFailure = async (res) => {
+        let raw = "";
+        try {
+          const errorData = await res.json();
+          raw = errorData.error || errorData.message || "";
+        } catch {
+          try {
+            raw = await res.text();
+          } catch {
+            raw = "";
+          }
+        }
+        // Next.js pages-api crashes often return an HTML overlay; pull the embedded message
+        // so internal faults are not mislabeled as generic provider "temporary" errors.
+        if (raw && /<!DOCTYPE html|<html/i.test(raw)) {
+          const embedded = raw.match(/"message":"((?:\\.|[^"\\])*)"/);
+          if (embedded?.[1]) {
+            try {
+              raw = JSON.parse(`"${embedded[1]}"`);
+            } catch {
+              raw = embedded[1].replace(/\\n/g, " ").slice(0, 240);
+            }
+          }
+        }
+        return classifyGenerationFailure({ httpStatus: res.status, message: raw });
+      };
+      let response = await postChat();
+      if (!response.ok) {
+        const classified = await classifyHttpFailure(response);
+        throw Object.assign(new Error(classified.userMessage), { classified });
+      }
+      await consumeChatStream(response, {
+        onText(chunkText) {
+          if (sessionEpochRef.current !== requestEpoch) return;
+          if (!streamChunkBelongsToTurn(activeRequestRef.current, requestController)) return;
+          if (firstTextMs === null) firstTextMs = Math.round(performance.now() - requestStartedAt);
+          streamedResponse += chunkText;
+          throttledDispatchSetAIResponseRef.current?.(streamedResponse);
+        },
+        onEvent(name, payload) {
+          if (sessionEpochRef.current !== requestEpoch) return;
+          if (!streamChunkBelongsToTurn(activeRequestRef.current, requestController)) return;
+          if (name === "admission") {
+            pendingAdmissionRef.current = payload;
+            setTurnDisposition({
+              decision: payload.decision || "ANSWER",
+              route: payload.route || "GENERATION",
+              reason: payload.reason || "",
+              scriptId: payload.scriptId || null
+            });
+          } else if (name === "analysis") {
+            pendingAnalysisRef.current = payload;
+          } else if (name === "context") {
+            pendingContextRef.current = payload;
+            setDebugContext(payload);
+          } else if (name === "generation") {
+            generationMetadata = payload;
+          }
+        }
+      });
+      if (!streamedResponse.trim()) {
+        const withheld = pendingAdmissionRef.current;
+        if (withheld && withheld.decision && withheld.decision !== "ANSWER") {
+          pendingAdmissionRef.current = null;
+          const reason = withheld.reason || withheld.decision;
+          commitHistory({
+            type: "response",
+            text: `Not answered (${reason}). The captured question is in the log. Correct the transcript or use Answer this.`,
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            answerId: `a_${Date.now()}`,
+            questionId,
+            source: "copilot",
+            status: "error"
+          });
+          setGenerationError({
+            retryable: true,
+            userMessage: "The question was captured but not answered. Correct it or retry.",
+            question: text,
+            source
+          });
+          showSnackbar("Question kept. It was not answered because it was incomplete or not a question.", "warning");
+          return;
+        }
+        throw Object.assign(new Error("Could not generate an answer."), {
+          classified: classifyGenerationFailure({ message: "empty generation" })
+        });
+      }
+      if (throttledDispatchSetAIResponseRef.current && typeof throttledDispatchSetAIResponseRef.current.cancel === "function") {
+        throttledDispatchSetAIResponseRef.current.cancel();
+      }
+      dispatch(setAIResponse(streamedResponse));
+
+      const finalTimestamp = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      commitHistory({
+        type: "response",
+        text: streamedResponse,
+        timestamp: finalTimestamp,
+        answerId: `a_${Date.now()}`,
+        questionId,
+        source: "copilot",
+        status: "completed",
+        metrics: responseMetrics(),
+        analysis: pendingAnalysisRef.current,
+        context: pendingAnalysisRef.current?.contextSummary || pendingContextRef.current
+      });
+      pendingAnalysisRef.current = null;
+      pendingContextRef.current = null;
+      setGenerationError(null);
+
+    } catch (error) {
+      if (sessionEpochRef.current !== requestEpoch) return;
+      const superseded = activeRequestRef.current !== requestController;
+      const aborted = error?.name === "AbortError" || requestController?.signal.aborted;
+      if (aborted && superseded) {
+        return;
+      }
+      if (streamedResponse.trim()) {
+        if (throttledDispatchSetAIResponseRef.current && typeof throttledDispatchSetAIResponseRef.current.cancel === "function") {
+          throttledDispatchSetAIResponseRef.current.cancel();
+        }
+        dispatch(setAIResponse(streamedResponse));
+        commitHistory({
+          type: "response",
+          text: streamedResponse,
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          answerId: `a_${Date.now()}`,
+          questionId,
+          retryCount,
+          source: "copilot",
+          status: "interrupted",
+          metrics: responseMetrics(),
+          analysis: null
+        });
+        pendingAnalysisRef.current = null;
+        pendingContextRef.current = null;
+        const classified = error?.classified || classifyGenerationFailure({
+          name: aborted ? "AbortError" : error?.name,
+          message: error?.message
+        });
+        setGenerationError({ ...classified, question: text, source });
+        showSnackbar("The answer may be incomplete. You can Retry.", "warning");
+        return;
+      }
+      const classified = error?.classified || classifyGenerationFailure({
+        message: error?.message,
+        name: error?.name
+      });
+      setGenerationError({ ...classified, question: text, source });
+      showSnackbar(classified.userMessage, "error");
+      dispatch(setAIResponse(""));
+      commitHistory({
+        type: "response",
+        text: classified.userMessage,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        status: "error",
+        questionId,
+        retryCount
+      });
+    } finally {
+      disarmTimeout();
+      if (sessionEpochRef.current !== requestEpoch) return;
+      const isCurrentRequest = !requestController
+        || activeRequestRef.current === requestController
+        || activeRequestRef.current == null;
+      if (isCurrentRequest) {
+        if (activeRequestRef.current === requestController) {
+          activeRequestRef.current = null;
+        }
+        const sourceAutoSubmits = shouldAutoSubmitSource({
+          source,
+          systemAutoMode: systemAutoModeRef.current,
+          manualMode: isManualModeRef.current,
+          systemAudioActive: systemAudioActiveRef.current
+        });
+        if (sourceAutoSubmits) {
+          if (speechTurnsRef.current[source]) {
+            speechTurnsRef.current[source].notifyGenerationSettled(utteranceId);
+          } else {
+            finalTranscript.current[source] = removeSubmittedSnapshot(
+              finalTranscript.current[source],
+              submittedSnapshot
+            );
+            if (source === 'system') {
+              dispatch(setTranscription(finalTranscript.current.system + systemInterimTranscription.current));
+            } else {
+              setMicTranscription(finalTranscript.current.microphone + micInterimTranscription.current);
+            }
+          }
+        }
+        isProcessingRef.current = false;
+        generationStartedAtRef.current = 0;
+        setIsProcessing(false);
+        drainQueuedSpeechTurn();
+      }
+    }
+  };
+  askOpenAIRef.current = askOpenAI;
+
+  const resetLiveInterviewSession = () => {
+    if (history.length > 0 || isProcessingRef.current || generationError) {
+      const confirmed = typeof window !== "undefined"
+        ? window.confirm("Start a new interview session? Visible Q&A on this page will be cleared. Audio capture stays running.")
+        : true;
+      if (!confirmed) return;
+    }
+    sessionEpochRef.current += 1;
+    try {
+      activeRequestRef.current?.abort();
+    } catch (abortError) {
+      console.error("Failed to abort request during session reset:", abortError);
+    }
+    activeRequestRef.current = null;
+    isProcessingRef.current = false;
+    generationStartedAtRef.current = 0;
+    setIsProcessing(false);
+    const snapshot = nextResetSnapshot();
+    pendingSpeechQueueRef.current = snapshot.pendingSpeechQueue;
+    setQueuedTurnCount(snapshot.queuedSpeechCount);
+    lastAskRef.current = snapshot.lastAsk;
+    pendingAnalysisRef.current = null;
+    pendingContextRef.current = null;
+    pendingAdmissionRef.current = null;
+    pendingFragmentRef.current = null;
+    setGenerationError(null);
+    setTurnDisposition(null);
+    setSelectedQuestions([]);
+    setDebugContext(null);
+    dispatch(clearHistory());
+    historyRef.current = [];
+    dispatch(setAIResponse(snapshot.aiResponse));
+    try {
+      if (typeof sessionStorage !== "undefined") rotateLiveSessionId(sessionStorage);
+    } catch (rotateError) {
+      console.error("Failed to rotate live session id:", rotateError);
+    }
+    setSessionPrep(readSessionPreparation(
+      typeof sessionStorage !== "undefined" ? sessionStorage : null,
+      getLiveInterviewSessionId()
+    ));
+    showSnackbar("New interview session started.", "success");
+  };
+
+  const retryQuestionFromResponse = (failedResponse) => {
+    const target = findRetryTarget(historyRef.current, failedResponse);
+    if (!target) {
+      showSnackbar("The original question is no longer available in this session.", "error");
+      return;
+    }
+    askOpenAI(target.text, target.source, { retry: true, retryTarget: target, utteranceId: target.utteranceId });
+  };
+
+  const retryLastAsk = () => {
+    const q = lastAskRef.current?.text;
+    const src = lastAskRef.current?.source || "microphone";
+    if (!q) return;
+    askOpenAI(q, src, { retry: true, retryTarget: lastAskRef.current });
+  };
+
+  const stopInFlightGeneration = () => {
+    pendingSpeechQueueRef.current = [];
+    setQueuedTurnCount(0);
+    const controller = activeRequestRef.current;
+    if (controller) {
+      try { controller.abort(); } catch { /* ignore */ }
+      return;
+    }
+    isProcessingRef.current = false;
+    generationStartedAtRef.current = 0;
+    setIsProcessing(false);
+    const classified = classifyGenerationFailure({ name: "AbortError", message: "Generation stopped." });
+    setGenerationError(classified);
+  };
+
+  const operatorState = deriveOperatorState({
+    isProcessing,
+    generationError,
+    isSystemAudioActive,
+    isMicrophoneActive,
+    queuedSpeechCount: queuedTurnCount
+  });
+
+  const formatAndDisplayResponse = useCallback((response) => {
+    if (!response) return null;
+    return (
+      <ReactMarkdown
+        components={{
+          code({ node, inline, className, children, ...props }) {
+            const match = /language-(\w+)/.exec(className || '');
+            return !inline && match ? (
+              <Box sx={{
+                my: 1,
+                position: 'relative',
+                '& pre': {
+                  borderRadius: '4px',
+                  padding: '12px !important',
+                  fontSize: '0.875rem',
+                  overflowX: 'auto',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-all',
+                }
+              }}>
+                <pre><code className={className} {...props} dangerouslySetInnerHTML={{ __html: hljs.highlight(String(children).replace(/\n$/, ''), { language: match[1], ignoreIllegals: true }).value }} /></pre>
+              </Box>
+            ) : (
+              <code
+                className={className}
+                {...props}
+                style={{
+                  backgroundColor: 'rgba(0,0,0,0.05)',
+                  padding: '2px 4px',
+                  borderRadius: '4px',
+                  fontFamily: 'monospace',
+                  fontSize: '0.875rem',
+                  wordBreak: 'break-all'
+                }}
+              >
+                {children}
+              </code>
+            );
+          },
+          p: ({ node, ...props }) => <Typography paragraph {...props} sx={{ mb: 1, fontSize: '0.95rem', wordBreak: 'break-word' }} />,
+          strong: ({ node, ...props }) => <Typography component="strong" fontWeight="bold" color="primary.main" {...props} />,
+          em: ({ node, ...props }) => <Typography component="em" fontStyle="italic" {...props} />,
+          ul: ({ node, ...props }) => <Typography component="ul" sx={{ pl: 2.5, mb: 1, fontSize: '0.95rem', wordBreak: 'break-word' }} {...props} />,
+          ol: ({ node, ...props }) => <Typography component="ol" sx={{ pl: 2.5, mb: 1, fontSize: '0.95rem', wordBreak: 'break-word' }} {...props} />,
+          li: ({ node, ...props }) => <Typography component="li" sx={{ mb: 0.25, fontSize: '0.95rem', wordBreak: 'break-word' }} {...props} />,
+        }}
+      >
+        {response}
+      </ReactMarkdown>
+    );
+  }, []);
+
+  const renderHistoryItem = (item, index) => {
+    if (item.type !== 'response' && item.type !== 'current_streaming') return null;
+    const Icon = SmartToyIcon;
+    const title = 'AI Assistant';
+    const avatarBgColor = theme.palette.secondary.light;
+
+    return (
+      <ListItem key={`response-${index}`} sx={{ alignItems: 'flex-start', px: 0, py: 1.5 }}>
+        <Avatar sx={{ bgcolor: avatarBgColor, mr: 2, mt: 0.5 }}>
+          <Icon sx={{ color: theme.palette.getContrastText(avatarBgColor) }} />
+        </Avatar>
+        <Paper variant="outlined" sx={{ p: 1.5, flexGrow: 1, bgcolor: theme.palette.background.default, borderColor: theme.palette.divider, overflowX: 'auto' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {item.type === 'current_streaming' ? 'AI Assistant' : item.status === 'error' ? 'Generation failed' : item.status === 'interrupted' ? 'Interrupted' : title}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">{item.timestamp}</Typography>
+          </Box>
+          {formatAndDisplayResponse(item.text)}
+          {item.metrics && (
+            <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+              {item.metrics.firstTextMs != null ? `First text ${(item.metrics.firstTextMs / 1000).toFixed(1)}s · ` : ''}
+              {item.status === 'completed' ? 'Completed' : 'Stopped'} in {(item.metrics.totalMs / 1000).toFixed(1)}s
+            </Typography>
+          )}
+          {item.status === 'interrupted' && (
+            <Typography variant="caption" color="warning.main" display="block" sx={{ mt: 1 }}>
+              Incomplete answer — excluded from follow-up context.
+            </Typography>
+          )}
+          {(item.status === 'error' || item.status === 'interrupted') && (
+            <Button
+              size="small"
+              sx={{ mt: 1 }}
+              disabled={isProcessing}
+              onClick={() => retryQuestionFromResponse(item)}
+            >
+              Retry
+            </Button>
+          )}
+          {item.analysis && <AnswerQualityPanel analysis={item.analysis} />}
+        </Paper>
+      </ListItem>
+    );
+  };
+
+  const renderQuestionHistoryItem = (item, index) => {
+    const Icon = item.source === 'system' ? HearingIcon : PersonIcon;
+    const title = item.source === 'system' ? 'Interviewer' : 'Candidate';
+    const avatarBgColor = item.source === 'system' ? theme.palette.info.light : theme.palette.success.light;
+
+    return (
+      <ListItem
+        key={`question-hist-${index}`}
+        secondaryAction={
+          <Checkbox
+            edge="end"
+            checked={selectedQuestions.includes(index)}
+            onChange={() => {
+              setSelectedQuestions(prev =>
+                prev.includes(index) ? prev.filter(x => x !== index) : [...prev, index]
+              );
+            }}
+            color="secondary"
+            size="small"
+          />
+        }
+        disablePadding
+        sx={{ py: 0.5, display: 'flex', alignItems: 'center' }}
+      >
+        <Avatar sx={{ bgcolor: avatarBgColor, mr: 1.5, width: 32, height: 32, fontSize: '1rem' }}>
+          <Icon fontSize="small" />
+        </Avatar>
+        <ListItemText
+          primary={
+            <Typography variant="body2" noWrap sx={{ fontWeight: selectedQuestions.includes(index) ? 'bold' : 'normal', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {item.text}
+            </Typography>
+          }
+          secondary={
+            <>
+              {`${title} - ${item.timestamp}${item.disposition === "IGNORE" ? " — ignored" : item.disposition === "DEFER" ? " — waiting" : item.disposition === "UNANSWERED" ? " — not answered" : ""}`}
+              {item.disposition === "UNANSWERED" && (
+                <Button
+                  size="small"
+                  sx={{ ml: 1 }}
+                  disabled={isProcessing}
+                  onClick={() => askOpenAI(item.text, item.source || "system", { manual: true })}
+                >
+                  Answer this
+                </Button>
+              )}
+            </>
+          }
+        />
+      </ListItem>
+    );
+  };
+
+  const handleSortOrderToggle = () => {
+    setAiResponseSortOrder(prev => prev === 'newestAtBottom' ? 'newestAtTop' : 'newestAtBottom');
+  };
+
+  const getAiResponsesToDisplay = () => {
+    let responses = history.filter(item => item.type === 'response').slice();
+    const currentStreamingText = aiResponseFromStore;
+
+    if (isProcessing) {
+      responses.push({
+        text: currentStreamingText && String(currentStreamingText).trim() !== ''
+          ? currentStreamingText
+          : 'Generating answer...',
+        timestamp: 'Streaming...',
+        type: 'current_streaming'
+      });
+    }
+
+    if (aiResponseSortOrder === 'newestAtTop') {
+      return responses.reverse();
+    }
+    return responses;
+  };
+
+  const togglePipWindow = async () => {
+    if (isPipWindowActive) {
+      if (documentPipWindowRef.current && typeof documentPipWindowRef.current.close === 'function') {
+        try {
+          await documentPipWindowRef.current.close();
+        } catch (e) { console.error("Error closing document PiP window:", e); }
+      } else if (pipWindowRef.current && !pipWindowRef.current.closed) {
+        pipWindowRef.current.close();
+      }
+      return;
+    }
+
+    const addResizeListener = (pipWindow) => {
+      const handlePipResize = debounce(() => {
+        if (!pipWindow || (pipWindow.closed)) return;
+        const target = documentPipIframeRef.current ? documentPipIframeRef.current.contentWindow : pipWindow;
+        if (target) {
+          target.postMessage({
+            type: 'PIP_RESIZE',
+            payload: {
+              width: pipWindow.innerWidth,
+              height: pipWindow.innerHeight
+            }
+          }, '*');
+        }
+      }, 50);
+
+      pipWindow.addEventListener('resize', handlePipResize);
+      return () => pipWindow.removeEventListener('resize', handlePipResize);
+    };
+
+    if (window.documentPictureInPicture && typeof window.documentPictureInPicture.requestWindow === 'function') {
+      try {
+        const pipOptions = { width: 400, height: 300 };
+        const requestedPipWindow = await window.documentPictureInPicture.requestWindow(pipOptions);
+        documentPipWindowRef.current = requestedPipWindow;
+        setIsPipWindowActive(true);
+
+        const iframe = documentPipWindowRef.current.document.createElement('iframe');
+        iframe.src = '/pip-log';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.border = 'none';
+        documentPipWindowRef.current.document.body.style.margin = '0';
+        documentPipWindowRef.current.document.body.style.overflow = 'hidden';
+        documentPipWindowRef.current.document.body.append(iframe);
+        documentPipIframeRef.current = iframe;
+
+        const removeResizeListener = addResizeListener(documentPipWindowRef.current);
+
+        iframe.onload = () => {
+          if (documentPipIframeRef.current && documentPipIframeRef.current.contentWindow) {
+            documentPipIframeRef.current.contentWindow.postMessage({
+              type: 'AI_LOG_DATA',
+              payload: {
+                historicalResponses: history.filter(item => item.type === 'response' && item.status !== 'error'),
+                currentStreamingText: isProcessing ? aiResponseFromStore : '',
+                isProcessing: isProcessing,
+                sortOrder: aiResponseSortOrder
+              }
+            }, '*');
+          }
+        };
+
+        documentPipWindowRef.current.addEventListener('pagehide', () => {
+          removeResizeListener();
+          setIsPipWindowActive(false);
+          documentPipWindowRef.current = null;
+          documentPipIframeRef.current = null;
+        });
+
+        showSnackbar('Native PiP window opened.', 'success');
+        return;
+
+      } catch (err) {
+        console.error('Document Picture-in-Picture API error:', err);
+        showSnackbar(`Native PiP not available or failed. Trying popup. (${err.message})`, 'warning');
+      }
+    }
+
+    pipWindowRef.current = window.open('/pip-log', 'AIResponsePiP', 'width=400,height=550,resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=no,noopener,noreferrer,popup=yes');
+
+    if (pipWindowRef.current) {
+      setIsPipWindowActive(true);
+      const removeResizeListener = addResizeListener(pipWindowRef.current);
+
+      pipWindowRef.current.onload = () => {
+        if (pipWindowRef.current && !pipWindowRef.current.closed) {
+          pipWindowRef.current.postMessage({
+            type: 'AI_LOG_DATA',
+            payload: {
+              historicalResponses: history.filter(item => item.type === 'response' && item.status !== 'error'),
+              currentStreamingText: isProcessing ? aiResponseFromStore : '',
+              isProcessing: isProcessing,
+              sortOrder: aiResponseSortOrder
+            }
+          }, '*');
+        }
+      };
+      const pipCheckInterval = setInterval(() => {
+        if (pipWindowRef.current && pipWindowRef.current.closed) {
+          clearInterval(pipCheckInterval);
+          removeResizeListener();
+          setIsPipWindowActive(false);
+          pipWindowRef.current = null;
+        }
+      }, 500);
+      if (pipWindowRef.current) pipWindowRef.current._pipIntervalId = pipCheckInterval;
+    } else {
+      showSnackbar('Failed to open PiP window. Please check popup blocker settings.', 'error');
+      setIsPipWindowActive(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (pipWindowRef.current && pipWindowRef.current._pipIntervalId) {
+        clearInterval(pipWindowRef.current._pipIntervalId);
+      }
+      if (documentPipWindowRef.current && typeof documentPipWindowRef.current.close === 'function') {
+        try { documentPipWindowRef.current.close(); } catch (e) { /*ignore*/ }
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    let targetWindowForMessage = null;
+
+    if (documentPipWindowRef.current && documentPipIframeRef.current && documentPipIframeRef.current.contentWindow) {
+      targetWindowForMessage = documentPipIframeRef.current.contentWindow;
+    } else if (pipWindowRef.current && !pipWindowRef.current.closed) {
+      targetWindowForMessage = pipWindowRef.current;
+    }
+
+    if (isPipWindowActive && targetWindowForMessage) {
+      try {
+        targetWindowForMessage.postMessage({
+          type: 'AI_LOG_DATA',
+          payload: {
+            historicalResponses: history.filter(item => item.type === 'response' && item.status !== 'error'),
+            currentStreamingText: isProcessing ? aiResponseFromStore : '',
+            isProcessing: isProcessing,
+            sortOrder: aiResponseSortOrder
+          }
+        }, '*');
+      } catch (e) {
+        console.warn("Could not post message to PiP window:", e);
+      }
+    }
+  }, [history, aiResponseFromStore, isPipWindowActive, aiResponseSortOrder, isProcessing]);
+
+  return (
+    <>
+      <Head>
+        <title>Interview Copilot - Active Session</title>
+      </Head>
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <AppBar position="static" color="default" elevation={1}>
+          <Toolbar>
+            <SmartToyIcon sx={{ mr: 2, color: 'primary.main' }} />
+            <Typography variant="h6" component="div" sx={{ color: 'text.primary', mr: 2 }}>
+              Interview Copilot
+            </Typography>
+            <Chip
+              size="small"
+              color={operatorState.tone === "default" ? "default" : operatorState.tone}
+              label={operatorState.label}
+              sx={{ mr: 1 }}
+            />
+            {turnDisposition && (
+              <Chip
+                size="small"
+                color={(turnDisposition.route === "PREPARED_SCRIPT" || turnDisposition.route === "ANSWER_BANK") ? "success" : turnDisposition.decision === "IGNORE" ? "default" : "info"}
+                label={turnDisposition.decision === "IGNORE" ? "Ignored — not a question" : turnDisposition.route === "PREPARED_SCRIPT" ? "Prepared script" : turnDisposition.route === "ANSWER_BANK" ? "Answer bank" : "Generated"}
+                sx={{ mr: 1 }}
+              />
+            )}
+            {isProcessing && (
+              <Button
+                size="small"
+                color="inherit"
+                startIcon={<StopIcon />}
+                onClick={stopInFlightGeneration}
+                sx={{ mr: 1 }}
+              >
+                Stop
+              </Button>
+            )}
+            <Box sx={{ flexGrow: 1 }} />
+            <Tooltip title="Start a new interview session. Clears visible Q&A; audio capture stays on.">
+              <span>
+                <IconButton color="primary" onClick={resetLiveInterviewSession} aria-label="new interview session">
+                  <RestartAltIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title="Settings">
+              <IconButton color="primary" onClick={() => setSettingsOpen(true)} aria-label="settings">
+                <SettingsIcon />
+              </IconButton>
+            </Tooltip>
+            <FormControlLabel
+              control={<Switch size="small" checked={debugEnabled} onChange={(event) => setDebugEnabled(event.target.checked)} />}
+              label="Debug"
+              sx={{ ml: 1, color: 'text.secondary' }}
+            />
+          </Toolbar>
+        </AppBar>
+
+        <Container maxWidth="xl" sx={{ flexGrow: 1, py: 2, display: 'flex', flexDirection: 'column' }}>
+          <Grid container spacing={2} sx={{ flexGrow: 1 }}>
+            {/* Left Panel */}
+            <Grid item xs={12} md={3} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Card>
+                <CardHeader title="This interview" sx={{ pb: 0 }} />
+                <CardContent>
+                  <TextField size="small" fullWidth margin="dense" label="Target role" value={sessionPrep.role}
+                    onChange={(e) => setSessionPrep((prev) => ({ ...prev, role: e.target.value }))} />
+                  <TextField size="small" fullWidth margin="dense" label="Seniority" value={sessionPrep.seniority}
+                    onChange={(e) => setSessionPrep((prev) => ({ ...prev, seniority: e.target.value }))} />
+                  <TextField size="small" fullWidth margin="dense" label="Round" value={sessionPrep.round}
+                    onChange={(e) => setSessionPrep((prev) => ({ ...prev, round: e.target.value }))} />
+                  <TextField size="small" fullWidth margin="dense" label="Focus" value={sessionPrep.focus} multiline rows={2}
+                    onChange={(e) => setSessionPrep((prev) => ({ ...prev, focus: e.target.value }))} />
+                  <TextField size="small" fullWidth margin="dense" label="Answer style" value={sessionPrep.style}
+                    onChange={(e) => setSessionPrep((prev) => ({ ...prev, style: e.target.value }))} />
+                  <Button size="small" sx={{ mt: 1 }} variant="outlined" onClick={() => {
+                    const saved = writeSessionPreparation(sessionStorage, getLiveInterviewSessionId(), sessionPrep);
+                    setSessionPrep(saved);
+                    showSnackbar("Preparation saved for this session only.", "success");
+                  }}>
+                    Save preparation
+                  </Button>
+                  <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                    {formatSessionPreparation(sessionPrep)
+                      ? "Saved emphasis applies to this session. A CV is optional and is not required for a technical answer."
+                      : "Optional. Role, round, and focus change emphasis only. They are cleared when you start a new session."}
+                  </Typography>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader title="System Audio (Interviewer)" avatar={<HearingIcon />} sx={{ pb: 1 }} />
+                <CardContent>
+                  <FormControlLabel
+                    control={<Switch checked={systemAutoMode} onChange={e => setSystemAutoMode(e.target.checked)} color="primary" />}
+                    label="Auto-Submit Question"
+                    sx={{ mb: 1 }}
+                  />
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={3}
+                    variant="outlined"
+                    value={transcriptionFromStore}
+                    onChange={(e) => handleManualInputChange(e.target.value, 'system')}
+                    onKeyDown={(e) => handleKeyPress(e, 'system')}
+                    placeholder="Interviewer's speech..."
+                    sx={{ mb: 2 }}
+                  />
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    <Button
+                      onClick={startSystemAudioRecognition}
+                      variant="contained"
+                      color={isSystemAudioActive ? 'error' : 'primary'}
+                      startIcon={isSystemAudioActive ? <StopScreenShareIcon /> : <ScreenShareIcon />}
+                      sx={{ flexGrow: 1 }}
+                    >
+                      {isSystemAudioActive ? 'Stop System Audio' : 'Record System Audio'}
+                    </Button>
+                    <Typography variant="caption" sx={{ mt: 1, display: 'block', width: '100%' }}>
+                      {isSystemAudioActive ? 'Recording system audio...' : 'Select "Chrome Tab" and check "Share audio" when prompted.'}
+                    </Typography>
+                    <Tooltip title="Clear System Transcription">
+                      <IconButton onClick={handleClearSystemTranscription}><DeleteSweepIcon /></IconButton>
+                    </Tooltip>
+                    <Button
+                      onClick={() => handleManualSubmit('system')}
+                      variant="outlined"
+                      color="primary"
+                      startIcon={<SendIcon />}
+                      disabled={!transcriptionFromStore.trim()}
+                    >
+                      Submit text
+                    </Button>
+                    {systemAutoMode && (
+                      <Typography variant="caption" color="text.secondary" sx={{ width: "100%" }}>
+                        Auto-Submit applies to captured interviewer speech. Typed text still uses Submit text or Enter.
+                      </Typography>
+                    )}
+                  </Box>
+                </CardContent>
+              </Card>
+              <Card sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                <CardHeader
+                  title="Question History"
+                  avatar={<PlaylistAddCheckIcon />}
+                  action={
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={handleCombineAndSubmit}
+                      disabled={selectedQuestions.length === 0 || isProcessing}
+                      startIcon={isProcessing ? <CircularProgress size={16} color="inherit" /> : <SendIcon />}
+                    >
+                      Ask Combined
+                    </Button>
+                  }
+                  sx={{ pb: 1, borderBottom: `1px solid ${theme.palette.divider}` }}
+                />
+                <CardContent sx={{ flexGrow: 1, overflow: 'hidden', p: 0 }}>
+                  <ScrollToBottom className="scroll-to-bottom" followButtonClassName="hidden-follow-button">
+                    <List dense sx={{ pt: 0, px: 1 }}>
+                      {history.filter(e => e.type === 'question').slice().reverse().map(renderQuestionHistoryItem)}
+                    </List>
+                  </ScrollToBottom>
+                </CardContent>
+              </Card>
+              {debugEnabled && (
+                <Card sx={{ mt: 2 }}>
+                  <CardHeader title="Interview Context" sx={{ pb: 0 }} />
+                  <CardContent>
+                    <Typography component="pre" variant="caption" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', m: 0 }}>
+                      {debugContext ? JSON.stringify(debugContext, null, 2) : 'Submit a question to view sanitized context.'}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              )}
+            </Grid>
+
+            {/* Center Panel */}
+            <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Card sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                <CardHeader
+                  title="AI Assistant Log"
+                  avatar={<SmartToyIcon />}
+                  action={
+                    <>
+                      <Tooltip title={isPipWindowActive ? "Close PiP Log" : "Open PiP Log"}>
+                        <IconButton onClick={togglePipWindow} size="small" color={isPipWindowActive ? "secondary" : "default"}>
+                          <PictureInPictureAltIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={aiResponseSortOrder === 'newestAtTop' ? "Sort: Newest at Bottom" : "Sort: Newest on Top"}>
+                        <IconButton onClick={handleSortOrderToggle} size="small">
+                          {aiResponseSortOrder === 'newestAtTop' ? <ArrowDownwardIcon /> : <ArrowUpwardIcon />}
+                        </IconButton>
+                      </Tooltip>
+                      <Typography variant="caption" sx={{ mr: 1, fontStyle: 'italic' }}>
+                        {aiResponseSortOrder === 'newestAtTop' ? "Newest First" : "Oldest First"}
+                      </Typography>
+                      <FormControlLabel
+                        control={<Switch checked={autoScroll} onChange={(e) => setAutoScroll(e.target.checked)} color="primary" />}
+                        label="Auto Scroll"
+                        sx={{ ml: 1 }}
+                      />
+                    </>
+                  }
+                  sx={{ borderBottom: `1px solid ${theme.palette.divider}` }}
+                />
+                <CardContent sx={{ flexGrow: 1, overflow: 'hidden', p: 0 }}>
+                  <ScrollToBottom
+                    className="scroll-to-bottom"
+                    mode={autoScroll ? (aiResponseSortOrder === 'newestAtTop' ? "top" : "bottom") : undefined}
+                    followButtonClassName="hidden-follow-button"
+                  >
+                    <List sx={{ px: 2, py: 1 }}>
+                      {getAiResponsesToDisplay().map(renderHistoryItem)}
+                      {isProcessing && (
+                        <ListItem sx={{ justifyContent: 'center', py: 2, flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <CircularProgress size={24} />
+                            <Typography variant="caption" sx={{ ml: 1 }}>{operatorState.label}</Typography>
+                          </Box>
+                          <Button size="small" variant="outlined" startIcon={<StopIcon />} onClick={stopInFlightGeneration}>
+                            Stop generating
+                          </Button>
+                        </ListItem>
+                      )}
+                      {!isProcessing && generationError && (
+                        <ListItem sx={{ justifyContent: 'center', py: 1 }}>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={retryLastAsk}
+                          >
+                            Retry
+                          </Button>
+                        </ListItem>
+                      )}
+                    </List>
+                  </ScrollToBottom>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Right Panel */}
+            <Grid item xs={12} md={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Card sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                <CardHeader title="Your Mic (Candidate)" avatar={<PersonIcon />} sx={{ pb: 1 }} />
+                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                  <FormControlLabel
+                    control={<Switch checked={isManualMode} onChange={e => setIsManualMode(e.target.checked)} color="primary" />}
+                    label="Manual Input Mode"
+                    sx={{ mb: 1 }}
+                  />
+                  <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
+                    This switch controls microphone auto-submit. Typed text can always be submitted.
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={8}
+                    variant="outlined"
+                    value={micTranscription}
+                    onChange={(e) => handleManualInputChange(e.target.value, 'microphone')}
+                    onKeyDown={(e) => handleKeyPress(e, 'microphone')}
+                    placeholder="Your speech or manual input..."
+                    sx={{ mb: 2, flexGrow: 1 }}
+                  />
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 'auto' }}>
+                    <Button
+                      onClick={startMicrophoneRecognition}
+                      variant="contained"
+                      color={isMicrophoneActive ? 'error' : 'primary'}
+                      startIcon={isMicrophoneActive ? <MicOffIcon /> : <MicIcon />}
+                      sx={{ flexGrow: 1 }}
+                    >
+                      {isMicrophoneActive ? 'Stop Mic' : 'Start Mic'}
+                    </Button>
+                    <Tooltip title="Clear Your Transcription">
+                      <IconButton onClick={handleClearMicTranscription}><DeleteSweepIcon /></IconButton>
+                    </Tooltip>
+                    <Button
+                      onClick={() => handleManualSubmit('microphone')}
+                      variant="outlined"
+                      color="primary"
+                      startIcon={<SendIcon />}
+                      disabled={!micTranscription.trim()}
+                    >
+                      Submit text
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        </Container>
+
+        <SettingsDialog
+          open={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          onSave={handleSettingsSaved}
+        />
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={4000}
+          onClose={handleSnackbarClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%', boxShadow: theme.shadows[6] }}>
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </Box>
+      <style jsx global>{`
+        .scroll-to-bottom {
+          height: 100%;
+          width: 100%;
+          overflow-y: auto;
+        }
+        .hidden-follow-button {
+          display: none;
+        }
+        .scroll-to-bottom::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        .scroll-to-bottom::-webkit-scrollbar-track {
+          background: ${theme.palette.background.paper};
+          border-radius: 10px;
+        }
+        .scroll-to-bottom::-webkit-scrollbar-thumb {
+          background-color: ${theme.palette.grey[400]};
+          border-radius: 10px;
+          border: 2px solid ${theme.palette.background.paper};
+        }
+        .scroll-to-bottom::-webkit-scrollbar-thumb:hover {
+          background-color: ${theme.palette.grey[500]};
+        }
+        .scroll-to-bottom {
+          scrollbar-width: thin;
+          scrollbar-color: ${theme.palette.grey[400]} ${theme.palette.background.paper};
+        }
+      `}</style>
+    </>
+  );
+}

@@ -1,0 +1,1838 @@
+{
+  "generatedAt": "2026-10-30T05:38:25.736Z",
+  "selfChecks": {
+    "encoder": {
+      "embeddingModel": "Xenova/all-MiniLM-L6-v2",
+      "manifestEmbedding": "Xenova/all-MiniLM-L6-v2",
+      "dimsOk": true,
+      "countsMatch": true,
+      "totalChunks": 3440
+    },
+    "siblingIdsInCandidate": {
+      "citation": false,
+      "body": false,
+      "heading": true,
+      "citationHeading": null,
+      "bodyHeading": null
+    },
+    "acPcScopeOnCandidate": {
+      "acHasPcPrimary": false,
+      "acHasProcessControlFile": false,
+      "acHasAcLane": true,
+      "pcHasPc": true,
+      "ffHasPcPrimary": false,
+      "msmpHasPcPrimary": false,
+      "msmpHasProcedure": true
+    },
+    "iasStaleGone": {
+      "unlikeCI": false,
+      "ciBrings": false,
+      "suite": true,
+      "sourceTarget": true
+    },
+    "msmpChunkInventory": {
+      "activeTotal": 41,
+      "candidateTotal": 44,
+      "activeTechSeq": 1,
+      "candidateTechSeq": 4,
+      "activeConfigure": 3,
+      "candidateConfigure": 3,
+      "techSeqPreviews": [
+        {
+          "id": "chunk_0946d92f486b",
+          "len": 681,
+          "preview": "## Technical Configuration Sequence For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > "
+        },
+        {
+          "id": "chunk_f2c4a39eed45",
+          "len": 907,
+          "preview": "Senior Architect MSMP sequence (Access Request Approval process, e.g. SAP_GRAC_ACCESS_REQUEST): 1. Process Global Settings / Process ID — select or confirm the delivered Access Req"
+        },
+        {
+          "id": "chunk_83a0bdd07c80",
+          "len": 124,
+          "preview": "7. Generate Version — regenerate the MSMP version after every structural change; ungenerated changes are not runtime-active."
+        },
+        {
+          "id": "chunk_027d5544f818",
+          "len": 846,
+          "preview": "Select the Access Request Approval process, then walk the seven stages above. Link each stage to its BRF+ agent-determination rule and map each BRF+ RULE_RESULT to the intended MSM"
+        }
+      ]
+    }
+  },
+  "msmpCompare": [
+    {
+      "question": "How do you configure MSMP in SAP GRC?",
+      "activeResolved": "D:\\My Projects\\InterviewCopilot\\data\\knowledgeIndex.json",
+      "candidateResolved": "D:\\My Projects\\InterviewCopilot\\data\\candidate-index\\p1.2-20261030-105244\\knowledgeIndex.json",
+      "activeTop": [
+        {
+          "rank": 1,
+          "score": 0.8419,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_6e24f05dd2cec312a314596a6a408e8b16a90cefc1a8be0ddcb43d7c1087acae",
+          "text": "## Technical Configuration Sequence For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. GRFNMW_CONFIGURE is the expert transaction documented for Access Control 10.0, 10.1, and 12.0; NWBC is a work-center shell, not that transaction. Select the Access Request Approval process, then configure its initiator, routing, paths, stages, and timeout/escalation behavior. Link each stage to",
+          "fullLen": 787,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 2,
+          "score": 0.6782,
+          "path": "grc/arm.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_cf6061264f176bc7282747d38f3f538a9e3f467624c44a5ccfe2fe2f3b06eb39",
+          "text": "## Implementation Activities - Design request types and their required approval stages based on business requirements - Build and test MSMP workflows for each request type - Configure BRF+ agent determination rules and validate against real organizational data - Integrate provisioning connectors for all in-scope target systems - Test the full request lifecycle from submission through provisioning before go-live",
+          "fullLen": 415,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 3,
+          "score": 0.6765,
+          "path": "grc/msmp.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_08b49de6facd314f5887523df66928a5121d850e53aac00163293608f08319a8",
+          "text": "## Implementation Activities - Design the stage sequence for each request type based on business approval requirements - Configure escalation timing appropriate to the organization's response expectations - Coordinate MSMP stage design with BRF+ agent rule design, since they have to align - Test the full workflow including escalation and rejection paths before go-live",
+          "fullLen": 371,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 4,
+          "score": 0.6336,
+          "path": "grc/brf-plus.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_323ff59e3fb636df0b05b523c217d7a5751029982f0ee0bbe3274707fa7558b9",
+          "text": "## Implementation Activities - Design decision tables based on actual organizational approval authority - Build and test BRF+ rules for every MSMP stage requiring agent determination - Validate rule coverage against realistic request scenarios, including edge cases - Document rule logic so future maintainers understand how agents are resolved",
+          "fullLen": 345,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": true
+          }
+        },
+        {
+          "rank": 5,
+          "score": 0.7467,
+          "path": "grc/msmp.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_72e74d8f2395e1aa710fea85b88a15e03d9b3c422c46a240cf6226abc230196c",
+          "text": "## Runtime Flow A request is submitted and matched to the appropriate MSMP process based on its type. MSMP evaluates the first stage, calling out to BRF+ to determine the agent for that stage. Once that agent approves, MSMP advances to the next configured stage, repeating the agent determination call. If a stage times out without a response, the configured escalation behavior triggers, which might notify a backup approver or escalate to a manager. Once every required stage approves, the request ",
+          "fullLen": 565,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 6,
+          "score": 0.7179,
+          "path": "grc/brf-plus.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_67bf6b61b57e88b63eb866762c2e2a51fbecb6f9bb110b46b4c9116a59776f05",
+          "text": "## Runtime Flow When an MSMP stage requires agent determination, it calls the linked BRF+ function, passing in relevant request data as input. BRF+ evaluates its configured rules, most commonly a decision table, against that input. If a matching row is found, the associated agent is returned to MSMP, which then routes the approval task to that agent. If no row matches, agent determination fails, and the stage has no resolvable approver — MSMP has no independent fallback unless one was explicitly",
+          "fullLen": 513,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 7,
+          "score": 0.6497,
+          "path": "grc/arm.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_4b3f77176d6bf71af5223c36895fc1ddc28cd30a73e9f83b6a1681c5d3a15c3a",
+          "text": "## Runtime Flow A request is submitted and immediately triggers a risk simulation against the ARA ruleset. The request enters the MSMP workflow, which evaluates its configured stages in sequence. At each stage, BRF+ rules determine the specific approver based on request attributes. If a stage requires mitigation review due to a flagged conflict, that approval can't be bypassed. Once all stages approve, the provisioning framework picks up the request and pushes the role assignment to the target s",
+          "fullLen": 557,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        }
+      ],
+      "candidateTop": [
+        {
+          "rank": 1,
+          "score": 0.8308,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_0946d92f486b3cacea2844ca06dbc541f2b917c5fd4a3f1ac42aa668ddd5d3d4",
+          "text": "## Technical Configuration Sequence For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. GRFNMW_CONFIGURE (and GRFNMW_CONFIGURE_WD where the Web Dynpro entry is used) is the expert transaction documented for Access Control 10.0, 10.1, and 12.0; NWBC is a work-center shell, not that transaction. Pair Maintain MSMP Workflows with Define Workflow-Related MSMP Rules for BRF+ flat-rule ",
+          "fullLen": 681,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 2,
+          "score": 0.8031,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_027d5544f818aecd2d70e62ffee3cb57a95e85c0550dbb83cef8bd1e9a7d9991",
+          "text": "Select the Access Request Approval process, then walk the seven stages above. Link each stage to its BRF+ agent-determination rule and map each BRF+ RULE_RESULT to the intended MSMP path. Authorization for workflow administration sits on the Access Control admin roles and related authorization objects on the GRC system; target provisioning still depends on connector configuration (Integration Framework / SM59) and target-system enforcement (PFCG / S_SERVICE on ABAP targets). Test a request in NW",
+          "fullLen": 846,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 3,
+          "score": 0.7757,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_f2c4a39eed45b0f2fee8400fa9207c08df7909871b3729cdc2f5e29813131c36",
+          "text": "Senior Architect MSMP sequence (Access Request Approval process, e.g. SAP_GRAC_ACCESS_REQUEST): 1. Process Global Settings / Process ID — select or confirm the delivered Access Request Approval process before inventing a parallel process. 2. Maintain Rules — declare initiator / agent / routing / notification rules and every RULE_RESULT that path mapping will consume; generate new BRF+ flat-rule shells in Define Workflow-Related MSMP Rules when a custom initiator or agent rule is required. 3. Mai",
+          "fullLen": 907,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 4,
+          "score": 0.7182,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_83a0bdd07c8079e487c88da03157546bc6975b865f75fba460142dae3751aafa",
+          "text": "7. Generate Version — regenerate the MSMP version after every structural change; ungenerated changes are not runtime-active.",
+          "fullLen": 124,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 5,
+          "score": 0.6782,
+          "path": "grc/arm.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_cf6061264f176bc7282747d38f3f538a9e3f467624c44a5ccfe2fe2f3b06eb39",
+          "text": "## Implementation Activities - Design request types and their required approval stages based on business requirements - Build and test MSMP workflows for each request type - Configure BRF+ agent determination rules and validate against real organizational data - Integrate provisioning connectors for all in-scope target systems - Test the full request lifecycle from submission through provisioning before go-live",
+          "fullLen": 415,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 6,
+          "score": 0.6765,
+          "path": "grc/msmp.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_08b49de6facd314f5887523df66928a5121d850e53aac00163293608f08319a8",
+          "text": "## Implementation Activities - Design the stage sequence for each request type based on business approval requirements - Configure escalation timing appropriate to the organization's response expectations - Coordinate MSMP stage design with BRF+ agent rule design, since they have to align - Test the full workflow including escalation and rejection paths before go-live",
+          "fullLen": 371,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 7,
+          "score": 0.7467,
+          "path": "grc/msmp.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_72e74d8f2395e1aa710fea85b88a15e03d9b3c422c46a240cf6226abc230196c",
+          "text": "## Runtime Flow A request is submitted and matched to the appropriate MSMP process based on its type. MSMP evaluates the first stage, calling out to BRF+ to determine the agent for that stage. Once that agent approves, MSMP advances to the next configured stage, repeating the agent determination call. If a stage times out without a response, the configured escalation behavior triggers, which might notify a backup approver or escalate to a manager. Once every required stage approves, the request ",
+          "fullLen": 565,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 8,
+          "score": 0.7179,
+          "path": "grc/brf-plus.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_67bf6b61b57e88b63eb866762c2e2a51fbecb6f9bb110b46b4c9116a59776f05",
+          "text": "## Runtime Flow When an MSMP stage requires agent determination, it calls the linked BRF+ function, passing in relevant request data as input. BRF+ evaluates its configured rules, most commonly a decision table, against that input. If a matching row is found, the associated agent is returned to MSMP, which then routes the approval task to that agent. If no row matches, agent determination fails, and the stage has no resolvable approver — MSMP has no independent fallback unless one was explicitly",
+          "fullLen": 513,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        }
+      ],
+      "activeDups": [
+        {
+          "a": 2,
+          "b": 3,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 2,
+          "b": 4,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 3,
+          "b": 4,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 5,
+          "b": 6,
+          "headingA": "Runtime Flow",
+          "headingB": "Runtime Flow",
+          "sameHeading": true
+        },
+        {
+          "a": 5,
+          "b": 7,
+          "headingA": "Runtime Flow",
+          "headingB": "Runtime Flow",
+          "sameHeading": true
+        },
+        {
+          "a": 6,
+          "b": 7,
+          "headingA": "Runtime Flow",
+          "headingB": "Runtime Flow",
+          "sameHeading": true
+        }
+      ],
+      "candidateDups": [
+        {
+          "a": 1,
+          "b": 2,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 1,
+          "b": 3,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 1,
+          "b": 4,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 2,
+          "b": 3,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 2,
+          "b": 4,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 3,
+          "b": 4,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 5,
+          "b": 6,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 7,
+          "b": 8,
+          "headingA": "Runtime Flow",
+          "headingB": "Runtime Flow",
+          "sameHeading": true
+        }
+      ],
+      "activeTechSeqCount": 1,
+      "candidateTechSeqCount": 4,
+      "activeConfigureCount": 0,
+      "candidateConfigureCount": 0
+    },
+    {
+      "question": "Explain the MSMP workflow configuration process.",
+      "activeResolved": "D:\\My Projects\\InterviewCopilot\\data\\knowledgeIndex.json",
+      "candidateResolved": "D:\\My Projects\\InterviewCopilot\\data\\candidate-index\\p1.2-20261030-105244\\knowledgeIndex.json",
+      "activeTop": [
+        {
+          "rank": 1,
+          "score": 0.5765,
+          "path": "grc/msmp.md",
+          "heading": "Configure an MSMP workflow for an access request",
+          "chunkId": "chunk_d5e6973a5d4392424481caee69aeb75ee67414e7e96c527055662aff8843dd70",
+          "text": "## Configure an MSMP workflow for an access request",
+          "fullLen": 51,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 2,
+          "score": 0.8362,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_6e24f05dd2cec312a314596a6a408e8b16a90cefc1a8be0ddcb43d7c1087acae",
+          "text": "## Technical Configuration Sequence For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. GRFNMW_CONFIGURE is the expert transaction documented for Access Control 10.0, 10.1, and 12.0; NWBC is a work-center shell, not that transaction. Select the Access Request Approval process, then configure its initiator, routing, paths, stages, and timeout/escalation behavior. Link each stage to",
+          "fullLen": 787,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 3,
+          "score": 0.8012,
+          "path": "grc/msmp.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_08b49de6facd314f5887523df66928a5121d850e53aac00163293608f08319a8",
+          "text": "## Implementation Activities - Design the stage sequence for each request type based on business approval requirements - Configure escalation timing appropriate to the organization's response expectations - Coordinate MSMP stage design with BRF+ agent rule design, since they have to align - Test the full workflow including escalation and rejection paths before go-live",
+          "fullLen": 371,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 4,
+          "score": 0.7938,
+          "path": "grc/arm.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_cf6061264f176bc7282747d38f3f538a9e3f467624c44a5ccfe2fe2f3b06eb39",
+          "text": "## Implementation Activities - Design request types and their required approval stages based on business requirements - Build and test MSMP workflows for each request type - Configure BRF+ agent determination rules and validate against real organizational data - Integrate provisioning connectors for all in-scope target systems - Test the full request lifecycle from submission through provisioning before go-live",
+          "fullLen": 415,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 5,
+          "score": 0.7031,
+          "path": "grc/brf-plus.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_323ff59e3fb636df0b05b523c217d7a5751029982f0ee0bbe3274707fa7558b9",
+          "text": "## Implementation Activities - Design decision tables based on actual organizational approval authority - Build and test BRF+ rules for every MSMP stage requiring agent determination - Validate rule coverage against realistic request scenarios, including edge cases - Document rule logic so future maintainers understand how agents are resolved",
+          "fullLen": 345,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": true
+          }
+        },
+        {
+          "rank": 6,
+          "score": 0.8522,
+          "path": "grc/msmp.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_72e74d8f2395e1aa710fea85b88a15e03d9b3c422c46a240cf6226abc230196c",
+          "text": "## Runtime Flow A request is submitted and matched to the appropriate MSMP process based on its type. MSMP evaluates the first stage, calling out to BRF+ to determine the agent for that stage. Once that agent approves, MSMP advances to the next configured stage, repeating the agent determination call. If a stage times out without a response, the configured escalation behavior triggers, which might notify a backup approver or escalate to a manager. Once every required stage approves, the request ",
+          "fullLen": 565,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 7,
+          "score": 0.7982,
+          "path": "grc/brf-plus.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_67bf6b61b57e88b63eb866762c2e2a51fbecb6f9bb110b46b4c9116a59776f05",
+          "text": "## Runtime Flow When an MSMP stage requires agent determination, it calls the linked BRF+ function, passing in relevant request data as input. BRF+ evaluates its configured rules, most commonly a decision table, against that input. If a matching row is found, the associated agent is returned to MSMP, which then routes the approval task to that agent. If no row matches, agent determination fails, and the stage has no resolvable approver — MSMP has no independent fallback unless one was explicitly",
+          "fullLen": 513,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 8,
+          "score": 0.7857,
+          "path": "grc/arm.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_4b3f77176d6bf71af5223c36895fc1ddc28cd30a73e9f83b6a1681c5d3a15c3a",
+          "text": "## Runtime Flow A request is submitted and immediately triggers a risk simulation against the ARA ruleset. The request enters the MSMP workflow, which evaluates its configured stages in sequence. At each stage, BRF+ rules determine the specific approver based on request attributes. If a stage requires mitigation review due to a flagged conflict, that approval can't be bypassed. Once all stages approve, the provisioning framework picks up the request and pushes the role assignment to the target s",
+          "fullLen": 557,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        }
+      ],
+      "candidateTop": [
+        {
+          "rank": 1,
+          "score": 0.8823,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_f2c4a39eed45b0f2fee8400fa9207c08df7909871b3729cdc2f5e29813131c36",
+          "text": "Senior Architect MSMP sequence (Access Request Approval process, e.g. SAP_GRAC_ACCESS_REQUEST): 1. Process Global Settings / Process ID — select or confirm the delivered Access Request Approval process before inventing a parallel process. 2. Maintain Rules — declare initiator / agent / routing / notification rules and every RULE_RESULT that path mapping will consume; generate new BRF+ flat-rule shells in Define Workflow-Related MSMP Rules when a custom initiator or agent rule is required. 3. Mai",
+          "fullLen": 907,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 2,
+          "score": 0.8485,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_027d5544f818aecd2d70e62ffee3cb57a95e85c0550dbb83cef8bd1e9a7d9991",
+          "text": "Select the Access Request Approval process, then walk the seven stages above. Link each stage to its BRF+ agent-determination rule and map each BRF+ RULE_RESULT to the intended MSMP path. Authorization for workflow administration sits on the Access Control admin roles and related authorization objects on the GRC system; target provisioning still depends on connector configuration (Integration Framework / SM59) and target-system enforcement (PFCG / S_SERVICE on ABAP targets). Test a request in NW",
+          "fullLen": 846,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 3,
+          "score": 0.8443,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_0946d92f486b3cacea2844ca06dbc541f2b917c5fd4a3f1ac42aa668ddd5d3d4",
+          "text": "## Technical Configuration Sequence For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. GRFNMW_CONFIGURE (and GRFNMW_CONFIGURE_WD where the Web Dynpro entry is used) is the expert transaction documented for Access Control 10.0, 10.1, and 12.0; NWBC is a work-center shell, not that transaction. Pair Maintain MSMP Workflows with Define Workflow-Related MSMP Rules for BRF+ flat-rule ",
+          "fullLen": 681,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 4,
+          "score": 0.8012,
+          "path": "grc/msmp.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_08b49de6facd314f5887523df66928a5121d850e53aac00163293608f08319a8",
+          "text": "## Implementation Activities - Design the stage sequence for each request type based on business approval requirements - Configure escalation timing appropriate to the organization's response expectations - Coordinate MSMP stage design with BRF+ agent rule design, since they have to align - Test the full workflow including escalation and rejection paths before go-live",
+          "fullLen": 371,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 5,
+          "score": 0.7938,
+          "path": "grc/arm.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_cf6061264f176bc7282747d38f3f538a9e3f467624c44a5ccfe2fe2f3b06eb39",
+          "text": "## Implementation Activities - Design request types and their required approval stages based on business requirements - Build and test MSMP workflows for each request type - Configure BRF+ agent determination rules and validate against real organizational data - Integrate provisioning connectors for all in-scope target systems - Test the full request lifecycle from submission through provisioning before go-live",
+          "fullLen": 415,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 6,
+          "score": 0.7389,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_83a0bdd07c8079e487c88da03157546bc6975b865f75fba460142dae3751aafa",
+          "text": "7. Generate Version — regenerate the MSMP version after every structural change; ungenerated changes are not runtime-active.",
+          "fullLen": 124,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 7,
+          "score": 0.7031,
+          "path": "grc/brf-plus.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_323ff59e3fb636df0b05b523c217d7a5751029982f0ee0bbe3274707fa7558b9",
+          "text": "## Implementation Activities - Design decision tables based on actual organizational approval authority - Build and test BRF+ rules for every MSMP stage requiring agent determination - Validate rule coverage against realistic request scenarios, including edge cases - Document rule logic so future maintainers understand how agents are resolved",
+          "fullLen": 345,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": true
+          }
+        },
+        {
+          "rank": 8,
+          "score": 0.8522,
+          "path": "grc/msmp.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_72e74d8f2395e1aa710fea85b88a15e03d9b3c422c46a240cf6226abc230196c",
+          "text": "## Runtime Flow A request is submitted and matched to the appropriate MSMP process based on its type. MSMP evaluates the first stage, calling out to BRF+ to determine the agent for that stage. Once that agent approves, MSMP advances to the next configured stage, repeating the agent determination call. If a stage times out without a response, the configured escalation behavior triggers, which might notify a backup approver or escalate to a manager. Once every required stage approves, the request ",
+          "fullLen": 565,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        }
+      ],
+      "activeDups": [
+        {
+          "a": 3,
+          "b": 4,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 3,
+          "b": 5,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 4,
+          "b": 5,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 6,
+          "b": 7,
+          "headingA": "Runtime Flow",
+          "headingB": "Runtime Flow",
+          "sameHeading": true
+        },
+        {
+          "a": 6,
+          "b": 8,
+          "headingA": "Runtime Flow",
+          "headingB": "Runtime Flow",
+          "sameHeading": true
+        },
+        {
+          "a": 7,
+          "b": 8,
+          "headingA": "Runtime Flow",
+          "headingB": "Runtime Flow",
+          "sameHeading": true
+        }
+      ],
+      "candidateDups": [
+        {
+          "a": 1,
+          "b": 2,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 1,
+          "b": 3,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 1,
+          "b": 6,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 2,
+          "b": 3,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 2,
+          "b": 6,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 3,
+          "b": 6,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 4,
+          "b": 5,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 4,
+          "b": 7,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 5,
+          "b": 7,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        }
+      ],
+      "activeTechSeqCount": 1,
+      "candidateTechSeqCount": 4,
+      "activeConfigureCount": 1,
+      "candidateConfigureCount": 0
+    },
+    {
+      "question": "How do you configure approval stages and paths in MSMP?",
+      "activeResolved": "D:\\My Projects\\InterviewCopilot\\data\\knowledgeIndex.json",
+      "candidateResolved": "D:\\My Projects\\InterviewCopilot\\data\\candidate-index\\p1.2-20261030-105244\\knowledgeIndex.json",
+      "activeTop": [
+        {
+          "rank": 1,
+          "score": 0.6155,
+          "path": "grc/msmp.md",
+          "heading": "Configure an MSMP workflow for an access request",
+          "chunkId": "chunk_be2887194b256e08dd90bb8b71a738d54e3373cfbccb0ce161a0cbeb4ca528db",
+          "text": "I would first check whether the delivered Access Request Approval workflow already covers the request type before I change Maintain MSMP Workflows. If it does, I would reuse that process and only change the initiator, paths, stages, agents, and route mapping that the business requires. If a new path is required, I would generate the BRF+ initiator or routing rule in Define Workflow-Related MSMP Rules before changing MSMP. In Maintain MSMP Workflows I would set the process global settings, declar",
+          "fullLen": 891,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 2,
+          "score": 0.8666,
+          "path": "grc/msmp.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_08b49de6facd314f5887523df66928a5121d850e53aac00163293608f08319a8",
+          "text": "## Implementation Activities - Design the stage sequence for each request type based on business approval requirements - Configure escalation timing appropriate to the organization's response expectations - Coordinate MSMP stage design with BRF+ agent rule design, since they have to align - Test the full workflow including escalation and rejection paths before go-live",
+          "fullLen": 371,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 3,
+          "score": 0.8395,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_6e24f05dd2cec312a314596a6a408e8b16a90cefc1a8be0ddcb43d7c1087acae",
+          "text": "## Technical Configuration Sequence For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. GRFNMW_CONFIGURE is the expert transaction documented for Access Control 10.0, 10.1, and 12.0; NWBC is a work-center shell, not that transaction. Select the Access Request Approval process, then configure its initiator, routing, paths, stages, and timeout/escalation behavior. Link each stage to",
+          "fullLen": 787,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 4,
+          "score": 0.7981,
+          "path": "grc/arm.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_cf6061264f176bc7282747d38f3f538a9e3f467624c44a5ccfe2fe2f3b06eb39",
+          "text": "## Implementation Activities - Design request types and their required approval stages based on business requirements - Build and test MSMP workflows for each request type - Configure BRF+ agent determination rules and validate against real organizational data - Integrate provisioning connectors for all in-scope target systems - Test the full request lifecycle from submission through provisioning before go-live",
+          "fullLen": 415,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 5,
+          "score": 0.7765,
+          "path": "grc/brf-plus.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_323ff59e3fb636df0b05b523c217d7a5751029982f0ee0bbe3274707fa7558b9",
+          "text": "## Implementation Activities - Design decision tables based on actual organizational approval authority - Build and test BRF+ rules for every MSMP stage requiring agent determination - Validate rule coverage against realistic request scenarios, including edge cases - Document rule logic so future maintainers understand how agents are resolved",
+          "fullLen": 345,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": true
+          }
+        },
+        {
+          "rank": 6,
+          "score": 0.8173,
+          "path": "grc/brf-plus.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_67bf6b61b57e88b63eb866762c2e2a51fbecb6f9bb110b46b4c9116a59776f05",
+          "text": "## Runtime Flow When an MSMP stage requires agent determination, it calls the linked BRF+ function, passing in relevant request data as input. BRF+ evaluates its configured rules, most commonly a decision table, against that input. If a matching row is found, the associated agent is returned to MSMP, which then routes the approval task to that agent. If no row matches, agent determination fails, and the stage has no resolvable approver — MSMP has no independent fallback unless one was explicitly",
+          "fullLen": 513,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 7,
+          "score": 0.8169,
+          "path": "grc/msmp.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_72e74d8f2395e1aa710fea85b88a15e03d9b3c422c46a240cf6226abc230196c",
+          "text": "## Runtime Flow A request is submitted and matched to the appropriate MSMP process based on its type. MSMP evaluates the first stage, calling out to BRF+ to determine the agent for that stage. Once that agent approves, MSMP advances to the next configured stage, repeating the agent determination call. If a stage times out without a response, the configured escalation behavior triggers, which might notify a backup approver or escalate to a manager. Once every required stage approves, the request ",
+          "fullLen": 565,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 8,
+          "score": 0.8125,
+          "path": "grc/arm.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_4b3f77176d6bf71af5223c36895fc1ddc28cd30a73e9f83b6a1681c5d3a15c3a",
+          "text": "## Runtime Flow A request is submitted and immediately triggers a risk simulation against the ARA ruleset. The request enters the MSMP workflow, which evaluates its configured stages in sequence. At each stage, BRF+ rules determine the specific approver based on request attributes. If a stage requires mitigation review due to a flagged conflict, that approval can't be bypassed. Once all stages approve, the provisioning framework picks up the request and pushes the role assignment to the target s",
+          "fullLen": 557,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        }
+      ],
+      "candidateTop": [
+        {
+          "rank": 1,
+          "score": 0.904,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_f2c4a39eed45b0f2fee8400fa9207c08df7909871b3729cdc2f5e29813131c36",
+          "text": "Senior Architect MSMP sequence (Access Request Approval process, e.g. SAP_GRAC_ACCESS_REQUEST): 1. Process Global Settings / Process ID — select or confirm the delivered Access Request Approval process before inventing a parallel process. 2. Maintain Rules — declare initiator / agent / routing / notification rules and every RULE_RESULT that path mapping will consume; generate new BRF+ flat-rule shells in Define Workflow-Related MSMP Rules when a custom initiator or agent rule is required. 3. Mai",
+          "fullLen": 907,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 2,
+          "score": 0.8666,
+          "path": "grc/msmp.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_08b49de6facd314f5887523df66928a5121d850e53aac00163293608f08319a8",
+          "text": "## Implementation Activities - Design the stage sequence for each request type based on business approval requirements - Configure escalation timing appropriate to the organization's response expectations - Coordinate MSMP stage design with BRF+ agent rule design, since they have to align - Test the full workflow including escalation and rejection paths before go-live",
+          "fullLen": 371,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 3,
+          "score": 0.8466,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_027d5544f818aecd2d70e62ffee3cb57a95e85c0550dbb83cef8bd1e9a7d9991",
+          "text": "Select the Access Request Approval process, then walk the seven stages above. Link each stage to its BRF+ agent-determination rule and map each BRF+ RULE_RESULT to the intended MSMP path. Authorization for workflow administration sits on the Access Control admin roles and related authorization objects on the GRC system; target provisioning still depends on connector configuration (Integration Framework / SM59) and target-system enforcement (PFCG / S_SERVICE on ABAP targets). Test a request in NW",
+          "fullLen": 846,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 4,
+          "score": 0.7981,
+          "path": "grc/arm.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_cf6061264f176bc7282747d38f3f538a9e3f467624c44a5ccfe2fe2f3b06eb39",
+          "text": "## Implementation Activities - Design request types and their required approval stages based on business requirements - Build and test MSMP workflows for each request type - Configure BRF+ agent determination rules and validate against real organizational data - Integrate provisioning connectors for all in-scope target systems - Test the full request lifecycle from submission through provisioning before go-live",
+          "fullLen": 415,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 5,
+          "score": 0.7765,
+          "path": "grc/brf-plus.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_323ff59e3fb636df0b05b523c217d7a5751029982f0ee0bbe3274707fa7558b9",
+          "text": "## Implementation Activities - Design decision tables based on actual organizational approval authority - Build and test BRF+ rules for every MSMP stage requiring agent determination - Validate rule coverage against realistic request scenarios, including edge cases - Document rule logic so future maintainers understand how agents are resolved",
+          "fullLen": 345,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": true
+          }
+        },
+        {
+          "rank": 6,
+          "score": 0.7273,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_0946d92f486b3cacea2844ca06dbc541f2b917c5fd4a3f1ac42aa668ddd5d3d4",
+          "text": "## Technical Configuration Sequence For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. GRFNMW_CONFIGURE (and GRFNMW_CONFIGURE_WD where the Web Dynpro entry is used) is the expert transaction documented for Access Control 10.0, 10.1, and 12.0; NWBC is a work-center shell, not that transaction. Pair Maintain MSMP Workflows with Define Workflow-Related MSMP Rules for BRF+ flat-rule ",
+          "fullLen": 681,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 7,
+          "score": 0.6643,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_83a0bdd07c8079e487c88da03157546bc6975b865f75fba460142dae3751aafa",
+          "text": "7. Generate Version — regenerate the MSMP version after every structural change; ungenerated changes are not runtime-active.",
+          "fullLen": 124,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 8,
+          "score": 0.8173,
+          "path": "grc/brf-plus.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_67bf6b61b57e88b63eb866762c2e2a51fbecb6f9bb110b46b4c9116a59776f05",
+          "text": "## Runtime Flow When an MSMP stage requires agent determination, it calls the linked BRF+ function, passing in relevant request data as input. BRF+ evaluates its configured rules, most commonly a decision table, against that input. If a matching row is found, the associated agent is returned to MSMP, which then routes the approval task to that agent. If no row matches, agent determination fails, and the stage has no resolvable approver — MSMP has no independent fallback unless one was explicitly",
+          "fullLen": 513,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        }
+      ],
+      "activeDups": [
+        {
+          "a": 2,
+          "b": 4,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 2,
+          "b": 5,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 4,
+          "b": 5,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 6,
+          "b": 7,
+          "headingA": "Runtime Flow",
+          "headingB": "Runtime Flow",
+          "sameHeading": true
+        },
+        {
+          "a": 6,
+          "b": 8,
+          "headingA": "Runtime Flow",
+          "headingB": "Runtime Flow",
+          "sameHeading": true
+        },
+        {
+          "a": 7,
+          "b": 8,
+          "headingA": "Runtime Flow",
+          "headingB": "Runtime Flow",
+          "sameHeading": true
+        }
+      ],
+      "candidateDups": [
+        {
+          "a": 1,
+          "b": 3,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 1,
+          "b": 6,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 1,
+          "b": 7,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 2,
+          "b": 4,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 2,
+          "b": 5,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 3,
+          "b": 6,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 3,
+          "b": 7,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 4,
+          "b": 5,
+          "headingA": "Implementation Activities",
+          "headingB": "Implementation Activities",
+          "sameHeading": true
+        },
+        {
+          "a": 6,
+          "b": 7,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        }
+      ],
+      "activeTechSeqCount": 1,
+      "candidateTechSeqCount": 4,
+      "activeConfigureCount": 1,
+      "candidateConfigureCount": 0
+    },
+    {
+      "question": "Explain SAP GRC Access Control implementation.",
+      "activeResolved": "D:\\My Projects\\InterviewCopilot\\data\\knowledgeIndex.json",
+      "candidateResolved": "D:\\My Projects\\InterviewCopilot\\data\\candidate-index\\p1.2-20261030-105244\\knowledgeIndex.json",
+      "activeTop": [
+        {
+          "rank": 1,
+          "score": 0.7505,
+          "path": "grc/grc-principal-architect-interview-bank.md",
+          "heading": "Q36: How do you justify the ROI of an SAP GRC upgrade or implementation to C-level stakeholders (CISO, CFO)?",
+          "chunkId": "chunk_68182b10aececa7aff9c1969e31b364cfc8eb9edc26703ecf2b920ded2d05be0",
+          "text": "## Q36: How do you justify the ROI of an SAP GRC upgrade or implementation to C-level stakeholders (CISO, CFO)? I would frame ROI as risk reduction and operating efficiency, without inventing guaranteed zero findings. Quantify audit effort avoided through consistent evidence, provisioning cycle-time reduction via ARM, and residual SoD exposure reduction through ARA and remediation. Separate Access Control benefits from Process Control and IAG benefits so the business case matches the products in",
+          "fullLen": 631,
+          "taskSignals": {
+            "configure": false,
+            "troubleshoot": true,
+            "implement": true
+          }
+        },
+        {
+          "rank": 2,
+          "score": 0.7196,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_6e24f05dd2cec312a314596a6a408e8b16a90cefc1a8be0ddcb43d7c1087acae",
+          "text": "## Technical Configuration Sequence For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. GRFNMW_CONFIGURE is the expert transaction documented for Access Control 10.0, 10.1, and 12.0; NWBC is a work-center shell, not that transaction. Select the Access Request Approval process, then configure its initiator, routing, paths, stages, and timeout/escalation behavior. Link each stage to",
+          "fullLen": 787,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 3,
+          "score": 0.7136,
+          "path": "grc/grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q62: A client on Greenfield S/4HANA Cloud Private Edition wants to integrate GRC 12.0 with SAP SuccessFactors and Ariba. How do you architect the governance framework?",
+          "chunkId": "chunk_5d4cd5c2d368293477d9bf8ef0a6cfecb0c4ac986a634a307a63cc3011ef5787",
+          "text": "## Q62: A client on Greenfield S/4HANA Cloud Private Edition wants to integrate GRC 12.0 with SAP SuccessFactors and Ariba. How do you architect the governance framework? I would describe a Bridge topology: Access Control for ABAP targets, IAG for supported cloud apps, with a documented sync path—not a single merged product. Decision: Use GRC 12.0 with IAG Bridge for hybrid cloud governance. Mechanism: Establish connectivity (Cloud Connector / IPS as designed for the landscape), synchronize SF/A",
+          "fullLen": 875,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": true
+          }
+        },
+        {
+          "rank": 4,
+          "score": 0.7094,
+          "path": "grc/authorization-sync.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_5a000175c3be56134ab16c091b696e701480cb28713466aa7aaa60ecc3ca3dce",
+          "text": "## Runtime Flow On its configured schedule, Authorization Sync connects through the target system's connector and pulls current user-to-role assignment data, updating GRC's local copy. User-level risk analysis, periodic access reviews, and audit reporting queries then evaluate against this synced data rather than querying the target system directly for each request.",
+          "fullLen": 369,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 5,
+          "score": 0.6866,
+          "path": "grc/brf-plus.md",
+          "heading": "Configure a BRFplus agent rule for MSMP",
+          "chunkId": "chunk_05062f25aec1b0c58780677c56a0ce8a7d5689b4412daf7e5866dbbb70a33f0f",
+          "text": "Source checked 2026-10-21: SAP Support Content BRF plus Flat Rule - SAP Access Control Integration; SAP Help Define Workflow-Related MSMP Rules and Maintain MSMP Workflows.",
+          "fullLen": 172,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 6,
+          "score": 0.6183,
+          "path": "grc/connectors.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_06d784e950a5ded226b380dce407e14e738986e553500e4c0cdb9c576a6553af",
+          "text": "## Implementation Activities - Design and configure connectors for every in-scope target system - Scope technical user authorizations tightly to what GRC actually needs - Test connector functionality for both risk analysis data pulls and provisioning actions - Establish connector health monitoring before go-live",
+          "fullLen": 314,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 7,
+          "score": 0.6114,
+          "path": "grc/user-sync.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_e40ca803ebf4b6c542e84517bf5d543ec0bd29eb44f3d41e6715cd2bd52a1b65",
+          "text": "## Runtime Flow On its configured schedule, User Sync connects through the target system's connector and pulls current user master data, updating GRC's local copy of user attributes. ARM request forms, reporting, and access reviews then reference this synced data for user search, filtering, and status display, rather than querying the target system live.",
+          "fullLen": 357,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 8,
+          "score": 0.6072,
+          "path": "grc/repository-sync.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_17eba548977c089b43478e46e6ac0b8371f59c9f522b03585c32083ae9cca159",
+          "text": "## Runtime Flow On its configured schedule, or when manually triggered, Repository Sync connects to the target system through the configured connector and pulls current role data — menu, description, and authorization content — for all roles in scope. That data updates GRC's local repository. Subsequent ARM request form displays and ARA risk analysis evaluations work against this updated repository data rather than querying the target system directly each time.",
+          "fullLen": 466,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        }
+      ],
+      "candidateTop": [
+        {
+          "rank": 1,
+          "score": 0.7505,
+          "path": "grc/grc-principal-architect-interview-bank.md",
+          "heading": "Q36: How do you justify the ROI of an SAP GRC upgrade or implementation to C-level stakeholders (CISO, CFO)?",
+          "chunkId": "chunk_68182b10aececa7aff9c1969e31b364cfc8eb9edc26703ecf2b920ded2d05be0",
+          "text": "## Q36: How do you justify the ROI of an SAP GRC upgrade or implementation to C-level stakeholders (CISO, CFO)? I would frame ROI as risk reduction and operating efficiency, without inventing guaranteed zero findings. Quantify audit effort avoided through consistent evidence, provisioning cycle-time reduction via ARM, and residual SoD exposure reduction through ARA and remediation. Separate Access Control benefits from Process Control and IAG benefits so the business case matches the products in",
+          "fullLen": 631,
+          "taskSignals": {
+            "configure": false,
+            "troubleshoot": true,
+            "implement": true
+          }
+        },
+        {
+          "rank": 2,
+          "score": 0.7136,
+          "path": "grc/grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q62: A client on Greenfield S/4HANA Cloud Private Edition wants to integrate GRC 12.0 with SAP SuccessFactors and Ariba. How do you architect the governance framework?",
+          "chunkId": "chunk_5d4cd5c2d368293477d9bf8ef0a6cfecb0c4ac986a634a307a63cc3011ef5787",
+          "text": "## Q62: A client on Greenfield S/4HANA Cloud Private Edition wants to integrate GRC 12.0 with SAP SuccessFactors and Ariba. How do you architect the governance framework? I would describe a Bridge topology: Access Control for ABAP targets, IAG for supported cloud apps, with a documented sync path—not a single merged product. Decision: Use GRC 12.0 with IAG Bridge for hybrid cloud governance. Mechanism: Establish connectivity (Cloud Connector / IPS as designed for the landscape), synchronize SF/A",
+          "fullLen": 875,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": true
+          }
+        },
+        {
+          "rank": 3,
+          "score": 0.7094,
+          "path": "grc/authorization-sync.md",
+          "heading": "Runtime Flow",
+          "chunkId": "chunk_5a000175c3be56134ab16c091b696e701480cb28713466aa7aaa60ecc3ca3dce",
+          "text": "## Runtime Flow On its configured schedule, Authorization Sync connects through the target system's connector and pulls current user-to-role assignment data, updating GRC's local copy. User-level risk analysis, periodic access reviews, and audit reporting queries then evaluate against this synced data rather than querying the target system directly for each request.",
+          "fullLen": 369,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 4,
+          "score": 0.7022,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_0946d92f486b3cacea2844ca06dbc541f2b917c5fd4a3f1ac42aa668ddd5d3d4",
+          "text": "## Technical Configuration Sequence For SAP Access Control 12.0, maintain the workflow in SPRO > Governance, Risks, and Compliance > Access Control > Workflow for Access Control > Maintain MSMP Workflows. GRFNMW_CONFIGURE (and GRFNMW_CONFIGURE_WD where the Web Dynpro entry is used) is the expert transaction documented for Access Control 10.0, 10.1, and 12.0; NWBC is a work-center shell, not that transaction. Pair Maintain MSMP Workflows with Define Workflow-Related MSMP Rules for BRF+ flat-rule ",
+          "fullLen": 681,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 5,
+          "score": 0.6694,
+          "path": "grc/brf-plus.md",
+          "heading": "Configure a BRFplus agent rule for MSMP",
+          "chunkId": "chunk_01de6c0abb9ab9d3e14ef7a532d0ea122f0b1ab87df5384897268efaac529342",
+          "text": "I would first confirm whether the change is an initiator rule or an agent rule before changing anything. The initiator rule selects the MSMP path from request attributes. The agent rule resolves who must approve at a stage. For an agent rule I would generate the BRF+ flat rule shell in Define Workflow-Related MSMP Rules for process SAP_GRAC_ACCESS_REQUEST with rule kind Agent Rule, then open BRFPLUS and maintain the function in Event Mode with the MSMP-compatible result structure. Agent determin",
+          "fullLen": 725,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        },
+        {
+          "rank": 6,
+          "score": 0.6621,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_027d5544f818aecd2d70e62ffee3cb57a95e85c0550dbb83cef8bd1e9a7d9991",
+          "text": "Select the Access Request Approval process, then walk the seven stages above. Link each stage to its BRF+ agent-determination rule and map each BRF+ RULE_RESULT to the intended MSMP path. Authorization for workflow administration sits on the Access Control admin roles and related authorization objects on the GRC system; target provisioning still depends on connector configuration (Integration Framework / SM59) and target-system enforcement (PFCG / S_SERVICE on ABAP targets). Test a request in NW",
+          "fullLen": 846,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 7,
+          "score": 0.6183,
+          "path": "grc/connectors.md",
+          "heading": "Implementation Activities",
+          "chunkId": "chunk_06d784e950a5ded226b380dce407e14e738986e553500e4c0cdb9c576a6553af",
+          "text": "## Implementation Activities - Design and configure connectors for every in-scope target system - Scope technical user authorizations tightly to what GRC actually needs - Test connector functionality for both risk analysis data pulls and provisioning actions - Establish connector health monitoring before go-live",
+          "fullLen": 314,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": true
+          }
+        },
+        {
+          "rank": 8,
+          "score": 0.6116,
+          "path": "grc/msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "chunkId": "chunk_f2c4a39eed45b0f2fee8400fa9207c08df7909871b3729cdc2f5e29813131c36",
+          "text": "Senior Architect MSMP sequence (Access Request Approval process, e.g. SAP_GRAC_ACCESS_REQUEST): 1. Process Global Settings / Process ID — select or confirm the delivered Access Request Approval process before inventing a parallel process. 2. Maintain Rules — declare initiator / agent / routing / notification rules and every RULE_RESULT that path mapping will consume; generate new BRF+ flat-rule shells in Define Workflow-Related MSMP Rules when a custom initiator or agent rule is required. 3. Mai",
+          "fullLen": 907,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        }
+      ],
+      "activeDups": [
+        {
+          "a": 4,
+          "b": 7,
+          "headingA": "Runtime Flow",
+          "headingB": "Runtime Flow",
+          "sameHeading": true
+        },
+        {
+          "a": 4,
+          "b": 8,
+          "headingA": "Runtime Flow",
+          "headingB": "Runtime Flow",
+          "sameHeading": true
+        },
+        {
+          "a": 7,
+          "b": 8,
+          "headingA": "Runtime Flow",
+          "headingB": "Runtime Flow",
+          "sameHeading": true
+        }
+      ],
+      "candidateDups": [
+        {
+          "a": 4,
+          "b": 6,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 4,
+          "b": 8,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        },
+        {
+          "a": 6,
+          "b": 8,
+          "headingA": "Technical Configuration Sequence",
+          "headingB": "Technical Configuration Sequence",
+          "sameHeading": true
+        }
+      ],
+      "activeTechSeqCount": 1,
+      "candidateTechSeqCount": 3,
+      "activeConfigureCount": 0,
+      "candidateConfigureCount": 0
+    },
+    {
+      "question": "How do you troubleshoot an MSMP workflow?",
+      "activeResolved": "D:\\My Projects\\InterviewCopilot\\data\\knowledgeIndex.json",
+      "candidateResolved": "D:\\My Projects\\InterviewCopilot\\data\\candidate-index\\p1.2-20261030-105244\\knowledgeIndex.json",
+      "activeTop": [
+        {
+          "rank": 1,
+          "score": 0.7973,
+          "path": "grc/msmp.md",
+          "heading": "Troubleshoot an MSMP access request with no approver",
+          "chunkId": "chunk_0488ce0add1504830d08909d718f80970824279f71437c786d9598631c67133e",
+          "text": "## Troubleshoot an MSMP access request with no approver",
+          "fullLen": 55,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 2,
+          "score": 0.78,
+          "path": "grc/msmp.md",
+          "heading": "Troubleshoot an MSMP access request with no approver",
+          "chunkId": "chunk_2abd0293797aee608c5f3d5ea2fa37319a3f25abd6570664f6f16ac2cd71c8fa",
+          "text": "I would open the stuck access request in Request Status and inspect Instance Status for the path, stage, and Approvers of Selected Path, then read the audit log to see where processing stopped. If no path was selected, I would inspect Maintain MSMP Workflows for the process, initiator, route mapping, and whether the MSMP version was generated after the last change. If the expected path is present but no approver appears, I would treat that as an agent-determination failure and inspect the stage ",
+          "fullLen": 990,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 3,
+          "score": 0.7659,
+          "path": "grc/msmp.md",
+          "heading": "Troubleshoot an MSMP access request with no approver",
+          "chunkId": "chunk_a7b829728a7fdd58ea330ae51a7f28a40dd6a43c6ba63e543bfa2e6ea2ce7b99",
+          "text": "Source checked 2026-10-21: SAP Access Control Viewing Your Request Status; Maintain MSMP Workflows; BRF plus Flat Rule integration.",
+          "fullLen": 131,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 4,
+          "score": 0.5522,
+          "path": "grc/msmp.md",
+          "heading": "Troubleshooting",
+          "chunkId": "chunk_cbd26268907580d57887cc21dcbff72b84029dbb7c5ae38e4ef67cc93ccf1769",
+          "text": "## Troubleshooting Common issue: a request is stuck at a stage indefinitely. Root cause: the BRF+ agent determination rule for that stage didn't resolve to a valid approver, so no one was ever notified. Resolution: check the BRF+ rule execution for that stage, identify the missing data or rule gap, and correct it. Common issue: a stage that should have been skipped is still requiring approval. Root cause: the conditional logic determining whether the stage is mandatory wasn't configured correctl",
+          "fullLen": 883,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 5,
+          "score": 0.528,
+          "path": "grc/arm.md",
+          "heading": "Troubleshooting",
+          "chunkId": "chunk_649d7f20a69e871468dec7e9c627c0f382417c9f8e9c73fc1eb7c1b7833ecc79",
+          "text": "## Troubleshooting Common issue: a request is stuck at an approval stage with no approver notified. Root cause: the BRF+ agent determination rule didn't resolve a valid approver for that stage. Resolution: review the BRF+ rule execution log, identify the missing or incorrect rule data, and correct it.",
+          "fullLen": 303,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 6,
+          "score": 0.5174,
+          "path": "grc/brf-plus.md",
+          "heading": "Troubleshooting",
+          "chunkId": "chunk_72473e58ba65fb4a580464c8727245625f95eff4a6bfdb822a63f8d89019919a",
+          "text": "## Troubleshooting Common issue: a request is stuck with no approver notified. Root cause: the BRF+ decision table has no matching row for this request's specific combination of attributes. Resolution: review the rule evaluation, identify the missing scenario, and add the corresponding row to the decision table. Common issue: a rule resolves to the wrong approver. Root cause: decision table rows weren't updated after an organizational change, like a role owner reassignment. Resolution: update th",
+          "fullLen": 915,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 7,
+          "score": 0.5314,
+          "path": "grc/msmp.md",
+          "heading": "MSMP Workflow",
+          "chunkId": "chunk_0d304db7783736eb98be114fc5d48ce61697189f1b2986090068a44c70bec164",
+          "text": "# MSMP Workflow",
+          "fullLen": 15,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        }
+      ],
+      "candidateTop": [
+        {
+          "rank": 1,
+          "score": 0.7973,
+          "path": "grc/msmp.md",
+          "heading": "Troubleshoot an MSMP access request with no approver",
+          "chunkId": "chunk_5e219833705296d226c888af5f2ea24802ce11f53a4a930d1f7bc0ec55477d7b",
+          "text": "## Troubleshoot an MSMP access request with no approver",
+          "fullLen": 55,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 2,
+          "score": 0.78,
+          "path": "grc/msmp.md",
+          "heading": "Troubleshoot an MSMP access request with no approver",
+          "chunkId": "chunk_a25bb8fcf47e25edf821f629023ab895cc462306de6be556e06fb4716d60c5b5",
+          "text": "I would open the stuck access request in Request Status and inspect Instance Status for the path, stage, and Approvers of Selected Path, then read the audit log to see where processing stopped. If no path was selected, I would inspect Maintain MSMP Workflows for the process, initiator, route mapping, and whether the MSMP version was generated after the last change. If the expected path is present but no approver appears, I would treat that as an agent-determination failure and inspect the stage ",
+          "fullLen": 990,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 3,
+          "score": 0.7659,
+          "path": "grc/msmp.md",
+          "heading": "Troubleshoot an MSMP access request with no approver",
+          "chunkId": "chunk_609bb45f6a3b07e3a72d4056931992031f9cabe08be849f6326a8074662ed30e",
+          "text": "Source checked 2026-10-21: SAP Access Control Viewing Your Request Status; Maintain MSMP Workflows; BRF plus Flat Rule integration.",
+          "fullLen": 131,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 4,
+          "score": 0.5522,
+          "path": "grc/msmp.md",
+          "heading": "Troubleshooting",
+          "chunkId": "chunk_b98f92903bb0c5d4faa9ca78a42479902fc5706fca63f0e6dbb37da76a41bb5e",
+          "text": "## Troubleshooting Common issue: a request is stuck at a stage indefinitely. Root cause: the BRF+ agent determination rule for that stage didn't resolve to a valid approver, so no one was ever notified. Resolution: check the BRF+ rule execution for that stage, identify the missing data or rule gap, and correct it. Common issue: a stage that should have been skipped is still requiring approval. Root cause: the conditional logic determining whether the stage is mandatory wasn't configured correctl",
+          "fullLen": 883,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 5,
+          "score": 0.528,
+          "path": "grc/arm.md",
+          "heading": "Troubleshooting",
+          "chunkId": "chunk_649d7f20a69e871468dec7e9c627c0f382417c9f8e9c73fc1eb7c1b7833ecc79",
+          "text": "## Troubleshooting Common issue: a request is stuck at an approval stage with no approver notified. Root cause: the BRF+ agent determination rule didn't resolve a valid approver for that stage. Resolution: review the BRF+ rule execution log, identify the missing or incorrect rule data, and correct it.",
+          "fullLen": 303,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 6,
+          "score": 0.5174,
+          "path": "grc/brf-plus.md",
+          "heading": "Troubleshooting",
+          "chunkId": "chunk_72473e58ba65fb4a580464c8727245625f95eff4a6bfdb822a63f8d89019919a",
+          "text": "## Troubleshooting Common issue: a request is stuck with no approver notified. Root cause: the BRF+ decision table has no matching row for this request's specific combination of attributes. Resolution: review the rule evaluation, identify the missing scenario, and add the corresponding row to the decision table. Common issue: a rule resolves to the wrong approver. Root cause: decision table rows weren't updated after an organizational change, like a role owner reassignment. Resolution: update th",
+          "fullLen": 915,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": true,
+            "implement": false
+          }
+        },
+        {
+          "rank": 7,
+          "score": 0.5314,
+          "path": "grc/msmp.md",
+          "heading": "MSMP Workflow",
+          "chunkId": "chunk_0d304db7783736eb98be114fc5d48ce61697189f1b2986090068a44c70bec164",
+          "text": "# MSMP Workflow",
+          "fullLen": 15,
+          "taskSignals": {
+            "configure": true,
+            "troubleshoot": false,
+            "implement": false
+          }
+        }
+      ],
+      "activeDups": [
+        {
+          "a": 1,
+          "b": 2,
+          "headingA": "Troubleshoot an MSMP access request with no approver",
+          "headingB": "Troubleshoot an MSMP access request with no approver",
+          "sameHeading": true
+        },
+        {
+          "a": 1,
+          "b": 3,
+          "headingA": "Troubleshoot an MSMP access request with no approver",
+          "headingB": "Troubleshoot an MSMP access request with no approver",
+          "sameHeading": true
+        },
+        {
+          "a": 2,
+          "b": 3,
+          "headingA": "Troubleshoot an MSMP access request with no approver",
+          "headingB": "Troubleshoot an MSMP access request with no approver",
+          "sameHeading": true
+        },
+        {
+          "a": 4,
+          "b": 5,
+          "headingA": "Troubleshooting",
+          "headingB": "Troubleshooting",
+          "sameHeading": true
+        },
+        {
+          "a": 4,
+          "b": 6,
+          "headingA": "Troubleshooting",
+          "headingB": "Troubleshooting",
+          "sameHeading": true
+        },
+        {
+          "a": 5,
+          "b": 6,
+          "headingA": "Troubleshooting",
+          "headingB": "Troubleshooting",
+          "sameHeading": true
+        }
+      ],
+      "candidateDups": [
+        {
+          "a": 1,
+          "b": 2,
+          "headingA": "Troubleshoot an MSMP access request with no approver",
+          "headingB": "Troubleshoot an MSMP access request with no approver",
+          "sameHeading": true
+        },
+        {
+          "a": 1,
+          "b": 3,
+          "headingA": "Troubleshoot an MSMP access request with no approver",
+          "headingB": "Troubleshoot an MSMP access request with no approver",
+          "sameHeading": true
+        },
+        {
+          "a": 2,
+          "b": 3,
+          "headingA": "Troubleshoot an MSMP access request with no approver",
+          "headingB": "Troubleshoot an MSMP access request with no approver",
+          "sameHeading": true
+        },
+        {
+          "a": 4,
+          "b": 5,
+          "headingA": "Troubleshooting",
+          "headingB": "Troubleshooting",
+          "sameHeading": true
+        },
+        {
+          "a": 4,
+          "b": 6,
+          "headingA": "Troubleshooting",
+          "headingB": "Troubleshooting",
+          "sameHeading": true
+        },
+        {
+          "a": 5,
+          "b": 6,
+          "headingA": "Troubleshooting",
+          "headingB": "Troubleshooting",
+          "sameHeading": true
+        }
+      ],
+      "activeTechSeqCount": 0,
+      "candidateTechSeqCount": 0,
+      "activeConfigureCount": 0,
+      "candidateConfigureCount": 0
+    }
+  ],
+  "controls": [
+    {
+      "question": "What is SAP IAS?",
+      "rankingChanged": true,
+      "activeTop3": [
+        "btp/ias.md | SAP Transactions | 0.8165",
+        "btp/ias.md | Interview Summary | 0.8103",
+        "btp/ias.md | SAP Identity Authentication Service (IAS) | 0.8018"
+      ],
+      "candidateTop3": [
+        "btp/ias.md | SAP Transactions | 0.8165",
+        "btp/ias.md | Overview | 0.8035",
+        "btp/ias.md | SAP Identity Authentication Service (IAS) | 0.8018"
+      ],
+      "activeBlur": 1,
+      "candidateBlur": 0,
+      "candidateSourceTarget": true,
+      "activeFiles": [
+        "btp/ias.md",
+        "btp/ias-ips-cloud-identity-services-architect-bank.md"
+      ],
+      "candidateFiles": [
+        "btp/ias.md",
+        "btp/ias-ips-cloud-identity-services-architect-bank.md"
+      ]
+    },
+    {
+      "question": "What is SAP IPS?",
+      "rankingChanged": false,
+      "activeTop3": [
+        "btp/ips.md | SAP Identity Provisioning Service (IPS) | 0.8056",
+        "btp/ips.md | Overview | 0.7934",
+        "btp/ias-ips-cloud-identity-services-architect-bank.md | SAP Cloud Identity Services — IAS & IPS Architecture | 0.7074"
+      ],
+      "candidateTop3": [
+        "btp/ips.md | SAP Identity Provisioning Service (IPS) | 0.8056",
+        "btp/ips.md | Overview | 0.7934",
+        "btp/ias-ips-cloud-identity-services-architect-bank.md | SAP Cloud Identity Services — IAS & IPS Architecture | 0.7074"
+      ],
+      "activeBlur": 0,
+      "candidateBlur": 0,
+      "candidateSourceTarget": false,
+      "activeFiles": [
+        "btp/ips.md",
+        "btp/ias-ips-cloud-identity-services-architect-bank.md"
+      ],
+      "candidateFiles": [
+        "btp/ips.md",
+        "btp/ias-ips-cloud-identity-services-architect-bank.md"
+      ]
+    },
+    {
+      "question": "What is the difference between IAS and IPS?",
+      "rankingChanged": true,
+      "activeTop3": [
+        "btp/ips.md | Red Flags | 0.8382",
+        "btp/ips.md | What Makes This a 10/10 Answer | 0.7103",
+        "btp/ias-ips-cloud-identity-services-architect-bank.md | SAP Cloud Identity Services — IAS & IPS Architecture | 0.7024"
+      ],
+      "candidateTop3": [
+        "btp/ips.md | Red Flags | 0.8382",
+        "btp/ias.md | Interview Summary | 0.7762",
+        "btp/ias.md | What Makes This a 10/10 Answer | 0.7396"
+      ],
+      "activeBlur": 1,
+      "candidateBlur": 0,
+      "candidateSourceTarget": false,
+      "activeFiles": [
+        "btp/ips.md",
+        "btp/ias-ips-cloud-identity-services-architect-bank.md",
+        "btp/ias.md"
+      ],
+      "candidateFiles": [
+        "btp/ips.md",
+        "btp/ias.md",
+        "btp/ias-ips-cloud-identity-services-architect-bank.md"
+      ]
+    },
+    {
+      "question": "How do you secure SAP Fiori?",
+      "rankingChanged": false,
+      "activeTop3": [
+        "fiori/fiori-security.md | Public Edition troubleshooting: app is missing | 0.5204",
+        "fiori/catalogs.md | Sources and scope | 0.5129",
+        "fiori/spaces-pages.md | Sources and scope | 0.4994"
+      ],
+      "candidateTop3": [
+        "fiori/fiori-security.md | Public Edition troubleshooting: app is missing | 0.5204",
+        "fiori/catalogs.md | Sources and scope | 0.5129",
+        "fiori/spaces-pages.md | Sources and scope | 0.4994"
+      ],
+      "activeBlur": 0,
+      "candidateBlur": 0,
+      "candidateSourceTarget": false,
+      "activeFiles": [
+        "fiori/fiori-security.md",
+        "fiori/catalogs.md",
+        "fiori/spaces-pages.md",
+        "fiori/launchpad.md",
+        "s4hana/s4hana-erp-security-architect-bank.md"
+      ],
+      "candidateFiles": [
+        "fiori/fiori-security.md",
+        "fiori/catalogs.md",
+        "fiori/spaces-pages.md",
+        "fiori/launchpad.md",
+        "s4hana/s4hana-erp-security-architect-bank.md"
+      ]
+    },
+    {
+      "question": "Explain an SAP GRC Process Control implementation.",
+      "rankingChanged": true,
+      "activeTop3": [
+        "grc/process-control.md | SAP GRC Process Control | 0.7731",
+        "grc/process-control.md | Access Control and Process Control | 0.5546",
+        "grc/process-control.md | Implement Process Control | 0.5533"
+      ],
+      "candidateTop3": [
+        "grc/process-control.md | SAP GRC Process Control | 0.7731",
+        "grc/process-control.md | Access Control and Process Control | 0.5546",
+        "grc/process-control.md | Implement Process Control | 0.5533"
+      ],
+      "activeBlur": 0,
+      "candidateBlur": 0,
+      "candidateSourceTarget": false,
+      "activeFiles": [
+        "grc/process-control.md"
+      ],
+      "candidateFiles": [
+        "grc/process-control.md"
+      ]
+    },
+    {
+      "question": "How do you configure Firefighter emergency access in SAP GRC?",
+      "rankingChanged": true,
+      "activeTop3": [
+        "grc/grc-overview.md | Implementation Activities | 0.7159",
+        "grc/firefighter.md | Runtime Flow | 0.6514",
+        "grc/msmp.md | Technical Configuration Sequence | 0.6405"
+      ],
+      "candidateTop3": [
+        "grc/grc-overview.md | Implementation Activities | 0.7159",
+        "grc/msmp.md | Technical Configuration Sequence | 0.6658",
+        "grc/firefighter.md | Runtime Flow | 0.6514"
+      ],
+      "activeBlur": 0,
+      "candidateBlur": 0,
+      "candidateSourceTarget": false,
+      "activeFiles": [
+        "grc/grc-overview.md",
+        "grc/firefighter.md",
+        "grc/msmp.md",
+        "grc/eam.md",
+        "grc/grc-principal-architect-interview-bank.md",
+        "grc/grc-scenarios-greenfield-brownfield.md",
+        "grc/authorization-sync.md"
+      ],
+      "candidateFiles": [
+        "grc/grc-overview.md",
+        "grc/msmp.md",
+        "grc/firefighter.md",
+        "grc/eam.md",
+        "grc/grc-principal-architect-interview-bank.md",
+        "grc/grc-scenarios-greenfield-brownfield.md",
+        "grc/authorization-sync.md",
+        "grc/deloitte-usi-specific-gap-fillers.md"
+      ]
+    }
+  ],
+  "loadProof": {
+    "activeMsmpIndex": "D:\\My Projects\\InterviewCopilot\\data\\knowledgeIndex.json",
+    "candidateMsmpIndex": "D:\\My Projects\\InterviewCopilot\\data\\candidate-index\\p1.2-20261030-105244\\knowledgeIndex.json",
+    "activeCtrlIndex": "D:\\My Projects\\InterviewCopilot\\data\\knowledgeIndex.json",
+    "candidateCtrlIndex": "D:\\My Projects\\InterviewCopilot\\data\\candidate-index\\p1.2-20261030-105244\\knowledgeIndex.json"
+  }
+}

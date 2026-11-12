@@ -1,0 +1,1111 @@
+{
+  "summary": {
+    "turns": 60,
+    "disposition": {
+      "answer": 25,
+      "ignore": 4,
+      "defer": 31
+    },
+    "answerRoute": {
+      "preparedScript": 1,
+      "normalGeneration": 24
+    },
+    "evidenceScope": {
+      "technical": 3,
+      "full": 3,
+      "domain": 2,
+      "portfolio": 13,
+      "methodology": 2,
+      "profile": 2
+    },
+    "answeredInCapture": 60,
+    "historicalUnsupportedOnAnsweredTurns": 7,
+    "currentReproduction": {
+      "preventedNoGeneration": 4,
+      "preventedPreparedScript": 1,
+      "evidenceOmitsClaim": 6,
+      "claimStillInEvidence": 0,
+      "stillInPreparedScript": 0
+    }
+  },
+  "rows": [
+    {
+      "turn": 1,
+      "transcript": "Hey, good morning, Valencia. How are you?",
+      "classification": "SHOULD_NOT_ANSWER",
+      "gate": "IGNORE",
+      "reason": "ignore-noise",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 2,
+      "transcript": "Good. Good bye, bye.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 3,
+      "transcript": "It will be two more. There will be. Yeah, there will be two.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 4,
+      "transcript": "This is only one round right? I mean you, you attended only one round of interview till now.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 5,
+      "transcript": "So you might be attending 3 rounds. There might be one more round here. That's it. The final round will be if everything goes fine. The final round will be discussing on the financials and your uh. It's a kind of discussion, the HR kind of discussion.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "profile",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 6,
+      "transcript": "Which we attended only till now. We have conducted one interview, this is the second one. There will be a third technical round will be there and the first the will. That's the HR panel.",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "technical",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 7,
+      "transcript": "Good morning, Vijay. Good morning.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 8,
+      "transcript": "Good, good. Thanks for asking.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 9,
+      "transcript": "We will just wait a little bit for for Miss Nita to join and then we can start. Thank you.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 10,
+      "transcript": "Yes, for sure.",
+      "classification": "SHOULD_NOT_ANSWER",
+      "gate": "IGNORE",
+      "reason": "ignore-noise",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 11,
+      "transcript": "Really. Good morning. Yeah, Yes. How are you doing today?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 12,
+      "transcript": "All well.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 13,
+      "transcript": "Balaji, can you run us through a profile and experience detail what all your word in terms of implementation and pre sales experience?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "PREPARED_SCRIPT",
+      "scriptId": "about-yourself",
+      "evidenceMode": "domain",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [
+        "years:17 years",
+        "users:8,700 user",
+        "countries:11 countries"
+      ],
+      "historicalClaims": [
+        {
+          "claim": "years:17 years",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "users:8,700 user",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "countries:11 countries",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        }
+      ],
+      "currentReproduction": "prevented-prepared-script"
+    },
+    {
+      "turn": 14,
+      "transcript": "Thanks, Balaji. Yeah. What clients have you worked with in the past and I mean what geography specific?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [
+        "region:india",
+        "region:uae",
+        "region:canada",
+        "region:europe",
+        "region:asia"
+      ],
+      "historicalClaims": [
+        {
+          "claim": "region:india",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "region:uae",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "region:canada",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "region:europe",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "region:asia",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        }
+      ],
+      "currentReproduction": "evidence-omits-claim"
+    },
+    {
+      "turn": 15,
+      "transcript": "Industry. What do you handle?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 16,
+      "transcript": "With geographies? Which countries?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [
+        "region:india",
+        "region:uae",
+        "region:canada",
+        "region:germany",
+        "region:australia"
+      ],
+      "historicalClaims": [
+        {
+          "claim": "region:india",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "region:uae",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "region:canada",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "region:germany",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "region:australia",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        }
+      ],
+      "currentReproduction": "evidence-omits-claim"
+    },
+    {
+      "turn": 17,
+      "transcript": "Middle East, can you give us a few examples of customers you work like what kind of projects can you dive into that?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [
+        "users:2,000 users"
+      ],
+      "historicalClaims": [
+        {
+          "claim": "users:2,000 users",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        }
+      ],
+      "currentReproduction": "evidence-omits-claim"
+    },
+    {
+      "turn": 18,
+      "transcript": "Fabtech Internet Balaji little slowly. So Fabtech International, that's a I mean what kind of company you said manufacturing.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "programme",
+      "programmeId": "fabtech",
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 19,
+      "transcript": "OK. So you, how long was the project, can you run us through that piece in a bit of detail and how many team members and just for us to get a sense of what was done? Yeah.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "methodology",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [
+        "months:18 months",
+        "team:team of 6",
+        "users:2,000 users"
+      ],
+      "historicalClaims": [
+        {
+          "claim": "months:18 months",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "team:team of 6",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "users:2,000 users",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        }
+      ],
+      "currentReproduction": "prevented-no-generation"
+    },
+    {
+      "turn": 20,
+      "transcript": "Mm-hmm.",
+      "classification": "SHOULD_NOT_ANSWER",
+      "gate": "IGNORE",
+      "reason": "ignore-noise",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 21,
+      "transcript": "OK. Other than the GRC role configured, you look at any other security area embedding or anything else.",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 22,
+      "transcript": "OK. And what are the other projects that you worked on in the Middle East?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [
+        "users:2,000 users"
+      ],
+      "historicalClaims": [
+        {
+          "claim": "users:2,000 users",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        }
+      ],
+      "currentReproduction": "evidence-omits-claim"
+    },
+    {
+      "turn": 23,
+      "transcript": "Toast has how many users? SAP users?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "methodology",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [
+        "users:8,700 users",
+        "countries:11 countries"
+      ],
+      "historicalClaims": [
+        {
+          "claim": "users:8,700 users",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "countries:11 countries",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        }
+      ],
+      "currentReproduction": "evidence-omits-claim"
+    },
+    {
+      "turn": 24,
+      "transcript": "OK, OK. And any other times anything in the UAE?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [
+        "region:uae"
+      ],
+      "historicalClaims": [
+        {
+          "claim": "region:uae",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        }
+      ],
+      "currentReproduction": "evidence-omits-claim"
+    },
+    {
+      "turn": 25,
+      "transcript": "Or, uh, Qatar kui.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [
+        "region:uae",
+        "region:qatar"
+      ],
+      "historicalClaims": [
+        {
+          "claim": "region:uae",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "region:qatar",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        }
+      ],
+      "currentReproduction": "prevented-no-generation"
+    },
+    {
+      "turn": 26,
+      "transcript": "OK. OK. So, so based in Dubai or or?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 27,
+      "transcript": "And may I ask?",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 28,
+      "transcript": "What's your hands on keyboard experience like? You spoke a lot about different things in SAP. And then you highlighted SAP GRC, so how much have you actually worked on 2 tools?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "methodology",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 29,
+      "transcript": "And totally, how many years of experience teaching?",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "methodology",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 30,
+      "transcript": "17 plus. So when you say 10 + 1010 ten years.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "technical",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [
+        "years:17 years"
+      ],
+      "historicalClaims": [
+        {
+          "claim": "years:17 years",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        }
+      ],
+      "currentReproduction": "prevented-no-generation"
+    },
+    {
+      "turn": 31,
+      "transcript": "Not an SAP.",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "technical",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 32,
+      "transcript": "Priyanka, if you don't mind, I want to understand from Balaji, what does SAP involve if you want to run us through?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 33,
+      "transcript": "Play a little bit. What do you do? Yeah, yeah.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 34,
+      "transcript": "OK. And so when you say that what what steps do you take? So you when do you get involved currently you'll get involved deal in?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 35,
+      "transcript": "And what is your day? From what, what what, what? What's the next with the desktop?",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "profile",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 36,
+      "transcript": "Did your audience is your focus? It's it's not the customer.",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 37,
+      "transcript": "And say.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 38,
+      "transcript": "Just few years.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 39,
+      "transcript": "So networking.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 40,
+      "transcript": "City started with SAP. How how? How did that start with and when when deleting decision years?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 41,
+      "transcript": "And so sod you maintained in your account, do do you also do implementation for SAP?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "domain",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 42,
+      "transcript": "So that again comes out as we're doing here.",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "contextual-follow-up",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "technical",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 43,
+      "transcript": "Implementation reco.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 44,
+      "transcript": "Then once you get your from. New York.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "profile",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 45,
+      "transcript": "Does this mean that you have hands on your keyboard and do configuration changes?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "profile",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 46,
+      "transcript": "Initially or then you, you you.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 47,
+      "transcript": "And for all these activities you do don't need.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 48,
+      "transcript": "Yeah, Priyanka.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 49,
+      "transcript": "No. So Balaji, have you statistical or any session demo case?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "profile",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 50,
+      "transcript": "Sure. And also have any background are you? Basically add-on security.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "technical",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [
+        "users:8,700 users",
+        "countries:11 countries"
+      ],
+      "historicalClaims": [
+        {
+          "claim": "users:8,700 users",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        },
+        {
+          "claim": "countries:11 countries",
+          "inCurrentEvidence": false,
+          "inPreparedScript": false
+        }
+      ],
+      "currentReproduction": "prevented-no-generation"
+    },
+    {
+      "turn": 51,
+      "transcript": "MMM.",
+      "classification": "SHOULD_NOT_ANSWER",
+      "gate": "IGNORE",
+      "reason": "ignore-noise",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 52,
+      "transcript": "Sure. OK, no assistance. I don't need anything else.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 53,
+      "transcript": "I can take some of that. Most most this is a correction. This is coming. Yeah. So don't, don't, don't, don't have it but but but we are trying to prosper. Explain. With, with, with, with, with the. Post selling is different and very, very different.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 54,
+      "transcript": "Objection handling because mostly. Problem. Right and. Proposal writing demos present. All of that.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "full",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 55,
+      "transcript": "Basically it is. Identify customer and then then it will be her. Partner playing to. How this happened?",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 56,
+      "transcript": "Will be very lucky saying they need. From step one. Deal with. The customer. Realize that he has a. So, yeah, so.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "ambiguous-fragment",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 57,
+      "transcript": "Connect correct? So that is. Engagement only only or the key technical part will be.",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 58,
+      "transcript": "And time, time, time, time, time, time, time, time, time, time, time, time, times, times, times, times, times, times, times, times, times, times times, times times, times, times times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times, times. Customers also ask for it to win production. So the person definitely should have very strong SAP knowledge because the people that he's going to be engaging with are SAP experts on the other side. Yeah. Who is? Extremely Yeah.",
+      "classification": "SHOULD_ANSWER",
+      "gate": "ANSWER",
+      "reason": "well-formed-question-or-technical-issue",
+      "route": "GENERATION",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 59,
+      "transcript": "Set enough balance, we will get to have, have, have, have.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    },
+    {
+      "turn": 60,
+      "transcript": "Interviewing and then we will let you know the outcome. Vijay will communicate with you. But thank you for your time and thank you for spending time. We'll take feedback from Chandrika as well. She has spoken to you. And if you have any questions, feel free to reach out to Vijay.",
+      "classification": "AMBIGUOUS",
+      "gate": "DEFER",
+      "reason": "insufficient-question-context",
+      "route": "NONE",
+      "scriptId": null,
+      "evidenceMode": "portfolio",
+      "programmeId": null,
+      "answerGenerated": true,
+      "unsupportedClaims": [],
+      "historicalClaims": [],
+      "currentReproduction": "none"
+    }
+  ]
+}

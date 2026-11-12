@@ -1,0 +1,104 @@
+{
+  "at": "2026-11-03T06:14:36.886Z",
+  "base": "http://127.0.0.1:3103",
+  "pass": false,
+  "cases": [
+    {
+      "id": "critical-actions",
+      "ok": true,
+      "note": "",
+      "status": 200,
+      "route": "GENERATION",
+      "providerMode": "mock",
+      "model": null,
+      "preview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive executable — typically a transaction, Web Dynpro, Fiori app, or service — as high risk on its own. It",
+      "events": [
+        "admission",
+        "answer_final",
+        "message",
+        "generation",
+        "analysis"
+      ]
+    },
+    {
+      "id": "mitigation-lifecycle",
+      "ok": true,
+      "note": "",
+      "status": 200,
+      "route": "GENERATION",
+      "providerMode": "mock",
+      "model": null,
+      "preview": "In GRC Access Control, mitigating controls are the governed exception path when a risk cannot be removed by changing access. Operationally I treat the control lifecycle as define the control and monitoring activity, assi",
+      "events": [
+        "admission",
+        "answer_final",
+        "message",
+        "generation",
+        "analysis"
+      ]
+    },
+    {
+      "id": "ruleset-components",
+      "ok": true,
+      "note": "",
+      "status": 200,
+      "route": "GENERATION",
+      "providerMode": "mock",
+      "model": null,
+      "preview": "In on-premise SAP GRC Access Control, a ruleset is the maintained ARA content that defines what constitutes access risk — not a cloud identity-governance business-function-group model. The core components are Risks, Func",
+      "events": [
+        "admission",
+        "answer_final",
+        "message",
+        "generation",
+        "analysis"
+      ]
+    },
+    {
+      "id": "ff-logs",
+      "ok": true,
+      "note": "",
+      "status": 200,
+      "route": "RETRIEVED_PROCEDURE",
+      "providerMode": null,
+      "model": null,
+      "preview": "I would choose Role-Based firefighting when Fiori/web channels must keep actions under the user's own ID. Mechanism: Build firefighter roles on the target, enable Role-Based EAM in Access Control, and provision temporari",
+      "events": [
+        "admission",
+        "answer_final",
+        "message"
+      ]
+    },
+    {
+      "id": "what-if-defer",
+      "ok": true,
+      "note": "deferred",
+      "status": 200,
+      "route": "NONE",
+      "providerMode": null,
+      "model": null,
+      "preview": "",
+      "events": [
+        "admission"
+      ]
+    },
+    {
+      "id": "s4-experience",
+      "ok": false,
+      "note": "expect miss",
+      "status": 200,
+      "route": "GENERATION",
+      "providerMode": "mock",
+      "model": null,
+      "preview": "Maintain two checklists where needed: (A) Activate phase exits, (B) RISE customer vs SAP responsibilities (SSO design Excluded Task, hyperscaler controls, Cloud ALM usage). Clean-core extension decisions recorded in Expl",
+      "events": [
+        "admission",
+        "answer_final",
+        "message",
+        "generation",
+        "analysis"
+      ]
+    }
+  ],
+  "healthStatus": 200
+}

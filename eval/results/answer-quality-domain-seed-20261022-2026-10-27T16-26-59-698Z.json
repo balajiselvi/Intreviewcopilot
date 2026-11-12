@@ -1,0 +1,1455 @@
+{
+  "createdAt": "2026-10-27T16:26:59.696Z",
+  "seed": 20261022,
+  "mode": "routing-and-verified-workflow-only",
+  "baseUrl": null,
+  "model": null,
+  "domainCount": 18,
+  "totalCases": 36,
+  "plannedCases": 36,
+  "requestsSent": 0,
+  "maxLiveRequests": 0,
+  "rateLimitDelayMs": 0,
+  "maxSpendUsd": null,
+  "worstCaseSpendUsd": null,
+  "estimatedSpendUsd": null,
+  "stopReason": null,
+  "failed": 0,
+  "completed": 36,
+  "rows": [
+    {
+      "domain": "SAP-Security-PFCG",
+      "question": "How would you design a derived PFCG role model for country variants?",
+      "topics": [],
+      "verifiedWorkflowId": "su24-pfcg-derived-roles",
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "For SU24 proposals and PFCG derived roles, I typically maintain check indicators and proposed values in SU24 so they land in USOBT_C and USOBX_C, and I use SU25 step 2b when upgrade defaults change. In PFCG I create the imparting role in AGR_DEFINE, set Derive from Role on the child, keep org levels only on the derived role in AGR_1252, and leave non-org authorizations in AGR_1251. From there I generate profiles into UST12 and run PFUD or PFCG_TIME_DEPENDENCY so AGR_USERS assignments pick up the new profile — never hand-editing AGR_1251 as a SU24 substitute, and always SoD-simulating before Production. After PFUD I have the test user complete the business transaction for that org value; SU53 or STAUTHTRACE only after a failed AUTHORITY-CHECK, with USR02 confirming the user master is active.",
+      "answerPreview": "For SU24 proposals and PFCG derived roles, I typically maintain check indicators and proposed values in SU24 so they land in USOBT_C and USOBX_C, and I use SU25 step 2b when upgrade defaults change. In PFCG I create the imparting role in AG",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "SAP-Security-PFCG",
+      "question": "A user has the role but SU53 still shows a missing authorization. How do you triage?",
+      "topics": [],
+      "verifiedWorkflowId": "abap-authorization-trace-su53",
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "I start with SU53 for the last failed check, but if it is blank or incomplete I run STAUTHTRACE filtered to the affected user and server, reproduce the failing action, and evaluate the actual failed AUTHORITY-CHECK. On older landscapes I use ST01 with the Authorization Check filter. I record the system, client, user, action, and timestamp; for RFC, Fiori/Gateway, or batch calls, I trace the actual execution path and user rather than assuming a dialog-user check. I distinguish a missing transaction or service permission from an authorization-object, field-value, or organizational-level failure, then apply the smallest justified PFCG role change, using SU24 proposals where appropriate. I do not use SAP_ALL as a diagnostic shortcut. Finally I repeat the same business action, verify the relevant trace passes, and retain a negative test for actions the user should not perform.",
+      "answerPreview": "I start with SU53 for the last failed check, but if it is blank or incomplete I run STAUTHTRACE filtered to the affected user and server, reproduce the failing action, and evaluate the actual failed AUTHORITY-CHECK. On older landscapes I us",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "Fiori-Gateway",
+      "question": "How do you authorize a custom Fiori app through catalog and OData services?",
+      "topics": [
+        "Fiori"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "Fiori-Gateway",
+      "question": "A Fiori tile is visible but the app fails to start. What do you check first?",
+      "topics": [
+        "Fiori"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-ARA",
+      "question": "How would you baseline SoD risks for a new role set before provisioning?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-ARA",
+      "question": "An ARA role analysis returns a risk absent from user analysis. What do you compare?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-ARM-MSMP",
+      "question": "How do you configure an MSMP workflow for access requests?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": "grc-msmp-access-request-config",
+      "expectedWorkflow": "grc-msmp-access-request-config",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "First, I check whether the delivered Access Request Approval workflow already covers the request type; if it does, I reuse that process and change only the initiator, paths, stages, agents, and route mapping required by the business. If a new path is needed, I define the BRF+ initiator or routing rule in Define Workflow-Related MSMP Rules, then maintain the process, rule and every RULE_RESULT, stage agents, paths, stages, timeout/escalation behaviour, and rule-result-to-path mapping in Maintain MSMP Workflows. I generate the MSMP version and test a request, confirming the selected path, stage, approver, and audit log in Request Status > Instance Status. I inspect provisioning logs only after the request is approved and the target assignment fails.",
+      "answerPreview": "First, I check whether the delivered Access Request Approval workflow already covers the request type; if it does, I reuse that process and change only the initiator, paths, stages, agents, and route mapping required by the business. If a n",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-ARM-MSMP",
+      "question": "An access request is stuck with no approver. What evidence do you check first?",
+      "topics": [],
+      "verifiedWorkflowId": "grc-msmp-stuck-troubleshoot",
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "When an MSMP access request is stuck because routing agents fail, I typically start in GRFNMW_CONFIGURE_WD to confirm the generated MSMP version and path mapping before I touch BRF+ agents. From there I run program GRFNMW_DB_CHECK to catch sync gaps between the MSMP runtime and the workflow database, then read GRACFFLOG and SLG1 under object GRAC for initiator or agent failures and check SWIA or SWI1 for the actual work-item state. Only after that evidence is clear do I adjust initiator RULE_RESULT mapping or stage agents — and never hot-fix Production MSMP without a transport and SoD owner awareness. I reproduce the request and prove the path, stage, and approver in Request Status → Instance Status with a clean SLG1 trail.",
+      "answerPreview": "When an MSMP access request is stuck because routing agents fail, I typically start in GRFNMW_CONFIGURE_WD to confirm the generated MSMP version and path mapping before I touch BRF+ agents. From there I run program GRFNMW_DB_CHECK to catch ",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-EAM",
+      "question": "How do you configure Firefighter emergency access in SAP GRC?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": "grc-firefighter",
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "A GRC firefighter ID is created on the target and synchronized up into GRC. Create the firefighter ID on the target system. Assign the firefighter role and the owner on that ID. The user launches with GRAC_SPM or /GRCPI/GRIA_EAM, gives a reason, and works under the firefighter ID. Repository sync brings the ID and the log up into GRC. The controller reviews the log in the GRC workflow. This ID is not created in IAG Maintain Privileged Access.",
+      "answerPreview": "A GRC firefighter ID is created on the target and synchronized up into GRC. Create the firefighter ID on the target system. Assign the firefighter role and the owner on that ID. The user launches with GRAC_SPM or /GRCPI/GRIA_EAM, gives a re",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [
+          {
+            "severity": "LOW",
+            "dimension": "evidenceUncertainty",
+            "code": "MISSING_SOURCE_META",
+            "detail": "Verified workflow has no sourceFiles metadata"
+          }
+        ],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-EAM",
+      "question": "A Firefighter user cannot launch an approved emergency session. What do you validate?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": "grc-firefighter-launch-troubleshooting",
+      "expectedWorkflow": "grc-firefighter-launch-troubleshooting",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "For a Firefighter who cannot launch an approved emergency session, I validate assignment, target ID and role, launch transaction, and repository sync before redesigning EAM. Confirm the Firefighter assignment and approval are active for that user and Firefighter ID, including validity dates and owner or controller assignment on the ID. Verify the user is launching with GRAC_SPM or /GRCPI/GRIA_EAM against the intended target connector, and that the Firefighter ID still exists on the target with the expected elevated role. Inspect reason-code and session prerequisites, then check repository synchronization so GRC and the target agree on the ID, assignment, and log configuration. Reproduce with a known-good Firefighter user on the same connector to separate a user-specific assignment defect from a connector, sync, or launchpad defect. A successful launch still requires the later controller log review; do not treat launch success alone as closed emergency-access control evidence. Do not answer a launch failure by recreating the Firefighter ID unless the ID is missing or invalid on the target.",
+      "answerPreview": "For a Firefighter who cannot launch an approved emergency session, I validate assignment, target ID and role, launch transaction, and repository sync before redesigning EAM. Confirm the Firefighter assignment and approval are active for tha",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-BRM",
+      "question": "How would you design a governed business role lifecycle in SAP GRC BRM?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": "brm-business-role-lifecycle",
+      "expectedWorkflow": "brm-business-role-lifecycle",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "In BRM I govern business-role definitions and their technical-role mappings so ARM requesters pick job-function names while provisioning still assigns the underlying PFCG roles. Define business roles in business language from agreed job functions, then map each business role to the correct underlying single, derived, or composite technical roles. Validate the mapping against actual technical role content and SoD expectations before requesters use the business role in ARM. Govern changes through BRM maintenance so technical role redesigns update the business-role mapping; retire business roles that no longer represent an active job function. Prove that an ARM request for the business role provisions the intended technical roles and that the business name still matches the access granted. BRM mapping is not PFCG role design itself and not IAG Role Designer.",
+      "answerPreview": "In BRM I govern business-role definitions and their technical-role mappings so ARM requesters pick job-function names while provisioning still assigns the underlying PFCG roles. Define business roles in business language from agreed job fun",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-BRM",
+      "question": "A business role change is approved in BRM but the technical role is stale. How do you isolate ownership?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": "brm-stale-technical-mapping-troubleshooting",
+      "expectedWorkflow": "brm-stale-technical-mapping-troubleshooting",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "When a BRM business-role change is approved but the technical role is stale, I isolate mapping ownership between BRM and the technical role maintainers before redesigning ARM. Compare the approved business role in BRM with its current technical-role mapping and with the technical roles that actually exist on the target after the change. Determine ownership: BRM owners maintain the business-to-technical mapping; PFCG or role admins own the technical role content; ARM only consumes the mapping at request time. If the business role was approved but the technical role is stale or missing, correct the BRM mapping or the transported technical role, then re-test provisioning through that business role. Do not treat an Access Control certification sync or an IAG Role Designer change as the first explanation for a BRM mapping defect. Re-request or re-provision via the business role and confirm the target technical assignments match the intended job function. A certification Authorization Sync issue is a different symptom from BRM mapping drift after a technical role change.",
+      "answerPreview": "When a BRM business-role change is approved but the technical role is stale, I isolate mapping ownership between BRM and the technical role maintainers before redesigning ARM. Compare the approved business role in BRM with its current techn",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-Process-Control",
+      "question": "How would you implement a manual control test plan in SAP GRC Process Control?",
+      "topics": [
+        "Process Control"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-Process-Control",
+      "question": "An automated control test produces an unexpected result. How do you isolate the cause?",
+      "topics": [
+        "Process Control"
+      ],
+      "verifiedWorkflowId": "process-control-test-troubleshooting",
+      "expectedWorkflow": "process-control-test-troubleshooting",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "An unexpected Process Control test result is isolated through control master data, Planner assignment, and connector or test evidence, not through Access Control MSMP redesign. Identify the control, organization, regulation, tester, and Planner assignment for the unexpected evaluation before changing unrelated Access Control workflow. For a manual test, reopen Assessments, Manual Test Plans and confirm the plan was Ready or Reserved, the window is current, and Pass or Fail was recorded on the intended activities. For an automated evaluation, validate the source-system connector and the control data the evaluation depends on, then correct master data or connector evidence and rerun. Retest only after the control definition, ownership, and evidence inputs are corrected, and keep issue closure evidence with the retest. Do not diagnose a Process Control test with AGR_USERS, AGR_1251, or BW analysis authorizations unless that control monitors those access objects.",
+      "answerPreview": "An unexpected Process Control test result is isolated through control master data, Planner assignment, and connector or test evidence, not through Access Control MSMP redesign. Identify the control, organization, regulation, tester, and Pla",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "IAG",
+      "question": "How would you build roles in IAG?",
+      "topics": [
+        "IAG"
+      ],
+      "verifiedWorkflowId": "iag-role-design",
+      "expectedWorkflow": "iag-role-design",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "When tackling IAG Role Design, my standard approach is to lock the business role's purpose, target apps, job function, and risk criteria before I touch entitlements. In Role Designer under Business Roles I build the role from the available application-access data, then I walk every included entitlement against that job function and strip anything that is not justified. Where the tenant uses role approvers, I always make sure Assignment Approver and Content Approver are populated through the IAS approver-group mapping and sync — content approval is a separate, release-dependent workflow and creating the role alone never starts it. From there I review the role's risk picture, remediate or mitigate conflicts, and only after approval do I assign or provision and prove least-privilege effective access with a representative user in each target. IAG Role Design never replaces target-side enforcement or classic PFCG administration.",
+      "answerPreview": "When tackling IAG Role Design, my standard approach is to lock the business role's purpose, target apps, job function, and risk criteria before I touch entitlements. In Role Designer under Business Roles I build the role from the available ",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "IAG",
+      "question": "How do you troubleshoot failed IAG access analysis or synchronization?",
+      "topics": [
+        "IAG"
+      ],
+      "verifiedWorkflowId": "iag-analysis-sync-troubleshooting",
+      "expectedWorkflow": "iag-analysis-sync-troubleshooting",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "For failed IAG access analysis or synchronization, I split analysis-ruleset evidence from sync or provisioning evidence before changing either side. Separate the symptom: Access Analysis risk evaluation failures belong to IAG governance content and jobs, while identity or entitlement synchronization failures belong to the connector, bridge, or provisioning path that feeds IAG. For Access Analysis, inspect Rule Setup processing and validation logs, Business Function Group assignment for the target, and the Access Analysis or Manage Jobs result for the affected system before changing request workflow rules. For synchronization, inspect the relevant IAG or bridge sync job history and, when identity data is the source, the IPS job or SCIM provisioner logs for skipped or failed records; do not treat an Access Request path defect as an analysis ruleset defect. Confirm the corrected analysis or sync job completes and that a representative access or risk result matches the expected target data. Access Analysis rules are not Access Request RequestTypeRule routing, and they are not MSMP.",
+      "answerPreview": "For failed IAG access analysis or synchronization, I split analysis-ruleset evidence from sync or provisioning evidence before changing either side. Separate the symptom: Access Analysis risk evaluation failures belong to IAG governance con",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "IAS-IPS",
+      "question": "How does IAS federation work with a corporate IdP?",
+      "topics": [
+        "IAS"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "IAS-IPS",
+      "question": "An IPS job completes with skipped users. How do you isolate transformation versus target errors?",
+      "topics": [
+        "IPS"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "SAP-IDM",
+      "question": "How would you design SAP IDM provisioning to an ABAP target?",
+      "topics": [
+        "SAP IDM"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "SAP-IDM",
+      "question": "IDM provisioning fails after a target role rename. What do you verify?",
+      "topics": [
+        "SAP IDM"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "BTP",
+      "question": "How do you design BTP role collections for an application role template?",
+      "topics": [
+        "BTP"
+      ],
+      "verifiedWorkflowId": "btp-role-collection",
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "On BTP I do not reach for PFCG or AGR_USERS — authorization starts in xs-security.json with scopes and role templates, then moves through XSUAA roles into BTP role collections and IAS group mapping. I typically define the scopes and role-templates in xs-security.json so the XSUAA runtime can validate the JWT and enforce those scopes at the app boundary, create a role from each template, place it in a role collection, and trust the subaccount to IAS over SAML 2.0 or OIDC so IAS user groups map to that collection. I keep destination OAuth clients separate from end-user collections and change-control the trust and mappings. After a fresh sign-in I confirm the token claims and issued collections, then retest the denied HTML5 action — destination auth failures are a different plane from missing scopes.",
+      "answerPreview": "On BTP I do not reach for PFCG or AGR_USERS — authorization starts in xs-security.json with scopes and role templates, then moves through XSUAA roles into BTP role collections and IAS group mapping. I typically define the scopes and role-te",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [
+          {
+            "severity": "LOW",
+            "dimension": "evidenceUncertainty",
+            "code": "MISSING_SOURCE_META",
+            "detail": "Verified workflow has no sourceFiles metadata"
+          }
+        ],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "BTP",
+      "question": "A BTP role collection mapped to an IdP group does not take effect. How do you isolate trust and mapping?",
+      "topics": [
+        "BTP"
+      ],
+      "verifiedWorkflowId": "btp-role-collection-mapping-troubleshooting",
+      "expectedWorkflow": "btp-role-collection-mapping-troubleshooting",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "When a BTP role collection mapped to an IdP group does not take effect, I isolate trust, group claim mapping, role-collection contents, and re-login before redesigning roles. Confirm the subaccount trust points at the intended identity provider and that the assertion or token still carries the expected group claim after sign-in. Compare the IdP group name with the role-collection mapping attribute exactly, including case and nested-group behavior the IdP emits. Verify the role collection contains the application role derived from the required role template, then have the user sign in again so the new collection is issued. Separate destination authentication failures from authorization mapping; a destination client secret does not grant a missing role collection. Retest the denied application action after a fresh sign-in and confirm the issued role collections for that user in the BTP cockpit. Creating a new role collection is not the first response when trust or group mapping evidence already explains the miss.",
+      "answerPreview": "When a BTP role collection mapped to an IdP group does not take effect, I isolate trust, group claim mapping, role-collection contents, and re-login before redesigning roles. Confirm the subaccount trust points at the intended identity prov",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "S4-RISE",
+      "question": "How do Public Edition business roles differ from Private Edition PFCG roles?",
+      "topics": [
+        "S/4"
+      ],
+      "verifiedWorkflowId": "s4-public-vs-private-roles",
+      "expectedWorkflow": "s4-public-vs-private-roles",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "Public Edition uses business roles and restrictions; Private Edition and on-premise still use PFCG for authorization design. On S/4HANA Cloud Public Edition, authorization is designed as business roles with business catalogs and restriction types in Maintain Business Roles, then assigned in Maintain Business Users. On Private Edition and on-premise, PFCG remains the role-and-authorization design tool, with SU24 proposals and classic authorization objects; launchpad spaces may still be assigned on the PFCG role. Do not design Public Edition access in PFCG, and do not treat Maintain Business Roles as the Private Edition substitute for PFCG. Name the edition before describing the admin surface; identity planes (IAS/IPS) remain separate from either authorization tool. IAG business-role governance is a separate cloud service; it is not the S/4 Public Edition Maintain Business Roles procedure.",
+      "answerPreview": "Public Edition uses business roles and restrictions; Private Edition and on-premise still use PFCG for authorization design. On S/4HANA Cloud Public Edition, authorization is designed as business roles with business catalogs and restriction",
+      "quality": {
+        "pass": true,
+        "questionType": "general",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "S4-RISE",
+      "question": "After an S/4HANA upgrade, authorization behavior changed in production. How do you triage?",
+      "topics": [
+        "S/4"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "SuccessFactors",
+      "question": "How do you implement SuccessFactors RBP while limiting the target population?",
+      "topics": [
+        "SuccessFactors"
+      ],
+      "verifiedWorkflowId": "sf-rbp",
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "When I configure SuccessFactors authorization, I typically work the RBP triad as three distinct objects. I start in Manage Permission Roles to grant the activity permissions, then move into Manage Permission Groups to define who belongs to that role, and I set Target Population separately so it controls whose data those people can see — a permission group is never the target population. SSO only authenticates; it does not grant RBP. I validate by signing in as a group member and confirming the intended data scope, then proving a user outside the target population cannot see it.",
+      "answerPreview": "When I configure SuccessFactors authorization, I typically work the RBP triad as three distinct objects. I start in Manage Permission Roles to grant the activity permissions, then move into Manage Permission Groups to define who belongs to ",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [
+          {
+            "severity": "LOW",
+            "dimension": "evidenceUncertainty",
+            "code": "MISSING_SOURCE_META",
+            "detail": "Verified workflow has no sourceFiles metadata"
+          }
+        ],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "SuccessFactors",
+      "question": "A SuccessFactors permission was granted but the action remains unavailable. What do you inspect?",
+      "topics": [
+        "SuccessFactors"
+      ],
+      "verifiedWorkflowId": "sf-rbp-unavailable-troubleshooting",
+      "expectedWorkflow": "sf-rbp-unavailable-troubleshooting",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "Manage Permission Roles, Manage Permission Groups, and Target Populations are what I inspect first when SuccessFactors compensation data is missing for a subsidiary — before touching SSO. I confirm the Permission Role grants the compensation view activities, that the HR administrator is in the linked Permission Group, and that the Target Population includes that subsidiary; group membership alone fails when employees sit outside the target population. SSO authentication success is a separate plane from RBP authorization. After any RBP change I sign out/in, retest the exact subsidiary compensation view, and prove denied persons remain outside the Target Population.",
+      "answerPreview": "Manage Permission Roles, Manage Permission Groups, and Target Populations are what I inspect first when SuccessFactors compensation data is missing for a subsidiary — before touching SSO. I confirm the Permission Role grants the compensatio",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [
+          {
+            "severity": "LOW",
+            "dimension": "evidenceUncertainty",
+            "code": "MISSING_SOURCE_META",
+            "detail": "Verified workflow has no sourceFiles metadata"
+          }
+        ],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "Ariba",
+      "question": "How would you provision Ariba users with enterprise SSO and controlled group access?",
+      "topics": [
+        "Ariba"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "Ariba",
+      "question": "An Ariba user authenticates but cannot see an expected workbench. What layers do you separate?",
+      "topics": [
+        "Ariba"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "HANA-BW",
+      "question": "How would you design least-privilege HANA analytic privileges for a reporting role?",
+      "topics": [
+        "HANA"
+      ],
+      "verifiedWorkflowId": "hana-analytic-privilege-design",
+      "expectedWorkflow": "hana-analytic-privilege-design",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "For least-privilege HANA reporting access I combine object privileges with analytic privileges on repository or HDI roles, then prove row filtering with positive and negative tests. Separate object privileges that grant SELECT on the view from analytic privileges that inject the row filter for the reporting role. Define analytic privileges against the analytic or calculation views the role must read, using the business attributes that bound the intended rows. Prefer repository or HDI roles for transportable application security; keep catalog roles for ad hoc administration that must not ship with the application. Object privileges alone do not provide row-level security; confirm analytic-privilege filtering with a negative test, not only a successful SELECT. HANA analytic privileges are not BW analysis authorizations in RSECADMIN.",
+      "answerPreview": "For least-privilege HANA reporting access I combine object privileges with analytic privileges on repository or HDI roles, then prove row filtering with positive and negative tests. Separate object privileges that grant SELECT on the view f",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "HANA-BW",
+      "question": "A HANA user can connect but cannot read one view. What checks isolate the access boundary?",
+      "topics": [
+        "HANA"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "SAC-Datasphere-CAR",
+      "question": "How would you design least-privilege Datasphere space access for an analytics team?",
+      "topics": [
+        "Datasphere"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "SAC-Datasphere-CAR",
+      "question": "A CAR analytics user has application access but cannot see expected data. How do you isolate the security layer?",
+      "topics": [
+        "CAR"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "Activate-PMP",
+      "question": "How would you plan the SAP security workstream across Activate Explore, Realize, and Deploy?",
+      "topics": [
+        "Activate"
+      ],
+      "verifiedWorkflowId": "activate-security-workstream",
+      "expectedWorkflow": "activate-security-workstream",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "For the SAP security workstream across Activate Explore, Realize, and Deploy, I plan scope in Explore, build and test in Realize, and prove cutover-ready access in Deploy. In Explore, lock authorization and identity scope before build: edition-correct enforcement, identity and governance planes in scope, SoD and privileged-access expectations, and the critical processes that must prove access before go-live. In Realize, build and test iteratively against that baseline: roles or restrictions, provisioning mappings, governed request paths where in scope, logged emergency access, and positive plus negative security test evidence before promotion. In Deploy, rehearse cutover with identity and authorization dependencies explicit: role readiness, assignment evidence, emergency-access path, critical-process access proof, open security defects, and the go/no-go decision. Do not quote a universal duration or percentage of standard processes; those belong to the approved plan for that contract. Public Edition business roles and Private Edition or on-premise PFCG remain different enforcement tools; do not describe one procedure as universal.",
+      "answerPreview": "For the SAP security workstream across Activate Explore, Realize, and Deploy, I plan scope in Explore, build and test in Realize, and prove cutover-ready access in Deploy. In Explore, lock authorization and identity scope before build: edit",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "Activate-PMP",
+      "question": "A Deploy cutover rehearsal fails on identity dependencies. How do you replan the go-live gate?",
+      "topics": [
+        "Activate"
+      ],
+      "verifiedWorkflowId": "activate-cutover-dependency-recovery",
+      "expectedWorkflow": "activate-cutover-dependency-recovery",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "For an identity-dependent cutover failure, I would replan the Deploy gate around verified dependency closure, retesting, and an explicit go/no-go decision. In Deploy, I would stop and assess the failed rehearsal against the cutover entry criteria rather than treat the date as the only success measure. Trace each identity dependency to its accountable owner, required completion evidence, and downstream role, trust, synchronization, or provisioning test; record the blocker, impact, decision date, and recovery action in the dependency and RAID tracking. Re-sequence the work only where dependencies permit, then rerun the affected identity and critical-business-role tests, including expected access succeeding and unintended access remaining absent. Escalate schedule or scope changes through project change control and the agreed governance forum. At the go/no-go gate, proceed only when mandatory security and business cutover criteria have evidence and owners accept residual risks; otherwise agree a controlled replan or the rehearsed rollback path for that deployment. Record the decision, retest results, accepted risks, cutover evidence, and operational handover owner before closing the gate. A technical rollback is deployment- and business-state-dependent; do not promise it after irreversible production activity.",
+      "answerPreview": "For an identity-dependent cutover failure, I would replan the Deploy gate around verified dependency closure, retesting, and an explicit go/no-go decision. In Deploy, I would stop and assess the failed rehearsal against the cutover entry cr",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "Compliance",
+      "question": "How would you use SAP GRC controls to support SOX ITGC access reviews without claiming automatic compliance?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "Compliance",
+      "question": "A SOX access control failed because approvals were missing. How do you contain, remediate, and retest it?",
+      "topics": [],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "responseLatencyMs": null,
+      "completionStatus": "not-run",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": null,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "",
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    }
+  ]
+}

@@ -1,0 +1,156 @@
+﻿event: admission
+data: {"decision":"ANSWER","route":"GENERATION","reason":"request","scriptId":null,"evidenceMode":"programme"}
+
+data: {"text":"The"}
+
+data: {"text":" Fab"}
+
+data: {"text":"tech"}
+
+data: {"text":" project"}
+
+data: {"text":" sp"}
+
+data: {"text":"anned"}
+
+data: {"text":" approximately"}
+
+data: {"text":" three"}
+
+data: {"text":" years"}
+
+data: {"text":","}
+
+data: {"text":" from"}
+
+data: {"text":" November"}
+
+data: {"text":" "}
+
+data: {"text":"201"}
+
+data: {"text":"6"}
+
+data: {"text":" to"}
+
+data: {"text":" September"}
+
+data: {"text":" "}
+
+data: {"text":"201"}
+
+data: {"text":"9"}
+
+data: {"text":"."}
+
+data: {"text":" The"}
+
+data: {"text":" team"}
+
+data: {"text":" size"}
+
+data: {"text":" is"}
+
+data: {"text":" not"}
+
+data: {"text":" documented"}
+
+data: {"text":" in"}
+
+data: {"text":" my"}
+
+data: {"text":" background"}
+
+data: {"text":","}
+
+data: {"text":" so"}
+
+data: {"text":" I"}
+
+data: {"text":" can't"}
+
+data: {"text":" provide"}
+
+data: {"text":" that"}
+
+data: {"text":" detail"}
+
+data: {"text":"."}
+
+data: {"text":" The"}
+
+data: {"text":" project"}
+
+data: {"text":" was"}
+
+data: {"text":" based"}
+
+data: {"text":" in"}
+
+data: {"text":" Dubai"}
+
+data: {"text":","}
+
+data: {"text":" and"}
+
+data: {"text":" while"}
+
+data: {"text":" the"}
+
+data: {"text":" specific"}
+
+data: {"text":" countries"}
+
+data: {"text":" covered"}
+
+data: {"text":" are"}
+
+data: {"text":" not"}
+
+data: {"text":" mentioned"}
+
+data: {"text":","}
+
+data: {"text":" it"}
+
+data: {"text":" involved"}
+
+data: {"text":" a"}
+
+data: {"text":" landscape"}
+
+data: {"text":" rebuilt"}
+
+data: {"text":" for"}
+
+data: {"text":" around"}
+
+data: {"text":" "}
+
+data: {"text":"2"}
+
+data: {"text":","}
+
+data: {"text":"000"}
+
+data: {"text":" users"}
+
+data: {"text":" and"}
+
+data: {"text":" "}
+
+data: {"text":"450"}
+
+data: {"text":" roles"}
+
+data: {"text":"."}
+
+event: generation
+data: {"finish_reason":"stop","maxTokens":240,"prompt_tokens":7473,"completion_tokens":72,"total_tokens":7545}
+
+event: analysis
+data: {"overallScore":0,"scale":10,"breakdown":[],"findings":["Technical depth is weak — few concrete SAP objects or T-codes mentioned.","Business framing is missing.","Answer is too short for a live interview."],"followups":["Can you walk through a specific example of this in practice?","What's the biggest risk if this is implemented incorrectly?"],"gaps":[],"contextSummary":{"questionIntent":"DIRECT_QUESTION","questionTopic":"General","questionSubtopic":"","questionResolved":"How long was the Fabtech project, how many team members were there, and which countries did it cover?","interviewerObjective":"direct question","depth":"normal","correctionDetected":false,"rejectionCount":0,"answeredFacets":[],"unresolvedFacets":["direct question"],"scenarioMode":"NONE","scenarioType":"","scenarioId":"","problem":"","systems":[],"constraints":[],"step":"","completedSteps":[],"unresolvedSteps":[],"evidence":{"confirmed":[],"inferred":[],"missing":[]},"experienceMode":"HYPOTHETICAL","scenarioConfidence":0,"correctionFlag":false,"incompleteUtterance":false}}
+
+data: [DONE]
+
+

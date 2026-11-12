@@ -1,0 +1,837 @@
+{
+  "createdAt": "2026-10-22T08:24:18.277Z",
+  "seed": 20261022,
+  "mode": "routing-and-verified-workflow-only",
+  "baseUrl": null,
+  "domainCount": 18,
+  "totalCases": 36,
+  "failed": 0,
+  "completed": 36,
+  "rows": [
+    {
+      "domain": "SAP-Security-PFCG",
+      "question": "How would you design a derived PFCG role model for country variants?",
+      "topics": [],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "SAP-Security-PFCG",
+      "question": "A user has the role but SU53 still shows a missing authorization. How do you triage?",
+      "topics": [],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "Fiori-Gateway",
+      "question": "How do you authorize a custom Fiori app through catalog and OData services?",
+      "topics": [
+        "Fiori"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "Fiori-Gateway",
+      "question": "A Fiori tile is visible but the app fails to start. What do you check first?",
+      "topics": [
+        "Fiori"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-ARA",
+      "question": "How would you baseline SoD risks for a new role set before provisioning?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-ARA",
+      "question": "An ARA role analysis returns a risk absent from user analysis. What do you compare?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-ARM-MSMP",
+      "question": "How do you configure an MSMP workflow for access requests?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-ARM-MSMP",
+      "question": "An access request is stuck with no approver. What evidence do you check first?",
+      "topics": [],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-EAM",
+      "question": "How do you configure Firefighter emergency access in SAP GRC?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": "grc-firefighter",
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "A GRC firefighter ID is created on the target and synchronized up into GRC. Create the firefighter ID on the target system. Assign the firefighter role and the owner on that ID. The user launches with GRAC_SPM or /GRCPI/GRIA_EAM, gives a re",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [
+          {
+            "severity": "LOW",
+            "dimension": "evidenceUncertainty",
+            "code": "MISSING_SOURCE_META",
+            "detail": "Verified workflow has no sourceFiles metadata"
+          }
+        ],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-EAM",
+      "question": "A Firefighter user cannot launch an approved emergency session. What do you validate?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": "grc-firefighter-launch-troubleshooting",
+      "expectedWorkflow": "grc-firefighter-launch-troubleshooting",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "For a Firefighter who cannot launch an approved emergency session, I validate assignment, target ID and role, launch transaction, and repository sync before redesigning EAM. Confirm the Firefighter assignment and approval are active for tha",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-BRM",
+      "question": "How would you design a governed business role lifecycle in SAP GRC BRM?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-BRM",
+      "question": "A business role change is approved in BRM but the technical role is stale. How do you isolate ownership?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-Process-Control",
+      "question": "How would you implement a manual control test plan in SAP GRC Process Control?",
+      "topics": [
+        "Process Control"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-Process-Control",
+      "question": "An automated control test produces an unexpected result. How do you isolate the cause?",
+      "topics": [
+        "Process Control"
+      ],
+      "verifiedWorkflowId": "process-control-test-troubleshooting",
+      "expectedWorkflow": "process-control-test-troubleshooting",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "An unexpected Process Control test result is isolated through control master data, Planner assignment, and connector or test evidence, not through Access Control MSMP redesign. Identify the control, organization, regulation, tester, and Pla",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "IAG",
+      "question": "How would you build roles in IAG?",
+      "topics": [
+        "IAG"
+      ],
+      "verifiedWorkflowId": "iag-role-design",
+      "expectedWorkflow": "iag-role-design",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "I build IAG business roles in Role Designer, Business Roles, and validate the resulting access in the connected target systems. Define the business role's purpose, target applications, job function, required access, business-process ownersh",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "IAG",
+      "question": "How do you troubleshoot failed IAG access analysis or synchronization?",
+      "topics": [
+        "IAG"
+      ],
+      "verifiedWorkflowId": "iag-analysis-sync-troubleshooting",
+      "expectedWorkflow": "iag-analysis-sync-troubleshooting",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "For failed IAG access analysis or synchronization, I split analysis-ruleset evidence from sync or provisioning evidence before changing either side. Separate the symptom: Access Analysis risk evaluation failures belong to IAG governance con",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "IAS-IPS",
+      "question": "How does IAS federation work with a corporate IdP?",
+      "topics": [
+        "IAS"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "IAS-IPS",
+      "question": "An IPS job completes with skipped users. How do you isolate transformation versus target errors?",
+      "topics": [
+        "IPS"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "SAP-IDM",
+      "question": "How would you design SAP IDM provisioning to an ABAP target?",
+      "topics": [
+        "SAP IDM"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "SAP-IDM",
+      "question": "IDM provisioning fails after a target role rename. What do you verify?",
+      "topics": [
+        "SAP IDM"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "BTP",
+      "question": "How do you design BTP role collections for an application role template?",
+      "topics": [
+        "BTP"
+      ],
+      "verifiedWorkflowId": "btp-role-collection",
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "BTP authorization is role template, role, role collection, trust, then assignment. Start from the role template the application provides. Create a role from that template, then put the role in a role collection. Configure trust to the ident",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [
+          {
+            "severity": "LOW",
+            "dimension": "evidenceUncertainty",
+            "code": "MISSING_SOURCE_META",
+            "detail": "Verified workflow has no sourceFiles metadata"
+          }
+        ],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "BTP",
+      "question": "A BTP role collection mapped to an IdP group does not take effect. How do you isolate trust and mapping?",
+      "topics": [
+        "BTP"
+      ],
+      "verifiedWorkflowId": "btp-role-collection-mapping-troubleshooting",
+      "expectedWorkflow": "btp-role-collection-mapping-troubleshooting",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "When a BTP role collection mapped to an IdP group does not take effect, I isolate trust, group claim mapping, role-collection contents, and re-login before redesigning roles. Confirm the subaccount trust points at the intended identity prov",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "S4-RISE",
+      "question": "How do Public Edition business roles differ from Private Edition PFCG roles?",
+      "topics": [],
+      "verifiedWorkflowId": "s4-public-cloud-role",
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "Public Cloud authorizations are business roles and restrictions. I build IAG business roles in Role Designer, Business Roles, and validate the resulting access in the connected target systems.",
+      "quality": {
+        "pass": true,
+        "questionType": "general",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty"
+        ],
+        "findings": [
+          {
+            "severity": "LOW",
+            "dimension": "evidenceUncertainty",
+            "code": "MISSING_SOURCE_META",
+            "detail": "Verified workflow has no sourceFiles metadata"
+          }
+        ],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "S4-RISE",
+      "question": "After an S/4HANA upgrade, authorization behavior changed in production. How do you triage?",
+      "topics": [
+        "S/4"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "SuccessFactors",
+      "question": "How do you implement SuccessFactors RBP while limiting the target population?",
+      "topics": [
+        "SuccessFactors"
+      ],
+      "verifiedWorkflowId": "sf-rbp",
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "SuccessFactors RBP is a permission role, a permission group, and a target population. Open Manage Permission Roles and grant the permissions. Open Manage Permission Groups and define who the role applies to. Assign the role to that group. S",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [
+          {
+            "severity": "LOW",
+            "dimension": "evidenceUncertainty",
+            "code": "MISSING_SOURCE_META",
+            "detail": "Verified workflow has no sourceFiles metadata"
+          }
+        ],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "SuccessFactors",
+      "question": "A SuccessFactors permission was granted but the action remains unavailable. What do you inspect?",
+      "topics": [
+        "SuccessFactors"
+      ],
+      "verifiedWorkflowId": "sf-rbp-unavailable-troubleshooting",
+      "expectedWorkflow": "sf-rbp-unavailable-troubleshooting",
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "When a SuccessFactors permission is granted but the action stays unavailable, I inspect role, group membership, and target population before changing SSO. Confirm the permission is present on the assigned permission role and that the user i",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [
+          {
+            "severity": "LOW",
+            "dimension": "evidenceUncertainty",
+            "code": "MISSING_SOURCE_META",
+            "detail": "Verified workflow has no sourceFiles metadata"
+          }
+        ],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "Ariba",
+      "question": "How would you provision Ariba users with enterprise SSO and controlled group access?",
+      "topics": [
+        "Ariba"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "Ariba",
+      "question": "An Ariba user authenticates but cannot see an expected workbench. What layers do you separate?",
+      "topics": [
+        "Ariba"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "HANA-BW",
+      "question": "How would you design least-privilege HANA analytic privileges for a reporting role?",
+      "topics": [
+        "HANA"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "HANA-BW",
+      "question": "A HANA user can connect but cannot read one view. What checks isolate the access boundary?",
+      "topics": [
+        "HANA"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "SAC-Datasphere-CAR",
+      "question": "How would you design least-privilege Datasphere space access for an analytics team?",
+      "topics": [
+        "Datasphere"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "SAC-Datasphere-CAR",
+      "question": "A CAR analytics user has application access but cannot see expected data. How do you isolate the security layer?",
+      "topics": [
+        "CAR"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "Activate-PMP",
+      "question": "How would you plan the SAP security workstream across Activate Explore, Realize, and Deploy?",
+      "topics": [],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "Activate-PMP",
+      "question": "A Deploy cutover rehearsal fails on identity dependencies. How do you replan the go-live gate?",
+      "topics": [
+        "Activate"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "Compliance",
+      "question": "How would you use SAP GRC controls to support SOX ITGC access reviews without claiming automatic compliance?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    },
+    {
+      "domain": "Compliance",
+      "question": "A SOX access control failed because approvals were missing. How do you contain, remediate, and retest it?",
+      "topics": [],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "routingPass": true,
+      "liveStatus": null,
+      "liveRoute": null,
+      "answerPreview": "",
+      "quality": {
+        "pass": true,
+        "findings": [],
+        "note": "No verified workflow; live answer not requested. Routing-only row."
+      },
+      "pass": true
+    }
+  ]
+}

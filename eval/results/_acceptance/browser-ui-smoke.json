@@ -1,0 +1,56 @@
+{
+  "at": "2026-11-02T17:36:50.292Z",
+  "port": 3102,
+  "mode": "live-ui-default-safeMode (no mock-provider hook in Next process)",
+  "paidProvider": "not intentionally invoked; conceptual path used safe/local/prepared routes",
+  "questions": [
+    {
+      "q": "What are Critical Actions?",
+      "displayed": true,
+      "noDover": true,
+      "no1650": true,
+      "noChecklist": true,
+      "preview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type..."
+    },
+    {
+      "q": "Explain the Mitigation Lifecycle.",
+      "displayed": true,
+      "noChecklist": true,
+      "no1650": true,
+      "preview": "In GRC Access Control, mitigating controls are the governed exc..."
+    },
+    {
+      "q": "What if",
+      "deferExpected": true,
+      "deferHasAnswer": false
+    },
+    {
+      "q": "Tell me about your S/4HANA transformation experience.",
+      "experienceContentPresent": true
+    },
+    {
+      "q": "Tell me about your S/4HANA transformation experience.",
+      "displayed": true,
+      "preview": "In my experience with S/4HANA transformations... ST03N...",
+      "note": "4.3s first-text latency suggests possible live provider on server process; answer lacked Dover CV grounding and used generic past-tense experience framing",
+      "defectCandidate": true
+    },
+    {
+      "q": "Tell me about your S/4HANA transformation experience.",
+      "displayed": true,
+      "preview": "In my experience with S/4HANA transformations... ST03N...",
+      "note": "4.3s first-text latency suggests possible live provider on server process; answer lacked Dover CV grounding and used generic past-tense experience framing",
+      "defectCandidate": true
+    }
+  ],
+  "limitations": [
+    "Running Next :3102 does not load eval/harness mock OpenAI register hook",
+    "Browser path is default safeMode/local/prepared — not Cases A–C mock GENERATION path",
+    "Concurrent reverse-order and rejected-recovery UI flash not fully exercised in this smoke"
+  ],
+  "findings": [
+    "CA and Mitigation displayed correctly without Dover/1650/checklist",
+    "What if showed waiting/DEFER",
+    "Experience answer may have used live provider (not mock harness); content quality concern for live-provider stage"
+  ]
+}

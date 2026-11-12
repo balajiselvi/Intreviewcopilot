@@ -1,0 +1,269 @@
+{
+  "createdAt": "2026-10-28T03:09:13.350Z",
+  "seed": 20261022,
+  "mode": "live-http-and-routing",
+  "baseUrl": "http://127.0.0.1:3000",
+  "model": "gpt-4o-mini",
+  "domainCount": 19,
+  "totalCases": 5,
+  "plannedCases": 37,
+  "requestsSent": 5,
+  "maxLiveRequests": 37,
+  "rateLimitDelayMs": 1000,
+  "maxSpendUsd": 0.5,
+  "worstCaseSpendUsd": 0.3677184,
+  "estimatedSpendUsd": 0,
+  "stopReason": "Stopped after GRC-ARA; generation token usage was not reported.",
+  "failed": 1,
+  "completed": 4,
+  "rows": [
+    {
+      "domain": "SAP-Security-PFCG",
+      "question": "How would you design a derived PFCG role model for country variants?",
+      "topics": [],
+      "verifiedWorkflowId": "su24-pfcg-derived-roles",
+      "expectedWorkflow": null,
+      "expectedLiveRoute": null,
+      "routingPass": true,
+      "liveRoutePass": true,
+      "liveStatus": 200,
+      "liveRoute": "VERIFIED_WORKFLOW",
+      "responseLatencyMs": 141,
+      "completionStatus": "complete",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": false,
+      "citationGrounding": {
+        "provenanceAvailable": true,
+        "sourceFiles": [
+          "knowledge/security/core-sap-security-authorizations-architect-bank.md",
+          "knowledge/security/pfcg.md"
+        ],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "For SU24 proposals and PFCG derived roles, I typically maintain check indicators and proposed values in SU24 so they land in USOBT_C and USOBX_C, and I use SU25 step 2b when upgrade defaults change. In PFCG I create the imparting role in AGR_DEFINE, set Derive from Role on the child, keep org levels only on the derived role in AGR_1252, and leave non-org authorizations in AGR_1251. After PFUD I have the test user complete the business transaction for that org value; SU53 or STAUTHTRACE only after a failed AUTHORITY-CHECK, with USR02 confirming the user master is active.",
+      "answerPreview": "For SU24 proposals and PFCG derived roles, I typically maintain check indicators and proposed values in SU24 so they land in USOBT_C and USOBX_C, and I use SU25 step 2b when upgrade defaults change. In PFCG I create the imparting role in AG",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "SAP-Security-PFCG",
+      "question": "A user has the role but SU53 still shows a missing authorization. How do you triage?",
+      "topics": [],
+      "verifiedWorkflowId": "abap-authorization-trace-su53",
+      "expectedWorkflow": null,
+      "expectedLiveRoute": null,
+      "routingPass": true,
+      "liveRoutePass": true,
+      "liveStatus": 200,
+      "liveRoute": "VERIFIED_WORKFLOW",
+      "responseLatencyMs": 55,
+      "completionStatus": "complete",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": false,
+      "citationGrounding": {
+        "provenanceAvailable": true,
+        "sourceFiles": [
+          "knowledge/security/core-sap-security-authorizations-architect-bank.md",
+          "knowledge/security/pfcg.md"
+        ],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "I start with SU53 for the last failed check, but if it is blank or incomplete I run STAUTHTRACE filtered to the affected user and server, reproduce the failing action, and evaluate the actual failed AUTHORITY-CHECK. I distinguish a missing transaction or service permission from an authorization-object, field-value, or organizational-level failure, then apply the smallest justified PFCG role change, using SU24 proposals where appropriate. Finally I repeat the same business action, verify the relevant trace passes, and retain a negative test for actions the user should not perform.",
+      "answerPreview": "I start with SU53 for the last failed check, but if it is blank or incomplete I run STAUTHTRACE filtered to the affected user and server, reproduce the failing action, and evaluate the actual failed AUTHORITY-CHECK. I distinguish a missing ",
+      "quality": {
+        "pass": true,
+        "questionType": "troubleshooting",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "Fiori-Gateway",
+      "question": "How do you authorize a custom Fiori app through catalog and OData services?",
+      "topics": [
+        "Fiori"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "expectedLiveRoute": "GENERATION",
+      "routingPass": true,
+      "liveRoutePass": false,
+      "liveStatus": 200,
+      "liveRoute": "RETRIEVED_PROCEDURE",
+      "responseLatencyMs": 4509,
+      "completionStatus": "complete",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": false,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "First, maintain OData service authorization for standard and custom Fiori apps. Next, validate backend authorization content is complete for every app granted launchpad access. Finally, test the full app experience end to end, not just launchpad visibility.",
+      "answerPreview": "First, maintain OData service authorization for standard and custom Fiori apps. Next, validate backend authorization content is complete for every app granted launchpad access. Finally, test the full app experience end to end, not just laun",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": false
+    },
+    {
+      "domain": "Fiori-Gateway",
+      "question": "A Fiori tile is visible but the app fails to start. What do you check first?",
+      "topics": [
+        "Fiori"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "expectedLiveRoute": null,
+      "routingPass": true,
+      "liveRoutePass": true,
+      "liveStatus": 200,
+      "liveRoute": "RETRIEVED_PROCEDURE",
+      "responseLatencyMs": 563,
+      "completionStatus": "complete",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": null,
+      "estimatedCostUsd": null,
+      "generationUsageAvailable": false,
+      "citationGrounding": {
+        "provenanceAvailable": false,
+        "sourceFiles": [],
+        "retrievedEvidence": [],
+        "inlineCitationCount": 0
+      },
+      "answerText": "On-premise ABAP Fiori troubleshooting starts with launchpad content and PFCG assignment, not with an authorization trace for a missing app. - Mechanism: Check the user's PFCG role and whether that role contains the catalog and the target mapping for the app. If the app opens and still errors, reproduce and inspect the browser error plus Gateway logs in /IWFND/ERROR_LOG and /IWBEP/ERROR_LOG for the actual frontend/backend topology; do not assume every system uses a hub. - Governance: Keep missing-app diagnosis on content/role assignment; do not jump to SU53 for a tile that never launches. - Validation: Use SU53 or STAUTHTRACE only when the log shows an authorization failure — SU53 shows the last failed check rather than proof of success. Correct the demonstrated cause and have the affected user complete the intended business task.",
+      "answerPreview": "On-premise ABAP Fiori troubleshooting starts with launchpad content and PFCG assignment, not with an authorization trace for a missing app. - Mechanism: Check the user's PFCG role and whether that role contains the catalog and the target ma",
+      "quality": {
+        "pass": true,
+        "questionType": "general",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    },
+    {
+      "domain": "GRC-ARA",
+      "question": "How would you baseline SoD risks for a new role set before provisioning?",
+      "topics": [
+        "GRC"
+      ],
+      "verifiedWorkflowId": null,
+      "expectedWorkflow": null,
+      "expectedLiveRoute": null,
+      "routingPass": true,
+      "liveRoutePass": true,
+      "liveStatus": 200,
+      "liveRoute": "GENERATION",
+      "responseLatencyMs": 4500,
+      "completionStatus": "complete",
+      "finishReason": null,
+      "truncated": false,
+      "tokenUsage": {
+        "promptTokens": null,
+        "completionTokens": null,
+        "totalTokens": null
+      },
+      "estimatedCostUsd": 0,
+      "generationUsageAvailable": false,
+      "citationGrounding": {
+        "provenanceAvailable": true,
+        "sourceFiles": [],
+        "retrievedEvidence": [
+          {
+            "id": "chunk_a3094e745f5095eb26dc2a34d3eb048e9a66c40f8cdb72381ffc7b32eb422c9a",
+            "label": "Architecture"
+          },
+          {
+            "id": "chunk_2177599c400a7ec1ea8a5cac771c5b0e24613c0c94315d582ccba8c20790ae7f",
+            "label": "How do you handle Deloitte client presentation scenarios when presenting a role redesign proposal to executive stakeholders?"
+          }
+        ],
+        "inlineCitationCount": 0
+      },
+      "answerText": "To baseline SoD risks for a new role set before provisioning, I start by leveraging the Access Risk Analysis (ARA) component of GRC. This involves defining a ruleset that outlines the segregation of duties conflicts relevant to the new roles. I would utilize transaction GRAC_RULE_BUILD to create or modify the ruleset, ensuring it aligns with the organization's compliance requirements.\n\nNext, I would run a risk analysis against the proposed role set using the ARA tool, which evaluates the roles against the defined ruleset to identify any potential SoD conflicts. The results can be reviewed in the ARA reports, which provide insights into any identified risks and their severity. This step is crucial for ensuring that any conflicts are addressed before the roles are provisioned, thereby maintaining compliance and reducing risk exposure. Finally, I would validate the findings by cross-referencing the identified conflicts with the mitigation controls in place, ensuring that any necessary remediation actions are documented",
+      "answerPreview": "To baseline SoD risks for a new role set before provisioning, I start by leveraging the Access Risk Analysis (ARA) component of GRC. This involves defining a ruleset that outlines the segregation of duties conflicts relevant to the new role",
+      "quality": {
+        "pass": true,
+        "questionType": "implementation",
+        "dimensionsEvaluated": [
+          "questionFulfilment",
+          "productTaskCorrectness",
+          "technicalCorrectness",
+          "communicationQuality",
+          "evidenceUncertainty",
+          "sequenceCompleteness",
+          "operationalReadiness"
+        ],
+        "findings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0
+      },
+      "pass": true
+    }
+  ]
+}

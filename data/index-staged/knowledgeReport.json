@@ -1,0 +1,24 @@
+{
+  "documentsProcessed": 127,
+  "documentsSkipped": 93,
+  "documentsUpdated": 34,
+  "chunksCreated": 341,
+  "elapsedSeconds": 746.543,
+  "errors": [],
+  "warnings": [
+    {
+      "stage": "document-skip",
+      "message": "Unsupported file type: .json",
+      "fileName": "stats.json"
+    },
+    {
+      "stage": "document-skip",
+      "message": "Unsupported file type: .json",
+      "fileName": "state.json"
+    },
+    {
+      "stage": "stub-disposition",
+      "message": "Checked 2026-10-19. All 23 previously empty markdown files are still 0 bytes and were left empty. The chunker correctly creates no chunks for blank documents. No text was invented for them. infoproviders.md stays empty because BW analysis authorization is in bw-security.md and analysis-authorizations.md. cloud-security.md, identity-federation.md, oauth.md, and saml.md stay empty because IAS, federation, and connectivity are in btp/ias.md, cloud-identity.md, and cloud-connector.md. compliance.md stays empty because SOX and SoD evidence are in audit/sox.md and compliance/sod.md. risk-mitigation.md stays empty because delivery risk is in project-management/risk-management.md and GRC mitigating controls are in grc/mitigation.md. rollback-plan.md stays empty because cutover and rollback evidence are in cutover/cutover-plan.md and rise/rise-cutover.md. catalogs.md, launchpad.md, and spaces-pages.md stay empty because those Fiori procedures are in fiori-security.md and s4hana-fiori.md. knowledge-transfer.md and post-go-live.md stay empty because handover and hypercare are in hypercare/hypercare.md, project-types/support.md, and the Run phase of project-management/sap-activate.md. client-management.md, delivery-management.md, team-management.md, and vendor-management.md stay empty because governance, stakeholders, resources, and Activate delivery are in the populated project-management documents, including sap-activate.md. chaRM.md, debugging.md, job-failures.md, and performance.md stay empty because no current official procedure for those exact topics was verified in this pass; existing files mention SM37 only as a job-log check and do not document a ChaRM or performance procedure. release-process.md and transport-management.md stay empty because release governance is already in project-management/release-management.md and was not replaced with an unverified ChaRM or STMS procedure."
+    }
+  ]
+}

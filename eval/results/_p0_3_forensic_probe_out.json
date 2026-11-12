@@ -1,0 +1,23 @@
+{
+  "sessionPath": "D:\\My Projects\\InterviewCopilot\\data\\interview-sessions\\live_mvt4dz46_5fcq9n4o.json",
+  "topKeys": [
+    "schemaVersion",
+    "sessionId",
+    "startedAt",
+    "endedAt",
+    "jobLabel",
+    "company",
+    "model",
+    "source",
+    "qa",
+    "evaluation"
+  ],
+  "sessionId": "live_mvt4dz46_5fcq9n4o",
+  "updatedAt": null,
+  "createdAt": null,
+  "qaCount": 0,
+  "qaContainer": "unknown",
+  "hits": [],
+  "last20": [],
+  "hitDetails": []
+}

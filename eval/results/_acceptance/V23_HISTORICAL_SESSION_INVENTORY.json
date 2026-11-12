@@ -1,0 +1,346 @@
+{
+  "at": "2026-11-03T11:48:02.008Z",
+  "persistence": {
+    "mechanism": "JSON files via lib/interviewSessionStore.js",
+    "directory": "data/interview-sessions",
+    "evalSessionsPresent": false,
+    "totalSessionFiles": 523
+  },
+  "providerEnv": [
+    {
+      "file": ".env.local",
+      "keys": {
+        "GROQ_API_KEY": {
+          "present": true,
+          "len": 56,
+          "prefix": "gsk_YP…"
+        },
+        "OPENAI_API_KEY": {
+          "present": true,
+          "len": 164,
+          "prefix": "sk-pro…"
+        }
+      }
+    }
+  ],
+  "provenanceCounts": {
+    "VERIFIED_LIVE": 23,
+    "TEST_OR_NON_LIVE": 248,
+    "CANDIDATE_LIVE_WEAK_PROVENANCE": 3,
+    "PROVENANCE_UNVERIFIED": 249
+  },
+  "selectedSessions": [
+    {
+      "sessionId": "live_mvt4dz46_5fcq9n4o",
+      "provenance": "VERIFIED_LIVE",
+      "reason": "microphone + model + token usage",
+      "startedAt": "2026-10-29T05:46:05.451Z",
+      "endedAt": "2026-11-03T11:20:14.788Z",
+      "mtime": "2026-11-03T11:20:14.798Z",
+      "qaCount": 136,
+      "completedCount": 116,
+      "models": [
+        "gpt-4o-mini",
+        "safe-mode"
+      ],
+      "sources": [
+        "microphone",
+        "verified-workflow",
+        "prepared-script",
+        "admission",
+        "system"
+      ],
+      "hasMic": true,
+      "hasUsageTokens": true
+    },
+    {
+      "sessionId": "live_mvt0tarh_4von54md",
+      "provenance": "VERIFIED_LIVE",
+      "reason": "microphone + model + GENERATION latency>800ms",
+      "startedAt": "2026-10-29T04:06:12.695Z",
+      "endedAt": "2026-10-29T04:35:43.544Z",
+      "mtime": "2026-10-29T04:35:43.545Z",
+      "qaCount": 4,
+      "completedCount": 1,
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "sources": [
+        "microphone",
+        "system",
+        "admission"
+      ],
+      "hasMic": true,
+      "hasUsageTokens": false
+    },
+    {
+      "sessionId": "live_mvrki89p_z9ge6ltn",
+      "provenance": "VERIFIED_LIVE",
+      "reason": "microphone + model + token usage",
+      "startedAt": "2026-10-28T03:42:00.972Z",
+      "endedAt": "2026-10-28T14:13:13.886Z",
+      "mtime": "2026-10-28T14:13:13.888Z",
+      "qaCount": 22,
+      "completedCount": 5,
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "sources": [
+        "admission",
+        "microphone"
+      ],
+      "hasMic": true,
+      "hasUsageTokens": true
+    },
+    {
+      "sessionId": "live_mvrk1llb_wldgvo5v",
+      "provenance": "VERIFIED_LIVE",
+      "reason": "microphone + model + token usage",
+      "startedAt": "2026-10-28T03:28:49.472Z",
+      "endedAt": "2026-10-28T03:38:40.426Z",
+      "mtime": "2026-10-28T03:38:40.427Z",
+      "qaCount": 5,
+      "completedCount": 2,
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "sources": [
+        "microphone",
+        "admission"
+      ],
+      "hasMic": true,
+      "hasUsageTokens": true
+    },
+    {
+      "sessionId": "live_mvqq943r_aavgq6ha",
+      "provenance": "CANDIDATE_LIVE_WEAK_PROVENANCE",
+      "reason": "microphone + model but no token usage / weak latency evidence",
+      "startedAt": "2026-10-27T14:58:45.080Z",
+      "endedAt": "2026-10-27T16:10:58.634Z",
+      "mtime": "2026-10-27T16:10:58.639Z",
+      "qaCount": 4,
+      "completedCount": 4,
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "sources": [
+        "microphone",
+        "verified-workflow"
+      ],
+      "hasMic": true,
+      "hasUsageTokens": false
+    }
+  ],
+  "recentTop15": [
+    {
+      "sessionId": "live_mvt4dz46_5fcq9n4o",
+      "provenance": "VERIFIED_LIVE",
+      "reason": "microphone + model + token usage",
+      "mtime": "2026-11-03T11:20:14.798Z",
+      "completedCount": 116,
+      "models": [
+        "gpt-4o-mini",
+        "safe-mode"
+      ],
+      "sources": [
+        "microphone",
+        "verified-workflow",
+        "prepared-script",
+        "admission",
+        "system"
+      ]
+    },
+    {
+      "sessionId": "manual_input_assert_fiori",
+      "provenance": "TEST_OR_NON_LIVE",
+      "reason": "test/assert/probe session id",
+      "mtime": "2026-11-03T06:50:16.000Z",
+      "completedCount": 67,
+      "models": [
+        "gpt-4o-mini",
+        "safe-mode"
+      ],
+      "sources": [
+        "system"
+      ]
+    },
+    {
+      "sessionId": "manual_input_assert_ias-ips-idm",
+      "provenance": "TEST_OR_NON_LIVE",
+      "reason": "test/assert/probe session id",
+      "mtime": "2026-11-03T06:50:15.462Z",
+      "completedCount": 68,
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "sources": [
+        "system"
+      ]
+    },
+    {
+      "sessionId": "manual_input_assert_msmp",
+      "provenance": "TEST_OR_NON_LIVE",
+      "reason": "test/assert/probe session id",
+      "mtime": "2026-11-03T06:50:11.383Z",
+      "completedCount": 69,
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "sources": [
+        "verified-workflow"
+      ]
+    },
+    {
+      "sessionId": "manual_input_assert_grc-ara",
+      "provenance": "TEST_OR_NON_LIVE",
+      "reason": "test/assert/probe session id",
+      "mtime": "2026-11-03T06:50:11.330Z",
+      "completedCount": 68,
+      "models": [
+        "gpt-4o-mini",
+        "safe-mode"
+      ],
+      "sources": [
+        "system"
+      ]
+    },
+    {
+      "sessionId": "manual_input_assert_ping",
+      "provenance": "TEST_OR_NON_LIVE",
+      "reason": "test/assert/probe session id",
+      "mtime": "2026-11-03T06:50:06.184Z",
+      "completedCount": 68,
+      "models": [
+        "gpt-4o-mini",
+        "safe-mode"
+      ],
+      "sources": [
+        "system"
+      ]
+    },
+    {
+      "sessionId": "live_mw08mo9z_lo9p5jx0",
+      "provenance": "TEST_OR_NON_LIVE",
+      "reason": "mock-deterministic model recorded",
+      "mtime": "2026-11-03T05:19:54.727Z",
+      "completedCount": 1,
+      "models": [
+        "gpt-4o-mini",
+        "mock-deterministic"
+      ],
+      "sources": [
+        "system",
+        "admission"
+      ]
+    },
+    {
+      "sessionId": "live_mvzjho2l_ibgnv8vj",
+      "provenance": "TEST_OR_NON_LIVE",
+      "reason": "system/assert sources only",
+      "mtime": "2026-11-02T17:36:41.703Z",
+      "completedCount": 3,
+      "models": [
+        "gpt-4o-mini",
+        "safe-mode"
+      ],
+      "sources": [
+        "system",
+        "admission"
+      ]
+    },
+    {
+      "sessionId": "live_mvt0tarh_4von54md",
+      "provenance": "VERIFIED_LIVE",
+      "reason": "microphone + model + GENERATION latency>800ms",
+      "mtime": "2026-10-29T04:35:43.545Z",
+      "completedCount": 1,
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "sources": [
+        "microphone",
+        "system",
+        "admission"
+      ]
+    },
+    {
+      "sessionId": "live_mvrki89p_z9ge6ltn",
+      "provenance": "VERIFIED_LIVE",
+      "reason": "microphone + model + token usage",
+      "mtime": "2026-10-28T14:13:13.888Z",
+      "completedCount": 5,
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "sources": [
+        "admission",
+        "microphone"
+      ]
+    },
+    {
+      "sessionId": "hist_0a899b",
+      "provenance": "TEST_OR_NON_LIVE",
+      "reason": "test/assert/probe session id",
+      "mtime": "2026-10-28T03:58:17.822Z",
+      "completedCount": 1,
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "sources": [
+        "system"
+      ]
+    },
+    {
+      "sessionId": "hist_d2cb60",
+      "provenance": "TEST_OR_NON_LIVE",
+      "reason": "test/assert/probe session id",
+      "mtime": "2026-10-28T03:58:14.551Z",
+      "completedCount": 1,
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "sources": [
+        "verified-workflow"
+      ]
+    },
+    {
+      "sessionId": "hist_4fc9bb",
+      "provenance": "TEST_OR_NON_LIVE",
+      "reason": "test/assert/probe session id",
+      "mtime": "2026-10-28T03:58:14.537Z",
+      "completedCount": 1,
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "sources": [
+        "system"
+      ]
+    },
+    {
+      "sessionId": "probe_7c1765",
+      "provenance": "TEST_OR_NON_LIVE",
+      "reason": "test/assert/probe session id",
+      "mtime": "2026-10-28T03:55:54.986Z",
+      "completedCount": 1,
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "sources": [
+        "system"
+      ]
+    },
+    {
+      "sessionId": "probe_e04eb7",
+      "provenance": "TEST_OR_NON_LIVE",
+      "reason": "test/assert/probe session id",
+      "mtime": "2026-10-28T03:55:51.916Z",
+      "completedCount": 1,
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "sources": [
+        "verified-workflow"
+      ]
+    }
+  ]
+}

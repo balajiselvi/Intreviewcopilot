@@ -1,0 +1,35 @@
+{
+  "id": "acronym-xsuaa",
+  "domain": "btp",
+  "product": "SAP Authorization and Trust Management service (XSUAA)",
+  "version_scope": "SAP BTP Cloud Foundry — confirm current product name in Help",
+  "claims": [
+    {
+      "id": "xsuaa-candidate-expansion",
+      "text": "Candidate note to verify: XSUAA is widely expanded as Extended Services for User Account and Authentication. Confirm against current SAP Help product naming (Authorization and Trust Management service) before treating any expansion as authoritative.",
+      "kind": "definition"
+    },
+    {
+      "id": "xsuaa-role",
+      "text": "XSUAA issues OAuth tokens and binds applications to role templates / role collections on SAP BTP; do not invent protocol details without a source.",
+      "kind": "definition"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://help.sap.com/",
+      "section": "SAP Authorization and Trust Management service (XSUAA) — verify",
+      "retrieved_on": "2026-10-29"
+    }
+  ],
+  "verification_status": "NEEDS_REVIEW",
+  "reviewer": null,
+  "verified_on": null,
+  "expiry": null,
+  "recheck_date": "2026-11-30",
+  "spoken_answer": null,
+  "conflicts": [
+    "Informal expansion vs official product name — resolve from SAP Help"
+  ],
+  "notes": "Do not hard-code expansions in prompts."
+}

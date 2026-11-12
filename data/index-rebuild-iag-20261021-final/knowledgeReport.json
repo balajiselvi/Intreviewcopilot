@@ -1,0 +1,20 @@
+{
+  "documentsProcessed": 134,
+  "documentsSkipped": 133,
+  "documentsUpdated": 1,
+  "chunksCreated": 14,
+  "elapsedSeconds": 0,
+  "errors": [],
+  "warnings": [
+    {
+      "stage": "document-skip",
+      "fileName": "stats.json",
+      "message": "Unsupported file type: .json"
+    },
+    {
+      "stage": "document-skip",
+      "fileName": "state.json",
+      "message": "Unsupported file type: .json"
+    }
+  ]
+}

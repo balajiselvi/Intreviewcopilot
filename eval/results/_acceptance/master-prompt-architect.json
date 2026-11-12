@@ -1,0 +1,47 @@
+{
+  "at": "2026-11-03T06:28:22.946Z",
+  "pass": true,
+  "cases": [
+    {
+      "id": "profile-sap-active",
+      "ok": true,
+      "preview": "Obey silently — never print this section title or profile labels.\nThis is the Master Prompt QUALITY PROFILE for spoken depth, vocabulary, and presentation. It does NOT override REA"
+    },
+    {
+      "id": "profile-open-world-iam",
+      "ok": true,
+      "preview": "Obey silently — never print this section title or profile labels.\nThis is the Master Prompt QUALITY PROFILE for spoken depth, vocabulary, and presentation. It does NOT override REA"
+    },
+    {
+      "id": "brm-architect-structure",
+      "ok": true,
+      "route": "VERIFIED_WORKFLOW",
+      "preview": "In BRM I govern business-role definitions and their technical-role mappings so ARM requesters pick job-function names while provisioning still assigns the underlying PFCG roles. Define business roles in business language from agreed job functions, then map each business role to t"
+    },
+    {
+      "id": "pfcg-architect-structure",
+      "ok": true,
+      "route": "RETRIEVED_PROCEDURE",
+      "soup": 0,
+      "preview": "Use transaction PFCG to create the single role, add the required transactions on the Menu tab, and maintain organizational levels on the Authorizations tab. Generate the authorization profile in PFCG after that authorization data is complete, because the generated profile is what"
+    },
+    {
+      "id": "critical-actions-depth",
+      "ok": true,
+      "route": "GENERATION",
+      "preview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive executable — typically a transaction, Web Dynpro, Fiori app, or service — as high risk on its own. It"
+    },
+    {
+      "id": "iam-no-sap-gui-dump",
+      "ok": true,
+      "route": "PREPARED_SCRIPT",
+      "preview": "Authentication answers who you are. Authorization answers what you may do. IAS or Entra ID can authenticate. SAP roles, authorization objects, and BTP role collections decide what that user can execute. Successful SSO is"
+    },
+    {
+      "id": "open-world-no-fabrication",
+      "ok": true,
+      "route": "GENERATION",
+      "preview": "I do not have verified product documentation for that module or transaction not confirmed in supporting knowledge in the knowledge base. I would not invent T-codes, tables, or configuration paths. If this maps to a stand"
+    }
+  ]
+}

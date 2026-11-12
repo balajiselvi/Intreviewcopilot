@@ -1,0 +1,1059 @@
+{
+  "profileSlug": "protiviti-senior-manager-sap-security-grc",
+  "title": "Protiviti Senior Manager — SAP Security / GRC (draft)",
+  "generated_on": "2026-10-29",
+  "status": "NEEDS_REVIEW",
+  "policy": "Only APPROVED entries are served in safe mode. Human marks APPROVED.",
+  "entries": [
+    {
+      "id": "prep-001-sod-framework",
+      "category": "SoD framework design",
+      "question": "How would you design an enterprise SoD framework for SAP Access Control?",
+      "paraphrases": [],
+      "headline": "SoD framework design",
+      "spoken_answer": "I would start from the critical business processes and risk library, classify rule types, agree ownership with process and control owners, and only then tune the ARA ruleset. The approach I would take is to baseline simulation results, clear false positives with evidence, and lock change control on rule transports before go-live.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-002-sod-custom",
+      "category": "SoD framework design",
+      "question": "How do you decide when a custom SoD rule is justified versus a mitigating control?",
+      "paraphrases": [],
+      "headline": "SoD framework design",
+      "spoken_answer": "I would require a documented business conflict that the delivered library cannot express, a named owner, and an expiry or review date on any mitigation. The approach I would take is to prefer remediation in role design first, then mitigation only when the residual risk is accepted in writing.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-003-grc-lifecycle",
+      "category": "GRC AC implementation lifecycle",
+      "question": "Walk me through a GRC Access Control 12.0 implementation lifecycle from Discover to Run.",
+      "paraphrases": [],
+      "headline": "GRC AC implementation lifecycle",
+      "spoken_answer": "I would sequence Activate phases: Discover scope and connectors, Explore design for ARA ARM BRM EAM, Realize configuration and transports, Deploy cutover rehearsals, and Run hypercare with audit evidence. The approach I would take is to keep MSMP and BRFplus changes under the same quality gate as role content.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-004-grc-connectors",
+      "category": "GRC AC implementation lifecycle",
+      "question": "How do you plan connector onboarding for multiple target systems in GRC AC?",
+      "paraphrases": [],
+      "headline": "GRC AC implementation lifecycle",
+      "spoken_answer": "I would inventory system types, connectivity, technical users, and sync jobs per connector, then pilot one production-like system before scaling. The approach I would take is to prove user, role, and risk sync quality with reconciliations before opening Access Request.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-005-msmp-config",
+      "category": "MSMP and BRFplus",
+      "question": "How do you configure an MSMP workflow for access requests?",
+      "paraphrases": [],
+      "headline": "MSMP and BRFplus",
+      "spoken_answer": "I would confirm whether the delivered path covers the request types, then maintain stages, agents, and route mapping, regenerating the version after rule changes. The approach I would take is to validate Approvers of Selected Path with representative requests rather than trusting design screens alone.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-006-msmp-stuck",
+      "category": "MSMP and BRFplus",
+      "question": "An access request is stuck with no approver. What do you check first?",
+      "paraphrases": [],
+      "headline": "MSMP and BRFplus",
+      "spoken_answer": "I would separate path selection from agent determination, inspect instance status, and verify the BRFplus decision table coverage for the request attributes. The approach I would take is to treat a missing decision-table row as an agent gap, not automatically as a broken MSMP path.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-007-brf-agent",
+      "category": "MSMP and BRFplus",
+      "question": "How do you configure a BRFplus agent rule for MSMP?",
+      "paraphrases": [],
+      "headline": "MSMP and BRFplus",
+      "spoken_answer": "I would confirm initiator versus agent rule, generate the flat rule shell for the process, maintain the decision table, activate the objects, declare the rule in Maintain Rules, and regenerate MSMP. The approach I would take is to test matching and non-matching rows before release.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-008-brf-initiator",
+      "category": "MSMP and BRFplus",
+      "question": "When do you create a custom BRFplus initiator instead of using the delivered one?",
+      "paraphrases": [],
+      "headline": "MSMP and BRFplus",
+      "spoken_answer": "I would only create a custom initiator when one process needs multiple paths the delivered initiator cannot express. The approach I would take is to map every RULE_RESULT to a path and prove each path with a controlled request.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-009-role-design",
+      "category": "Role design and optimisation",
+      "question": "How would you redesign a bloated PFCG role catalog for S/4HANA?",
+      "paraphrases": [],
+      "headline": "Role design and optimisation",
+      "spoken_answer": "I would re-anchor on job functions, separate single derived and composite patterns, and simulate every candidate role in ARA before transport. The approach I would take is to retire near-duplicates with an owner-approved consolidation plan rather than copying production roles forward.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-010-role-derived",
+      "category": "Role design and optimisation",
+      "question": "How do you use derived roles for country variants without exploding maintenance?",
+      "paraphrases": [],
+      "headline": "Role design and optimisation",
+      "spoken_answer": "I would keep master functional content thin, push org levels into derived values, and govern naming so country clones stay traceable. The approach I would take is to block local transaction additions on derived copies unless the master is updated through change control.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-011-s4-arch",
+      "category": "SAP security architecture",
+      "question": "How would you describe S/4HANA security architecture to a steering committee?",
+      "paraphrases": [],
+      "headline": "SAP security architecture",
+      "spoken_answer": "I would explain business roles and Fiori catalogs as the user experience layer, PFCG authorizations as the enforcement layer on Private Edition or on-premise, and governance through GRC or IAG. The approach I would take is to contrast Public Edition restriction apps clearly when that deployment is in scope.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-012-fiori-auth",
+      "category": "SAP security architecture",
+      "question": "How do you authorize a custom Fiori app through catalog and OData services?",
+      "paraphrases": [],
+      "headline": "SAP security architecture",
+      "spoken_answer": "I would bind the app to a catalog and target mapping, ensure the OData service is active and authorized, and assign the business role that exposes the catalog. The approach I would take is to validate tile visibility separately from backend authorization failures.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-013-fiori-tile",
+      "category": "SAP security architecture",
+      "question": "A Fiori tile is visible but the app fails to start. What do you check first?",
+      "paraphrases": [],
+      "headline": "SAP security architecture",
+      "spoken_answer": "I would separate launchpad visibility from OData and backend authorization, then inspect the gateway or Public Edition trace appropriate to the edition. The approach I would take is to avoid chasing PFCG when the failure is a missing service activation.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-014-iag-hybrid",
+      "category": "IAG and hybrid",
+      "question": "How would you position Cloud IAG versus on-premise GRC Access Control in a hybrid landscape?",
+      "paraphrases": [],
+      "headline": "IAG and hybrid",
+      "spoken_answer": "I would keep Cloud IAG as the cloud governance plane and GRC AC where ABAP MSMP and on-premise connectors remain authoritative, then define which system owns Access Request for each population. The approach I would take is to avoid mixing planes inside one spoken procedure.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-015-iag-roles",
+      "category": "IAG and hybrid",
+      "question": "How would you build roles in IAG Role Designer?",
+      "paraphrases": [],
+      "headline": "IAG and hybrid",
+      "spoken_answer": "I would define business roles against application access, route content and assignment approvals, and keep PFCG administration in the target ABAP system when that is the enforcement plane. The approach I would take is to validate provisioning results in the target, not only in IAG design screens.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-016-ias-ips",
+      "category": "IAG and hybrid",
+      "question": "How do IAS, IPS, and IAG differ in a BTP security design?",
+      "paraphrases": [],
+      "headline": "IAG and hybrid",
+      "spoken_answer": "IAS authenticates and federates, IPS provisions and synchronizes identities, and IAG governs access risks and requests; the target application still enforces authorization. The approach I would take is to diagnose authentication failures versus authorization failures before changing role content.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-017-presales",
+      "category": "Pre-sales and estimation",
+      "question": "How do you approach estimation for a GRC AC workstream in a pre-sales pursuit?",
+      "paraphrases": [],
+      "headline": "Pre-sales and estimation",
+      "spoken_answer": "I would estimate from drivers such as system count, rule complexity, MSMP path count, role volume, and audit windows, and I would mark any numeric ranges as illustrative only until discovery. The approach I would take is never to invent a fixed effort number without scoped assumptions.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-018-presales-scope",
+      "category": "Pre-sales and estimation",
+      "question": "What discovery questions do you ask before proposing a security and GRC scope?",
+      "paraphrases": [],
+      "headline": "Pre-sales and estimation",
+      "spoken_answer": "I would confirm deployment editions, identity source, SoD obligations, firefighter needs, and who owns approvals. The approach I would take is to separate mandatory compliance evidence from optional accelerators in the proposal.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-019-sox",
+      "category": "Regulatory and audit",
+      "question": "How would you support SOX ITGC access reviews with SAP GRC without claiming automatic compliance?",
+      "paraphrases": [],
+      "headline": "Regulatory and audit",
+      "spoken_answer": "I would map controls to evidence such as Access Request history, SoD simulation results, and firefighter logs, then keep remediation and retest trails. The approach I would take is to state that tools support the control; management still owns compliance assertions.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-020-audit-finding",
+      "category": "Regulatory and audit",
+      "question": "A SOX access control failed because approvals were missing. How do you contain and remediate?",
+      "paraphrases": [],
+      "headline": "Regulatory and audit",
+      "spoken_answer": "I would freeze further high-risk provisioning on the broken path, reconstruct who received access, remediate the workflow gap, and retest with evidence. The approach I would take is to brief audit with facts and dates, not assurances.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-021-india-reg",
+      "category": "Regulatory and audit",
+      "question": "How would you frame Indian regulatory expectations in an SAP access engagement?",
+      "paraphrases": [],
+      "headline": "Regulatory and audit",
+      "spoken_answer": "I would treat Indian regulatory and sector obligations as context that must be sourced and dated before any firm claim, and otherwise speak in method terms about mapping local requirements into control evidence. The approach I would take is to hedge until a verified source card exists for the specific obligation.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-022-team-lead",
+      "category": "Team leadership",
+      "question": "How do you lead a multi-country SAP security workstream with mixed seniorities?",
+      "paraphrases": [],
+      "headline": "Team leadership",
+      "spoken_answer": "I would set a single design authority, a RAID cadence, and pairing so juniors execute under reviewed patterns. The approach I would take is to escalate only with options and impact, not with raw defect lists.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-023-cxo",
+      "category": "Stakeholder and CXO",
+      "question": "How do you explain residual SoD risk to a CFO or CIO without fear language?",
+      "paraphrases": [],
+      "headline": "Stakeholder and CXO",
+      "spoken_answer": "I would quantify exposure in business-process terms, show compensating controls, and ask for an explicit risk acceptance or remediation fund. The approach I would take is to keep the conversation on decisions and dates.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-024-stakeholder",
+      "category": "Stakeholder and CXO",
+      "question": "How do you handle a process owner who refuses to remediate a critical SoD conflict?",
+      "paraphrases": [],
+      "headline": "Stakeholder and CXO",
+      "spoken_answer": "I would document the conflict, the business impact, and the mitigation options, then escalate through governance with a clear recommend path. The approach I would take is never to silently widen access to keep a go-live date.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-025-difficult",
+      "category": "Difficult-client scenarios",
+      "question": "Tell me about a time a client pushed to skip SoD simulation before cutover.",
+      "paraphrases": [],
+      "headline": "Difficult-client scenarios",
+      "spoken_answer": "I would not invent a workplace story. The approach I would take is to present cutover risk, propose a minimal simulation gate on critical roles, and escalate with a written risk acceptance if leadership still proceeds.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-026-difficult-scope",
+      "category": "Difficult-client scenarios",
+      "question": "A client wants firefighter access as standing privilege. How do you respond?",
+      "paraphrases": [],
+      "headline": "Difficult-client scenarios",
+      "spoken_answer": "I would restate that emergency access must be time-bound, logged, and reviewed, then offer a controlled EAM design. The approach I would take is to refuse silent standing privileged access even under schedule pressure.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-027-why-firm",
+      "category": "Why this firm",
+      "question": "Why do you want to join this firm as a Senior Manager in SAP Security and GRC?",
+      "paraphrases": [],
+      "headline": "Why this firm",
+      "spoken_answer": "I would align on the firm client-delivery model, quality bar, and opportunity to lead hybrid SAP security programmes. The approach I would take is to speak to mutual fit without inventing firm metrics or awards.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-028-values",
+      "category": "Why this firm",
+      "question": "How do your values show up when audit and delivery dates conflict?",
+      "paraphrases": [],
+      "headline": "Why this firm",
+      "spoken_answer": "I would protect evidence quality and least privilege even when dates slip, and I would surface trade-offs early. The approach I would take is to make the risk owner decide consciously.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-029-pc",
+      "category": "Process Control",
+      "question": "How would you approach SAP Process Control for manual control testing?",
+      "paraphrases": [],
+      "headline": "Process Control",
+      "spoken_answer": "I would map control owners, test plans, evidence locations, and issue workflows, then keep Process Control distinct from Access Control MSMP. The approach I would take is method-level until verified configuration paths are loaded.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-030-rm",
+      "category": "Risk Management",
+      "question": "How does SAP Risk Management relate to access risk work you already do in ARA?",
+      "paraphrases": [],
+      "headline": "Risk Management",
+      "spoken_answer": "I would keep enterprise risk registers distinct from access SoD technical rules, then link only where the organisation explicitly maps them. The approach I would take is to avoid collapsing Risk Management and ARA into one procedure.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-031-public-cloud",
+      "category": "Public Cloud security",
+      "question": "How does authorization differ in S/4HANA Cloud Public Edition versus Private Edition?",
+      "paraphrases": [],
+      "headline": "Public Cloud security",
+      "spoken_answer": "In Public Edition I would work with business roles, catalogs, and restriction apps; in Private Edition or on-premise I would work with PFCG and classic traces. The approach I would take is never to mix those admin surfaces in one answer.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-032-btp-sec",
+      "category": "BTP security",
+      "question": "How would you secure a BTP subaccount for an enterprise extension?",
+      "paraphrases": [],
+      "headline": "BTP security",
+      "spoken_answer": "I would structure directory and subaccount boundaries, establish IAS trust, define role templates and role collections, and review destinations and Cloud Connector exposure. The approach I would take is to answer with current security primitives rather than a generic platform pillar list.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-033-btp-pillars",
+      "category": "BTP security",
+      "question": "What are the pillars of SAP BTP?",
+      "paraphrases": [],
+      "headline": "BTP security",
+      "spoken_answer": "I would avoid a memorised marketing inventory unless a dated SAP source is in verified content. The approach I would take for a security interview is to reframe to subaccounts, identity trust, role collections, XSUAA, connectivity, and audit logging.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-034-eam",
+      "category": "GRC AC implementation lifecycle",
+      "question": "How do you configure Firefighter emergency access in SAP GRC?",
+      "paraphrases": [],
+      "headline": "GRC AC implementation lifecycle",
+      "spoken_answer": "I would configure firefighter IDs, owners, controllers, and logging, then prove checkout and review. The approach I would take is to keep emergency access exceptional and reviewed, never standing.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-035-brm",
+      "category": "Role design and optimisation",
+      "question": "How would you design a governed business role lifecycle in BRM?",
+      "paraphrases": [],
+      "headline": "Role design and optimisation",
+      "spoken_answer": "I would define ownership, request and approval, risk review, and publication rules while keeping technical PFCG maintenance in the target system. The approach I would take is to prevent BRM from becoming a shadow authorization editor.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-036-ips-skip",
+      "category": "IAG and hybrid",
+      "question": "An IPS job completes with skipped users. How do you isolate the fault?",
+      "paraphrases": [],
+      "headline": "IAG and hybrid",
+      "spoken_answer": "I would read job logs, separate transformation failures from target rejects, and fix mappings with a controlled re-run. The approach I would take is to avoid blind full syncs in production.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-037-ias-entra",
+      "category": "IAG and hybrid",
+      "question": "How do you configure IAS federation with Entra ID?",
+      "paraphrases": [],
+      "headline": "IAG and hybrid",
+      "spoken_answer": "I would establish trust, map claims, set MFA policy in the correct plane, and test positive and negative sign-in. The approach I would take is to confirm which identity provider is authoritative before changing application trust.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-038-hypercare",
+      "category": "GRC AC implementation lifecycle",
+      "question": "What do you do in security hypercare after an S/4 go-live?",
+      "paraphrases": [],
+      "headline": "GRC AC implementation lifecycle",
+      "spoken_answer": "I would triage access defects by plane, protect firefighter abuse reviews, and freeze risky role changes without change control. The approach I would take is a daily RAID with clear closers.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-039-su24",
+      "category": "SAP security architecture",
+      "question": "How do you maintain SU24 proposals for a custom transaction?",
+      "paraphrases": [],
+      "headline": "SAP security architecture",
+      "spoken_answer": "I would maintain proposals carefully, transport related changes through the landscape, and retest authorizations after import. The approach I would take is to avoid ad-hoc SU24 edits in production.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-040-jml",
+      "category": "IAG and hybrid",
+      "question": "How would you design HR-driven JML with SuccessFactors and IPS?",
+      "paraphrases": [],
+      "headline": "IAG and hybrid",
+      "spoken_answer": "I would treat SuccessFactors as the lifecycle source, IPS as the provisioning engine, and target enforcement separately from IAG request flows unless the landscape explicitly integrates them. The approach I would take is methodology framing when CV evidence is silent on a named employer for that pattern.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-041-star-conflict",
+      "category": "Difficult-client scenarios",
+      "question": "Describe how you handle conflict between security and a programme manager on cutover scope.",
+      "paraphrases": [],
+      "headline": "Difficult-client scenarios",
+      "spoken_answer": "I would not invent a specific incident. The approach I would take is to present the access risk, the minimum safe gate, and a written option set for the sponsor.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-042-consulting",
+      "category": "Team leadership",
+      "question": "How do you build a consulting practice bench for SAP security and GRC?",
+      "paraphrases": [],
+      "headline": "Team leadership",
+      "spoken_answer": "I would define reusable accelerators, review checklists, and pairing standards so delivery quality does not depend on one hero. The approach I would take is to measure reuse and review findings, not utilisation alone.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-043-estimation-risk",
+      "category": "Pre-sales and estimation",
+      "question": "What estimation risks do you call out for MSMP and BRFplus heavy programmes?",
+      "paraphrases": [],
+      "headline": "Pre-sales and estimation",
+      "spoken_answer": "I would call out path proliferation, decision-table edge cases, and rework when organisational data is dirty. The approach I would take is to keep ranges illustrative and tied to those drivers.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-044-ara-fp",
+      "category": "SoD framework design",
+      "question": "How do you investigate an ARA false positive?",
+      "paraphrases": [],
+      "headline": "SoD framework design",
+      "spoken_answer": "I would compare role versus user analysis, check rule logic and mitigating controls, and reproduce with the same user and role context. The approach I would take is to document the evidence before changing the ruleset.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-045-uar",
+      "category": "Regulatory and audit",
+      "question": "How do you run user access reviews with GRC?",
+      "paraphrases": [],
+      "headline": "Regulatory and audit",
+      "spoken_answer": "I would define reviewers, campaign scope, evidence retention, and follow-up for revoked access. The approach I would take is to treat incomplete campaigns as control failures, not admin noise.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-046-rise",
+      "category": "SAP security architecture",
+      "question": "What changes for security on a RISE with SAP programme?",
+      "paraphrases": [],
+      "headline": "SAP security architecture",
+      "spoken_answer": "I would clarify shared responsibility, identity integration, and which admin surfaces remain customer-owned versus provider-operated. The approach I would take is to confirm edition before prescribing PFCG or Public Edition apps.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-047-integration",
+      "category": "IAG and hybrid",
+      "question": "How do you integrate SAP and non-SAP applications into one access governance model?",
+      "paraphrases": [],
+      "headline": "IAG and hybrid",
+      "spoken_answer": "I would classify each system's identity and authorization plane, choose connectors or IAG bridges deliberately, and keep SoD semantics honest across unlike platforms. The approach I would take is not to force every app through one identical workflow.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-048-quality-gate",
+      "category": "GRC AC implementation lifecycle",
+      "question": "What quality gates do you enforce before transporting GRC configuration?",
+      "paraphrases": [],
+      "headline": "GRC AC implementation lifecycle",
+      "spoken_answer": "I would require peer review, simulation evidence, and a backout note for MSMP and ruleset changes. The approach I would take is to block transport when Approvers of Selected Path tests fail.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-049-mentor",
+      "category": "Team leadership",
+      "question": "How do you mentor consultants who freeze in CXO meetings?",
+      "paraphrases": [],
+      "headline": "Team leadership",
+      "spoken_answer": "I would rehearse a three-sentence risk narrative and attend the first sessions as design authority. The approach I would take is feedback on decisions, not on personality.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    },
+    {
+      "id": "prep-050-culture",
+      "category": "Why this firm",
+      "question": "How do you evaluate culture fit for a Senior Manager role?",
+      "paraphrases": [],
+      "headline": "Why this firm",
+      "spoken_answer": "I would look for whether the firm rewards early risk escalation and evidence quality. The approach I would take is to ask for an example of a stopped go-live decision and how it was handled.",
+      "product": "",
+      "version_scope": "",
+      "approval_status": "NEEDS_REVIEW",
+      "verification_status": "NEEDS_REVIEW",
+      "sources": [
+        {
+          "url": "https://help.sap.com/",
+          "section": "Draft pending human approval",
+          "retrieved_on": "2026-10-29"
+        }
+      ],
+      "personal_claims": "none-unless-cv",
+      "notes": "Method framing; no invented numbers; not served until APPROVED"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+
+> latest@0.1.0 dev
+> node scripts/dev-server.js
+
+   ▲ Next.js 15.1.6
+   - Local:        http://127.0.0.1:3102
+   - Network:      http://127.0.0.1:3102
+   - Environments: .env.local
+
+ ✓ Starting...
+IPv6 localhost proxy ready on [::1]:3102
+ ✓ Ready in 1743ms
+ ○ Compiling /interview ...
+ ✓ Compiled /interview in 26.8s (2686 modules)
+ GET /interview 200 in 35717ms
+ ○ Compiling /api/chat ...
+ ✓ Compiled /api/chat in 1458ms (717 modules)
+{"timestamp":"2026-10-22T15:05:31.016Z","level":"info","event":{"event":"app.startup_diagnostics","executionMode":"full","provider":"openai","defaultModel":"gpt-4o-mini","hasOpenAIKey":true,"hasGeminiKey":false,"nodeEnv":"development","timestamp":"2026-10-22T15:05:31.016Z"}}
+{"timestamp":"2026-10-22T15:05:31.017Z","level":"info","event":{"event":"app.mode_production","message":"Running in production mode with LLM generation enabled.","mode":"full","provider":"openai","model":"gpt-4o-mini"}}
+ POST /api/chat 200 in 3874ms
+{"timestamp":"2026-10-22T15:05:31.155Z","level":"info","event":{"event":"interview.request","executionMode":"full","model":"gpt-4o-mini","isProduction":true,"isRetrievalOnly":false,"isDisabled":false}}
+{"timestamp":"2026-10-22T15:05:31.246Z","level":"info","event":{"event":"interview.streaming_llm_response","model":"gpt-4o-mini","provider":"openai","hasApiKey":true}}
+ POST /api/chat 200 in 4177ms
+ POST /api/chat 200 in 15ms
+ GET /interview 200 in 1644ms
+ ✓ Compiled in 712ms (649 modules)
+[?25h

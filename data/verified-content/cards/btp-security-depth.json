@@ -1,0 +1,33 @@
+{
+  "id": "btp-security-depth",
+  "domain": "btp",
+  "product": "SAP Business Technology Platform",
+  "version_scope": "BTP — confirm current capability framing dates vs legacy pillar marketing",
+  "claims": [
+    {
+      "id": "legacy-pillars",
+      "text": "Earlier BTP marketing used a small set of capability pillars (historically framed around areas such as database/data management, application development, integration, analytics, and related platform themes). Treat any fixed '5-pillar' inventory as dated marketing unless a dated SAP source for the interview context is attached.",
+      "kind": "definition"
+    },
+    {
+      "id": "security-focus-topics",
+      "text": "For security-focused BTP questions, cover: global account / directory / subaccount structure; identity trust with Cloud Identity (IAS); role templates; role collections; XSUAA (Authorization and Trust Management); destinations and connectivity including Cloud Connector; audit logging. Mention OAuth, mTLS, or principal propagation only when a source supports the claim for the scenario.",
+      "kind": "integration"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://help.sap.com/",
+      "section": "SAP BTP security / Authorization and Trust Management / Cloud Connector (verify)",
+      "retrieved_on": "2026-10-29"
+    }
+  ],
+  "verification_status": "NEEDS_REVIEW",
+  "reviewer": null,
+  "verified_on": null,
+  "expiry": null,
+  "recheck_date": "2026-11-30",
+  "spoken_answer": null,
+  "conflicts": [],
+  "notes": "Depth checklist for security-focused asks; not every BTP question requires the full security set."
+}

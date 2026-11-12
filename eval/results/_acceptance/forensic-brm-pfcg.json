@@ -1,0 +1,446 @@
+{
+  "at": "2026-11-03T05:52:20.627Z",
+  "mode": "READ_ONLY_FORENSIC",
+  "providerModeConfigured": "mock",
+  "safeModeDefault": false,
+  "cases": [
+    {
+      "id": "brm",
+      "question": "Why do organizations implement BRM?",
+      "normalization": {
+        "analysisCategory": "Implementation",
+        "analysisDomain": "SAP GRC",
+        "analysisComponents": null,
+        "topic": "GRC",
+        "folders": [
+          "grc"
+        ],
+        "family": "",
+        "procedureIntent": "configure",
+        "contextTopic": null,
+        "resolvedQuestion": null,
+        "answerScope": "DEFAULT"
+      },
+      "provider": {
+        "mode": "mock",
+        "liveTransportInvocations": 0,
+        "mockInvocations": 0,
+        "openaiHarnessCalls": 0,
+        "llmActuallyInvoked": false,
+        "note": "MOCK mode — deterministic path; openaiHarnessCalls must be 0 when providerMode=mock"
+      },
+      "selection": {
+        "preparedScript": null,
+        "preparedPack": {
+          "hit": false
+        },
+        "verifiedWorkflow": {
+          "workflowId": "brm-business-role-lifecycle",
+          "hasAnswer": true
+        }
+      },
+      "retrieval": {
+        "candidateCount": 16,
+        "scopedCount": 16,
+        "coverageStatus": "IRRELEVANT_RETRIEVAL",
+        "useRetrievedAsGrounding": false,
+        "top12": [
+          {
+            "rank": 1,
+            "id": "chunk_e86725b998a4d35c0b221330e886a6b20f6567671590164978fef9127d216daa",
+            "sourceFolder": "grc",
+            "sourceFile": "grc-principal-architect-interview-bank.md",
+            "heading": "Q36: How do you justify the ROI of an SAP GRC upgrade or implementation to C-level stakeholders (CISO, CFO)?",
+            "score": 0.4191056301719828,
+            "sourceCategory": "interview-qa-bank",
+            "isBank": true,
+            "preview": "I would frame ROI as risk reduction and operating efficiency, without inventing guaranteed zero findings. Quantify audit effort avoided through consistent evidence, provisioning cycle-time reduction via ARM, and residual"
+          },
+          {
+            "rank": 2,
+            "id": "chunk_88ccc09ee24dbdf29238535ab601a2c0095f7f32ac935991dcf72b2ffd552506",
+            "sourceFolder": "grc",
+            "sourceFile": "deloitte-usi-specific-gap-fillers.md",
+            "heading": "Q104: How do you integrate SAP Security Transport Management with enterprise ITSM tools (e.g., ServiceNow, SAP ChaRM / Focused Build)?",
+            "score": 0.4225742564716638,
+            "sourceCategory": "interview-qa-bank",
+            "isBank": true,
+            "preview": "- **Decision:** Mandate that no security transport request (TR) moves to Quality or Production without automated ChaRM/ServiceNow approval gating. - **Mechanism:** Create Security TRs in Development using `SE09` / `SE10`"
+          },
+          {
+            "rank": 3,
+            "id": "chunk_48f4639f599a7e577e72309455d5296b22e4607126d01b8966ea82d6c02c43ab",
+            "sourceFolder": "grc",
+            "sourceFile": "grc-overview.md",
+            "heading": "Implementation Activities",
+            "score": 0.5860638991730579,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "- Design the ARA ruleset based on the organization's actual SoD risk tolerance - Build MSMP workflows and BRF+ rules for access request routing - Configure connectors to all in-scope target systems - Define business role"
+          },
+          {
+            "rank": 4,
+            "id": "chunk_faed0275634d263d27ee099648b21b19a30c5968d9022c265e34ae55eea93803",
+            "sourceFolder": "grc",
+            "sourceFile": "brf-plus.md",
+            "heading": "Implementation Activities",
+            "score": 0.48924773702624086,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "- Design decision tables based on actual organizational approval authority - Build and test BRF+ rules for every MSMP stage requiring agent determination - Validate rule coverage against realistic request scenarios, incl"
+          },
+          {
+            "rank": 5,
+            "id": "chunk_d8c727411742d6f497e4bbc333c4b730b94e3832e2892ef4bea33914c399b4db",
+            "sourceFolder": "grc",
+            "sourceFile": "rulesets.md",
+            "heading": "Implementation Activities",
+            "score": 0.4638723004386214,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "- Review the standard ruleset against actual organizational business processes - Build custom functions mapping custom transactions to their authorization objects - Define custom risks for organization-specific conflicts"
+          },
+          {
+            "rank": 6,
+            "id": "chunk_d77655cb6d5d8eb6c01e32aace543732e7f6f7b3366716c70a950c30ccf4163f",
+            "sourceFolder": "grc",
+            "sourceFile": "msmp.md",
+            "heading": "Implementation Activities",
+            "score": 0.45522594945129913,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "- Design the stage sequence for each request type based on business approval requirements - Configure escalation timing appropriate to the organization's response expectations - Coordinate MSMP stage design with BRF+ age"
+          },
+          {
+            "rank": 7,
+            "id": "chunk_37f7641745248b49b8f0bfe511ef9ca26d7d011880e6b57aad51d0e58a5a058f",
+            "sourceFolder": "grc",
+            "sourceFile": "arm.md",
+            "heading": "Implementation Activities",
+            "score": 0.4550367673240133,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "- Design request types and their required approval stages based on business requirements - Build and test MSMP workflows for each request type - Configure BRF+ agent determination rules and validate against real organiza"
+          },
+          {
+            "rank": 8,
+            "id": "chunk_f2c4a39eed45b0f2fee8400fa9207c08df7909871b3729cdc2f5e29813131c36",
+            "sourceFolder": "grc",
+            "sourceFile": "msmp.md",
+            "heading": "Technical Configuration Sequence",
+            "score": 0.4339001210620257,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "Senior Architect MSMP sequence (Access Request Approval process, e.g. SAP_GRAC_ACCESS_REQUEST): 1. Process Global Settings / Process ID — select or confirm the delivered Access Request Approval process before inventing a"
+          },
+          {
+            "rank": 9,
+            "id": "chunk_c48e3e037e2f43c75418507da1c43fed3905be9b3ffaccdce93f769aac62fee5",
+            "sourceFolder": "grc",
+            "sourceFile": "risk-analysis.md",
+            "heading": "Implementation Activities",
+            "score": 0.42115125993702696,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "- Run baseline risk analysis and triage results into remediation, mitigation, or acceptance - Design mitigating control templates for common conflict scenarios - Establish the review cadence for mitigating controls - Bui"
+          },
+          {
+            "rank": 10,
+            "id": "chunk_3e63660fa0f0e1a2ad5f3d599e63e89cff7c58976cd1b4fce6cea326b0690cf6",
+            "sourceFolder": "grc",
+            "sourceFile": "firefighter.md",
+            "heading": "Implementation Activities",
+            "score": 0.41611227377113336,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "- Determine which support scenarios need Firefighter and assign IDs accordingly - Configure reason codes matching real operational categories - Decide and configure ID-based versus role-based per system - Train the suppo"
+          },
+          {
+            "rank": 11,
+            "id": "chunk_406b094b6a4ead0dc79ba03f722d259dbfe5812f50caae76c28179c2edf9d03e",
+            "sourceFolder": "grc",
+            "sourceFile": "grc-scenarios-greenfield-brownfield.md",
+            "heading": "Q62: A client on Greenfield S/4HANA Cloud Private Edition wants to integrate GRC 12.0 with SAP SuccessFactors and Ariba. How do you architect the governance framework?",
+            "score": 0.4541158414902255,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "I would describe a Bridge topology: Access Control for ABAP targets, IAG for supported cloud apps, with a documented sync path—not a single merged product. Decision: Use GRC 12.0 with IAG Bridge for hybrid cloud governan"
+          },
+          {
+            "rank": 12,
+            "id": "chunk_4b3f77176d6bf71af5223c36895fc1ddc28cd30a73e9f83b6a1681c5d3a15c3a",
+            "sourceFolder": "grc",
+            "sourceFile": "arm.md",
+            "heading": "Runtime Flow",
+            "score": 0.4589068760095065,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "## Runtime Flow A request is submitted and immediately triggers a risk simulation against the ARA ruleset. The request enters the MSMP workflow, which evaluates its configured stages in sequence. At each stage, BRF+ rule"
+          }
+        ],
+        "bankChunksInTop12": [
+          "1:grc-principal-architect-interview-bank.md",
+          "2:deloitte-usi-specific-gap-fillers.md"
+        ],
+        "technicalTargetInTop12": [],
+        "technicalTargetRank": null
+      },
+      "prompt": {
+        "dumpPath": null,
+        "dumpChars": 0,
+        "containsBankHeading": null,
+        "containsBrmDoc": null,
+        "containsPfcgDoc": null,
+        "knowledgeExcerptPreview": null
+      },
+      "delivery": {
+        "admission": {
+          "decision": "ANSWER",
+          "route": "VERIFIED_WORKFLOW",
+          "reason": "verified-procedure",
+          "scriptId": "brm-business-role-lifecycle",
+          "sourceFiles": [
+            "knowledge/grc/brm.md"
+          ],
+          "confidence": 1,
+          "evidenceMode": null
+        },
+        "generation": null,
+        "answerFinal": null,
+        "events": [
+          "admission",
+          "data"
+        ],
+        "substantivePreview": "I do not have a reliable technical answer I can defend for that question right now (Why do organizations implement BRM?). I would rather qualify the gap and verify the product, release and control evidence than invent a procedure or substitute a different SAP topic.",
+        "substantiveChars": 266,
+        "integrityOk": true,
+        "integrityKind": "validated",
+        "integrityRecovered": false
+      },
+      "failureHypotheses": [
+        "brm.md-not-preferred-in-retrieval",
+        "qa-bank-outranks-technical-brm-doc"
+      ]
+    },
+    {
+      "id": "pfcg",
+      "question": "Explain how do you use PFCG?",
+      "normalization": {
+        "analysisCategory": "Role Design",
+        "analysisDomain": "SAP Security",
+        "analysisComponents": null,
+        "topic": null,
+        "folders": [],
+        "family": "",
+        "procedureIntent": "",
+        "contextTopic": null,
+        "resolvedQuestion": null,
+        "answerScope": "DEFAULT"
+      },
+      "provider": {
+        "mode": "mock",
+        "liveTransportInvocations": 0,
+        "mockInvocations": 0,
+        "openaiHarnessCalls": 0,
+        "llmActuallyInvoked": false,
+        "note": "MOCK mode — deterministic path; openaiHarnessCalls must be 0 when providerMode=mock"
+      },
+      "selection": {
+        "preparedScript": null,
+        "preparedPack": {
+          "hit": false
+        },
+        "verifiedWorkflow": {
+          "workflowId": "su24-pfcg-derived-roles",
+          "hasAnswer": true
+        }
+      },
+      "retrieval": {
+        "candidateCount": 16,
+        "scopedCount": 16,
+        "coverageStatus": "IRRELEVANT_RETRIEVAL",
+        "useRetrievedAsGrounding": false,
+        "top12": [
+          {
+            "rank": 1,
+            "id": "chunk_eb76d67ce5386df5639c8b6c07c8125f0840bbee7401b7d9a3ecd786095e6d2e",
+            "sourceFolder": "security",
+            "sourceFile": "pfcg.md",
+            "heading": "Overview",
+            "score": 0.5509317747610513,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "## Overview PFCG is the Profile Generator, the standard transaction for building and maintaining roles in SAP. It's where you assign transactions to a role's menu, pull in authorization defaults from SU24, maintain field"
+          },
+          {
+            "rank": 2,
+            "id": "chunk_dd1e93edb76364f6d63a0715528866ad5d02bb2a40d8eff6b72aa8c887058212",
+            "sourceFolder": "security",
+            "sourceFile": "pfcg.md",
+            "heading": "What Makes This a 10/10 Answer",
+            "score": 0.5367488739474837,
+            "sourceCategory": "qa-or-coaching-format",
+            "isBank": false,
+            "preview": "An average answer describes PFCG as \"where you build roles.\" A 10/10 answer explains the actual mechanics — how SU24 feeds the authorization tab, why generation matters as a distinct step, and how derived and composite r"
+          },
+          {
+            "rank": 3,
+            "id": "chunk_8daeae6914927a2ab8a9c9ac3e9b36e5062d53e8311f5eaaa79ad4683ecf59da",
+            "sourceFolder": "security",
+            "sourceFile": "pfcg.md",
+            "heading": "Common Interview Questions",
+            "score": 0.5267999480591992,
+            "sourceCategory": "qa-or-coaching-format",
+            "isBank": false,
+            "preview": "1. What does PFCG stand for and what does it do? 2. What's the difference between a role and a generated profile? 3. How does SU24 relate to PFCG? 4. What happens when you generate a role? 5. Why would a role change not "
+          },
+          {
+            "rank": 4,
+            "id": "chunk_b40a771f092942a8d9d0207d01b68d44b4d5be6998b92cc7e307b0fe2aed74f1",
+            "sourceFolder": "security",
+            "sourceFile": "pfcg.md",
+            "heading": "30 Second Interview Answer",
+            "score": 0.5239684222185567,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "PFCG is where roles get built. You add transactions to the menu tab, and the system automatically proposes authorization objects and default values based on SU24 data for each transaction. From there you fill in organiza"
+          },
+          {
+            "rank": 5,
+            "id": "chunk_2d3cc4c5ef68914323262e5dfe96d6f8ecfdc2df88fd3daadd6e20635c005799",
+            "sourceFolder": "security",
+            "sourceFile": "pfcg.md",
+            "heading": "PFCG",
+            "score": 0.5070023757427721,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "# PFCG"
+          },
+          {
+            "rank": 6,
+            "id": "chunk_93822f563da4d370fbd9377ed61f7612eca5d3f1ff60f256d669dced4ef23275",
+            "sourceFolder": "project-management",
+            "sourceFile": "senior-consultant-delivery.md",
+            "heading": "Interview questions and follow-up probes",
+            "score": 0.4982883730326685,
+            "sourceCategory": "qa-or-coaching-format",
+            "isBank": false,
+            "preview": "These prompts are preparation themes. They are not a confirmed Deloitte script, and they are not a procedure. Round one, technical depth. How do you design a single role and prove the user can complete the business task?"
+          },
+          {
+            "rank": 7,
+            "id": "chunk_394f5467d34cfe29e3275ea59eb7f110b6b216364162b12a22e3c26dc3a05d8c",
+            "sourceFolder": "security",
+            "sourceFile": "pfcg.md",
+            "heading": "Tough Follow-up Questions",
+            "score": 0.4887479488679004,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "11. How would you validate that a transported role generated identically in the target system? 12. What's your approach to cleaning up roles that reference deleted or deprecated transactions? 13. How do you handle emerge"
+          },
+          {
+            "rank": 8,
+            "id": "chunk_664fced5a2c6034abfe303b566862fab4ec82ade8b77d20c3eae3d92499b17c9",
+            "sourceFolder": "security",
+            "sourceFile": "sap-security.md",
+            "heading": "Interviewer's Hidden Expectations",
+            "score": 0.4839901177491272,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "Interviewers want to know you think about authorization design as a control, not a checkbox. They're listening for whether you understand runtime enforcement mechanics, not just PFCG button clicks. They also want evidenc"
+          },
+          {
+            "rank": 9,
+            "id": "chunk_a43111d60f558ecf345935868fe4ebd744f81e20562820f105477596745690bf",
+            "sourceFolder": "security",
+            "sourceFile": "sap-security.md",
+            "heading": "What Makes This a 10/10 Answer",
+            "score": 0.48268891909627293,
+            "sourceCategory": "qa-or-coaching-format",
+            "isBank": false,
+            "preview": "An average answer defines authorization objects and describes PFCG. A 10/10 answer explains the runtime mechanism — how AUTHORITY-CHECK actually fires, why SU24 matters for role building, and how design decisions like de"
+          },
+          {
+            "rank": 10,
+            "id": "chunk_26d55e87e9855429ff73150d78b809f9b4643f8e3b41c11119ebc8fd4434485c",
+            "sourceFolder": "security",
+            "sourceFile": "pfcg.md",
+            "heading": "60 Second Interview Answer",
+            "score": 0.4824894058927403,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "PFCG is the transaction that turns a business requirement into a working set of access. You start on the menu tab and add the transactions the role needs. Every time you add one, the system pulls in default authorization"
+          },
+          {
+            "rank": 11,
+            "id": "chunk_352ef97eb9ee645cf2b6a9aaa680c014776a854ac90664f1641f47cc22a351d6",
+            "sourceFolder": "security",
+            "sourceFile": "pfcg.md",
+            "heading": "Red Flags",
+            "score": 0.4801864616765295,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "## Red Flags - Not knowing the difference between a role and a generated profile - Saying role changes take effect immediately without mentioning generation or buffer refresh - Describing composite roles as if they hold "
+          },
+          {
+            "rank": 12,
+            "id": "chunk_658f7145c603977faa2bf528bb5d1221960d6ee85cb77ea69f086845b511f837",
+            "sourceFolder": "audit",
+            "sourceFile": "sox.md",
+            "heading": "SAP Transactions",
+            "score": 0.4760389866626353,
+            "sourceCategory": "technical-doc",
+            "isBank": false,
+            "preview": "- **PFCG:** Profile Generator (role design, SoD enforcement) - **SU01:** User master (access assignments) - **SUIM:** User Information System (reports, queries) - **FB50/FB60:** GL posting transactions (test control oper"
+          }
+        ],
+        "bankChunksInTop12": [],
+        "technicalTargetInTop12": [
+          "1:pfcg.md:Overview",
+          "2:pfcg.md:What Makes This a 10/10 Answer",
+          "3:pfcg.md:Common Interview Questions",
+          "4:pfcg.md:30 Second Interview Answer",
+          "5:pfcg.md:PFCG",
+          "7:pfcg.md:Tough Follow-up Questions",
+          "10:pfcg.md:60 Second Interview Answer",
+          "11:pfcg.md:Red Flags"
+        ],
+        "technicalTargetRank": 1
+      },
+      "prompt": {
+        "dumpPath": null,
+        "dumpChars": 0,
+        "containsBankHeading": null,
+        "containsBrmDoc": null,
+        "containsPfcgDoc": null,
+        "knowledgeExcerptPreview": null
+      },
+      "delivery": {
+        "admission": {
+          "decision": "ANSWER",
+          "route": "VERIFIED_WORKFLOW",
+          "reason": "verified-procedure",
+          "scriptId": "su24-pfcg-derived-roles",
+          "sourceFiles": [
+            "knowledge/security/core-sap-security-authorizations-architect-bank.md",
+            "knowledge/security/pfcg.md"
+          ],
+          "confidence": 1,
+          "evidenceMode": null
+        },
+        "generation": null,
+        "answerFinal": null,
+        "events": [
+          "admission",
+          "data"
+        ],
+        "substantivePreview": "For SU24 proposals and PFCG derived roles, I typically maintain check indicators and proposed values in SU24 so they land in USOBT_C and USOBX_C, and I use SU25 step 2b when upgrade defaults change. In PFCG I create the imparting role in AGR_DEFINE, set Derive from Role on the child, keep org levels only on the derived role in AGR_1252, and leave non-org authorizations in AGR_1251. From there I generate profiles into UST12 and run PFUD or PFCG_TIME_DEPENDENCY so AGR_USERS assignments pick up the",
+        "substantiveChars": 801,
+        "integrityOk": true,
+        "integrityKind": "validated",
+        "integrityRecovered": false
+      },
+      "failureHypotheses": []
+    }
+  ]
+}

@@ -1,0 +1,1168 @@
+{
+  "generatedAt": "2026-10-30T03:17:08.872Z",
+  "mode": "deterministic-offline-impl-transform-audit",
+  "cases": [
+    {
+      "id": "W1a",
+      "q": "How would you lead an SAP GRC Access Control implementation from requirements workshops through production hypercare?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc",
+        "hypercare"
+      ],
+      "topic": "GRC",
+      "scope": "IMPLEMENTATION_WALKTHROUGH",
+      "verifiedId": null,
+      "verifiedRoute": null,
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-siblings",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 4,
+      "pathGuess": "RETRIEVED_PROCEDURE",
+      "pcBleed": true,
+      "evidence": [
+        {
+          "id": "chunk_d2987d176cbd4d54ff0558b69108cb3ac6a00932de25435210cafa4b6a834c1a",
+          "folder": "grc",
+          "file": "process-control.md",
+          "heading": "Move a Process Control change through development quality and production",
+          "pc": true,
+          "preview": "## Move a Process Control change through development quality and production"
+        },
+        {
+          "id": "chunk_6a1aaf2cb9e49908fc10864d4d0943ddef4ded647fe8d91ddf489ddd776a85dd",
+          "folder": "grc",
+          "file": "arm.md",
+          "heading": "Design access request from submission through target provisioning",
+          "pc": false,
+          "preview": "## Design access request from submission through target provisioning For an end-to-end ARM design question, keep the sequence explicit: subm"
+        },
+        {
+          "id": "chunk_086b1ef96158d9923a09df256bd43f7132a6dd9631a6dd638795fe86dd32e9f5",
+          "folder": "grc",
+          "file": "process-control.md",
+          "heading": "Move a Process Control change through development quality and production",
+          "pc": true,
+          "preview": "Record the Process Control configuration change on a transport request in the development system. Release that request only after the contro"
+        },
+        {
+          "id": "chunk_c37f9a01e35e713ce9a916bb4caab6eb2fd74c90cf2f84cbe77a71f9564d693e",
+          "folder": "grc",
+          "file": "grc-principal-architect-interview-bank.md",
+          "heading": "Q1: How do you align SAP Security and GRC Access Control strategy with enterprise-wide Zero Trust Architecture (ZTA)?",
+          "pc": false,
+          "preview": "## Q1: How do you align SAP Security and GRC Access Control strategy with enterprise-wide Zero Trust Architecture (ZTA)? I would align SAP S"
+        },
+        {
+          "id": "chunk_c1312a81b5564cdddc32c6433088c59085116a84ddba43726ea039bb4c133095",
+          "folder": "grc",
+          "file": "process-control.md",
+          "heading": "Access Control and Process Control",
+          "pc": true,
+          "preview": "SAP Access Control and SAP Process Control are related GRC applications with different jobs. Access Control analyzes access risk, routes acc"
+        },
+        {
+          "id": "chunk_8fc65e7510d6f8622293f92928e32dfb5926854b0cc2c4121a380930898afecd",
+          "folder": "grc",
+          "file": "grc-principal-architect-interview-bank.md",
+          "heading": "Q16: Walk me through setting up an end-to-end MSMP Workflow in Access Request Management (ARM).",
+          "pc": false,
+          "preview": "## Q16: Walk me through setting up an end-to-end MSMP Workflow in Access Request Management (ARM). I would configure MSMP on Access Control,"
+        }
+      ]
+    },
+    {
+      "id": "W1b",
+      "q": "In a greenfield Access Control 12.0 programme, what is the ordered build sequence for connectors, ARA ruleset, MSMP/BRF+, BRM and Firefighter before UAT?",
+      "topics": [
+        "Transformation",
+        "GRC"
+      ],
+      "folders": [
+        "project-types",
+        "project-management",
+        "cutover",
+        "hypercare",
+        "rise",
+        "grc",
+        "s4hana"
+      ],
+      "topic": "Transformation",
+      "scope": "DEFAULT",
+      "verifiedId": "grc-ac12-ara-msmp-config",
+      "verifiedRoute": "VERIFIED_WORKFLOW",
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-pool",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 5,
+      "pathGuess": "VERIFIED_WORKFLOW",
+      "pcBleed": true,
+      "evidence": [
+        {
+          "id": "chunk_20cb14855b216b44117beab5492e129d50e522e909335ae3fc571b8896662566",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q60: How do you configure EAM (Firefighter) in S/4HANA Greenfield for central Fiori Launchpad usage?",
+          "pc": false,
+          "preview": "## Q60: How do you configure EAM (Firefighter) in S/4HANA Greenfield for central Fiori Launchpad usage? I would choose Role-Based firefighti"
+        },
+        {
+          "id": "chunk_6019bcbe64b37ff4b21cef3180d7e35f3d3a3713e106d4e08422acf75ec5bc37",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q89: How do you configure Continuous Control Monitoring (CCM) in SAP Process Control to compensate for unmitigated SoD risks in GRC Access Control?",
+          "pc": true,
+          "preview": "## Q89: How do you configure Continuous Control Monitoring (CCM) in SAP Process Control to compensate for unmitigated SoD risks in GRC Acces"
+        },
+        {
+          "id": "chunk_ae73b2bf9fe4e9bb5033ae370d4e94acdafce0d4ae45121ba63a18f6a59ceb6e",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q55: A client migrating Brownfield wants to know if their existing ECC GRC 10.1 Access Control ruleset can be re-used in S/4HANA 2023. How do you advise?",
+          "pc": false,
+          "preview": "## Q55: A client migrating Brownfield wants to know if their existing ECC GRC 10.1 Access Control ruleset can be re-used in S/4HANA 2023. Ho"
+        },
+        {
+          "id": "chunk_1c956b5dae9f86ec02872e4312f2510208b6c714bfc0b80291ce242a1d2fee07",
+          "folder": "grc",
+          "file": "grc-principal-architect-interview-bank.md",
+          "heading": "Q21: What are the differences between User Access Review (UAR) and SoD Review in GRC Access Control?",
+          "pc": false,
+          "preview": "## Q21: What are the differences between User Access Review (UAR) and SoD Review in GRC Access Control? UAR certifies whether assigned acces"
+        },
+        {
+          "id": "chunk_f1736a1b2eef7f165f828fcae6c4e938bc6f9cd86c7470738a1eab0a5a3b54f8",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q56: How do you design an ARM MSMP workflow in Greenfield to route access requests dynamically based on cross-system SoD risk results?",
+          "pc": false,
+          "preview": "## Q56: How do you design an ARM MSMP workflow in Greenfield to route access requests dynamically based on cross-system SoD risk results? I "
+        },
+        {
+          "id": "chunk_ca5f05291e7c65426d0d61028d6be7f940d8d4cde5fa16ee4aa4100a3e8cb51f",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q78: How do you establish an effective User Access Review (UAR) process in GRC 12.0 post-Greenfield go-live?",
+          "pc": false,
+          "preview": "## Q78: How do you establish an effective User Access Review (UAR) process in GRC 12.0 post-Greenfield go-live? I would run UAR as Access Co"
+        }
+      ]
+    },
+    {
+      "id": "W2a",
+      "q": "How would you plan an SAP GRC Access Control upgrade, including support-package impacts, remediation, regression testing and rollback?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "topic": "GRC",
+      "scope": "DEFAULT",
+      "verifiedId": null,
+      "verifiedRoute": null,
+      "prefer": false,
+      "preferReason": "insufficient-steps",
+      "preferRoute": "GENERATION",
+      "stepCount": 0,
+      "pathGuess": "GENERATION",
+      "pcBleed": true,
+      "evidence": [
+        {
+          "id": "chunk_c1312a81b5564cdddc32c6433088c59085116a84ddba43726ea039bb4c133095",
+          "folder": "grc",
+          "file": "process-control.md",
+          "heading": "Access Control and Process Control",
+          "pc": true,
+          "preview": "SAP Access Control and SAP Process Control are related GRC applications with different jobs. Access Control analyzes access risk, routes acc"
+        },
+        {
+          "id": "chunk_e5275522cb221926004e1c00bdd56dc9b15d00e242f0ea6ac3d4db422ca945fb",
+          "folder": "grc",
+          "file": "grc-principal-architect-interview-bank.md",
+          "heading": "Q35: How do you automate role testing during an S/4HANA upgrade project?",
+          "pc": false,
+          "preview": "## Q35: How do you automate role testing during an S/4HANA upgrade project? I would capture STAUTHTRACE during integration tests, compare re"
+        },
+        {
+          "id": "chunk_ae73b2bf9fe4e9bb5033ae370d4e94acdafce0d4ae45121ba63a18f6a59ceb6e",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q55: A client migrating Brownfield wants to know if their existing ECC GRC 10.1 Access Control ruleset can be re-used in S/4HANA 2023. How do you advise?",
+          "pc": false,
+          "preview": "## Q55: A client migrating Brownfield wants to know if their existing ECC GRC 10.1 Access Control ruleset can be re-used in S/4HANA 2023. Ho"
+        },
+        {
+          "id": "chunk_6019bcbe64b37ff4b21cef3180d7e35f3d3a3713e106d4e08422acf75ec5bc37",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q89: How do you configure Continuous Control Monitoring (CCM) in SAP Process Control to compensate for unmitigated SoD risks in GRC Access Control?",
+          "pc": true,
+          "preview": "## Q89: How do you configure Continuous Control Monitoring (CCM) in SAP Process Control to compensate for unmitigated SoD risks in GRC Acces"
+        },
+        {
+          "id": "chunk_f82f8b6b308a5c57f0a64a2d18c8f0f7c46f833ee8f002b7c99e98af82ed08b1",
+          "folder": "grc",
+          "file": "process-control.md",
+          "heading": "Access Control and Process Control",
+          "pc": true,
+          "preview": "## Access Control and Process Control"
+        },
+        {
+          "id": "chunk_0055a7efab4b2d3086864c8119b498b0a6dc3d7cbafaf899d0d07b50df3046c5",
+          "folder": "grc",
+          "file": "process-control.md",
+          "heading": "Access Control and Process Control",
+          "pc": true,
+          "preview": "pdf and the SAP Access Control 12.0 SP31 introduction."
+        }
+      ]
+    },
+    {
+      "id": "W2b",
+      "q": "After applying a GRC Access Control support package, what authorization and workflow regressions must you prove before returning the system to business users?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "topic": "GRC",
+      "scope": "DEFAULT",
+      "verifiedId": null,
+      "verifiedRoute": null,
+      "prefer": false,
+      "preferReason": "insufficient-steps",
+      "preferRoute": "GENERATION",
+      "stepCount": 0,
+      "pathGuess": "GENERATION",
+      "pcBleed": false,
+      "evidence": [
+        {
+          "id": "chunk_867275cb646c6221bdfaf148d09d643b2ba7773a873dc2b629b3555b1b0f6eac",
+          "folder": "grc",
+          "file": "grc-principal-architect-interview-bank.md",
+          "heading": "Q11: What authorization objects control SAP Fiori Launchpad personalization and app execution?",
+          "pc": false,
+          "preview": "## Q11: What authorization objects control SAP Fiori Launchpad personalization and app execution? I would name the objects by job, then conf"
+        },
+        {
+          "id": "chunk_1c956b5dae9f86ec02872e4312f2510208b6c714bfc0b80291ce242a1d2fee07",
+          "folder": "grc",
+          "file": "grc-principal-architect-interview-bank.md",
+          "heading": "Q21: What are the differences between User Access Review (UAR) and SoD Review in GRC Access Control?",
+          "pc": false,
+          "preview": "## Q21: What are the differences between User Access Review (UAR) and SoD Review in GRC Access Control? UAR certifies whether assigned acces"
+        },
+        {
+          "id": "chunk_f1736a1b2eef7f165f828fcae6c4e938bc6f9cd86c7470738a1eab0a5a3b54f8",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q56: How do you design an ARM MSMP workflow in Greenfield to route access requests dynamically based on cross-system SoD risk results?",
+          "pc": false,
+          "preview": "## Q56: How do you design an ARM MSMP workflow in Greenfield to route access requests dynamically based on cross-system SoD risk results? I "
+        },
+        {
+          "id": "chunk_80e67dbf647384cf99ee9e84da058370010e089259b6584fbfdef1495d3b9a4b",
+          "folder": "grc",
+          "file": "deloitte-usi-specific-gap-fillers.md",
+          "heading": "Q105: How do you troubleshoot ARM workflow requests in GRC Access Control that become stuck in 'In Process' status?",
+          "pc": false,
+          "preview": "## Q105: How do you troubleshoot ARM workflow requests in GRC Access Control that become stuck in 'In Process' status? - **Decision:** Diagn"
+        },
+        {
+          "id": "chunk_dcb9ebca768f09e84750dc13bdbded7d0d25dfed343c605fc3ac116c3a9a68a9",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q58: During Greenfield testing, users are unable to access Fiori apps due to missing CDS View DCL permissions, but SU53 shows no authorization errors. How do you fix this?",
+          "pc": false,
+          "preview": "## Q58: During Greenfield testing, users are unable to access Fiori apps due to missing CDS View DCL permissions, but SU53 shows no authoriz"
+        },
+        {
+          "id": "chunk_b750b67ad6ea862b7ffa68fc8bb1e80135bebcf118ac858a5d3e286338f3a481",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q96: How do you handle emergency access log review workflow routing when the designated EAM Controller is absent?",
+          "pc": false,
+          "preview": "## Q96: How do you handle emergency access log review workflow routing when the designated EAM Controller is absent? I would configure Acces"
+        }
+      ]
+    },
+    {
+      "id": "W3a",
+      "q": "How do you transform SAP Security and GRC from ECC to S/4HANA, including role remediation and Access Control connector impacts?",
+      "topics": [
+        "GRC",
+        "ECC",
+        "S/4"
+      ],
+      "folders": [
+        "grc",
+        "security",
+        "s4hana",
+        "fiori"
+      ],
+      "topic": "GRC",
+      "scope": "DEFAULT",
+      "verifiedId": null,
+      "verifiedRoute": null,
+      "prefer": false,
+      "preferReason": "insufficient-steps",
+      "preferRoute": "GENERATION",
+      "stepCount": 0,
+      "pathGuess": "GENERATION",
+      "pcBleed": false,
+      "evidence": [
+        {
+          "id": "chunk_c37f9a01e35e713ce9a916bb4caab6eb2fd74c90cf2f84cbe77a71f9564d693e",
+          "folder": "grc",
+          "file": "grc-principal-architect-interview-bank.md",
+          "heading": "Q1: How do you align SAP Security and GRC Access Control strategy with enterprise-wide Zero Trust Architecture (ZTA)?",
+          "pc": false,
+          "preview": "## Q1: How do you align SAP Security and GRC Access Control strategy with enterprise-wide Zero Trust Architecture (ZTA)? I would align SAP S"
+        },
+        {
+          "id": "chunk_9c3918ed263f65384f4c43352d810b9eeb128fa0a8ee101e0b4718e627c6e14e",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q54: In a Greenfield S/4HANA deployment, how do you architect Fiori security using Spaces and Pages without creating role explosion?",
+          "pc": false,
+          "preview": "## Q54: In a Greenfield S/4HANA deployment, how do you architect Fiori security using Spaces and Pages without creating role explosion? I wo"
+        },
+        {
+          "id": "chunk_2783e55e307a6be4624ae43586db730677a297b4638e065250f1a45151acc491",
+          "folder": "grc",
+          "file": "deloitte-usi-specific-gap-fillers.md",
+          "heading": "Q110: How do you analyze user access usage data in SAP using `ST03N` / `STAT26` / `SWNC` to clean up unused roles before an S/4HANA migration?",
+          "pc": false,
+          "preview": "## Q110: How do you analyze user access usage data in SAP using `ST03N` / `STAT26` / `SWNC` to clean up unused roles before an S/4HANA migra"
+        },
+        {
+          "id": "chunk_7fa77e35c3f572768b5eb45622102641ea665e29486f1dc4b7603600020eaab1",
+          "folder": "grc",
+          "file": "deloitte-usi-specific-gap-fillers.md",
+          "heading": "Q110: How do you analyze user access usage data in SAP using `ST03N` / `STAT26` / `SWNC` to clean up unused roles before an S/4HANA migration?",
+          "pc": false,
+          "preview": "- **Decision:** Perform usage-based role rationalization by analyzing historical transaction execution logs over a 12-month period. - **Mech"
+        },
+        {
+          "id": "chunk_dfbebda165128cc9b9caa8e7671d974dc7cf5d7ccaecf05f6b0ede80a68dcf47",
+          "folder": "grc",
+          "file": "grc-principal-architect-interview-bank.md",
+          "heading": "Q9: How do SAP CDS Views implement DCL (Data Control Language) for row-level security in S/4HANA?",
+          "pc": false,
+          "preview": "## Q9: How do SAP CDS Views implement DCL (Data Control Language) for row-level security in S/4HANA? I would explain DCL as query-time row f"
+        },
+        {
+          "id": "chunk_ac3fe84ff52744617d295efc9fbaf1e6040984f1d7bb521710a215b0dc853daf",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q53: During an S/4HANA Brownfield conversion, users report widespread missing access errors despite keeping legacy PFCG roles. How do you remediate?",
+          "pc": false,
+          "preview": "## Q53: During an S/4HANA Brownfield conversion, users report widespread missing access errors despite keeping legacy PFCG roles. How do you"
+        }
+      ]
+    },
+    {
+      "id": "W3b",
+      "q": "During an ECC to S/4HANA brownfield conversion, how do you handle SU25, role redesign and GRC ruleset remediation without freezing operations?",
+      "topics": [
+        "ECC",
+        "S/4",
+        "Transformation",
+        "GRC"
+      ],
+      "folders": [
+        "security",
+        "grc",
+        "s4hana",
+        "fiori",
+        "project-types",
+        "project-management",
+        "cutover",
+        "hypercare",
+        "rise"
+      ],
+      "topic": "ECC",
+      "scope": "DEFAULT",
+      "verifiedId": "su25-s4-migration-auth",
+      "verifiedRoute": "VERIFIED_WORKFLOW",
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-pool",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 3,
+      "pathGuess": "VERIFIED_WORKFLOW",
+      "pcBleed": false,
+      "evidence": [
+        {
+          "id": "chunk_7193c1a4b081c24e9cfbe7ad272d7119aa3ae6fb5f1def44a31f5118a74fe82b",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q90: During Brownfield conversion, how do you handle custom roles that contain obsolete HR authorization objects (e.g., `P_ORGIN`)?",
+          "pc": false,
+          "preview": "## Q90: During Brownfield conversion, how do you handle custom roles that contain obsolete HR authorization objects (e.g., `P_ORGIN`)? I wou"
+        },
+        {
+          "id": "chunk_ac3fe84ff52744617d295efc9fbaf1e6040984f1d7bb521710a215b0dc853daf",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q53: During an S/4HANA Brownfield conversion, users report widespread missing access errors despite keeping legacy PFCG roles. How do you remediate?",
+          "pc": false,
+          "preview": "## Q53: During an S/4HANA Brownfield conversion, users report widespread missing access errors despite keeping legacy PFCG roles. How do you"
+        },
+        {
+          "id": "chunk_b2a20c58c1d75e6a6f9003016c8150dea067c4d2c14b6d2593ca594540e184eb",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q61: During a Brownfield project, legacy user accounts have massive accumulated roles containing broad S_TABU_DIS values (&NC&). How do you remediate without breaking operations?",
+          "pc": false,
+          "preview": "## Q61: During a Brownfield project, legacy user accounts have massive accumulated roles containing broad S_TABU_DIS values (&NC&). How do y"
+        },
+        {
+          "id": "chunk_9ced8b4ac387363ffefca2372e451011f7dd30f60deb0bdbf8c5195d9dde33f4",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q59: In a Brownfield conversion, how do you handle custom Z-transactions that contain hardcoded authority checks that fail in S/4HANA?",
+          "pc": false,
+          "preview": "## Q59: In a Brownfield conversion, how do you handle custom Z-transactions that contain hardcoded authority checks that fail in S/4HANA? I "
+        },
+        {
+          "id": "chunk_a88448d5ca3536353b222ab7b0c56c49f3f97e12b451023676f616f360c2cd8d",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q69: During a Brownfield system conversion, how do you handle custom table display transactions that bypass SAP authorization checks?",
+          "pc": false,
+          "preview": "## Q69: During a Brownfield system conversion, how do you handle custom table display transactions that bypass SAP authorization checks? I w"
+        },
+        {
+          "id": "chunk_79bbd8110976b78da6e850a7395fc91b9056e72c98086bc857e0e1ac10ac8984",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q74: In a Brownfield S/4HANA conversion, how do you remediate roles that contain full-authorization (`*`) values in critical authorization objects?",
+          "pc": false,
+          "preview": "## Q74: In a Brownfield S/4HANA conversion, how do you remediate roles that contain full-authorization (`*`) values in critical authorizatio"
+        }
+      ]
+    },
+    {
+      "id": "W4a",
+      "q": "How would you design the SAP Security architecture for a RISE with SAP Private Edition landscape, including identity and GRC boundaries?",
+      "topics": [
+        "RISE",
+        "S/4",
+        "GRC"
+      ],
+      "folders": [
+        "rise",
+        "s4hana",
+        "fiori",
+        "security",
+        "grc"
+      ],
+      "topic": "RISE",
+      "scope": "DEFAULT",
+      "verifiedId": "rise-hybrid-identity",
+      "verifiedRoute": "VERIFIED_WORKFLOW",
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-pool",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 4,
+      "pathGuess": "VERIFIED_WORKFLOW",
+      "pcBleed": false,
+      "evidence": [
+        {
+          "id": "chunk_3f106564752195c1e2a0a3ecc026c9b348ed2a2393727b2b1dd0f3d8abcc6478",
+          "folder": "rise",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "heading": "Q3: How do you design identity, network, and technical-user connectivity for RISE Private Edition?",
+          "pc": false,
+          "preview": "## Q3: How do you design identity, network, and technical-user connectivity for RISE Private Edition? - **Decision:** IAS as SAP-facing IdP "
+        },
+        {
+          "id": "chunk_3dfc7cea52cfafaefb8ca6c52f7e08d9a1f7c6e14c3608b9ca088f654dab7f1c",
+          "folder": "rise",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "heading": "RISE with SAP & Cloud Transformation — Security Architecture",
+          "pc": false,
+          "preview": "# RISE with SAP & Cloud Transformation — Security Architecture Spoken architect style: fluent Senior Principal Architect paragraphs — lead w"
+        },
+        {
+          "id": "chunk_c374606c7ba9355ee864c101d396042ccbc349872791ef9f0a4b5d55a0e0818f",
+          "folder": "security",
+          "file": "core-sap-security-authorizations-architect-bank.md",
+          "heading": "Q1: How do you design a least-privilege role architecture for ECC versus S/4HANA Private Edition without collapsing into mega-roles?",
+          "pc": false,
+          "preview": "## Q1: How do you design a least-privilege role architecture for ECC versus S/4HANA Private Edition without collapsing into mega-roles?"
+        },
+        {
+          "id": "chunk_ab3908c58c88b8a942362a709469ed957ec33ef3c0011d21bf8306ad0fa051fd",
+          "folder": "security",
+          "file": "core-sap-security-authorizations-architect-bank.md",
+          "heading": "Q1: How do you design a least-privilege role architecture for ECC versus S/4HANA Private Edition without collapsing into mega-roles?",
+          "pc": false,
+          "preview": "- **Decision:** Separate single roles by task (display / change / approve) and org scope; use composites only as assignment packages—not as "
+        },
+        {
+          "id": "chunk_c37f9a01e35e713ce9a916bb4caab6eb2fd74c90cf2f84cbe77a71f9564d693e",
+          "folder": "grc",
+          "file": "grc-principal-architect-interview-bank.md",
+          "heading": "Q1: How do you align SAP Security and GRC Access Control strategy with enterprise-wide Zero Trust Architecture (ZTA)?",
+          "pc": false,
+          "preview": "## Q1: How do you align SAP Security and GRC Access Control strategy with enterprise-wide Zero Trust Architecture (ZTA)? I would align SAP S"
+        },
+        {
+          "id": "chunk_da798cdd14c68a048c9d55c72e6512e72888cca354d300a765f824804b5d935a",
+          "folder": "rise",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "heading": "Q5: How do you apply clean-core principles to security design under RISE?",
+          "pc": false,
+          "preview": "## Q5: How do you apply clean-core principles to security design under RISE? - **Decision:** Prefer standard auth and released APIs; side-by"
+        }
+      ]
+    },
+    {
+      "id": "W4b",
+      "q": "On RISE with SAP, who operates infrastructure versus customer security responsibilities, and how does that change Access Control and IAS/IPS design?",
+      "topics": [
+        "RISE",
+        "IAS",
+        "IPS"
+      ],
+      "folders": [
+        "rise",
+        "s4hana",
+        "btp",
+        "cloud"
+      ],
+      "topic": "RISE",
+      "scope": "DEFAULT",
+      "verifiedId": null,
+      "verifiedRoute": null,
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-pool",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 3,
+      "pathGuess": "RETRIEVED_PROCEDURE",
+      "pcBleed": false,
+      "evidence": [
+        {
+          "id": "chunk_9848dec7ba4ad1d153ec8e52806ce520c3ba9fa0a4f86e3698ce95302b91b2a0",
+          "folder": "btp",
+          "file": "btp-security-architect-bank.md",
+          "heading": "Q29: How do you design a hybrid RISE with SAP + BTP security control matrix?",
+          "pc": false,
+          "preview": "## Q29: How do you design a hybrid RISE with SAP + BTP security control matrix? - **Decision:** Clarify ownership: hyperscaler/RISE basis vs"
+        },
+        {
+          "id": "chunk_05f33526301188170c2f63afe1f6bfa4480d3511320242edd2317c77b98f7dd3",
+          "folder": "rise",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "heading": "Q2: How do you map customer vs SAP vs partner security responsibilities under RISE?",
+          "pc": false,
+          "preview": "## Q2: How do you map customer vs SAP vs partner security responsibilities under RISE? - **Decision:** Build a RACI from the contracted R&R:"
+        },
+        {
+          "id": "chunk_da798cdd14c68a048c9d55c72e6512e72888cca354d300a765f824804b5d935a",
+          "folder": "rise",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "heading": "Q5: How do you apply clean-core principles to security design under RISE?",
+          "pc": false,
+          "preview": "## Q5: How do you apply clean-core principles to security design under RISE? - **Decision:** Prefer standard auth and released APIs; side-by"
+        },
+        {
+          "id": "chunk_3dfc7cea52cfafaefb8ca6c52f7e08d9a1f7c6e14c3608b9ca088f654dab7f1c",
+          "folder": "rise",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "heading": "RISE with SAP & Cloud Transformation — Security Architecture",
+          "pc": false,
+          "preview": "# RISE with SAP & Cloud Transformation — Security Architecture Spoken architect style: fluent Senior Principal Architect paragraphs — lead w"
+        },
+        {
+          "id": "chunk_052b07062604f699fad3951ddf97dcf0788dc231ce2a654a774d87f69a6c2d41",
+          "folder": "rise",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "heading": "Q1: How do you explain RISE versus Activate in a security-architect interview?",
+          "pc": false,
+          "preview": "## Q1: How do you explain RISE versus Activate in a security-architect interview? - **Decision:** RISE frames transformation + cloud operati"
+        },
+        {
+          "id": "chunk_ea27adb518014cab1db23c63b9a13d8f0721684fd445b00800caa3692fb04783",
+          "folder": "rise",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "heading": "Q9: How do you communicate RISE security risk to executives without false assurance?",
+          "pc": false,
+          "preview": "## Q9: How do you communicate RISE security risk to executives without false assurance? - **Decision:** Report residual risk, open SoD, RACI"
+        }
+      ]
+    },
+    {
+      "id": "W5a",
+      "q": "How do you run the SAP Security workstream under SAP Activate, and when would you use Agile versus Waterfall governance inside Explore and Realize?",
+      "topics": [
+        "Activate"
+      ],
+      "folders": [
+        "project-management"
+      ],
+      "topic": "Activate",
+      "scope": "IMPLEMENTATION_WALKTHROUGH",
+      "verifiedId": "activate-security-workstream",
+      "verifiedRoute": "VERIFIED_WORKFLOW",
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-pool",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 3,
+      "pathGuess": "VERIFIED_WORKFLOW",
+      "pcBleed": false,
+      "evidence": [
+        {
+          "id": "chunk_1dec42678bb2f6a8a387e5016ed9ac8cd35ce31fe4aa766ef20377a55fefcd58",
+          "folder": "project-management",
+          "file": "sap-activate-methodology-architect-bank.md",
+          "heading": "Q10: What does a Principal Architect answer when asked “where does security sit in Activate”?",
+          "pc": false,
+          "preview": "## Q10: What does a Principal Architect answer when asked “where does security sit in Activate”? - **Decision:** Security is a continuous wo"
+        },
+        {
+          "id": "chunk_7b6a9a5d20a7ed934b958e14f50daf031c44b36dad5bd589e3d108c6997d7f5d",
+          "folder": "project-management",
+          "file": "sap-security-delivery-governance-architect-bank.md",
+          "heading": "SAP Project Management & Delivery Governance — Security Workstream",
+          "pc": false,
+          "preview": "# SAP Project Management & Delivery Governance — Security Workstream Spoken architect style: fluent Senior Principal Architect paragraphs — "
+        },
+        {
+          "id": "chunk_a2379c58a2820ff2d56f7eeb6ff2f798e4f87b5a7df6399eddc86f075a029d1f",
+          "folder": "project-management",
+          "file": "sap-activate-methodology-architect-bank.md",
+          "heading": "Q2: What Prepare-phase security workstream setup do you mandate before Explore workshops?",
+          "pc": false,
+          "preview": "## Q2: What Prepare-phase security workstream setup do you mandate before Explore workshops? - **Decision:** Prepare establishes governance,"
+        },
+        {
+          "id": "chunk_435e3fad0d42fdb95504a1bbcdf8b89d14d880359a27b8376ab3b9dc446f58d1",
+          "folder": "project-management",
+          "file": "sap-security-delivery-governance-architect-bank.md",
+          "heading": "Q1: How do you define scope and charter for a security/IAM workstream?",
+          "pc": false,
+          "preview": "## Q1: How do you define scope and charter for a security/IAM workstream? - **Decision:** Charter states in-scope systems/editions, identity"
+        },
+        {
+          "id": "chunk_6239f72f022a0596e2cfc3cd59b4249f7ca5127ac2ccf55e4f74cdc3cf7979bc",
+          "folder": "project-management",
+          "file": "sap-security-delivery-governance-architect-bank.md",
+          "heading": "Q7: How do you apply Agile/sprint patterns to security build safely?",
+          "pc": false,
+          "preview": "## Q7: How do you apply Agile/sprint patterns to security build safely? - **Decision:** Sprint role waves with Definition of Done (FE+BE+neg"
+        },
+        {
+          "id": "chunk_a5584de906945b9dce672b8ab6ff5e94ef59139ca647a54f0e5a6491bfc1faa7",
+          "folder": "project-management",
+          "file": "sap-activate-methodology-architect-bank.md",
+          "heading": "SAP Activate Methodology & Quality Gates — Security Architecture",
+          "pc": false,
+          "preview": "# SAP Activate Methodology & Quality Gates — Security Architecture Spoken architect style: fluent Senior Principal Architect paragraphs — le"
+        }
+      ]
+    },
+    {
+      "id": "W5b",
+      "q": "How do you distinguish SAP Activate quality gates from RISE transformation gates for a security and GRC workstream?",
+      "topics": [
+        "Activate",
+        "RISE",
+        "GRC"
+      ],
+      "folders": [
+        "project-management",
+        "rise",
+        "s4hana",
+        "grc"
+      ],
+      "topic": "Activate",
+      "scope": "IMPLEMENTATION_WALKTHROUGH",
+      "verifiedId": null,
+      "verifiedRoute": null,
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-pool",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 4,
+      "pathGuess": "RETRIEVED_PROCEDURE",
+      "pcBleed": false,
+      "evidence": [
+        {
+          "id": "chunk_0213c368f4cb46d64b614b8c46e8d51837e799bd2ba18f32861e5ae078234af9",
+          "folder": "project-management",
+          "file": "sap-activate-methodology-architect-bank.md",
+          "heading": "Q7: How do you distinguish SAP Activate quality gates from RISE transformation gates without mixing terms?",
+          "pc": false,
+          "preview": "## Q7: How do you distinguish SAP Activate quality gates from RISE transformation gates without mixing terms? - **Decision:** Activate quali"
+        },
+        {
+          "id": "chunk_052b07062604f699fad3951ddf97dcf0788dc231ce2a654a774d87f69a6c2d41",
+          "folder": "rise",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "heading": "Q1: How do you explain RISE versus Activate in a security-architect interview?",
+          "pc": false,
+          "preview": "## Q1: How do you explain RISE versus Activate in a security-architect interview? - **Decision:** RISE frames transformation + cloud operati"
+        },
+        {
+          "id": "chunk_a5584de906945b9dce672b8ab6ff5e94ef59139ca647a54f0e5a6491bfc1faa7",
+          "folder": "project-management",
+          "file": "sap-activate-methodology-architect-bank.md",
+          "heading": "SAP Activate Methodology & Quality Gates — Security Architecture",
+          "pc": false,
+          "preview": "# SAP Activate Methodology & Quality Gates — Security Architecture Spoken architect style: fluent Senior Principal Architect paragraphs — le"
+        },
+        {
+          "id": "chunk_ced64465daaeb8922a53d4edfd3bc0b9623244cc3d1e4c27c3e9fba84eb82c08",
+          "folder": "rise",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "heading": "Q6: How do you use Cloud ALM and quality gates for security readiness?",
+          "pc": false,
+          "preview": "## Q6: How do you use Cloud ALM and quality gates for security readiness? - **Decision:** Security tasks and defects tracked in the program "
+        },
+        {
+          "id": "chunk_3dfc7cea52cfafaefb8ca6c52f7e08d9a1f7c6e14c3608b9ca088f654dab7f1c",
+          "folder": "rise",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "heading": "RISE with SAP & Cloud Transformation — Security Architecture",
+          "pc": false,
+          "preview": "# RISE with SAP & Cloud Transformation — Security Architecture Spoken architect style: fluent Senior Principal Architect paragraphs — lead w"
+        },
+        {
+          "id": "chunk_8d380260dd5fb681c93430f8e7586d408f554a7ab4a90c2f55469887ba489a93",
+          "folder": "rise",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "heading": "Q10: What evidence pack proves RISE security transformation readiness?",
+          "pc": false,
+          "preview": "## Q10: What evidence pack proves RISE security transformation readiness? - **Decision:** R&R-mapped RACI, identity diagram, role remediatio"
+        }
+      ]
+    },
+    {
+      "id": "W6a",
+      "q": "How would you plan security and GRC testing, cutover, go/no-go, rollback and hypercare for an S/4HANA go-live?",
+      "topics": [
+        "GRC",
+        "S/4"
+      ],
+      "folders": [
+        "grc",
+        "s4hana",
+        "fiori",
+        "security",
+        "cutover",
+        "hypercare"
+      ],
+      "topic": "GRC",
+      "scope": "DEFAULT",
+      "verifiedId": null,
+      "verifiedRoute": null,
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-siblings",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 4,
+      "pathGuess": "RETRIEVED_PROCEDURE",
+      "pcBleed": false,
+      "evidence": [
+        {
+          "id": "chunk_03fd527d8ed863b2d9b303a36bbd2c8f97969c3ee722a0a430ef9bcb065a3e93",
+          "folder": "cutover",
+          "file": "rollback-plan.md",
+          "heading": "Prepare and execute a security rollback for a failed cutover wave",
+          "pc": false,
+          "preview": "I would prepare the rollback before the cutover window. I would freeze further role design, export the approved assignment baseline, list th"
+        },
+        {
+          "id": "chunk_fbb592866b75e3cf1d05e769c52342ad8729ad65f26d69c912dd310ab6b2e43a",
+          "folder": "cutover",
+          "file": "rollback-plan.md",
+          "heading": "Security Cutover Rollback",
+          "pc": false,
+          "preview": "# Security Cutover Rollback"
+        },
+        {
+          "id": "chunk_c2577f807c66bcc0e55a5ab2c831dadb0f21ea79ed7ff26a8529a0bb5a8c3fc0",
+          "folder": "cutover",
+          "file": "rollback-plan.md",
+          "heading": "Prepare and execute a security rollback for a failed cutover wave",
+          "pc": false,
+          "preview": "## Prepare and execute a security rollback for a failed cutover wave"
+        },
+        {
+          "id": "chunk_d26143bc4d68a690387e687324a285e08d6476da22bd764b82221207eb96389d",
+          "folder": "cutover",
+          "file": "rollback-plan.md",
+          "heading": "Prepare and execute a security rollback for a failed cutover wave",
+          "pc": false,
+          "preview": "I would not widen a shared composite as a rollback shortcut, and I would not treat a clean SU53 as evidence that cutover or rollback succeed"
+        },
+        {
+          "id": "chunk_ae0cec50cd9577dc22394fcf4a7541dca10b6c776425c65aab13a37a5c6c84f8",
+          "folder": "hypercare",
+          "file": "testing-service-ops-security-architect-bank.md",
+          "heading": "Q4: How do you rehearse cutover and rollback for security?",
+          "pc": false,
+          "preview": "## Q4: How do you rehearse cutover and rollback for security? - **Decision:** Cutover rehearsal includes role import, provisioning freeze/th"
+        },
+        {
+          "id": "chunk_ec917f050407eac59e2c3b52badd08961e9311db0eca706671b991240e462d64",
+          "folder": "hypercare",
+          "file": "hypercare.md",
+          "heading": "Security Hypercare After Go-Live",
+          "pc": false,
+          "preview": "# Security Hypercare After Go-Live"
+        }
+      ]
+    },
+    {
+      "id": "W6b",
+      "q": "What is your cutover runbook for GRC connectors, Firefighter and role transports, including rollback triggers?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc",
+        "cutover"
+      ],
+      "topic": "GRC",
+      "scope": "DEFAULT",
+      "verifiedId": "grc-firefighter",
+      "verifiedRoute": "VERIFIED_WORKFLOW",
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-siblings",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 4,
+      "pathGuess": "VERIFIED_WORKFLOW",
+      "pcBleed": false,
+      "evidence": [
+        {
+          "id": "chunk_03fd527d8ed863b2d9b303a36bbd2c8f97969c3ee722a0a430ef9bcb065a3e93",
+          "folder": "cutover",
+          "file": "rollback-plan.md",
+          "heading": "Prepare and execute a security rollback for a failed cutover wave",
+          "pc": false,
+          "preview": "I would prepare the rollback before the cutover window. I would freeze further role design, export the approved assignment baseline, list th"
+        },
+        {
+          "id": "chunk_c7f74f029b6b3c8903c0f73f3f2b544b0d6a228bfec0ae12bb8103f121b69cfd",
+          "folder": "cutover",
+          "file": "cutover-plan.md",
+          "heading": "Role and Access Cutover",
+          "pc": false,
+          "preview": "# Role and Access Cutover"
+        },
+        {
+          "id": "chunk_fbb592866b75e3cf1d05e769c52342ad8729ad65f26d69c912dd310ab6b2e43a",
+          "folder": "cutover",
+          "file": "rollback-plan.md",
+          "heading": "Security Cutover Rollback",
+          "pc": false,
+          "preview": "# Security Cutover Rollback"
+        },
+        {
+          "id": "chunk_c2577f807c66bcc0e55a5ab2c831dadb0f21ea79ed7ff26a8529a0bb5a8c3fc0",
+          "folder": "cutover",
+          "file": "rollback-plan.md",
+          "heading": "Prepare and execute a security rollback for a failed cutover wave",
+          "pc": false,
+          "preview": "## Prepare and execute a security rollback for a failed cutover wave"
+        },
+        {
+          "id": "chunk_d26143bc4d68a690387e687324a285e08d6476da22bd764b82221207eb96389d",
+          "folder": "cutover",
+          "file": "rollback-plan.md",
+          "heading": "Prepare and execute a security rollback for a failed cutover wave",
+          "pc": false,
+          "preview": "I would not widen a shared composite as a rollback shortcut, and I would not treat a clean SU53 as evidence that cutover or rollback succeed"
+        },
+        {
+          "id": "chunk_708ea77db5af5c90aa3612cf25fa95abc88ea275558ca2e1d4fba3a3feae025d",
+          "folder": "grc",
+          "file": "grc-principal-architect-interview-bank.md",
+          "heading": "Q2: What is your methodology for driving a Greenfield vs. Brownfield SAP S/4HANA Security and GRC migration?",
+          "pc": false,
+          "preview": "## Q2: What is your methodology for driving a Greenfield vs. Brownfield SAP S/4HANA Security and GRC migration? I would decide Greenfield ve"
+        }
+      ]
+    },
+    {
+      "id": "W7a",
+      "q": "How would you roll out SAP GRC Access Control to additional company codes and locations without breaking the global ruleset?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "topic": "GRC",
+      "scope": "IMPLEMENTATION_WALKTHROUGH",
+      "verifiedId": null,
+      "verifiedRoute": null,
+      "prefer": false,
+      "preferReason": "no-procedure-intent",
+      "preferRoute": "GENERATION",
+      "stepCount": 0,
+      "pathGuess": "GENERATION",
+      "pcBleed": true,
+      "evidence": [
+        {
+          "id": "chunk_ae73b2bf9fe4e9bb5033ae370d4e94acdafce0d4ae45121ba63a18f6a59ceb6e",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q55: A client migrating Brownfield wants to know if their existing ECC GRC 10.1 Access Control ruleset can be re-used in S/4HANA 2023. How do you advise?",
+          "pc": false,
+          "preview": "## Q55: A client migrating Brownfield wants to know if their existing ECC GRC 10.1 Access Control ruleset can be re-used in S/4HANA 2023. Ho"
+        },
+        {
+          "id": "chunk_b750b67ad6ea862b7ffa68fc8bb1e80135bebcf118ac858a5d3e286338f3a481",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q96: How do you handle emergency access log review workflow routing when the designated EAM Controller is absent?",
+          "pc": false,
+          "preview": "## Q96: How do you handle emergency access log review workflow routing when the designated EAM Controller is absent? I would configure Acces"
+        },
+        {
+          "id": "chunk_b2a20c58c1d75e6a6f9003016c8150dea067c4d2c14b6d2593ca594540e184eb",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q61: During a Brownfield project, legacy user accounts have massive accumulated roles containing broad S_TABU_DIS values (&NC&). How do you remediate without breaking operations?",
+          "pc": false,
+          "preview": "## Q61: During a Brownfield project, legacy user accounts have massive accumulated roles containing broad S_TABU_DIS values (&NC&). How do y"
+        },
+        {
+          "id": "chunk_f82f8b6b308a5c57f0a64a2d18c8f0f7c46f833ee8f002b7c99e98af82ed08b1",
+          "folder": "grc",
+          "file": "process-control.md",
+          "heading": "Access Control and Process Control",
+          "pc": true,
+          "preview": "## Access Control and Process Control"
+        },
+        {
+          "id": "chunk_c1312a81b5564cdddc32c6433088c59085116a84ddba43726ea039bb4c133095",
+          "folder": "grc",
+          "file": "process-control.md",
+          "heading": "Access Control and Process Control",
+          "pc": true,
+          "preview": "SAP Access Control and SAP Process Control are related GRC applications with different jobs. Access Control analyzes access risk, routes acc"
+        },
+        {
+          "id": "chunk_0055a7efab4b2d3086864c8119b498b0a6dc3d7cbafaf899d0d07b50df3046c5",
+          "folder": "grc",
+          "file": "process-control.md",
+          "heading": "Access Control and Process Control",
+          "pc": true,
+          "preview": "pdf and the SAP Access Control 12.0 SP31 introduction."
+        }
+      ]
+    },
+    {
+      "id": "W7b",
+      "q": "For a multi-company Access Control rollout, how do you localize MSMP approvers and SoD risk ownership while keeping one global ruleset?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "topic": "GRC",
+      "scope": "DEFAULT",
+      "verifiedId": "grc-msmp-access-request-config",
+      "verifiedRoute": "VERIFIED_WORKFLOW",
+      "prefer": false,
+      "preferReason": "no-procedure-intent",
+      "preferRoute": "GENERATION",
+      "stepCount": 0,
+      "pathGuess": "VERIFIED_WORKFLOW",
+      "pcBleed": false,
+      "evidence": [
+        {
+          "id": "chunk_6c872e86422035032f10ea25ce89d74bb3284316bc6288a6b8e1040ff9ff06bb",
+          "folder": "grc",
+          "file": "msmp.md",
+          "heading": "Configure an MSMP workflow for an access request",
+          "pc": false,
+          "preview": "Source checked 2026-10-21: SAP Help Maintain MSMP Workflows; SAP Support Content BRF plus Flat Rule integration; SAP Community MSMP Workflow"
+        },
+        {
+          "id": "chunk_d5e6973a5d4392424481caee69aeb75ee67414e7e96c527055662aff8843dd70",
+          "folder": "grc",
+          "file": "msmp.md",
+          "heading": "Configure an MSMP workflow for an access request",
+          "pc": false,
+          "preview": "## Configure an MSMP workflow for an access request"
+        },
+        {
+          "id": "chunk_be2887194b256e08dd90bb8b71a738d54e3373cfbccb0ce161a0cbeb4ca528db",
+          "folder": "grc",
+          "file": "msmp.md",
+          "heading": "Configure an MSMP workflow for an access request",
+          "pc": false,
+          "preview": "I would first check whether the delivered Access Request Approval workflow already covers the request type before I change Maintain MSMP Wor"
+        },
+        {
+          "id": "chunk_2abd0293797aee608c5f3d5ea2fa37319a3f25abd6570664f6f16ac2cd71c8fa",
+          "folder": "grc",
+          "file": "msmp.md",
+          "heading": "Troubleshoot an MSMP access request with no approver",
+          "pc": false,
+          "preview": "I would open the stuck access request in Request Status and inspect Instance Status for the path, stage, and Approvers of Selected Path, the"
+        },
+        {
+          "id": "chunk_a7b829728a7fdd58ea330ae51a7f28a40dd6a43c6ba63e543bfa2e6ea2ce7b99",
+          "folder": "grc",
+          "file": "msmp.md",
+          "heading": "Troubleshoot an MSMP access request with no approver",
+          "pc": false,
+          "preview": "Source checked 2026-10-21: SAP Access Control Viewing Your Request Status; Maintain MSMP Workflows; BRF plus Flat Rule integration."
+        }
+      ]
+    },
+    {
+      "id": "W8a",
+      "q": "How would you estimate, staff and govern a multi-location SAP Security and GRC engagement for an RFP response?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "topic": "GRC",
+      "scope": "DEFAULT",
+      "verifiedId": null,
+      "verifiedRoute": null,
+      "prefer": false,
+      "preferReason": "no-procedure-intent",
+      "preferRoute": "GENERATION",
+      "stepCount": 0,
+      "pathGuess": "GENERATION",
+      "pcBleed": false,
+      "evidence": [
+        {
+          "id": "chunk_8842a7070ca1a9b60ddfeb1be0974b4f5d5995f5bafbaaf8591d6acb29878b70",
+          "folder": "grc",
+          "file": "grc-principal-architect-interview-bank.md",
+          "heading": "Q40: Describe a scenario where you proactively identified and mitigated a major security vulnerability on a client engagement.",
+          "pc": false,
+          "preview": "## Q40: Describe a scenario where you proactively identified and mitigated a major security vulnerability on a client engagement. I would no"
+        },
+        {
+          "id": "chunk_0e361e573da23fbc09d2e0378256cfd5962bdb26dc11a3d13a7e85a19a70561a",
+          "folder": "grc",
+          "file": "deloitte-usi-specific-gap-fillers.md",
+          "heading": "Deloitte USI Specific SAP Security & GRC Interview Gap-Fillers",
+          "pc": false,
+          "preview": "# Deloitte USI Specific SAP Security & GRC Interview Gap-Fillers Spoken architect answers for Deloitte USI senior SAP Security / GRC intervi"
+        },
+        {
+          "id": "chunk_758c3e543c331014f48a8fe277f6f1d8d6e09e705ad871c562eca7c668dcd76d",
+          "folder": "grc",
+          "file": "deloitte-usi-specific-gap-fillers.md",
+          "heading": "Q120: How do you prepare for a Deloitte USI technical manager round for an SAP GRC Security Senior Consultant position?",
+          "pc": false,
+          "preview": "## Q120: How do you prepare for a Deloitte USI technical manager round for an SAP GRC Security Senior Consultant position? - **Decision:** F"
+        },
+        {
+          "id": "chunk_67ec99730088308ae103a4e35e82c1336a7a2ff243df256a52ecef074c7d4562",
+          "folder": "grc",
+          "file": "grc-principal-architect-interview-bank.md",
+          "heading": "Q5: How do you establish an effective Governance Framework for custom authorization objects and Z-transactions?",
+          "pc": false,
+          "preview": "## Q5: How do you establish an effective Governance Framework for custom authorization objects and Z-transactions? I would make custom secur"
+        },
+        {
+          "id": "chunk_27697f9f67c4491d24344e70aba175857a814d76510781e769ca8f1a334e7d2a",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q51: In an S/4HANA Greenfield implementation, business process owners insist on using legacy ECC T-codes. How do you enforce a Clean Core security architecture?",
+          "pc": false,
+          "preview": "## Q51: In an S/4HANA Greenfield implementation, business process owners insist on using legacy ECC T-codes. How do you enforce a Clean Core"
+        },
+        {
+          "id": "chunk_9c3918ed263f65384f4c43352d810b9eeb128fa0a8ee101e0b4718e627c6e14e",
+          "folder": "grc",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q54: In a Greenfield S/4HANA deployment, how do you architect Fiori security using Spaces and Pages without creating role explosion?",
+          "pc": false,
+          "preview": "## Q54: In a Greenfield S/4HANA deployment, how do you architect Fiori security using Spaces and Pages without creating role explosion? I wo"
+        }
+      ]
+    },
+    {
+      "id": "W8b",
+      "q": "As a Protiviti Senior Manager, how do you set effort assumptions, RAID governance and audit expectations for a GRC Access Control delivery proposal?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc",
+        "audit",
+        "compliance",
+        "project-management"
+      ],
+      "topic": "GRC",
+      "scope": "DEFAULT",
+      "verifiedId": null,
+      "verifiedRoute": null,
+      "prefer": false,
+      "preferReason": "no-procedure-intent",
+      "preferRoute": "GENERATION",
+      "stepCount": 0,
+      "pathGuess": "GENERATION",
+      "pcBleed": false,
+      "evidence": [
+        {
+          "id": "chunk_29a70a346f319d93695907b1303f55debb1fa2c54876055ade631b4d39a0db18",
+          "folder": "compliance",
+          "file": "governance-risk-audit-sap-security-architect-bank.md",
+          "heading": "Governance, Risk, Compliance & Audit — SAP Security Architecture",
+          "pc": false,
+          "preview": "# Governance, Risk, Compliance & Audit — SAP Security Architecture Spoken architect style: fluent Senior Principal Architect paragraphs — le"
+        },
+        {
+          "id": "chunk_af5aceb0502814c4824c78227b2e57ccef39a52e678890d89cdd247bc8f228a3",
+          "folder": "compliance",
+          "file": "governance-risk-audit-sap-security-architect-bank.md",
+          "heading": "Q3: How do you run access certification / UAR that auditors trust?",
+          "pc": false,
+          "preview": "## Q3: How do you run access certification / UAR that auditors trust? - **Decision:** Campaign scope matches control (systems, privileged, f"
+        },
+        {
+          "id": "chunk_a6dac0ad7a366c19e3975f0178afff9fb2158e698a97d96107eb1a6d02e6bb03",
+          "folder": "compliance",
+          "file": "governance-risk-audit-sap-security-architect-bank.md",
+          "heading": "Q5: How do you govern emergency / privileged access for audit?",
+          "pc": false,
+          "preview": "## Q5: How do you govern emergency / privileged access for audit? - **Decision:** Firefighter/IAG PAM/CyberArk checkouts are controlled, log"
+        },
+        {
+          "id": "chunk_7b6a9a5d20a7ed934b958e14f50daf031c44b36dad5bd589e3d108c6997d7f5d",
+          "folder": "project-management",
+          "file": "sap-security-delivery-governance-architect-bank.md",
+          "heading": "SAP Project Management & Delivery Governance — Security Workstream",
+          "pc": false,
+          "preview": "# SAP Project Management & Delivery Governance — Security Workstream Spoken architect style: fluent Senior Principal Architect paragraphs — "
+        },
+        {
+          "id": "chunk_ac8042af0a714eef4e82c822af453aa30a32f66ef8c2ced600dc73028d7498ae",
+          "folder": "project-management",
+          "file": "senior-consultant-delivery.md",
+          "heading": "Senior consultant delivery for SAP Security and GRC",
+          "pc": false,
+          "preview": "# Senior consultant delivery for SAP Security and GRC These are the judgement calls a senior consultant owns on a client engagement. They si"
+        },
+        {
+          "id": "chunk_98032b3fb20642860c5ae5b59779870b05d5ff413e863d2e7b6421ccfe797ac1",
+          "folder": "compliance",
+          "file": "risk-mitigation.md",
+          "heading": "Remediate an access or control audit finding",
+          "pc": false,
+          "preview": "## Remediate an access or control audit finding I would capture the finding, the population or sample that failed, and the risk if the contr"
+        }
+      ]
+    }
+  ]
+}

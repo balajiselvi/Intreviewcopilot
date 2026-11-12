@@ -1,0 +1,24 @@
+{
+  "documentsProcessed": 125,
+  "documentsSkipped": 100,
+  "documentsUpdated": 25,
+  "chunksCreated": 45,
+  "elapsedSeconds": 136.695,
+  "errors": [],
+  "warnings": [
+    {
+      "stage": "document-skip",
+      "message": "Unsupported file type: .json",
+      "fileName": "stats.json"
+    },
+    {
+      "stage": "document-skip",
+      "message": "Unsupported file type: .json",
+      "fileName": "state.json"
+    },
+    {
+      "stage": "in-place-patch",
+      "message": "In-place patch on 2026-10-19. Canonical loadKnowledgeDocumentsWithReport returns 126 documents, including knowledge/btp/joule-security.md. The index has 2772 chunks, all stored vectors are 384-dimensional, and patched vectors were regenerated with Xenova/all-MiniLM-L6-v2. The embeddingVersion label remains text-embedding-3-small because that label is the incremental-build compatibility key; changing it would invalidate every stored chunk. 23 loaded markdown files are 0-byte stubs and are absent from the index because the chunker discards empty content. They were not filled or rebuilt. The files are infoproviders.md, cloud-security.md, identity-federation.md, oauth.md, saml.md, compliance.md, risk-mitigation.md, rollback-plan.md, catalogs.md, launchpad.md, spaces-pages.md, knowledge-transfer.md, post-go-live.md, client-management.md, delivery-management.md, team-management.md, vendor-management.md, chaRM.md, release-process.md, transport-management.md, debugging.md, job-failures.md, and performance.md."
+    }
+  ]
+}

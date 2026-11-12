@@ -1,0 +1,137 @@
+{
+  "question": "How do you configure an SAP Fiori app in the launchpad?",
+  "topics": [
+    "Fiori"
+  ],
+  "decideInterviewTurn": {
+    "route": "GENERATION",
+    "reason": "well-formed-question-or-technical-issue",
+    "workflowId": null
+  },
+  "selectVerifiedWorkflow": null,
+  "folders": [
+    "fiori",
+    "s4hana"
+  ],
+  "topRankedChunks": [
+    {
+      "rank": 1,
+      "id": "chunk_cf48c9f664ffc51bde27bda69d2699e9a6ee966c77d7ede82d0f431a97698428",
+      "folder": "fiori",
+      "file": "catalogs.md",
+      "heading": "Fiori Catalogs and Target Mappings",
+      "score": null,
+      "preview": "# Fiori Catalogs and Target Mappings"
+    },
+    {
+      "rank": 2,
+      "id": "chunk_4b0ae8d21f4698ad9496669adef6323f507dbb0eba9f7dc0d992a70d32f2bbf9",
+      "folder": "fiori",
+      "file": "catalogs.md",
+      "heading": "Overview",
+      "score": null,
+      "preview": "## Overview A Fiori catalog holds the tiles and target mappings that make an app resolvable on the launchpad. Catalog assignment alone does not prove the user can complete the business task. Runtime authorization still d"
+    },
+    {
+      "rank": 3,
+      "id": "chunk_0b3466a84e0c4e7356685ea8c055d07e7249bee4adbfc4d2eb9e455c7105957f",
+      "folder": "fiori",
+      "file": "catalogs.md",
+      "heading": "Interview Summary",
+      "score": null,
+      "preview": "## Interview Summary I would treat a missing app as a catalog, space, page, or role-assignment problem before any authorization trace."
+    },
+    {
+      "rank": 4,
+      "id": "chunk_335101b591b10cc9d6e38d08f13b5bdba93713eaea671c7517c8d64a203d6a7e",
+      "folder": "fiori",
+      "file": "catalogs.md",
+      "heading": "Check catalog and target mapping for a missing Fiori app",
+      "score": null,
+      "preview": "## Check catalog and target mapping for a missing Fiori app I would confirm the deployment first. On SAP S/4HANA Cloud Public Edition I would use Maintain Business Users and Maintain Business Roles and verify the busines"
+    },
+    {
+      "rank": 5,
+      "id": "chunk_1726273cdfedbbe73ad91366720a0fd94e4367e33eb918741eb3a86923d83bc8",
+      "folder": "fiori",
+      "file": "catalogs.md",
+      "heading": "Sources and scope",
+      "score": null,
+      "preview": "## Sources and scope - knowledge/fiori/fiori-security.md - SAP Learning, Managing Content on the SAP Fiori Launchpad; KBA 3499342 for Public Edition missing-app checks"
+    },
+    {
+      "rank": 6,
+      "id": "chunk_0122e75491ccc5f9d0e4c2bcaae4ed7853400f91dcb79a24e3de4ace507df8a7",
+      "folder": "fiori",
+      "file": "fiori-security.md",
+      "heading": "Fiori Launchpad and App Authorization",
+      "score": null,
+      "preview": "# Fiori Launchpad and App Authorization"
+    },
+    {
+      "rank": 7,
+      "id": "chunk_0d94e342cc560506fdc7f9032e1c6cd83c952ea595d5e02ea2edb4f7d703535c",
+      "folder": "fiori",
+      "file": "fiori-security.md",
+      "heading": "Overview",
+      "score": null,
+      "preview": "## Overview Fiori authorization is a front-end visibility model plus a backend execution model. Which tool applies depends on the deployment. On SAP S/4HANA Cloud Public Edition, a missing app starts in Maintain Business"
+    },
+    {
+      "rank": 8,
+      "id": "chunk_4031f628a1de3f473cce9fa0f3f59abaff6f9ac8ff45aebeb745b23d60188d7e",
+      "folder": "fiori",
+      "file": "fiori-security.md",
+      "heading": "Design Fiori security for an S/4 rollout",
+      "score": null,
+      "preview": "## Design Fiori security for an S/4 rollout"
+    },
+    {
+      "rank": 9,
+      "id": "chunk_55f4a4d0dacf36901e3d2e8f02fdb585db67bb1d1b4fa90bb14beaaae10147de",
+      "folder": "fiori",
+      "file": "fiori-security.md",
+      "heading": "Design Fiori security for an S/4 rollout",
+      "score": null,
+      "preview": "Design Fiori security as launchpad visibility plus runtime authorization, and keep the administration path with the deployment. Use Maintain Business Roles to assign business catalogs, spaces, and pages on SAP S/4HANA Cl"
+    },
+    {
+      "rank": 10,
+      "id": "chunk_dd1032ccab54a1c736a623d511a85972a6d2bd3ffd8990d8aebf9b37e6a1591f",
+      "folder": "fiori",
+      "file": "fiori-security.md",
+      "heading": "Interview Summary",
+      "score": null,
+      "preview": "## Interview Summary A business role in S/4HANA is not just a composite of single roles. It must include the catalog or space assignment that exposes apps and the runtime authorization required by the app's services and "
+    },
+    {
+      "rank": 11,
+      "id": "chunk_08daa02624f30b6e908231945f45d5561f22d9427220e806f3fb8d0e3e7958b3",
+      "folder": "fiori",
+      "file": "fiori-security.md",
+      "heading": "30 Second Interview Answer",
+      "score": null,
+      "preview": "## 30 Second Interview Answer I would split Fiori security into launchpad visibility and runtime authorization. In Public Edition, business roles, catalogs, spaces, and pages control app availability; in customer-managed"
+    },
+    {
+      "rank": 12,
+      "id": "chunk_3e12be645dfbee8a83aa9a3bea317c631503d665d27341c1c72dfdea6005111c",
+      "folder": "fiori",
+      "file": "fiori-security.md",
+      "heading": "60 Second Interview Answer",
+      "score": null,
+      "preview": "## 60 Second Interview Answer The launchpad content model depends on edition and release. Public Edition uses business roles with catalogs and spaces/pages. Customer-managed ABAP systems may use groups on older releases "
+    }
+  ],
+  "sourceFilesUsed": [
+    "fiori/catalogs.md",
+    "fiori/fiori-security.md"
+  ],
+  "promptLaneCheck": {
+    "hasSpacesPages": true,
+    "hasClassicDesigner": true,
+    "hasODataV4": true,
+    "hasDeploymentFirst": true,
+    "fioriTemplatePreview": "Structure: Launchpad Content (catalogs, spaces, pages, target mapping resolving a tile to a target) → Business Role & Authorization Assignment → Runtime OData Check using evidence available in the named deployment (Public Edition: Display Authorization Trace for an authorization failure; ABAP Gateway: hub/backend error logs, then an ABAP trace) → Root Cause Isolation → Corrective Branch & Same-User Validation. Missing app stays on the content/role/page path; do not use a runtime trace to diagnos"
+  }
+}

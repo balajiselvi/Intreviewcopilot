@@ -1,0 +1,25 @@
+{
+  "at": "2026-11-06T14:33:02.384Z",
+  "model": "gpt-4o",
+  "temperature": 0.2,
+  "latencyMs": 4423,
+  "ttftMs": 1045,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 3413,
+    "completion_tokens": 306,
+    "total_tokens": 3719,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "rawChars": 1822,
+  "raw": "The difference between SAP BTP and SAP Cloud Platform (SCP) primarily lies in their evolution and scope. SAP Cloud Platform was the original name for SAP's platform-as-a-service offering, which provided a range of services for building, deploying, and managing applications in the cloud. It focused on enabling developers to create applications that extend SAP solutions or integrate with third-party systems.\n\nSAP Business Technology Platform (BTP) is the evolved version of SCP, representing a broader and more integrated suite of services. BTP encompasses not only the application development and integration capabilities of SCP but also includes data management, analytics, and intelligent technologies. This expansion reflects SAP's strategy to provide a comprehensive platform that supports digital transformation by combining database and data management, analytics, application development, and intelligent technologies under one umbrella.\n\nUnder the hood, SAP BTP includes components like the SAP HANA Cloud for database services, SAP Integration Suite for seamless connectivity, and SAP Extension Suite for application development. It also integrates with SAP's intelligent technologies like AI and machine learning, which were not as prominently featured in the original SCP. This makes BTP a more robust platform for enterprises looking to innovate and transform their business processes.\n\nFrom a governance perspective, SAP BTP supports a clean core approach by allowing extensions and integrations to be developed outside of the core ERP systems, thus preserving the integrity and upgradeability of the core. This aligns with modern IT governance practices that emphasize agility, scalability, and compliance, ensuring that enterprises can innovate rapidly while maintaining control over their IT landscapes."
+}

@@ -1,0 +1,44 @@
+{
+  "mode": "offline-mocked-prefer-path",
+  "notLiveGeneratedAnswer": true,
+  "selectedChunk": {
+    "id": "chunk_05062f25aec1b0c58780677c56a0ce8a7d5689b4412daf7e5866dbbb70a33f0f",
+    "heading": "Configure a BRFplus agent rule for MSMP",
+    "sourceFile": "brf-plus.md",
+    "chunkIndex": 15,
+    "thin": true,
+    "preview": "Source checked 2026-10-21: SAP Support Content BRF plus Flat Rule - SAP Access Control Integration; SAP Help Define Work"
+  },
+  "assembledEvidence": {
+    "merged": true,
+    "gap": null,
+    "chunkIds": [
+      "chunk_2d2d272bae8e5d754abee169d4da339da897f332698252cc13ffe578884deb78",
+      "chunk_c06bb7006f0118654844d379a6c0596f26d8bccbb8c63fcd46a7a88be6fc5de9",
+      "chunk_05062f25aec1b0c58780677c56a0ce8a7d5689b4412daf7e5866dbbb70a33f0f"
+    ],
+    "sourceFile": "brf-plus.md",
+    "heading": "Configure a BRFplus agent rule for MSMP",
+    "preview": "## Configure a BRFplus agent rule for MSMP\n\nI would first confirm whether the change is an initiator rule or an agent rule before changing anything. The initiator rule selects the MSMP path from request attributes. The agent rule resolves who must approve at a stage. For an agent"
+  },
+  "beforeSiblingRecovery": {
+    "prefer": false,
+    "reason": "insufficient-steps",
+    "route": "GENERATION",
+    "stepCount": 0
+  },
+  "afterSiblingRecovery": {
+    "prefer": true,
+    "reason": "coherent-source-procedure-from-siblings",
+    "route": "RETRIEVED_PROCEDURE",
+    "stepCount": 5,
+    "answerSource": "RETRIEVED_PROCEDURE (assembled same-heading siblings)",
+    "spokenPreview": "I would first confirm whether the change is an initiator rule or an agent rule before changing anything. The initiator rule selects the MSMP path from request attributes. For an agent rule I would generate the BRF+ flat "
+  },
+  "genericBrfGuard": {
+    "prefer": false,
+    "reason": "task-fit-msmp-scoped-brf",
+    "verified": null
+  },
+  "msmpVerified": "grc-brf-msmp-agent-rule-config"
+}

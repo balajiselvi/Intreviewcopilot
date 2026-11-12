@@ -1,0 +1,127 @@
+{
+  "at": "2026-11-03T06:28:45.717Z",
+  "pass": true,
+  "cases": [
+    {
+      "id": "s9-alt-terminology-accepted",
+      "ok": true,
+      "reasons": []
+    },
+    {
+      "id": "s9-fabricated-wrong-subject-rejected",
+      "ok": true,
+      "reasons": [
+        "disallowed-project-metrics",
+        "wrong-product:critical-actions",
+        "concept-coverage:missing-essential-concepts",
+        "critical-actions-incomplete-definition"
+      ]
+    },
+    {
+      "id": "s9-disabled-msg-not-rewritten",
+      "ok": true,
+      "kind": "provider_disabled"
+    },
+    {
+      "id": "s9-finalization-rejects-s4-leak",
+      "ok": true,
+      "kind": "recovered_direct_technical",
+      "preview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags "
+    },
+    {
+      "id": "s10-mode-live-resolve",
+      "ok": true
+    },
+    {
+      "id": "s10-mode-mock-resolve",
+      "ok": true
+    },
+    {
+      "id": "s10-mode-disabled-resolve",
+      "ok": true
+    },
+    {
+      "id": "s10-mode-unknown-fail-closed",
+      "ok": true
+    },
+    {
+      "id": "s10-live-guard-allows",
+      "ok": true
+    },
+    {
+      "id": "s10-disabled-cannot-invoke-llm-guard",
+      "ok": true
+    },
+    {
+      "id": "s10-disabled-msg-operational-not-knowledge-gap",
+      "ok": true
+    },
+    {
+      "id": "s10-existing-bank-or-indexed-definition",
+      "ok": true,
+      "route": "GENERATION",
+      "preview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive e"
+    },
+    {
+      "id": "s10-new-question-indexed-domain",
+      "ok": true,
+      "preview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive e"
+    },
+    {
+      "id": "s10-skill-domain-no-exact-bank",
+      "ok": true,
+      "route": "VERIFIED_WORKFLOW",
+      "answerFinal": false,
+      "preview": "For a Firefighter who cannot launch an approved emergency session, I validate assignment, target ID and role, launch tra"
+    },
+    {
+      "id": "s10-outside-inventory-finalized-no-live",
+      "ok": true,
+      "preview": "I do not have verified product documentation for that module or transaction not confirmed in supporting knowledge in the knowledge base. I would not invent T-codes, tables, or conf"
+    },
+    {
+      "id": "s10-acronym-contextual-ips",
+      "ok": true,
+      "topic": "IPS",
+      "resolved": null
+    },
+    {
+      "id": "s10-ambiguous-acronym-needs-clarity-or-safe",
+      "ok": true,
+      "admission": {
+        "decision": "DEFER",
+        "route": "NONE",
+        "reason": "ambiguous-fragment",
+        "scriptId": null,
+        "confidence": 0,
+        "evidenceMode": null,
+        "normalizedQuestion": "What about AC?"
+      },
+      "preview": ""
+    },
+    {
+      "id": "s10-disabled-no-llm-and-finalized",
+      "ok": true,
+      "route": "LOCAL_KNOWLEDGE_FALLBACK",
+      "kind": "disabled",
+      "preview": "Install Cloud Connector in the corporate DMZ/network zone; register the BTP subaccount; define Access Control entries for specific HTTPS/RFC hosts and URL paths"
+    },
+    {
+      "id": "s10-unrelated-retrieval-contamination-rejected",
+      "ok": true,
+      "kind": "recovered_direct_technical",
+      "preview": "In on-premise SAP GRC Access Control, a ruleset is the maintained ARA content that defines what constitutes access risk — not a cloud identi"
+    },
+    {
+      "id": "s10-indexed-domain-has-relevant-rag",
+      "ok": true,
+      "status": "RELEVANT_SUFFICIENT",
+      "scoped": 3
+    },
+    {
+      "id": "s10-zero-relevant-rag-detected",
+      "ok": true,
+      "status": "IRRELEVANT_RETRIEVAL"
+    }
+  ]
+}

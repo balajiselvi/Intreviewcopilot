@@ -1,0 +1,40 @@
+{
+  "at": "2026-11-03T05:19:00.000Z",
+  "port": 3103,
+  "serverEnv": {
+    "LLM_PROVIDER_MODE": "mock",
+    "INTERVIEW_SAFE_MODE": "0",
+    "NEXT_DIST_DIR": ".next-mock-3103"
+  },
+  "apiSixQuestion": {
+    "file": "eval/results/_acceptance/mock-generation-six-questions.json",
+    "pass": true,
+    "note": "Full six-question sequence against /api/chat on :3103 with providerMode=mock"
+  },
+  "browserUi": {
+    "url": "http://127.0.0.1:3103/interview",
+    "manualInputMode": true,
+    "questions": [
+      {
+        "q": "What are Critical Actions?",
+        "displayed": true,
+        "noDover": true,
+        "no1650": true,
+        "preview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive executable..."
+      },
+      {
+        "q": "What if",
+        "deferExpected": true,
+        "uiState": "waiting",
+        "deferHasAnswer": false
+      }
+    ],
+    "remainingCoveredByApiHarness": [
+      "Explain the Mitigation Lifecycle.",
+      "What are the GRC Rule Set Components?",
+      "What if Firefighter Logs are Not Generated?",
+      "Tell me about your S/4HANA transformation experience."
+    ]
+  },
+  "paidProvider": "not invoked — LLM_PROVIDER_MODE=mock; liveTransportInvocations=0 proven in provider-mode-chat-e2e.json"
+}

@@ -1,0 +1,35 @@
+{
+  "tmp": "C:\\Users\\balaj\\AppData\\Local\\Temp\\fix1-triage-hmnRUM",
+  "productBoundary": {
+    "question": "Compare the Fiori app assignment in S/4HANA Cloud Public Edition and Private Edition.",
+    "head": [
+      "Public Edition: user cannot see a Fiori app",
+      "Private Edition: user cannot see a Fiori app",
+      "Private Edition launchpad",
+      "Public Edition troubleshooting: app is missing"
+    ],
+    "current": [
+      "Public Edition troubleshooting: app is missing",
+      "Public Edition: user cannot see a Fiori app",
+      "Private Edition: user cannot see a Fiori app",
+      "Private Edition launchpad"
+    ],
+    "expectedByAssert": [
+      "Public Edition: user cannot see a Fiori app",
+      "Private Edition: user cannot see a Fiori app",
+      "Private Edition launchpad",
+      "Public Edition troubleshooting: app is missing"
+    ]
+  },
+  "answerQuality": {
+    "question": "How do you configure an MSMP workflow for access requests?",
+    "headId": "grc-ac12-ara-msmp-config",
+    "curId": "grc-msmp-access-request-config",
+    "headHasSelectedPathPhrase": false,
+    "curHasSelectedPathPhrase": false,
+    "headHasApproversOfSelectedPath": false,
+    "curHasApproversOfSelectedPath": true,
+    "headSnippet": "RACFFOBJECT, and GRACFFLOG tables under change control and SoD owner sign-off. I always prove it with an ARA toxic-user simulation, an ARM Instance Status path check, and a GRACFFLOG review when elevated access was used.",
+    "curSnippet": "by confirming path, stage, Approvers of Selected Path, and the audit log on a positive request, then a negative agent or mapping case; I open provisioning logs only after approval when the target assignment itself fails."
+  }
+}

@@ -1,0 +1,1255 @@
+{
+  "generatedAt": "2026-10-22T13:30:30.956Z",
+  "mode": "offline-production-retrieval",
+  "questionCount": 40,
+  "seed": null,
+  "rows": [
+    {
+      "domain": "ARA",
+      "question": "How do I validate SoD risk coverage before a new role is provisioned?",
+      "product": "GRC",
+      "intent": "REQUEST_FOR_VALIDATION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [
+        {
+          "file": "grc/grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q78: How do you establish an effective User Access Review (UAR) process in GRC 12.0 post-Greenfield go-live?",
+          "score": 0.44340224509270254
+        },
+        {
+          "file": "grc/grc-principal-architect-interview-bank.md",
+          "heading": "Q3: How do you design an enterprise Segregation of Duties (SoD) Framework to eliminate false positives in GRC ARA?",
+          "score": 0.43512913583383983
+        },
+        {
+          "file": "grc/deloitte-usi-specific-gap-fillers.md",
+          "heading": "Q118: How do you configure GRC ARA to generate automated email alerts when critical risks are assigned to users?",
+          "score": 0.42602372868375926
+        },
+        {
+          "file": "grc/grc-principal-architect-interview-bank.md",
+          "heading": "Q35: How do you automate role testing during an S/4HANA upgrade project?",
+          "score": 0.40197829117639355
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "ARA",
+      "question": "In SAP GRC ARA, user-level analysis misses a role conflict; what should I compare?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [
+        {
+          "file": "grc/authorization-sync.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.4903085213033555
+        },
+        {
+          "file": "grc/grc-overview.md",
+          "heading": "Architecture",
+          "score": 0.47475691542577414
+        },
+        {
+          "file": "grc/grc-principal-architect-interview-bank.md",
+          "heading": "Q23: How do you perform offline GRC Risk Analysis for non-SAP applications?",
+          "score": 0.46471758777511607
+        },
+        {
+          "file": "grc/repository-sync.md",
+          "heading": "Overview",
+          "score": 0.45495809580539737
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "ARM",
+      "question": "How should an access request move from approval to target provisioning?",
+      "product": "General",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [],
+      "topSources": [
+        {
+          "file": "grc/arm.md",
+          "heading": "Design access request from submission through target provisioning",
+          "score": 0.5193188400040127
+        },
+        {
+          "file": "grc/arm.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.4881284864153803
+        },
+        {
+          "file": "grc/arm.md",
+          "heading": "Tough Follow-up Questions",
+          "score": 0.4801422811927954
+        },
+        {
+          "file": "grc/arm.md",
+          "heading": "30 Second Interview Answer",
+          "score": 0.4798735829362211
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "ARM",
+      "question": "The request is approved but access is absent in the target; where do I trace it?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [
+        {
+          "file": "grc/msmp.md",
+          "heading": "Troubleshoot an MSMP access request with no approver",
+          "score": 0.42105715797881343
+        },
+        {
+          "file": "iag/iag-access-request.md",
+          "heading": "Authorization policy",
+          "score": 0.4153990652544986
+        },
+        {
+          "file": "grc/arm.md",
+          "heading": "Design access request from submission through target provisioning",
+          "score": 0.40825629267438446
+        },
+        {
+          "file": "grc/grc-overview.md",
+          "heading": "Troubleshooting",
+          "score": 0.4018278655834992
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "EAM",
+      "question": "How do I govern Firefighter owners, controllers, and session-log review?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [
+        {
+          "file": "grc/firefighter.md",
+          "heading": "Overview",
+          "score": 0.46657409907665226
+        },
+        {
+          "file": "grc/eam.md",
+          "heading": "Best Practices",
+          "score": 0.45630514386073173
+        },
+        {
+          "file": "grc/firefighter.md",
+          "heading": "Runtime Flow",
+          "score": 0.45515755345088704
+        },
+        {
+          "file": "grc/firefighter.md",
+          "heading": "Red Flags",
+          "score": 0.4524838598198123
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "EAM",
+      "question": "An emergency session log is missing from controller review; how do I investigate?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [
+        {
+          "file": "grc/grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q96: How do you handle emergency access log review workflow routing when the designated EAM Controller is absent?",
+          "score": 0.44432895256094723
+        },
+        {
+          "file": "grc/eam.md",
+          "heading": "Troubleshooting",
+          "score": 0.43478194017986677
+        },
+        {
+          "file": "grc/grc-principal-architect-interview-bank.md",
+          "heading": "Q19: How do you handle EAM log review failures or missing audit logs for Firefighter sessions?",
+          "score": 0.3870013398138388
+        },
+        {
+          "file": "grc/eam.md",
+          "heading": "Common Interview Questions",
+          "score": 0.3838729636250913
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "BRM",
+      "question": "How do I govern business-role design and risk approval before assignment?",
+      "product": "General",
+      "intent": "REQUEST_FOR_ARCHITECTURE",
+      "folders": [],
+      "topSources": [
+        {
+          "file": "project-management/senior-consultant-delivery.md",
+          "heading": "Present a security proposal to a client",
+          "score": 0.5634248488218754
+        },
+        {
+          "file": "grc/arm.md",
+          "heading": "Architecture",
+          "score": 0.5516741544184788
+        },
+        {
+          "file": "grc/arm.md",
+          "heading": "Common Interview Questions",
+          "score": 0.5441598811098166
+        },
+        {
+          "file": "grc/arm.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.543713312337526
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "BRM",
+      "question": "An approved business role does not reflect changed target authorizations; what do I check?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [
+        {
+          "file": "grc/brm.md",
+          "heading": "Business role approved but technical role is stale",
+          "score": 0.46932655203232493
+        },
+        {
+          "file": "grc/grc-overview.md",
+          "heading": "Troubleshooting",
+          "score": 0.45580689610292724
+        },
+        {
+          "file": "security/pfcg.md",
+          "heading": "Generate and assign a single role",
+          "score": 0.41700447640262933
+        },
+        {
+          "file": "transports/transport-management.md",
+          "heading": "Role transport and business acceptance",
+          "score": 0.4152573722612181
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "MSMP/BRF+",
+      "question": "How do I map a BRFplus rule result to the correct MSMP approval path?",
+      "product": "GRC",
+      "intent": "REQUEST_FOR_REMEDIATION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [
+        {
+          "file": "grc/grc-principal-architect-interview-bank.md",
+          "heading": "Q17: How do you configure BRF+ (Business Rules Framework Plus) for dynamic approver routing in GRC ARM?",
+          "score": 0.5233517539948894
+        },
+        {
+          "file": "grc/arm.md",
+          "heading": "No Approver MSMP BRFplus",
+          "score": 0.5098611033443734
+        },
+        {
+          "file": "grc/brf-plus.md",
+          "heading": "Configure a BRFplus initiator rule for MSMP",
+          "score": 0.5066154369833866
+        },
+        {
+          "file": "grc/msmp.md",
+          "heading": "30 Second Interview Answer",
+          "score": 0.48236110281801214
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "MSMP/BRF+",
+      "question": "An MSMP request has no agent; how do I trace rule and stage evaluation?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [
+        {
+          "file": "grc/msmp.md",
+          "heading": "Common Mistakes",
+          "score": 0.4914885401443294
+        },
+        {
+          "file": "grc/brf-plus.md",
+          "heading": "Runtime Flow",
+          "score": 0.48292309889820095
+        },
+        {
+          "file": "grc/msmp.md",
+          "heading": "30 Second Interview Answer",
+          "score": 0.4806904385316112
+        },
+        {
+          "file": "grc/msmp.md",
+          "heading": "Runtime Flow",
+          "score": 0.4650221832850058
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "Process Control",
+      "question": "How do I implement a manual assessment in SAP GRC Process Control with evidence and retesting?",
+      "product": "Process Control",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [
+        {
+          "file": "grc/process-control.md",
+          "heading": "Implement Process Control",
+          "score": 0.5876926110062044
+        },
+        {
+          "file": "grc/process-control.md",
+          "heading": "SAP GRC Process Control",
+          "score": 0.585077854090529
+        },
+        {
+          "file": "grc/process-control.md",
+          "heading": "Move a Process Control change through development quality and production",
+          "score": 0.4905158003607632
+        },
+        {
+          "file": "grc/process-control.md",
+          "heading": "Troubleshooting: unexpected automated or manual control test result",
+          "score": 0.487305130110325
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "Process Control",
+      "question": "A control assessment fails on incomplete evidence; how do I remediate and retest?",
+      "product": "General",
+      "intent": "REQUEST_FOR_REMEDIATION",
+      "folders": [],
+      "topSources": [
+        {
+          "file": "grc/process-control.md",
+          "heading": "Troubleshooting: unexpected automated or manual control test result",
+          "score": 0.43610140644270895
+        },
+        {
+          "file": "audit/audit-support.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.38714588492342206
+        },
+        {
+          "file": "compliance/risk-mitigation.md",
+          "heading": "Remediate an access or control audit finding",
+          "score": 0.3706169931397296
+        },
+        {
+          "file": "audit/audit-support.md",
+          "heading": "Common Interview Questions",
+          "score": 0.3697172381922995
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "SAP Security",
+      "question": "How do I design a least-privilege derived PFCG role and validate it?",
+      "product": "Authorization",
+      "intent": "REQUEST_FOR_VALIDATION",
+      "folders": [],
+      "topSources": [
+        {
+          "file": "security/derived-roles.md",
+          "heading": "Interview Summary",
+          "score": 0.5836739524782929
+        },
+        {
+          "file": "security/pfcg.md",
+          "heading": "Common Interview Questions",
+          "score": 0.5689607287548948
+        },
+        {
+          "file": "grc/grc-principal-architect-interview-bank.md",
+          "heading": "Q20: How do you configure Business Role Management (BRM) to enforce a standardized Role Lifecycle Methodology?",
+          "score": 0.5602085025931514
+        },
+        {
+          "file": "grc/deloitte-usi-specific-gap-fillers.md",
+          "heading": "Q106: How do you manage Master and Derived role relationships during a multi-country rollout in S/4HANA?",
+          "score": 0.5498868370031081
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "SAP Security",
+      "question": "A user receives an authorization failure after transport; how do I isolate it?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [
+        {
+          "file": "btp/btp-security-architect-bank.md",
+          "heading": "Q17: How do you troubleshoot HTTP 401/403 errors in a BTP Fiori / CAP application?",
+          "score": 0.70724658931744
+        },
+        {
+          "file": "security/sap-security.md",
+          "heading": "Troubleshooting",
+          "score": 0.6753372797800208
+        },
+        {
+          "file": "fiori/fiori-security.md",
+          "heading": "Troubleshoot a user who cannot access a Fiori app",
+          "score": 0.6621325149827412
+        },
+        {
+          "file": "fiori/fiori-security.md",
+          "heading": "Troubleshoot Fiori access when the server is on premise",
+          "score": 0.659536789439565
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "Fiori",
+      "question": "A tile is absent from the launchpad; what content assignments do I validate?",
+      "product": "Fiori",
+      "intent": "REQUEST_FOR_VALIDATION",
+      "folders": [
+        "fiori",
+        "s4hana",
+        "rise"
+      ],
+      "topSources": [
+        {
+          "file": "s4hana/s4hana-fiori.md",
+          "heading": "Private Edition launchpad",
+          "score": 0.4816010003086097
+        },
+        {
+          "file": "fiori/fiori-frontend-security-architect-bank.md",
+          "heading": "SAP Fiori & Front-End Security Architecture",
+          "score": 0.4728682512704731
+        },
+        {
+          "file": "fiori/fiori-security.md",
+          "heading": "Fiori app missing from the launchpad",
+          "score": 0.46910997042091696
+        },
+        {
+          "file": "fiori/fiori-frontend-security-architect-bank.md",
+          "heading": "Q1: How do you design front-end versus backend roles so tiles appear only when the user can execute?",
+          "score": 0.4663850100714594
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "Fiori",
+      "question": "The tile launches but the app fails at runtime; how do I distinguish service from authorization issues?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [
+        {
+          "file": "fiori/fiori-security.md",
+          "heading": "Deployment model",
+          "score": 0.47281682944036557
+        },
+        {
+          "file": "fiori/fiori-frontend-security-architect-bank.md",
+          "heading": "Q1: How do you design front-end versus backend roles so tiles appear only when the user can execute?",
+          "score": 0.4497375492791692
+        },
+        {
+          "file": "fiori/launchpad.md",
+          "heading": "Troubleshoot launchpad visibility before runtime authorization",
+          "score": 0.4453406003958797
+        },
+        {
+          "file": "s4hana/s4hana-security.md",
+          "heading": "Troubleshooting: Fiori app opens but a request fails",
+          "score": 0.44506104338416114
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "IDM/IAM",
+      "question": "How do I migrate identity provisioning from SAP IDM to Cloud Identity Services?",
+      "product": "IPS",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "btp",
+        "idm",
+        "cloud"
+      ],
+      "topSources": [
+        {
+          "file": "idm/idm-overview.md",
+          "heading": "Overview",
+          "score": 0.7517367592954922
+        },
+        {
+          "file": "idm/idm-overview.md",
+          "heading": "Interview Summary",
+          "score": 0.7265223697219081
+        },
+        {
+          "file": "idm/idm-overview.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.719391983229175
+        },
+        {
+          "file": "idm/sap-idm-identity-management-architect-bank.md",
+          "heading": "SAP Identity Management (IDM) 7.2/8.0 Architecture",
+          "score": 0.7173993112186486
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "IDM/IAM",
+      "question": "An identity transformation provisions the wrong group; how do I trace mapping and target behavior?",
+      "product": "General",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [],
+      "topSources": [
+        {
+          "file": "idm/identity-control-planes.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.45320328593904746
+        },
+        {
+          "file": "grc/grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q75: How do you architect Identity Lifecycle Management when integrating S/4HANA, GRC ARM, and an external IdP (e.g., Azure AD)?",
+          "score": 0.40652804597707165
+        },
+        {
+          "file": "troubleshooting/authorization-errors.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.4034757110271307
+        },
+        {
+          "file": "iag/iag-cloud-identity-access-governance-architect-bank.md",
+          "heading": "Q9: How do you troubleshoot identity/role sync mismatches between IAG and targets?",
+          "score": 0.3929827588147421
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "IAS/IPS/BTP",
+      "question": "How do I map IdP groups to BTP role collections through trust configuration?",
+      "product": "BTP",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "btp",
+        "cloud",
+        "idm"
+      ],
+      "topSources": [
+        {
+          "file": "btp/btp-security-architect-bank.md",
+          "heading": "Q16: How do you integrate a corporate IdP (e.g., Azure AD / Okta) with IAS and BTP?",
+          "score": 0.7515170303465527
+        },
+        {
+          "file": "btp/btp-overview.md",
+          "heading": "Implementation Activities",
+          "score": 0.6681847704402113
+        },
+        {
+          "file": "btp/ips.md",
+          "heading": "Runtime Flow",
+          "score": 0.6277560359557766
+        },
+        {
+          "file": "btp/btp-security.md",
+          "heading": "Runtime Flow",
+          "score": 0.5707606256427108
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "IAS/IPS/BTP",
+      "question": "Users authenticate successfully but lack a BTP application role; where do I diagnose it?",
+      "product": "BTP",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "btp",
+        "cloud"
+      ],
+      "topSources": [
+        {
+          "file": "btp/btp-overview.md",
+          "heading": "Troubleshooting",
+          "score": 0.7227354232036332
+        },
+        {
+          "file": "btp/ias.md",
+          "heading": "Troubleshooting: IAS sign-in succeeds but a BTP app denies access",
+          "score": 0.7027217085917891
+        },
+        {
+          "file": "btp/btp-security-architect-bank.md",
+          "heading": "Q17: How do you troubleshoot HTTP 401/403 errors in a BTP Fiori / CAP application?",
+          "score": 0.6683451930605377
+        },
+        {
+          "file": "btp/btp-security.md",
+          "heading": "Troubleshooting",
+          "score": 0.66555309816812
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "SuccessFactors",
+      "question": "How do I grant employee-data access using permission groups and target populations?",
+      "product": "General",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [],
+      "topSources": [
+        {
+          "file": "idm/successfactors-iam.md",
+          "heading": "Role-based permissions",
+          "score": 0.4496792644109818
+        },
+        {
+          "file": "successfactors/successfactors-rbp-security-architect-bank.md",
+          "heading": "SAP SuccessFactors RBP Security Architecture",
+          "score": 0.41162153354527475
+        },
+        {
+          "file": "successfactors/successfactors-rbp-security-architect-bank.md",
+          "heading": "Q1: How do you architect SuccessFactors RBP so permission roles, groups, and target populations stay correctly separated?",
+          "score": 0.3802854575950575
+        },
+        {
+          "file": "grc/arm.md",
+          "heading": "30 Second Interview Answer",
+          "score": 0.3708162220582899
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "SuccessFactors",
+      "question": "In SuccessFactors RBP, a manager sees employees outside the intended target population; how do I troubleshoot it?",
+      "product": "SuccessFactors",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "idm"
+      ],
+      "topSources": [
+        {
+          "file": "idm/successfactors-iam.md",
+          "heading": "Role-based permissions",
+          "score": 0.15677285077308406
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "Ariba",
+      "question": "How do I integrate Ariba user provisioning and role assignment with enterprise identity?",
+      "product": "Ariba",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "lob"
+      ],
+      "topSources": [
+        {
+          "file": "lob/ariba-security-architect-bank.md",
+          "heading": "Q3: How do you federate identity (IAS / corporate IdP) without mistaking SSO for authorization?",
+          "score": 0.4853292372924877
+        },
+        {
+          "file": "lob/ariba-security-architect-bank.md",
+          "heading": "Q2: How do you separate Ariba Administrator from business procurement personas?",
+          "score": 0.44385364119172327
+        },
+        {
+          "file": "lob/ariba-security.md",
+          "heading": "Architecture Notes",
+          "score": 0.441568829171683
+        },
+        {
+          "file": "lob/ariba-security-architect-bank.md",
+          "heading": "Q6: How do you provision joiners and revoke leavers for Ariba at enterprise scale?",
+          "score": 0.43384936158537374
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "Ariba",
+      "question": "Ariba SSO works but a user lacks application access; what do I verify?",
+      "product": "Ariba",
+      "intent": "REQUEST_FOR_VALIDATION",
+      "folders": [
+        "lob",
+        "cloud",
+        "idm"
+      ],
+      "topSources": [
+        {
+          "file": "lob/ariba-security.md",
+          "heading": "Troubleshooting: a user can sign in but cannot perform a procurement action",
+          "score": 0.631917621222455
+        },
+        {
+          "file": "lob/ariba-security-architect-bank.md",
+          "heading": "Q3: How do you federate identity (IAS / corporate IdP) without mistaking SSO for authorization?",
+          "score": 0.6236764843823815
+        },
+        {
+          "file": "lob/ariba-security-architect-bank.md",
+          "heading": "Q8: How do you troubleshoot “user signs in but cannot create a requisition / open a workspace”?",
+          "score": 0.6234496954509939
+        },
+        {
+          "file": "lob/ariba-security-architect-bank.md",
+          "heading": "Q9: How do you run access reviews and audit evidence for Ariba?",
+          "score": 0.6086737921245102
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "BW/BW4HANA",
+      "question": "How do I design and transport BW analysis authorizations for data-level access?",
+      "product": "BW",
+      "intent": "REQUEST_FOR_ARCHITECTURE",
+      "folders": [
+        "bw"
+      ],
+      "topSources": [
+        {
+          "file": "bw/analysis-authorizations.md",
+          "heading": "BW Analysis Authorizations",
+          "score": 0.6254451963723971
+        },
+        {
+          "file": "bw/bw4hana-analysis-authorizations-architect-bank.md",
+          "heading": "Q9: How do you transport and test analysis authorizations across the BW landscape?",
+          "score": 0.602375622465423
+        },
+        {
+          "file": "bw/bw-security.md",
+          "heading": "Implementation Activities",
+          "score": 0.5848161793346204
+        },
+        {
+          "file": "bw/bw4hana-analysis-authorizations-architect-bank.md",
+          "heading": "Q10: What audit evidence proves BW data-access control is operating?",
+          "score": 0.5319056484564547
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "BW/BW4HANA",
+      "question": "A query returns excess records for one user; how do I trace analysis authorization?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [
+        {
+          "file": "bw/bw-security.md",
+          "heading": "Troubleshooting: query runs but returns no data for one user",
+          "score": 0.48679972897094836
+        },
+        {
+          "file": "bw/bw-security.md",
+          "heading": "Interview Summary",
+          "score": 0.45018945527994125
+        },
+        {
+          "file": "bw/bw-security.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.44667403011258267
+        },
+        {
+          "file": "s4hana/s4hana-security.md",
+          "heading": "Source",
+          "score": 0.4268333494041084
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "HANA",
+      "question": "How do I grant least-privilege HANA object access to an application user?",
+      "product": "HANA",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "hana"
+      ],
+      "topSources": [
+        {
+          "file": "hana/hana-database-security-architect-bank.md",
+          "heading": "Q7: How do you troubleshoot authorization failures at the HANA layer versus application layer?",
+          "score": 0.5030670729953488
+        },
+        {
+          "file": "hana/hana-authorization.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.48183689914829453
+        },
+        {
+          "file": "hana/hana-authorization.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.4806122202934551
+        },
+        {
+          "file": "hana/hana-authorization.md",
+          "heading": "30 Second Interview Answer",
+          "score": 0.471281221376892
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "HANA",
+      "question": "A user can connect to HANA but cannot read a view; what privilege layers do I inspect?",
+      "product": "HANA",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "hana"
+      ],
+      "topSources": [
+        {
+          "file": "hana/hana-database-security-architect-bank.md",
+          "heading": "Q7: How do you troubleshoot authorization failures at the HANA layer versus application layer?",
+          "score": 0.7520050807854485
+        },
+        {
+          "file": "hana/hana-authorization.md",
+          "heading": "Troubleshooting: SAP HANA insufficient privilege error",
+          "score": 0.7187586690215444
+        },
+        {
+          "file": "hana/hana-authorization.md",
+          "heading": "Troubleshooting: SAP HANA insufficient privilege error",
+          "score": 0.6359580825357287
+        },
+        {
+          "file": "hana/hana-database-security-architect-bank.md",
+          "heading": "Q2: How do you design analytic privileges / data-level authorization for calculation views?",
+          "score": 0.24252606976388918
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "SAC",
+      "question": "How do I separate SAC role permissions from model data access?",
+      "product": "SAC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "sac"
+      ],
+      "topSources": [
+        {
+          "file": "sac/sac-security-architect-bank.md",
+          "heading": "Q1: How do you separate SAC application roles from model-level Data Access Control?",
+          "score": 0.7829216532536607
+        },
+        {
+          "file": "sac/sac-security.md",
+          "heading": "What Makes This a 10/10 Answer",
+          "score": 0.7430505497649507
+        },
+        {
+          "file": "sac/sac-security.md",
+          "heading": "Interview Summary",
+          "score": 0.7407739624612497
+        },
+        {
+          "file": "sac/sac-security.md",
+          "heading": "Red Flags",
+          "score": 0.7304776712108714
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "SAC",
+      "question": "In SAP Analytics Cloud, a user opens a story but sees incorrect model data; how do I isolate access controls?",
+      "product": "SAC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "sac"
+      ],
+      "topSources": [
+        {
+          "file": "sac/sac-security-architect-bank.md",
+          "heading": "Q7: How do you troubleshoot “user opens story but data cells are empty / error”?",
+          "score": 0.9130242589055668
+        },
+        {
+          "file": "sac/sac-security-architect-bank.md",
+          "heading": "SAP Analytics Cloud (SAC) Security Architecture",
+          "score": 0.4844391432325948
+        },
+        {
+          "file": "sac/sac-security-architect-bank.md",
+          "heading": "Q1: How do you separate SAC application roles from model-level Data Access Control?",
+          "score": 0.45850999918518714
+        },
+        {
+          "file": "sac/sac-security-architect-bank.md",
+          "heading": "Q3: How do you secure live connections to BW, S/4, and HANA differently from acquired data models?",
+          "score": 0.43484962678735345
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "Datasphere/CAR",
+      "question": "How do I restrict Datasphere space and view access for an analytics team?",
+      "product": "Datasphere",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "datasphere"
+      ],
+      "topSources": [
+        {
+          "file": "datasphere/datasphere-security.md",
+          "heading": "SAP Datasphere Access",
+          "score": 0.6519082205551061
+        },
+        {
+          "file": "datasphere/datasphere-security.md",
+          "heading": "30 Second Interview Answer",
+          "score": 0.6136652800616669
+        },
+        {
+          "file": "datasphere/datasphere-security.md",
+          "heading": "Interview Summary",
+          "score": 0.6021959030803244
+        },
+        {
+          "file": "datasphere/datasphere-security.md",
+          "heading": "Overview",
+          "score": 0.49379130521581915
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "Datasphere/CAR",
+      "question": "In SAP Customer Activity Repository (CAR), an analytics user has application access but sees no expected data; what do I inspect?",
+      "product": "CAR",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "lob"
+      ],
+      "topSources": [
+        {
+          "file": "lob/car-security.md",
+          "heading": "SAP Customer Activity Repository Access",
+          "score": 0.3184837278446972
+        },
+        {
+          "file": "lob/car-security.md",
+          "heading": "Source",
+          "score": 0.16265639735022303
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "RISE/S4",
+      "question": "How do I plan security testing and cutover for a RISE brownfield conversion?",
+      "product": "RISE",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "rise",
+        "s4hana",
+        "project-types",
+        "project-management",
+        "cutover",
+        "hypercare"
+      ],
+      "topSources": [
+        {
+          "file": "rise/rise-cutover.md",
+          "heading": "Cutover and Hypercare",
+          "score": 0.9031145773224377
+        },
+        {
+          "file": "cutover/rollback-plan.md",
+          "heading": "Prepare and execute a security rollback for a failed cutover wave",
+          "score": 0.8986476852628233
+        },
+        {
+          "file": "cutover/rollback-plan.md",
+          "heading": "Prepare and execute a security rollback for a failed cutover wave",
+          "score": 0.8856764742176801
+        },
+        {
+          "file": "cutover/rollback-plan.md",
+          "heading": "Security Cutover Rollback",
+          "score": 0.8272852767073786
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "RISE/S4",
+      "question": "After an S/4HANA upgrade, authorization behavior changed; how do I triage it?",
+      "product": "S/4",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "s4hana",
+        "fiori",
+        "security"
+      ],
+      "topSources": [
+        {
+          "file": "s4hana/s4hana-migration.md",
+          "heading": "Troubleshooting",
+          "score": 0.8017949085462462
+        },
+        {
+          "file": "security/su25.md",
+          "heading": "Troubleshooting",
+          "score": 0.6977356697399708
+        },
+        {
+          "file": "security/pfcg.md",
+          "heading": "Troubleshooting",
+          "score": 0.682145559675577
+        },
+        {
+          "file": "security/sap-security.md",
+          "heading": "Troubleshooting",
+          "score": 0.6697348023361522
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "SAP Activate",
+      "question": "How do I govern security design and quality gates across Explore and Realize?",
+      "product": "General",
+      "intent": "REQUEST_FOR_ARCHITECTURE",
+      "folders": [],
+      "topSources": [
+        {
+          "file": "project-management/senior-consultant-delivery.md",
+          "heading": "Present a security proposal to a client",
+          "score": 0.5642205584386476
+        },
+        {
+          "file": "project-types/security-workstream.md",
+          "heading": "Plan the security workstream across Explore, Realize, and Deploy",
+          "score": 0.5264129232106247
+        },
+        {
+          "file": "project-management/sap-activate.md",
+          "heading": "Design guidance",
+          "score": 0.502918493208011
+        },
+        {
+          "file": "project-types/security-workstream.md",
+          "heading": "Plan the security workstream across Explore, Realize, and Deploy",
+          "score": 0.4757208223599851
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "SAP Activate",
+      "question": "Role testing is incomplete near the Realize milestone; how do I recover the schedule?",
+      "product": "Activate",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "project-management",
+        "rise"
+      ],
+      "topSources": [
+        {
+          "file": "project-management/sap-activate-methodology-architect-bank.md",
+          "heading": "Q4: How do you structure Realize so role build, integrations, and test evidence stay synchronized?",
+          "score": 0.36609665499209654
+        },
+        {
+          "file": "project-management/project-lifecycle.md",
+          "heading": "Issue 3: Execute Phase Slips Because Testing Incomplete",
+          "score": 0.3643031498746449
+        },
+        {
+          "file": "project-management/senior-consultant-delivery.md",
+          "heading": "Recover a security workstream that is behind",
+          "score": 0.3474848520571906
+        },
+        {
+          "file": "project-management/sap-activate-methodology-architect-bank.md",
+          "heading": "Q6: How does the Run phase keep Activate from ending at go-live for security operations?",
+          "score": 0.31667256445213915
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "PMP/Delivery",
+      "question": "How do I manage RAID, dependencies, and forecasts across SAP security workstreams?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "project-management"
+      ],
+      "topSources": [
+        {
+          "file": "project-management/project-lifecycle.md",
+          "heading": "Architecture",
+          "score": 0.3856823887702812
+        },
+        {
+          "file": "project-management/blueprinting.md",
+          "heading": "Configuration",
+          "score": 0.38507408310506475
+        },
+        {
+          "file": "project-management/raid-log.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.38166302625953347
+        },
+        {
+          "file": "project-management/senior-consultant-delivery.md",
+          "heading": "Estimate an SAP Security workstream",
+          "score": 0.37381953779657917
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "PMP/Delivery",
+      "question": "On an SAP GRC program, a vendor delay threatens cutover; how do I govern recovery and escalation?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc",
+        "project-management"
+      ],
+      "topSources": [
+        {
+          "file": "project-management/sap-activate.md",
+          "heading": "Implementation sequence",
+          "score": 0.6919138943831666
+        },
+        {
+          "file": "project-management/project-lifecycle.md",
+          "heading": "Issue 4: Deploy Phase Cutover Fails, System Down",
+          "score": 0.5552635481536118
+        },
+        {
+          "file": "project-management/blueprinting.md",
+          "heading": "Implementation Activities",
+          "score": 0.5257757229456138
+        },
+        {
+          "file": "project-management/project-lifecycle.md",
+          "heading": "Configuration",
+          "score": 0.5224006075541322
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "Compliance",
+      "question": "How does SAP GRC evidence support SOX ITGC without implying automatic compliance?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc",
+        "audit",
+        "compliance"
+      ],
+      "topSources": [
+        {
+          "file": "compliance/sox.md",
+          "heading": "Interview Summary",
+          "score": 0.5391893879407244
+        },
+        {
+          "file": "compliance/sox.md",
+          "heading": "Overview",
+          "score": 0.47538569204457015
+        },
+        {
+          "file": "audit/audit-support.md",
+          "heading": "Related Topics",
+          "score": 0.38331964060723445
+        },
+        {
+          "file": "compliance/sox.md",
+          "heading": "Prepare SAP Security for a SOX ITGC audit",
+          "score": 0.3827356218362013
+        }
+      ],
+      "sourceMatch": true
+    },
+    {
+      "domain": "Compliance",
+      "question": "How do I distinguish GDPR obligations from ISO 27001 controls in an SAP audit?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "audit",
+        "compliance",
+        "grc"
+      ],
+      "topSources": [
+        {
+          "file": "grc/grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q100: How do you demonstrate overall SAP Security and GRC compliance readiness to executive auditors prior to S/4HANA Go-Live?",
+          "score": 0.4402784817131802
+        },
+        {
+          "file": "compliance/gdpr.md",
+          "heading": "Design SAP Security to support GDPR access control and accountability",
+          "score": 0.4402273365525751
+        },
+        {
+          "file": "compliance/gdpr.md",
+          "heading": "Explain GDPR principles without claiming technology equals compliance",
+          "score": 0.4301042372604194
+        }
+      ],
+      "sourceMatch": true
+    }
+  ],
+  "failed": []
+}

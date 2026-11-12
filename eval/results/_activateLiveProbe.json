@@ -1,0 +1,58 @@
+[
+  {
+    "id": "activate",
+    "question": "How would you deliver a programme with SAP Activate?",
+    "finish": null,
+    "words": 91,
+    "latencyMs": 4867,
+    "answer": "### 1. Direct Answer\nConfirm the configuration sequence Discover, Prepare, Explore, Realize, Deploy, and Run.\n\n### 2. Technical Mechanism and Exact Artifacts\nIn Discover, confirm the business case, the high-level scope, and the deployment choice before the project is committed. In Explore, confirm the fit-to-standard gaps, the extension decisions, and the authorization scope before the configuration build. In Realize, configure the solution in iterations, complete integration and test evidence, and confirm the cutover prerequisites.\n\n### 3. Validation and Operational Boundary\nIn Deploy, complete the production cutover, the go/no-go review, and hypercare."
+  },
+  {
+    "id": "rise-owner",
+    "question": "Who owns the application security concept in RISE with SAP S/4HANA Cloud, private edition?",
+    "finish": "stop",
+    "words": 143,
+    "latencyMs": 7322,
+    "answer": "### 1. Direct Answer  \nThe application security concept in RISE with SAP S/4HANA Cloud, private edition, is owned by the customer. While SAP manages the infrastructure, the customer retains responsibility for application configuration, including security settings and role management.\n\n### 2. Technical Mechanism and Exact Artifacts  \nIn this context, the customer utilizes tools such as PFCG for role management and authorization assignments, ensuring that security policies align with their organizational needs. The customer also manages the integration of identity services through IAS and provisioning via IPS, which supports the synchronization of user identities and access rights.\n\n### 3. Validation and Operational Boundary  \nValidation of the application security setup can be performed by running user comparisons and ensuring that assigned users can successfully complete their business transactions. This process confirms that the security configurations are correctly implemented and operational within the defined organizational structure."
+  },
+  {
+    "id": "joule",
+    "question": "How is identity and access administered for SAP Joule?",
+    "finish": "stop",
+    "words": 117,
+    "latencyMs": 3789,
+    "answer": "### 1. Direct Answer  \nIdentity and access for SAP Joule is administered through SAP Cloud Identity Services, which manages user authentication and role assignments.\n\n### 2. Technical Mechanism and Exact Artifacts  \nTrust is established in the BTP cockpit under Security, Trust Configuration. User groups such as `joule_tenant_admin`, `joule_end_user`, and `joule_analytics_admin` are assigned in the Identity Authentication administration console to control access to different functionalities within Joule.\n\n### 3. Validation and Operational Boundary  \nThe administration of these roles and groups ensures that users can access the appropriate features based on their assigned roles. This setup is validated by confirming the correct group assignments in the Identity Authentication console, ensuring that users can perform their designated tasks within Joule."
+  },
+  {
+    "id": "car",
+    "question": "How do you authorize an administrator for SAP Customer Activity Repository?",
+    "finish": null,
+    "words": 74,
+    "latencyMs": 1314,
+    "answer": "### 1. Direct Answer\nCreate the CAR authorization role in PFCG.\n\n### 2. Technical Mechanism and Exact Artifacts\nUse the authorization role /POSDW/ADMINISTRATOR for administration such as deleting data. Use the authorization role /POSDW/SALES_AUDIT for daily POS inbound monitoring. Use the authorization role /POSDW/DPP_SECURITY for private and sensitive subject data.\n\n### 3. Validation and Operational Boundary\nConfirm that check on the product and edition named in the question before treating it as the fix."
+  },
+  {
+    "id": "fiori-miss",
+    "question": "A user cannot launch a Fiori app in SAP S/4HANA Cloud Public Edition. What do you check?",
+    "finish": null,
+    "words": 128,
+    "latencyMs": 1579,
+    "answer": "### 1. Direct Answer\nInspect App Finder or All My Apps for the user's role in SAP S/4HANA Cloud Public Edition 2608 before treating the app as missing.\n\n### 2. Technical Mechanism and Exact Artifacts\nIf the app is in App Finder but absent from the expected page, inspect the user's space assignment and page content in Manage Launchpad Spaces and Manage Launchpad Pages.\n\n### 3. Validation and Operational Boundary\nIf it is absent from App Finder, use Maintain Business Users to confirm assigned business roles, then Maintain Business Roles and IAM Information System to verify the business catalog or direct IAM app assignment and activation. Check the user's restrictions or scope only when they explain app eligibility. A missing app is not an OData authorization trace case."
+  },
+  {
+    "id": "joule-experience",
+    "question": "Have you worked on SAP Joule?",
+    "finish": "stop",
+    "words": 98,
+    "latencyMs": 4908,
+    "answer": "### 1. Direct Answer  \nNo, I have not worked directly on SAP Joule.\n\n### 2. Technical Mechanism and Exact Artifacts  \nHowever, I understand that Joule is an SAP business AI assistant that requires configuration of authorization trust from the SAP BTP subaccount to the Identity Authentication tenant. The relevant artifacts include the Identity Authentication groups such as joule_tenant_admin, joule_analytics_admin, and joule_end_user for managing access.\n\n### 3. Validation and Operational Boundary  \nValidation would involve ensuring that the correct roles are assigned through the Identity Authentication tenant, which is essential for the proper functioning of Joule within the SAP landscape."
+  },
+  {
+    "id": "years",
+    "question": "How many years of SAP GRC experience do you have, and are you PMP certified?",
+    "finish": "stop",
+    "words": 109,
+    "latencyMs": 3933,
+    "answer": "### 1. Direct Answer  \nI have over 12 years of SAP GRC experience, and I am PMP certified.\n\n### 2. Technical Mechanism and Exact Artifacts  \nIn my experience with SAP GRC, I have worked extensively with components such as Access Risk Analysis (ARA) for segregation of duties checks, Access Request Management (ARM) for governed provisioning, and Emergency Access Management (EAM) for controlled elevated access. These components ensure that access changes are analyzed, approved, and auditable.\n\n### 3. Validation and Operational Boundary  \nThe effectiveness of these components can be validated through the audit trails generated during access requests and the logging of emergency access sessions, ensuring compliance with governance standards."
+  }
+]

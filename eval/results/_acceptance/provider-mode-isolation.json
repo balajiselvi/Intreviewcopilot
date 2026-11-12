@@ -1,0 +1,99 @@
+{
+  "cases": [
+    {
+      "name": "resolve-mock-env",
+      "ok": true
+    },
+    {
+      "name": "resolve-disabled-env",
+      "ok": true
+    },
+    {
+      "name": "resolve-live-env",
+      "ok": true
+    },
+    {
+      "name": "resolve-unknown-fail-closed",
+      "ok": true
+    },
+    {
+      "name": "resolve-acceptance-lock",
+      "ok": true
+    },
+    {
+      "name": "resolve-default-live",
+      "ok": true
+    },
+    {
+      "name": "mock-stream-invocation",
+      "ok": true,
+      "stats": {
+        "mode": "mock",
+        "mockInvocations": 1,
+        "liveTransportInvocations": 0,
+        "disabledBlocked": 0,
+        "lastImplementation": "deterministic-mock"
+      },
+      "textLen": 732
+    },
+    {
+      "name": "mock-live-guard-blocked",
+      "ok": true,
+      "stats": {
+        "mode": "mock",
+        "mockInvocations": 1,
+        "liveTransportInvocations": 0,
+        "disabledBlocked": 0,
+        "lastImplementation": "deterministic-mock"
+      }
+    },
+    {
+      "name": "disabled-live-guard-blocked",
+      "ok": true,
+      "stats": {
+        "mode": "disabled",
+        "mockInvocations": 0,
+        "liveTransportInvocations": 0,
+        "disabledBlocked": 0,
+        "lastImplementation": null
+      },
+      "messagePreview": "Provider generation is disabled on this server. That is an o"
+    },
+    {
+      "name": "env-overrides-config-live-spoof",
+      "ok": true
+    },
+    {
+      "name": "live-guard-allows",
+      "ok": true,
+      "stats": {
+        "mode": "live",
+        "mockInvocations": 0,
+        "liveTransportInvocations": 1,
+        "disabledBlocked": 0,
+        "lastImplementation": "openai-sdk"
+      }
+    },
+    {
+      "name": "chat-imports-providerMode",
+      "ok": true
+    },
+    {
+      "name": "chat-strips-keys-mock-disabled",
+      "ok": true
+    },
+    {
+      "name": "chat-mock-branch",
+      "ok": true
+    },
+    {
+      "name": "chat-disabled-branch",
+      "ok": true
+    },
+    {
+      "name": "chat-sdk-guards",
+      "ok": true
+    }
+  ],
+  "pass": true
+}

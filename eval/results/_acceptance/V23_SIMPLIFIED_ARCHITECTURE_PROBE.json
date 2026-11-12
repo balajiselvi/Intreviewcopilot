@@ -1,0 +1,735 @@
+{
+  "at": "2026-11-03T11:20:07.836Z",
+  "architecture": "QUESTION → KB RETRIEVAL → LLM GENERATION → VALIDATION → DISPLAY",
+  "providerModeConfigured": "mock",
+  "cases": [
+    {
+      "id": "pfcg",
+      "questionReceived": "Explain how do you use PFCG?",
+      "admissionTurnBeforeDemote": {
+        "route": "GENERATION",
+        "reason": "well-formed-question-or-technical-issue",
+        "scriptId": null
+      },
+      "topic": null,
+      "folders": [
+        "security",
+        "s4hana",
+        "fiori"
+      ],
+      "verifiedWorkflowAvailable": null,
+      "retrievedDocuments": [
+        {
+          "rank": 1,
+          "id": "chunk_eb76d67ce5386df5639c8b6c07c8125f0840bbee7401b7d9a3ecd786095e6d2e",
+          "sourceFolder": "security",
+          "sourceFile": "pfcg.md",
+          "heading": "Overview",
+          "score": 0.7709317747610512,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "## Overview PFCG is the Profile Generator, the standard transaction for building and maintaining roles in SAP. It's where you assign transactions to a role's menu, pull in authoriz"
+        },
+        {
+          "rank": 2,
+          "id": "chunk_2d3cc4c5ef68914323262e5dfe96d6f8ecfdc2df88fd3daadd6e20635c005799",
+          "sourceFolder": "security",
+          "sourceFile": "pfcg.md",
+          "heading": "PFCG",
+          "score": 0.727002375742772,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "# PFCG"
+        },
+        {
+          "rank": 3,
+          "id": "chunk_6e83eb805d31c2045095c40d893baf1953c2c6cf68cdf11990044c1e85a029b2",
+          "sourceFolder": "security",
+          "sourceFile": "pfcg.md",
+          "heading": "Interview Summary",
+          "score": 0.6801925802676193,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "PFCG turns a list of transactions into a working authorization profile. You add transactions to the menu tab, the system pulls SU24 default values into the authorization tab, you a"
+        },
+        {
+          "rank": 4,
+          "id": "chunk_419c2ad6aed1ac054e843eeea3802ae76e210606efaadea2fc9770acb62352a1",
+          "sourceFolder": "security",
+          "sourceFile": "pfcg.md",
+          "heading": "Interviewer's Hidden Expectations",
+          "score": 0.6394485908268233,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "Interviewers want to hear that you understand the difference between the role definition and the generated profile, because that distinction is where most real-world PFCG confusion"
+        },
+        {
+          "rank": 5,
+          "id": "chunk_352ef97eb9ee645cf2b6a9aaa680c014776a854ac90664f1641f47cc22a351d6",
+          "sourceFolder": "security",
+          "sourceFile": "pfcg.md",
+          "heading": "Red Flags",
+          "score": 0.7001864616765295,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "## Red Flags - Not knowing the difference between a role and a generated profile - Saying role changes take effect immediately without mentioning generation or buffer refresh - Des"
+        },
+        {
+          "rank": 6,
+          "id": "chunk_ac6dd4920163548fd53eda76ea78dc51438ab9e60e5ea2335f54e9a70d89c0da",
+          "sourceFolder": "security",
+          "sourceFile": "pfcg.md",
+          "heading": "Keywords",
+          "score": 0.6152152810657473,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "## Keywords PFCG, Profile Generator, menu tab, authorization tab, SU24, generated profile, derived role, composite role, organizational level, user buffer, role generation"
+        },
+        {
+          "rank": 7,
+          "id": "chunk_8b34038c7d0122b0f1fa73689bbfbbc3a13ade81d66972adcb2cb911f794da09",
+          "sourceFolder": "security",
+          "sourceFile": "pfcg.md",
+          "heading": "Best Practices",
+          "score": 0.5928750814417182,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "- Always regenerate a role immediately after any authorization change - Use derived roles for org-level variation instead of duplicating master roles - Keep SU24 maintained so new "
+        }
+      ],
+      "bankChunksInScoped": [],
+      "coverageStatus": "RELEVANT_SUFFICIENT",
+      "evidencePassedToLlm": {
+        "promptDumpChars": 66458,
+        "promptDumpPath": "eval\\results\\_acceptance\\v23-simp-prompt-pfcg.txt",
+        "procedureBackboneHint": null
+      },
+      "providerMode": "mock",
+      "generationRoute": "GENERATION",
+      "providerStats": {
+        "mockInvocations": 1,
+        "liveTransportInvocations": 0,
+        "openaiHarnessCalls": 0
+      },
+      "generatedAnswerPreview": "Use transaction PFCG to create the single role, add the required transactions on the Menu tab, and maintain organizational levels on the Authorizations tab. Generate the authorization profile in PFCG after that authorization data is complete, because the generated profile is what the user buffer checks. Assign the role on the PFCG User tab or in transaction SU01, then run user comparison so the profile enters the user buffer. Review table AGR_USERS for the user assignment and table AGR_1251 for authorization values, and do not treat AGR_USERS as a transaction. Transport the released role change with the Change and Transport System and import it in the target system. Use transaction SU53 only",
+      "generatedAnswerChars": 820,
+      "validation": {
+        "integrityOk": true,
+        "answerKind": "validated",
+        "recovered": false,
+        "finalDisplayedPreview": "Use transaction PFCG to create the single role, add the required transactions on the Menu tab, and maintain organizational levels on the Authorizations tab. Generate the authorization profile in PFCG after that authorization data is complete, because the generated profile is what the user buffer checks. Assign the role on the PFCG User tab or in transaction SU01, then run user comparison so the profile enters the user buffer. Review table AGR_USERS for the user assignment and table AGR_1251 for authorization values, and do not treat AGR_USERS as a transaction. Transport the released role change with the Change and Transport System and import it in the target system. Use transaction SU53 only"
+      },
+      "bannedPhrases": [],
+      "expectations": {
+        "routeIsGeneration": true,
+        "noBankInRetrieval": true,
+        "noBannedPhrases": true,
+        "mockInvoked": true,
+        "noLiveTransport": true,
+        "noOpenaiHarness": true,
+        "integrityOk": true,
+        "addressesQuestion": true
+      },
+      "failures": []
+    },
+    {
+      "id": "brm",
+      "questionReceived": "Why do organizations implement BRM?",
+      "admissionTurnBeforeDemote": {
+        "route": "GENERATION",
+        "reason": "well-formed-question-or-technical-issue",
+        "scriptId": null
+      },
+      "topic": "GRC",
+      "folders": [
+        "grc"
+      ],
+      "verifiedWorkflowAvailable": {
+        "id": "brm-business-role-lifecycle",
+        "hasAnswer": true
+      },
+      "retrievedDocuments": [
+        {
+          "rank": 1,
+          "id": "chunk_2dd6f977d69af01f570275675f79add8c637766459212d9421a66098222f0c03",
+          "sourceFolder": "grc",
+          "sourceFile": "brm.md",
+          "heading": "Implementation Activities",
+          "score": 0.6196897883664202,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "- Design business role definitions based on actual job functions, in business language - Map each business role to the correct underlying technical roles - Validate business role m"
+        },
+        {
+          "rank": 2,
+          "id": "chunk_27a266fee9bacc6d68f71073b801fdbdf1ee0b19e9af8c36d07241a18f3e4835",
+          "sourceFolder": "grc",
+          "sourceFile": "brm.md",
+          "heading": "Runtime Flow",
+          "score": 0.6196709770217788,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "## Runtime Flow A requester searches for and selects a business role by name in the ARM request interface. When the request is approved, the provisioning framework resolves the bus"
+        },
+        {
+          "rank": 3,
+          "id": "chunk_d3dc0c3eb72cead2cde4ac8d7bbddf9c15f4ebbf249db269cca3da996c094e70",
+          "sourceFolder": "grc",
+          "sourceFile": "brm.md",
+          "heading": "Business Role Management (BRM)",
+          "score": 0.4694809875020149,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "# Business Role Management (BRM)"
+        },
+        {
+          "rank": 4,
+          "id": "chunk_2638e5383639e59dd59944ccf7e25046d7a0b60ca23e7e28ffaea148ccf09e1f",
+          "sourceFolder": "grc",
+          "sourceFile": "brm.md",
+          "heading": "Common Mistakes",
+          "score": 0.39146298682435704,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "- Defining business roles once and never revisiting mappings as technical roles evolve - Letting the business role catalog grow without ownership or governance - Creating business "
+        },
+        {
+          "rank": 5,
+          "id": "chunk_dded67e9aca1586cb9ef94431f31a2428441e3dc725722d1a876a5824e42b5db",
+          "sourceFolder": "grc",
+          "sourceFile": "brm.md",
+          "heading": "Business role approved but technical role is stale",
+          "score": 0.331743394010592,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "Common issue: a business role change is approved in BRM but the technical role on the target is stale or missing. Root cause: the underlying technical role was redesigned or not tr"
+        },
+        {
+          "rank": 6,
+          "id": "chunk_7ca90aa956a09f8032edee23d059ed34c2ffc5a10869fb9b16238b213ecaaaa7",
+          "sourceFolder": "grc",
+          "sourceFile": "brm.md",
+          "heading": "Interviewer's Hidden Expectations",
+          "score": 0.401769135251253,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "Interviewers want to hear that you understand BRM as a maintained mapping layer with real drift risk, not just a friendlier naming convention. They're listening for whether you rec"
+        },
+        {
+          "rank": 7,
+          "id": "chunk_084227b5be5cc6a11e197c0f33cdb1a6dc38ab1ff209f68cc62009b5fd80ee48",
+          "sourceFolder": "grc",
+          "sourceFile": "brm.md",
+          "heading": "Interview Summary",
+          "score": 0.38493864048811577,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "BRM sits between the business and the technical role catalog. A business role is a named, business-language grouping that maps to one or more technical single, derived, or composit"
+        },
+        {
+          "rank": 8,
+          "id": "chunk_48f4639f599a7e577e72309455d5296b22e4607126d01b8966ea82d6c02c43ab",
+          "sourceFolder": "grc",
+          "sourceFile": "grc-overview.md",
+          "heading": "Implementation Activities",
+          "score": 0.5860638991730579,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "- Design the ARA ruleset based on the organization's actual SoD risk tolerance - Build MSMP workflows and BRF+ rules for access request routing - Configure connectors to all in-sco"
+        },
+        {
+          "rank": 9,
+          "id": "chunk_faed0275634d263d27ee099648b21b19a30c5968d9022c265e34ae55eea93803",
+          "sourceFolder": "grc",
+          "sourceFile": "brf-plus.md",
+          "heading": "Implementation Activities",
+          "score": 0.28924773702624085,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "- Design decision tables based on actual organizational approval authority - Build and test BRF+ rules for every MSMP stage requiring agent determination - Validate rule coverage a"
+        },
+        {
+          "rank": 10,
+          "id": "chunk_3f7b08e299d7347b82d30ece18e18bfebd9cef019de066f2325172e3c4f16f88",
+          "sourceFolder": "grc",
+          "sourceFile": "brm.md",
+          "heading": "Red Flags",
+          "score": 0.36355065413261334,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "## Red Flags - Describing business roles as if they're a separate, independent access mechanism from technical roles - Not mentioning the maintenance burden of keeping mappings cur"
+        }
+      ],
+      "bankChunksInScoped": [],
+      "coverageStatus": "RELEVANT_SUFFICIENT",
+      "evidencePassedToLlm": {
+        "promptDumpChars": 78211,
+        "promptDumpPath": "eval\\results\\_acceptance\\v23-simp-prompt-brm.txt",
+        "procedureBackboneHint": null
+      },
+      "providerMode": "mock",
+      "generationRoute": "GENERATION",
+      "providerStats": {
+        "mockInvocations": 1,
+        "liveTransportInvocations": 0,
+        "openaiHarnessCalls": 0
+      },
+      "generatedAnswerPreview": "In BRM I govern business-role definitions and their technical-role mappings so ARM requesters pick job-function names while provisioning still assigns the underlying PFCG roles. Define business roles in business language from agreed job functions, then map each business role to the correct underlying single, derived, or composite technical roles. Validate the mapping against actual technical role content and SoD expectations before requesters use the business role in ARM. Govern changes through an administration surface not confirmed in supporting knowledge maintenance so technical role redesigns update the business-role mapping; retire business roles that no longer represent an active job f",
+      "generatedAnswerChars": 927,
+      "validation": {
+        "integrityOk": true,
+        "answerKind": "validated",
+        "recovered": false,
+        "finalDisplayedPreview": "In BRM I govern business-role definitions and their technical-role mappings so ARM requesters pick job-function names while provisioning still assigns the underlying PFCG roles. Define business roles in business language from agreed job functions, then map each business role to the correct underlying single, derived, or composite technical roles. Validate the mapping against actual technical role content and SoD expectations before requesters use the business role in ARM. Govern changes through an administration surface not confirmed in supporting knowledge maintenance so technical role redesigns update the business-role mapping; retire business roles that no longer represent an active job f"
+      },
+      "bannedPhrases": [],
+      "expectations": {
+        "routeIsGeneration": true,
+        "noBankInRetrieval": true,
+        "noBannedPhrases": true,
+        "mockInvoked": true,
+        "noLiveTransport": true,
+        "noOpenaiHarness": true,
+        "integrityOk": true,
+        "addressesQuestion": true
+      },
+      "failures": []
+    },
+    {
+      "id": "bw",
+      "questionReceived": "Explain SAP BW analysis authorizations.",
+      "admissionTurnBeforeDemote": {
+        "route": "ANSWER_BANK",
+        "reason": "well-formed-question-or-technical-issue",
+        "scriptId": "SAPSC-026"
+      },
+      "topic": "BW",
+      "folders": [
+        "bw",
+        "security",
+        "s4hana",
+        "fiori"
+      ],
+      "verifiedWorkflowAvailable": {
+        "id": "bw4-analysis-authorizations",
+        "hasAnswer": true
+      },
+      "retrievedDocuments": [
+        {
+          "rank": 1,
+          "id": "chunk_32b9938f2d799e61cfe1a0c5f154892ea136c92a20840fcae87bc745bc45d395",
+          "sourceFolder": "bw",
+          "sourceFile": "analysis-authorizations.md",
+          "heading": "BW Analysis Authorizations",
+          "score": 0.5033016745518349,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "# BW Analysis Authorizations"
+        },
+        {
+          "rank": 2,
+          "id": "chunk_bd6b4b6e832e35757d77696d01d8b27071763c5f7a77f890f04be6834482c1b8",
+          "sourceFolder": "bw",
+          "sourceFile": "analysis-authorizations.md",
+          "heading": "Interview Summary",
+          "score": 0.46537409306100624,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "RSECADMIN holds named analysis authorizations. PFCG assigns them through S_RS_AUTH. 0BI_ALL is full data and is an audit finding if used as a convenience default. Queries fail clos"
+        },
+        {
+          "rank": 3,
+          "id": "chunk_16b7d3e73ecd5addcc52c43e290dbff019c1b4baed305e83a9cbe5de4ffda559",
+          "sourceFolder": "bw",
+          "sourceFile": "bw-security.md",
+          "heading": "Configuration",
+          "score": 0.5047400643081544,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "- Mark a characteristic as authorization-relevant on the InfoObject before it can be used in an analysis authorization - Build analysis authorizations in RSECADMIN, defining the sp"
+        },
+        {
+          "rank": 4,
+          "id": "chunk_26a23c0adc861feaf48e0bab8ee24e7352436d99f4a9727b790945e44f42ceed",
+          "sourceFolder": "bw",
+          "sourceFile": "bw-security.md",
+          "heading": "Overview",
+          "score": 0.6465746005941279,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "## Overview BW/4HANA security operates on two distinct authorization layers that are frequently conflated in interviews. Standard SAP authorization — the same PFCG-role, authorizat"
+        },
+        {
+          "rank": 5,
+          "id": "chunk_47ba241bc8b3e70134ea20f8db3b3c1e6f279e5cb05029c3aa59885858f6444e",
+          "sourceFolder": "bw",
+          "sourceFile": "bw-security.md",
+          "heading": "Common Mistakes",
+          "score": 0.5912045734622232,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "- Troubleshooting a \"no data returned\" issue by checking S_RS_COMP/PFCG role assignment first, when the user already successfully executed the query and the real gap is in RSECADMI"
+        },
+        {
+          "rank": 6,
+          "id": "chunk_e325edb20fd5f4678c9be68024af0dbc548399285b334f5466cc80c5a03b6c28",
+          "sourceFolder": "bw",
+          "sourceFile": "bw-security.md",
+          "heading": "SAP BW/4HANA Security & Analysis Authorization",
+          "score": 0.5767481603286143,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "# SAP BW/4HANA Security & Analysis Authorization"
+        },
+        {
+          "rank": 7,
+          "id": "chunk_7239ae221d3d94649c07fc1d1b408b9e1a1c80f25eb2af84552237e0a00332c6",
+          "sourceFolder": "bw",
+          "sourceFile": "bw-security.md",
+          "heading": "Red Flags",
+          "score": 0.49938660391255885,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "## Red Flags - Cannot distinguish execution-level authorization (S_RS_COMP) from analysis authorization (RSECADMIN) - Treats \"login works but query returns no data\" the same as a s"
+        }
+      ],
+      "bankChunksInScoped": [],
+      "coverageStatus": "RELEVANT_SUFFICIENT",
+      "evidencePassedToLlm": {
+        "promptDumpChars": 65782,
+        "promptDumpPath": "eval\\results\\_acceptance\\v23-simp-prompt-bw.txt",
+        "procedureBackboneHint": null
+      },
+      "providerMode": "mock",
+      "generationRoute": "GENERATION",
+      "providerStats": {
+        "mockInvocations": 1,
+        "liveTransportInvocations": 0,
+        "openaiHarnessCalls": 0
+      },
+      "generatedAnswerPreview": "In my experience with BW/4HANA, standard ABAP PFCG authorizations only control transaction and object access — they never filter query result rows for regional data. When I set this up, I mark the InfoObjects as authorization-relevant and design Analysis Authorizations in RSECADMIN for characteristics like region or company code, then assign those Analysis Authorizations to the reporting user or role while keeping S_RS_* PFCG objects strictly for query start rights. I always change-control the Analysis Authorizations separately from PFCG generation and retain RSECADMIN evidence. To prove it, the user can open the query but only sees allowed regional values, and an out-of-scope region comes b",
+      "generatedAnswerChars": 785,
+      "validation": {
+        "integrityOk": true,
+        "answerKind": "validated",
+        "recovered": false,
+        "finalDisplayedPreview": "In my experience with BW/4HANA, standard ABAP PFCG authorizations only control transaction and object access — they never filter query result rows for regional data. When I set this up, I mark the InfoObjects as authorization-relevant and design Analysis Authorizations in RSECADMIN for characteristics like region or company code, then assign those Analysis Authorizations to the reporting user or role while keeping S_RS_* PFCG objects strictly for query start rights. I always change-control the Analysis Authorizations separately from PFCG generation and retain RSECADMIN evidence. To prove it, the user can open the query but only sees allowed regional values, and an out-of-scope region comes b"
+      },
+      "bannedPhrases": [],
+      "expectations": {
+        "routeIsGeneration": true,
+        "noBankInRetrieval": true,
+        "noBannedPhrases": true,
+        "mockInvoked": true,
+        "noLiveTransport": true,
+        "noOpenaiHarness": true,
+        "integrityOk": true,
+        "addressesQuestion": true
+      },
+      "failures": []
+    },
+    {
+      "id": "idm",
+      "questionReceived": "Explain the SAP IDM identity provisioning lifecycle.",
+      "admissionTurnBeforeDemote": {
+        "route": "GENERATION",
+        "reason": "well-formed-question-or-technical-issue",
+        "scriptId": null
+      },
+      "topic": "SAP IDM",
+      "folders": [
+        "idm"
+      ],
+      "verifiedWorkflowAvailable": null,
+      "retrievedDocuments": [
+        {
+          "rank": 1,
+          "id": "chunk_cafa3b432f90a9ffc4c187041d29233d96c45594942dd0b6164c4383fc128801",
+          "sourceFolder": "idm",
+          "sourceFile": "idm-overview.md",
+          "heading": "Overview",
+          "score": 0.8113152818299801,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "## Overview SAP Identity Management (SAP IDM) is the on-premise identity lifecycle product. SAP Cloud Identity services — Identity Authentication (IAS) and Identity Provisioning (I"
+        },
+        {
+          "rank": 2,
+          "id": "chunk_ee562199b09326e95894c2e11296d80c9071ad634ec15e90bd5dd7570442e510",
+          "sourceFolder": "idm",
+          "sourceFile": "idm-architecture.md",
+          "heading": "Overview",
+          "score": 0.7334015373878527,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "## Overview Identity architecture for a Principal SAP IAM role is the design of how a person becomes a user, how their access follows business responsibility, and how that access i"
+        },
+        {
+          "rank": 3,
+          "id": "chunk_4e22d01180b156816f8c2325569e10551be09c06b6d5e1dbd9ea3b41ba40feb9",
+          "sourceFolder": "idm",
+          "sourceFile": "identity-control-planes.md",
+          "heading": "Overview",
+          "score": 0.6782079786129945,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "## Overview A Principal Architect separates five planes. Mixing them is the fastest way to fail a Head of SAP Security interview. | Plane | Typical product | Responsibility | |---|"
+        },
+        {
+          "rank": 4,
+          "id": "chunk_f84bf41b7f930dc33c23708d22b97634a6124654544abf60a8b405c8ab9e6d4a",
+          "sourceFolder": "idm",
+          "sourceFile": "idm-provisioning.md",
+          "heading": "Joiner Flow",
+          "score": 0.6145211563365861,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "## Joiner Flow HR hire → identity created in IdP/IAS as designed → IPS or IDM provisions user in targets → birthright roles assigned → optional IAG/GRC check → user can authenticat"
+        },
+        {
+          "rank": 5,
+          "id": "chunk_9c0bada72454f0743d8ef468ee88e6b8b45041556c2f6978f2a26bf8a66acc22",
+          "sourceFolder": "idm",
+          "sourceFile": "idm-overview.md",
+          "heading": "Architecture",
+          "score": 0.7364574078485253,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "## Architecture - On-premise: SAP IDM Identity Center, dispatchers, connectors, approval workflow - Cloud: IAS (authenticate), IPS (provision), IAG (govern) - Corporate IdP: often "
+        },
+        {
+          "rank": 6,
+          "id": "chunk_d45c8c6957a084fe6e66693ebae4889b6b202f821fe59c9b39d9e6136222f8aa",
+          "sourceFolder": "idm",
+          "sourceFile": "idm-architecture.md",
+          "heading": "Architecture Building Blocks",
+          "score": 0.7134278315878212,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "1. Business event: join, move, leave, contractor start/end, rehire 2. Source of truth: HR and/or corporate directory 3. Identity correlation key 4. Authentication: corporate IdP an"
+        },
+        {
+          "rank": 7,
+          "id": "chunk_01a902c58e976df1613f2ef934e0bff86c1ac3736196d10d49334b4694e6a3ce",
+          "sourceFolder": "idm",
+          "sourceFile": "idm-overview.md",
+          "heading": "Distinctions Interviewers Test",
+          "score": 0.6923238859031801,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "- Authentication is not authorization - Provisioning is not SoD policy - SAP IDM is not IPS - IAG is not IAS - SuccessFactors as an HR source does not replace S/4 role design"
+        },
+        {
+          "rank": 8,
+          "id": "chunk_801f0269ce28093aa90487be090005559f02ff0643fc415efdd560040f0a8d9e",
+          "sourceFolder": "idm",
+          "sourceFile": "idm-overview.md",
+          "heading": "Interview Summary",
+          "score": 0.7679583529115025,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "Use SAP IDM when discussing an existing on-premise identity hub that is already in production. Use IAS for authentication, federation, and SSO. Use IPS for joiner/mover/leaver prov"
+        }
+      ],
+      "bankChunksInScoped": [],
+      "coverageStatus": "RELEVANT_SUFFICIENT",
+      "evidencePassedToLlm": {
+        "promptDumpChars": 64750,
+        "promptDumpPath": "eval\\results\\_acceptance\\v23-simp-prompt-idm.txt",
+        "procedureBackboneHint": null
+      },
+      "providerMode": "mock",
+      "generationRoute": "GENERATION",
+      "providerStats": {
+        "mockInvocations": 1,
+        "liveTransportInvocations": 0,
+        "openaiHarnessCalls": 0
+      },
+      "generatedAnswerPreview": "Joiner Flow HR hire → identity created in IdP/IAS as designed → IPS or IDM provisions user in targets → birthright roles assigned → optional IAG/GRC check → user can authenticate. Mover Flow HR attribute change → lifecycle event → correlate identity → determine new access set → risk check if required → provision additions → remove obsolete assignments → reconcile → audit. Leaver Flow HR termination → disable identity → deprovision targets → revoke privileged access → certify evidence for audit.",
+      "generatedAnswerChars": 499,
+      "validation": {
+        "integrityOk": true,
+        "answerKind": "validated",
+        "recovered": false,
+        "finalDisplayedPreview": "Joiner Flow HR hire → identity created in IdP/IAS as designed → IPS or IDM provisions user in targets → birthright roles assigned → optional IAG/GRC check → user can authenticate. Mover Flow HR attribute change → lifecycle event → correlate identity → determine new access set → risk check if required → provision additions → remove obsolete assignments → reconcile → audit. Leaver Flow HR termination → disable identity → deprovision targets → revoke privileged access → certify evidence for audit."
+      },
+      "bannedPhrases": [],
+      "expectations": {
+        "routeIsGeneration": true,
+        "noBankInRetrieval": true,
+        "noBannedPhrases": true,
+        "mockInvoked": true,
+        "noLiveTransport": true,
+        "noOpenaiHarness": true,
+        "integrityOk": true,
+        "addressesQuestion": true,
+        "idmNotCloudIdentityPrimary": true
+      },
+      "failures": []
+    },
+    {
+      "id": "zero_kb",
+      "questionReceived": "Explain how Merkle trees support zero-knowledge proof verification.",
+      "admissionTurnBeforeDemote": {
+        "route": "GENERATION",
+        "reason": "well-formed-question-or-technical-issue",
+        "scriptId": null
+      },
+      "topic": null,
+      "folders": [],
+      "verifiedWorkflowAvailable": null,
+      "retrievedDocuments": [
+        {
+          "rank": 1,
+          "id": "chunk_d6d760a7b56ae74fdb4b9f236b3006e4f178c295d6e776ea575caa41cca55e1c",
+          "sourceFolder": "troubleshooting",
+          "sourceFile": "authorization-errors.md",
+          "heading": "SU53: What It Shows and What It Does Not Prove",
+          "score": 0.2604119109632555,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "In an ABAP system, transaction SU53 displays recent failed authorization checks for the user, including the authorization object and checked values. Use it immediately after reprod"
+        },
+        {
+          "rank": 2,
+          "id": "chunk_bf3fd933514334f0af6f1f9717e0ab1226c7b7e2021515557522670b401652de",
+          "sourceFolder": "compliance",
+          "sourceFile": "iso27001.md",
+          "heading": "Interview Summary",
+          "score": 0.25820385597368994,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "I would explain how SAP access controls and GRC evidence support risk treatment inside an ISMS, and I would refuse to treat a PFCG role or GRC workflow as ISO certification."
+        },
+        {
+          "rank": 3,
+          "id": "chunk_9c68490281e09d76f371e673eba67122bb2038cd68bb21a6966e7b29716d40be",
+          "sourceFolder": "bw",
+          "sourceFile": "analysis-authorizations.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.2454973166485695,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "Design starts on InfoObjects: which characteristics are authorization-relevant. Company code, plant, and sales org are typical. Too many relevant characteristics makes every query "
+        },
+        {
+          "rank": 4,
+          "id": "chunk_08aca590141dbfb8b84b778dc250d83d25da23016077f78158ff99f8ae56bc17",
+          "sourceFolder": "grc",
+          "sourceFile": "brf-plus.md",
+          "heading": "Configure a BRFplus agent rule for MSMP",
+          "score": 0.2435338831316658,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "I would maintain the decision table so each realistic attribute combination returns the intended agent result, activate the application, function, and decision table, declare that "
+        },
+        {
+          "rank": 5,
+          "id": "chunk_4aff134500d660b647a5abeee58fc1d6363242473fdbbf9119cdd50f34fdc74a",
+          "sourceFolder": "btp",
+          "sourceFile": "btp-principal-propagation-deepdive.md",
+          "heading": "Q9: What is the definitive validation pack for Principal Propagation go-live?",
+          "score": 0.23925273800731095,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "- **Decision:** No Production cutover without positive **and** negative identity proofs plus evidence retention. - **Mechanism:** Evidence set: 1. Destination screenshot: Auth + Pr"
+        },
+        {
+          "rank": 6,
+          "id": "chunk_84a957c3c5211502ab183820142103253e31a9f384eb361d462c442ddd1b5838",
+          "sourceFolder": "security",
+          "sourceFile": "authorization-objects.md",
+          "heading": "Tough Follow-up Questions",
+          "score": 0.23546092886076753,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "1. If a check passes for nine fields but fails on the tenth, does the user get partial access? 2. How would you design an authorization object for a process that needs dynamic fiel"
+        },
+        {
+          "rank": 7,
+          "id": "chunk_30ef4e97e9ed106f09671d8f33b8b52cb1b54607706aaf6b19a49a8a3c498634",
+          "sourceFolder": "security",
+          "sourceFile": "su24.md",
+          "heading": "Architecture",
+          "score": 0.2291566479114716,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "## Architecture - SU24 entries: transaction-to-authorization-object mappings with default field values - Standard transaction defaults: shipped by SAP, maintained by SAP notes and "
+        },
+        {
+          "rank": 8,
+          "id": "chunk_728d5e5a69dc6390acc533262ae1d4ca7112c85985c07d11e0219a8a4f903035",
+          "sourceFolder": "grc",
+          "sourceFile": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q100: How do you demonstrate overall SAP Security and GRC compliance readiness to executive auditors prior to S/4HANA Go-Live?",
+          "score": 0.2260856902264468,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "I would present evidence packages by control domain—not a slide claim of zero risk. Decision: Combine ARA residual-risk posture, UAR completion, SU25/SU24 baseline proof, and EAM r"
+        },
+        {
+          "rank": 9,
+          "id": "chunk_a43111d60f558ecf345935868fe4ebd744f81e20562820f105477596745690bf",
+          "sourceFolder": "security",
+          "sourceFile": "sap-security.md",
+          "heading": "What Makes This a 10/10 Answer",
+          "score": 0.22604996331014648,
+          "sourceCategory": "qa-or-coaching-format",
+          "isBank": false,
+          "preview": "An average answer defines authorization objects and describes PFCG. A 10/10 answer explains the runtime mechanism — how AUTHORITY-CHECK actually fires, why SU24 matters for role bu"
+        },
+        {
+          "rank": 10,
+          "id": "chunk_aa4423e2962d024557a81b446cda81ee144c7c4777e14e78001278cc9ea8345f",
+          "sourceFolder": "grc",
+          "sourceFile": "brf-plus.md",
+          "heading": "Tough Follow-up Questions",
+          "score": 0.22184033404259162,
+          "sourceCategory": "technical-doc",
+          "isBank": false,
+          "preview": "1. If a BRF+ rule silently fails to resolve an agent, how would you design monitoring to catch that before a user reports it? 2. How would you redesign a decision table that's grow"
+        }
+      ],
+      "bankChunksInScoped": [],
+      "coverageStatus": "IRRELEVANT_RETRIEVAL",
+      "evidencePassedToLlm": {
+        "promptDumpChars": 66780,
+        "promptDumpPath": "eval\\results\\_acceptance\\v23-simp-prompt-zero_kb.txt",
+        "procedureBackboneHint": null
+      },
+      "providerMode": "mock",
+      "generationRoute": "GENERATION",
+      "providerStats": {
+        "mockInvocations": 1,
+        "liveTransportInvocations": 0,
+        "openaiHarnessCalls": 0
+      },
+      "generatedAnswerPreview": "I would answer from established general knowledge for this topic: state the direct concept, explain the mechanism in a logical sequence, and separate well-established facts from version-dependent or uncertain details. I will not invent product capabilities or personal implementation history.",
+      "generatedAnswerChars": 292,
+      "validation": {
+        "integrityOk": true,
+        "answerKind": "validated",
+        "recovered": false,
+        "finalDisplayedPreview": "I would answer from established general knowledge for this topic: state the direct concept, explain the mechanism in a logical sequence, and separate well-established facts from version-dependent or uncertain details. I will not invent product capabilities or personal implementation history."
+      },
+      "bannedPhrases": [],
+      "expectations": {
+        "routeIsGeneration": true,
+        "noBankInRetrieval": true,
+        "noBannedPhrases": true,
+        "mockInvoked": true,
+        "noLiveTransport": true,
+        "noOpenaiHarness": true,
+        "integrityOk": true,
+        "addressesQuestion": true,
+        "zeroOrIrrelevantKb": true
+      },
+      "failures": []
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": []
+  }
+}

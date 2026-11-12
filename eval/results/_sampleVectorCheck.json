@@ -1,0 +1,30 @@
+[
+  {
+    "sourceFile": "sap-activate.md",
+    "heading": "Overview",
+    "dim": 384,
+    "fresh": true,
+    "score": 1
+  },
+  {
+    "sourceFile": "joule-security.md",
+    "heading": "Overview",
+    "dim": 384,
+    "fresh": true,
+    "score": 1
+  },
+  {
+    "sourceFile": "car-security.md",
+    "heading": "Overview",
+    "dim": 384,
+    "fresh": true,
+    "score": 1
+  },
+  {
+    "sourceFile": "rise-project.md",
+    "heading": "Overview",
+    "dim": 384,
+    "fresh": true,
+    "score": 1
+  }
+]

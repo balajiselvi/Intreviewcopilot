@@ -1,0 +1,54 @@
+[
+  {
+    "id": "rise-editions",
+    "question": "How does the infrastructure of SAP S/4HANA Cloud Public Edition differ from Private Edition in a RISE landscape?",
+    "httpStatus": 200,
+    "route": "GENERATION",
+    "modelCalls": 1,
+    "chars": 829,
+    "claimsEc2AsArchitecture": false,
+    "mentionsGracconnectors": false,
+    "mentionsSm59": false,
+    "mentionsSaas": true,
+    "answer": "In a RISE landscape, the infrastructure of SAP S/4HANA Cloud Public Edition is a multi-tenant environment managed by SAP, where resources are shared among multiple customers. This model allows for rapid updates and scalability but limits customization options. In contrast, the Private Edition operates as a single-tenant system, providing dedicated resources for each customer, which allows for greater customization and control over the environment. \n\nThe Public Edition leverages SAP's managed services for maintenance and upgrades, while the Private Edition requires more customer involvement in managing their infrastructure. This distinction impacts how organizations approach their security and compliance strategies, as the Private Edition may necessitate more robust governance frameworks due to its customizable nature."
+  },
+  {
+    "id": "rise-trace",
+    "question": "A user on SAP S/4HANA Cloud Public Edition cannot see a Fiori application. Where do you start, and why is an ABAP authorization trace the wrong first tool?",
+    "httpStatus": 200,
+    "route": "GENERATION",
+    "modelCalls": 1,
+    "chars": 921,
+    "claimsEc2AsArchitecture": false,
+    "mentionsGracconnectors": false,
+    "mentionsSm59": false,
+    "mentionsSaas": false,
+    "answer": "To start troubleshooting why a user cannot see a Fiori application in SAP S/4HANA Cloud Public Edition, I would first check the Fiori launchpad configuration, specifically the catalogs and groups assigned to the user. The visibility of the Fiori application is controlled at this layer, and if the user is not assigned to the correct catalog or group, the tile will not appear.\n\nAn ABAP authorization trace is the wrong first tool because it focuses on backend authorization checks, which are not relevant to the launchpad visibility issue. Instead, I would verify the user's role assignments using the Fiori launchpad designer and check the associated catalogs and target mappings. This will help establish whether the user has the necessary permissions to see the application tile. If the launchpad configuration is correct, I would then look into backend authorizations for the OData services related to the Fiori app."
+  },
+  {
+    "id": "connector",
+    "question": "How do you connect an ECC system to SAP Access Control so risk analysis can read its authorization data?",
+    "httpStatus": 200,
+    "route": "GENERATION",
+    "modelCalls": 1,
+    "chars": 1542,
+    "claimsEc2AsArchitecture": false,
+    "mentionsGracconnectors": false,
+    "mentionsSm59": false,
+    "mentionsSaas": false,
+    "answer": "First, you need to ensure that the SAP GRC Access Control is properly configured to connect with the ECC system. Start by setting up the connection in the GRC system using the transaction code GRFNMW_CONFIG. This involves defining the connection parameters, such as the ECC system's client, user credentials, and the relevant RFC destination.\n\nNext, you will need to configure the authorization data extraction. This is done by creating a data source in the GRC system that specifies which authorization objects and roles you want to analyze. Use transaction code GRAC_SPM to define the data source and map it to the relevant authorization objects in the ECC system.\n\nAfter that, you will need to schedule the data extraction job. This can be done using transaction code GRAC_SPM_JOB, where you can set the frequency of the data extraction and ensure that it runs successfully. \n\nTo validate the configuration, check the job logs for any errors and ensure that the authorization data is being pulled correctly. You can also use transaction SUIM in the ECC system to verify that the roles and authorizations are correctly assigned to users.\n\nFinally, ensure that the GRC system has the necessary authorizations to access the ECC data. This involves checking the roles assigned to the GRC user in the ECC system to confirm they have the required access to read the authorization data. Once everything is set up and validated, the risk analysis in SAP Access Control should be able to read the authorization data from the ECC system effectively."
+  },
+  {
+    "id": "connector-follow",
+    "question": "The RFC destination in SM59 tests successfully, but Access Control risk analysis still returns no data from that system. What do you check next?",
+    "httpStatus": 200,
+    "route": "GENERATION",
+    "modelCalls": 1,
+    "chars": 914,
+    "claimsEc2AsArchitecture": false,
+    "mentionsGracconnectors": false,
+    "mentionsSm59": false,
+    "mentionsSaas": false,
+    "answer": "First, I would verify the configuration of the Access Control risk analysis settings to ensure that the system is correctly set up to pull data from the RFC destination. This includes checking the rulebook and ruleset to confirm that they are aligned with the business processes and risks defined for that system. \n\nNext, I would inspect the connectivity between the GRC Access Control and the target system to ensure that the necessary permissions and authorizations are in place for the risk analysis to function properly. This may involve checking the relevant authorization objects, such as S_TABU_NAM, to ensure that the appropriate access is granted.\n\nFinally, I would review the logs for any errors or warnings that might indicate issues with the data retrieval process. This evidence would help determine if the lack of data is due to configuration issues, authorization problems, or connectivity failures."
+  }
+]

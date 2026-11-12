@@ -1,0 +1,890 @@
+{
+  "generatedAt": "2026-10-26T15:45:47.872Z",
+  "mode": "offline-production-retrieval",
+  "questionCount": 40,
+  "seed": null,
+  "rows": [
+    {
+      "domain": "ARA",
+      "question": "How do I validate SoD risk coverage before a new role is provisioned?",
+      "product": "GRC",
+      "intent": "REQUEST_FOR_VALIDATION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "ARA",
+      "question": "In SAP GRC ARA, user-level analysis misses a role conflict; what should I compare?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "ARM",
+      "question": "How should an access request move from approval to target provisioning?",
+      "product": "General",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "ARM",
+      "question": "The request is approved but access is absent in the target; where do I trace it?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "EAM",
+      "question": "How do I govern Firefighter owners, controllers, and session-log review?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "EAM",
+      "question": "An emergency session log is missing from controller review; how do I investigate?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "BRM",
+      "question": "How do I govern business-role design and risk approval before assignment?",
+      "product": "General",
+      "intent": "REQUEST_FOR_ARCHITECTURE",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "BRM",
+      "question": "An approved business role does not reflect changed target authorizations; what do I check?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "MSMP/BRF+",
+      "question": "How do I map a BRFplus rule result to the correct MSMP approval path?",
+      "product": "GRC",
+      "intent": "REQUEST_FOR_REMEDIATION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "MSMP/BRF+",
+      "question": "An MSMP request has no agent; how do I trace rule and stage evaluation?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Process Control",
+      "question": "How do I implement a manual assessment in SAP GRC Process Control with evidence and retesting?",
+      "product": "Process Control",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Process Control",
+      "question": "A control assessment fails on incomplete evidence; how do I remediate and retest?",
+      "product": "General",
+      "intent": "REQUEST_FOR_REMEDIATION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SAP Security",
+      "question": "How do I design a least-privilege derived PFCG role and validate it?",
+      "product": "Authorization",
+      "intent": "REQUEST_FOR_VALIDATION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SAP Security",
+      "question": "A user receives an authorization failure after transport; how do I isolate it?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Fiori",
+      "question": "A tile is absent from the launchpad; what content assignments do I validate?",
+      "product": "Fiori",
+      "intent": "REQUEST_FOR_VALIDATION",
+      "folders": [
+        "fiori",
+        "s4hana",
+        "rise"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Fiori",
+      "question": "The tile launches but the app fails at runtime; how do I distinguish service from authorization issues?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "IDM/IAM",
+      "question": "How do I migrate identity provisioning from SAP IDM to Cloud Identity Services?",
+      "product": "IPS",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "btp",
+        "idm",
+        "cloud"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "IDM/IAM",
+      "question": "An identity transformation provisions the wrong group; how do I trace mapping and target behavior?",
+      "product": "General",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "IAS/IPS/BTP",
+      "question": "How do I map IdP groups to BTP role collections through trust configuration?",
+      "product": "BTP",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "btp",
+        "cloud",
+        "idm"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "IAS/IPS/BTP",
+      "question": "Users authenticate successfully but lack a BTP application role; where do I diagnose it?",
+      "product": "BTP",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "btp",
+        "cloud"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SuccessFactors",
+      "question": "How do I grant employee-data access using permission groups and target populations?",
+      "product": "SuccessFactors",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "successfactors",
+        "idm"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SuccessFactors",
+      "question": "In SuccessFactors RBP, a manager sees employees outside the intended target population; how do I troubleshoot it?",
+      "product": "SuccessFactors",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "successfactors",
+        "idm"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Ariba",
+      "question": "How do I integrate Ariba user provisioning and role assignment with enterprise identity?",
+      "product": "Ariba",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "lob"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Ariba",
+      "question": "Ariba SSO works but a user lacks application access; what do I verify?",
+      "product": "Ariba",
+      "intent": "REQUEST_FOR_VALIDATION",
+      "folders": [
+        "lob",
+        "cloud",
+        "idm"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "BW/BW4HANA",
+      "question": "How do I design and transport BW analysis authorizations for data-level access?",
+      "product": "BW",
+      "intent": "REQUEST_FOR_ARCHITECTURE",
+      "folders": [
+        "bw"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "BW/BW4HANA",
+      "question": "A query returns excess records for one user; how do I trace analysis authorization?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "HANA",
+      "question": "How do I grant least-privilege HANA object access to an application user?",
+      "product": "HANA",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "hana"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "HANA",
+      "question": "A user can connect to HANA but cannot read a view; what privilege layers do I inspect?",
+      "product": "HANA",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "hana"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SAC",
+      "question": "How do I separate SAC role permissions from model data access?",
+      "product": "SAC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "sac"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SAC",
+      "question": "In SAP Analytics Cloud, a user opens a story but sees incorrect model data; how do I isolate access controls?",
+      "product": "SAC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "sac"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Datasphere/CAR",
+      "question": "How do I restrict Datasphere space and view access for an analytics team?",
+      "product": "Datasphere",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "datasphere"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Datasphere/CAR",
+      "question": "In SAP Customer Activity Repository (CAR), an analytics user has application access but sees no expected data; what do I inspect?",
+      "product": "CAR",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "lob"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "RISE/S4",
+      "question": "How do I plan security testing and cutover for a RISE brownfield conversion?",
+      "product": "RISE",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "rise",
+        "s4hana",
+        "project-types",
+        "project-management",
+        "cutover",
+        "hypercare"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "RISE/S4",
+      "question": "After an S/4HANA upgrade, authorization behavior changed; how do I triage it?",
+      "product": "Authorization",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "s4hana",
+        "fiori",
+        "security"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SAP Activate",
+      "question": "How do I govern security design and quality gates across Explore and Realize?",
+      "product": "General",
+      "intent": "REQUEST_FOR_ARCHITECTURE",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SAP Activate",
+      "question": "Role testing is incomplete near the Realize milestone; how do I recover the schedule?",
+      "product": "Activate",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "project-management",
+        "rise"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "PMP/Delivery",
+      "question": "How do I manage RAID, dependencies, and forecasts across SAP security workstreams?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "project-management"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "PMP/Delivery",
+      "question": "On an SAP GRC program, a vendor delay threatens cutover; how do I govern recovery and escalation?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc",
+        "project-management"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Compliance",
+      "question": "How does SAP GRC evidence support SOX ITGC without implying automatic compliance?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc",
+        "audit",
+        "compliance"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Compliance",
+      "question": "How do I distinguish GDPR obligations from ISO 27001 controls in an SAP audit?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "audit",
+        "compliance",
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    }
+  ],
+  "failed": [
+    {
+      "domain": "ARA",
+      "question": "How do I validate SoD risk coverage before a new role is provisioned?",
+      "product": "GRC",
+      "intent": "REQUEST_FOR_VALIDATION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "ARA",
+      "question": "In SAP GRC ARA, user-level analysis misses a role conflict; what should I compare?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "ARM",
+      "question": "How should an access request move from approval to target provisioning?",
+      "product": "General",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "ARM",
+      "question": "The request is approved but access is absent in the target; where do I trace it?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "EAM",
+      "question": "How do I govern Firefighter owners, controllers, and session-log review?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "EAM",
+      "question": "An emergency session log is missing from controller review; how do I investigate?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "BRM",
+      "question": "How do I govern business-role design and risk approval before assignment?",
+      "product": "General",
+      "intent": "REQUEST_FOR_ARCHITECTURE",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "BRM",
+      "question": "An approved business role does not reflect changed target authorizations; what do I check?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "MSMP/BRF+",
+      "question": "How do I map a BRFplus rule result to the correct MSMP approval path?",
+      "product": "GRC",
+      "intent": "REQUEST_FOR_REMEDIATION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "MSMP/BRF+",
+      "question": "An MSMP request has no agent; how do I trace rule and stage evaluation?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Process Control",
+      "question": "How do I implement a manual assessment in SAP GRC Process Control with evidence and retesting?",
+      "product": "Process Control",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Process Control",
+      "question": "A control assessment fails on incomplete evidence; how do I remediate and retest?",
+      "product": "General",
+      "intent": "REQUEST_FOR_REMEDIATION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SAP Security",
+      "question": "How do I design a least-privilege derived PFCG role and validate it?",
+      "product": "Authorization",
+      "intent": "REQUEST_FOR_VALIDATION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SAP Security",
+      "question": "A user receives an authorization failure after transport; how do I isolate it?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Fiori",
+      "question": "A tile is absent from the launchpad; what content assignments do I validate?",
+      "product": "Fiori",
+      "intent": "REQUEST_FOR_VALIDATION",
+      "folders": [
+        "fiori",
+        "s4hana",
+        "rise"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Fiori",
+      "question": "The tile launches but the app fails at runtime; how do I distinguish service from authorization issues?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "IDM/IAM",
+      "question": "How do I migrate identity provisioning from SAP IDM to Cloud Identity Services?",
+      "product": "IPS",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "btp",
+        "idm",
+        "cloud"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "IDM/IAM",
+      "question": "An identity transformation provisions the wrong group; how do I trace mapping and target behavior?",
+      "product": "General",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "IAS/IPS/BTP",
+      "question": "How do I map IdP groups to BTP role collections through trust configuration?",
+      "product": "BTP",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "btp",
+        "cloud",
+        "idm"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "IAS/IPS/BTP",
+      "question": "Users authenticate successfully but lack a BTP application role; where do I diagnose it?",
+      "product": "BTP",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "btp",
+        "cloud"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SuccessFactors",
+      "question": "How do I grant employee-data access using permission groups and target populations?",
+      "product": "SuccessFactors",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "successfactors",
+        "idm"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SuccessFactors",
+      "question": "In SuccessFactors RBP, a manager sees employees outside the intended target population; how do I troubleshoot it?",
+      "product": "SuccessFactors",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "successfactors",
+        "idm"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Ariba",
+      "question": "How do I integrate Ariba user provisioning and role assignment with enterprise identity?",
+      "product": "Ariba",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "lob"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Ariba",
+      "question": "Ariba SSO works but a user lacks application access; what do I verify?",
+      "product": "Ariba",
+      "intent": "REQUEST_FOR_VALIDATION",
+      "folders": [
+        "lob",
+        "cloud",
+        "idm"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "BW/BW4HANA",
+      "question": "How do I design and transport BW analysis authorizations for data-level access?",
+      "product": "BW",
+      "intent": "REQUEST_FOR_ARCHITECTURE",
+      "folders": [
+        "bw"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "BW/BW4HANA",
+      "question": "A query returns excess records for one user; how do I trace analysis authorization?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "HANA",
+      "question": "How do I grant least-privilege HANA object access to an application user?",
+      "product": "HANA",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "hana"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "HANA",
+      "question": "A user can connect to HANA but cannot read a view; what privilege layers do I inspect?",
+      "product": "HANA",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "hana"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SAC",
+      "question": "How do I separate SAC role permissions from model data access?",
+      "product": "SAC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "sac"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SAC",
+      "question": "In SAP Analytics Cloud, a user opens a story but sees incorrect model data; how do I isolate access controls?",
+      "product": "SAC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "sac"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Datasphere/CAR",
+      "question": "How do I restrict Datasphere space and view access for an analytics team?",
+      "product": "Datasphere",
+      "intent": "REQUEST_FOR_TECHNICAL_STEPS",
+      "folders": [
+        "datasphere"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Datasphere/CAR",
+      "question": "In SAP Customer Activity Repository (CAR), an analytics user has application access but sees no expected data; what do I inspect?",
+      "product": "CAR",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "lob"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "RISE/S4",
+      "question": "How do I plan security testing and cutover for a RISE brownfield conversion?",
+      "product": "RISE",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "rise",
+        "s4hana",
+        "project-types",
+        "project-management",
+        "cutover",
+        "hypercare"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "RISE/S4",
+      "question": "After an S/4HANA upgrade, authorization behavior changed; how do I triage it?",
+      "product": "Authorization",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "s4hana",
+        "fiori",
+        "security"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SAP Activate",
+      "question": "How do I govern security design and quality gates across Explore and Realize?",
+      "product": "General",
+      "intent": "REQUEST_FOR_ARCHITECTURE",
+      "folders": [],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "SAP Activate",
+      "question": "Role testing is incomplete near the Realize milestone; how do I recover the schedule?",
+      "product": "Activate",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "project-management",
+        "rise"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "PMP/Delivery",
+      "question": "How do I manage RAID, dependencies, and forecasts across SAP security workstreams?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "project-management"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "PMP/Delivery",
+      "question": "On an SAP GRC program, a vendor delay threatens cutover; how do I govern recovery and escalation?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc",
+        "project-management"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Compliance",
+      "question": "How does SAP GRC evidence support SOX ITGC without implying automatic compliance?",
+      "product": "GRC",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "grc",
+        "audit",
+        "compliance"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    },
+    {
+      "domain": "Compliance",
+      "question": "How do I distinguish GDPR obligations from ISO 27001 controls in an SAP audit?",
+      "product": "General",
+      "intent": "DIRECT_QUESTION",
+      "folders": [
+        "audit",
+        "compliance",
+        "grc"
+      ],
+      "topSources": [],
+      "sourceMatch": false
+    }
+  ]
+}

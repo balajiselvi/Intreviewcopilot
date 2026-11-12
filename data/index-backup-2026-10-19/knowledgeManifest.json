@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "parserVersion": "a5fdef3073fe",
+  "chunkVersion": "59c1e5914015",
+  "embeddingVersion": "text-embedding-3-small",
+  "buildTimestamp": "2026-10-19T12:58:00.000Z",
+  "totalDocuments": 126,
+  "totalChunks": 2772,
+  "indexVersion": 1
+}

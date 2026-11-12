@@ -1,0 +1,38 @@
+{
+  "id": "acronym-scim-role-collection-template",
+  "domain": "btp-identity",
+  "product": "SAP BTP / Cloud Identity Services",
+  "version_scope": "Confirm SCIM version and BTP role model wording on Help Portal",
+  "claims": [
+    {
+      "id": "scim",
+      "text": "SCIM (System for Cross-domain Identity Management) is commonly used as the provisioning protocol family for identity sync; confirm SAP IPS connector documentation for the exact profile in use.",
+      "kind": "definition"
+    },
+    {
+      "id": "role-template",
+      "text": "A role template is an application-defined authorization template on SAP BTP that is exposed for assignment via role collections.",
+      "kind": "definition"
+    },
+    {
+      "id": "role-collection",
+      "text": "A role collection groups role templates (and related authorizations) for assignment to users or identity-provider groups on SAP BTP.",
+      "kind": "definition"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://help.sap.com/",
+      "section": "IPS SCIM / BTP role collections and role templates (verify)",
+      "retrieved_on": "2026-10-29"
+    }
+  ],
+  "verification_status": "NEEDS_REVIEW",
+  "reviewer": null,
+  "verified_on": null,
+  "expiry": null,
+  "recheck_date": "2026-11-30",
+  "spoken_answer": null,
+  "conflicts": [],
+  "notes": "Draft definitions pending official wording."
+}

@@ -1,0 +1,43 @@
+{
+  "at": "2026-11-03T06:26:24.722Z",
+  "pass": true,
+  "cases": [
+    {
+      "id": "brm-why",
+      "ok": true,
+      "route": "VERIFIED_WORKFLOW",
+      "preview": "In BRM I govern business-role definitions and their technical-role mappings so ARM requesters pick job-function names while provisioning still assigns the underlying PFCG roles. Define business roles in business language from agreed job functions, then map each business role to the correct underlying single, derived, o"
+    },
+    {
+      "id": "pfcg-usage",
+      "ok": true,
+      "route": "RETRIEVED_PROCEDURE",
+      "soup": 0,
+      "preview": "Use transaction PFCG to create the single role, add the required transactions on the Menu tab, and maintain organizational levels on the Authorizations tab. Generate the authorization profile in PFCG after that authorization data is complete, because the generated profile is what the user buffer checks. Assign the role"
+    },
+    {
+      "id": "cross-domain-iam-concepts",
+      "ok": true,
+      "route": "PREPARED_SCRIPT",
+      "preview": "Authentication answers who you are. Authorization answers what you may do. IAS or Entra ID can authenticate. SAP roles, authorization objects, and BTP role collections decide what that user can execute. Successful SSO is"
+    },
+    {
+      "id": "zero-kb-outside-inventory",
+      "ok": true,
+      "route": "GENERATION",
+      "preview": "I do not have verified product documentation for that module or transaction not confirmed in supporting knowledge in the knowledge base. I would not invent T-codes, tables, or configuration paths. If this maps to a stand"
+    },
+    {
+      "id": "experience-s4-methodology",
+      "ok": true,
+      "route": "GENERATION",
+      "preview": "I would answer from verified CV engagements only: the transformation objective, the security and role decisions I owned, Fiori or platform authorization readiness where relevant, and the cutover evidence I would defend —"
+    },
+    {
+      "id": "no-exact-bank-pfcg-paraphrase",
+      "ok": true,
+      "route": "RETRIEVED_PROCEDURE",
+      "preview": "Use transaction PFCG to create the single role, add the required transactions on the Menu tab, and maintain organizational levels on the Authorizations tab. Generate the authorization profile in PFCG after that authoriza"
+    }
+  ]
+}

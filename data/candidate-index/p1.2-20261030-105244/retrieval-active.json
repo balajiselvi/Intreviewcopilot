@@ -1,0 +1,833 @@
+{
+  "label": "active",
+  "indexFile": "D:\\My Projects\\InterviewCopilot\\data\\knowledgeIndex.json",
+  "rows": [
+    {
+      "question": "What is SAP IAS?",
+      "folders": [
+        "btp",
+        "cloud"
+      ],
+      "top": [
+        {
+          "rank": 1,
+          "score": 0.8165,
+          "file": "ias.md",
+          "heading": "SAP Transactions",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 2,
+          "score": 0.8103,
+          "file": "ias.md",
+          "heading": "Interview Summary",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 3,
+          "score": 0.8018,
+          "file": "ias.md",
+          "heading": "SAP Identity Authentication Service (IAS)",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 4,
+          "score": 0.7789,
+          "file": "ias.md",
+          "heading": "Overview",
+          "blur": true,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 5,
+          "score": 0.7738,
+          "file": "ias.md",
+          "heading": "90 Second Interview Answer",
+          "blur": true,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 6,
+          "score": 0.7632,
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "heading": "SAP Cloud Identity Services — IAS & IPS Architecture",
+          "blur": false,
+          "hasSuite": true,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 7,
+          "score": 0.7534,
+          "file": "ias.md",
+          "heading": "60 Second Interview Answer",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 8,
+          "score": 0.7427,
+          "file": "ias.md",
+          "heading": "Red Flags",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        }
+      ]
+    },
+    {
+      "question": "What is SAP IPS?",
+      "folders": [
+        "btp",
+        "cloud"
+      ],
+      "top": [
+        {
+          "rank": 1,
+          "score": 0.8056,
+          "file": "ips.md",
+          "heading": "SAP Identity Provisioning Service (IPS)",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 2,
+          "score": 0.7934,
+          "file": "ips.md",
+          "heading": "Overview",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 3,
+          "score": 0.7074,
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "heading": "SAP Cloud Identity Services — IAS & IPS Architecture",
+          "blur": false,
+          "hasSuite": true,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 4,
+          "score": 0.6987,
+          "file": "ips.md",
+          "heading": "Interview Summary",
+          "blur": false,
+          "hasSuite": true,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 5,
+          "score": 0.6949,
+          "file": "ips.md",
+          "heading": "Runtime Flow",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 6,
+          "score": 0.688,
+          "file": "ips.md",
+          "heading": "SAP Tables",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 7,
+          "score": 0.6858,
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "heading": "Q3: How do you configure IPS source, target, and proxy systems for hybrid SAP landscapes?",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 8,
+          "score": 0.6804,
+          "file": "ips.md",
+          "heading": "What Makes This a 10/10 Answer",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        }
+      ]
+    },
+    {
+      "question": "What is the difference between IAS and IPS?",
+      "folders": [
+        "btp",
+        "cloud"
+      ],
+      "top": [
+        {
+          "rank": 1,
+          "score": 0.8382,
+          "file": "ips.md",
+          "heading": "Red Flags",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 2,
+          "score": 0.7103,
+          "file": "ips.md",
+          "heading": "What Makes This a 10/10 Answer",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 3,
+          "score": 0.7024,
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "heading": "SAP Cloud Identity Services — IAS & IPS Architecture",
+          "blur": false,
+          "hasSuite": true,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 4,
+          "score": 0.6388,
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "heading": "Q10: What operating evidence do auditors need for IAS/IPS?",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 5,
+          "score": 0.6349,
+          "file": "ias.md",
+          "heading": "What Makes This a 10/10 Answer",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 6,
+          "score": 0.628,
+          "file": "ias.md",
+          "heading": "90 Second Interview Answer",
+          "blur": true,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 7,
+          "score": 0.6273,
+          "file": "ias.md",
+          "heading": "Overview",
+          "blur": true,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        }
+      ]
+    },
+    {
+      "question": "How do IAS and IPS work together?",
+      "folders": [
+        "btp",
+        "cloud"
+      ],
+      "top": [
+        {
+          "rank": 1,
+          "score": 0.8358,
+          "file": "ips.md",
+          "heading": "Red Flags",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 2,
+          "score": 0.7921,
+          "file": "ias.md",
+          "heading": "Interview Summary",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 3,
+          "score": 0.7223,
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "heading": "Q6: How do you troubleshoot “SSO works but user has no access” across IAS/IPS/app?",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 4,
+          "score": 0.6962,
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "heading": "Q7: How do you manage certificates, secrets, and technical users for IAS/IPS connectors?",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 5,
+          "score": 0.6907,
+          "file": "ips.md",
+          "heading": "Interview Summary",
+          "blur": false,
+          "hasSuite": true,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 6,
+          "score": 0.6753,
+          "file": "ips.md",
+          "heading": "60 Second Interview Answer",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 7,
+          "score": 0.6512,
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "heading": "Q1: How do you place IAS in a corporate IdP federation without making IAS a shadow HR directory?",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 8,
+          "score": 0.6003,
+          "file": "ias.md",
+          "heading": "90 Second Interview Answer",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        }
+      ]
+    },
+    {
+      "question": "How does IPS provision identities from a corporate directory into SAP cloud applications?",
+      "folders": [
+        "btp",
+        "cloud"
+      ],
+      "top": [
+        {
+          "rank": 1,
+          "score": 0.752,
+          "file": "ips.md",
+          "heading": "90 Second Interview Answer",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": true,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 2,
+          "score": 0.7438,
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "heading": "SAP Cloud Identity Services — IAS & IPS Architecture",
+          "blur": false,
+          "hasSuite": true,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 3,
+          "score": 0.7274,
+          "file": "ips.md",
+          "heading": "SAP Identity Provisioning Service (IPS)",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 4,
+          "score": 0.7238,
+          "file": "ips.md",
+          "heading": "Interview Summary",
+          "blur": false,
+          "hasSuite": true,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 5,
+          "score": 0.7164,
+          "file": "ips.md",
+          "heading": "SAP Transactions",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": true,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 6,
+          "score": 0.7147,
+          "file": "ips.md",
+          "heading": "Overview",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 7,
+          "score": 0.7143,
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "heading": "Q8: How do you orchestrate identity lifecycle across SAP cloud and on-premises with Cloud Connector?",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": true,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 8,
+          "score": 0.6848,
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "heading": "Q1: How do you place IAS in a corporate IdP federation without making IAS a shadow HR directory?",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        }
+      ]
+    },
+    {
+      "question": "How do you secure SAP Fiori?",
+      "folders": [
+        "fiori",
+        "s4hana",
+        "rise"
+      ],
+      "top": [
+        {
+          "rank": 1,
+          "score": 0.5204,
+          "file": "fiori-security.md",
+          "heading": "Public Edition troubleshooting: app is missing",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 2,
+          "score": 0.5129,
+          "file": "catalogs.md",
+          "heading": "Sources and scope",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 3,
+          "score": 0.4994,
+          "file": "spaces-pages.md",
+          "heading": "Sources and scope",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 4,
+          "score": 0.4994,
+          "file": "launchpad.md",
+          "heading": "Sources and scope",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 5,
+          "score": 0.4903,
+          "file": "s4hana-erp-security-architect-bank.md",
+          "heading": "Q4: How do you secure custom transactions, custom Fiori, and clean-core extensions?",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 6,
+          "score": 0.4751,
+          "file": "launchpad.md",
+          "heading": "SAP Fiori Launchpad Access",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        }
+      ]
+    },
+    {
+      "question": "Explain SAP GRC Access Control implementation.",
+      "folders": [
+        "grc"
+      ],
+      "top": [
+        {
+          "rank": 1,
+          "score": 0.7505,
+          "file": "grc-principal-architect-interview-bank.md",
+          "heading": "Q36: How do you justify the ROI of an SAP GRC upgrade or implementation to C-level stakeholders (CISO, CFO)?",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 2,
+          "score": 0.7196,
+          "file": "msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 3,
+          "score": 0.7136,
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q62: A client on Greenfield S/4HANA Cloud Private Edition wants to integrate GRC 12.0 with SAP SuccessFactors and Ariba. How do you architect the governance framework?",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": true,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 4,
+          "score": 0.7094,
+          "file": "authorization-sync.md",
+          "heading": "Runtime Flow",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 5,
+          "score": 0.6866,
+          "file": "brf-plus.md",
+          "heading": "Configure a BRFplus agent rule for MSMP",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 6,
+          "score": 0.6183,
+          "file": "connectors.md",
+          "heading": "Implementation Activities",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 7,
+          "score": 0.6114,
+          "file": "user-sync.md",
+          "heading": "Runtime Flow",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 8,
+          "score": 0.6072,
+          "file": "repository-sync.md",
+          "heading": "Runtime Flow",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        }
+      ]
+    },
+    {
+      "question": "Explain an SAP GRC Process Control implementation.",
+      "folders": [
+        "grc"
+      ],
+      "top": [
+        {
+          "rank": 1,
+          "score": 0.7731,
+          "file": "process-control.md",
+          "heading": "SAP GRC Process Control",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 2,
+          "score": 0.5546,
+          "file": "process-control.md",
+          "heading": "Access Control and Process Control",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 3,
+          "score": 0.5533,
+          "file": "process-control.md",
+          "heading": "Implement Process Control",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 4,
+          "score": 0.5501,
+          "file": "process-control.md",
+          "heading": "Why a concise CV may omit Process Control",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 5,
+          "score": 0.5293,
+          "file": "process-control.md",
+          "heading": "Move a Process Control change through development quality and production",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 6,
+          "score": 0.4916,
+          "file": "process-control.md",
+          "heading": "Troubleshooting: unexpected automated or manual control test result",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 7,
+          "score": 0.398,
+          "file": "process-control.md",
+          "heading": "Process Control master data",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        }
+      ]
+    },
+    {
+      "question": "How do you configure MSMP workflow?",
+      "folders": [
+        "grc"
+      ],
+      "top": [
+        {
+          "rank": 1,
+          "score": 0.6734,
+          "file": "msmp.md",
+          "heading": "Configure an MSMP workflow for an access request",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 2,
+          "score": 0.5703,
+          "file": "msmp.md",
+          "heading": "Configure an MSMP workflow for an access request",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 3,
+          "score": 0.8191,
+          "file": "msmp.md",
+          "heading": "Implementation Activities",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 4,
+          "score": 0.818,
+          "file": "msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 5,
+          "score": 0.8034,
+          "file": "arm.md",
+          "heading": "Implementation Activities",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 6,
+          "score": 0.7218,
+          "file": "brf-plus.md",
+          "heading": "Implementation Activities",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 7,
+          "score": 0.8233,
+          "file": "msmp.md",
+          "heading": "Runtime Flow",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        },
+        {
+          "rank": 8,
+          "score": 0.7869,
+          "file": "brf-plus.md",
+          "heading": "Runtime Flow",
+          "blur": false,
+          "hasSuite": false,
+          "hasSourceTarget": false,
+          "cloudConnector": false,
+          "cloudIdentityFile": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "startedAt": "2026-11-03T12:58:08.154Z",
+  "envLoad": {
+    "loaded": true,
+    "count": 4
+  },
+  "providerMode": "live",
+  "model": "gpt-4o-mini",
+  "plannedCount": 3,
+  "fullWorklistCount": 141,
+  "limit": null,
+  "completed": 3,
+  "liveFailed": 0,
+  "shortCircuits": 0,
+  "mockViolations": 0,
+  "last": {
+    "runId": "defect_st03n_export",
+    "at": "2026-11-03T12:58:27.243Z",
+    "liveFailed": false
+  },
+  "endedAt": "2026-11-03T12:58:27.246Z"
+}

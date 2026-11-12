@@ -1,0 +1,318 @@
+{
+  "generatedAt": "2026-10-21T11:38:43.558Z",
+  "mode": "production-retrieval",
+  "cases": [
+    {
+      "question": "How do I configure BRF+ agent determination in MSMP?",
+      "domain": "SAP GRC",
+      "intent": "configure",
+      "answerPath": "retrieved-procedure",
+      "rankedSources": [
+        {
+          "file": "brf-plus.md",
+          "heading": "Configure a BRFplus agent rule for MSMP",
+          "score": 1
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "Runtime Flow",
+          "score": 0.9894791818853691
+        },
+        {
+          "file": "msmp.md",
+          "heading": "Runtime Flow",
+          "score": 0.9501124893910203
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "Configure a BRFplus initiator rule for MSMP",
+          "score": 0.9445352001434942
+        },
+        {
+          "file": "arm.md",
+          "heading": "Implementation Activities",
+          "score": 0.8867590919536782
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "Implementation Activities",
+          "score": 0.8691980191968247
+        },
+        {
+          "file": "msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "score": 0.8538652034805706
+        },
+        {
+          "file": "msmp.md",
+          "heading": "Implementation Activities",
+          "score": 0.8533226228198514
+        }
+      ],
+      "procedureStepCount": 5,
+      "answer": "I would first confirm whether the change is an initiator rule or an agent rule before changing anything. The initiator rule selects the MSMP path from request attributes. For an agent rule I would generate the BRF+ flat rule shell in Define Workflow-Related MSMP Rules for process SAP_GRAC_ACCESS_REQUEST with rule kind Agent Rule, then open BRF+ and maintain the decision table so each realistic attribute combination returns the intended agent result. I would activate the application, function, and decision table, declare that rule in Maintain MSMP Workflows Maintain Rules, attach it to the stage that needs agent determination, and regenerate the MSMP version. I would test with a request that matches the decision-table row and confirm the Approvers of Selected Path in Request Status Instance Status.",
+      "inventedGrcmsmp": false,
+      "sourcedMsmpOrBrfArtifacts": true
+    },
+    {
+      "question": "How do I attach the BRFplus agent rule?",
+      "domain": "General SAP",
+      "intent": "",
+      "answerPath": "generation-required",
+      "rankedSources": [
+        {
+          "file": "brf-plus.md",
+          "heading": "Architecture",
+          "score": 0.5008431280500819
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "Overview",
+          "score": 0.4892491400152018
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.4722503487356551
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.46883202496369025
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.4668222086144227
+        },
+        {
+          "file": "msmp.md",
+          "heading": "Interview Summary",
+          "score": 0.464075940061091
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "Red Flags",
+          "score": 0.4586518547279804
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "Configure a BRFplus agent rule for MSMP",
+          "score": 0.4477440435993424
+        }
+      ],
+      "procedureStepCount": 0,
+      "answer": "",
+      "inventedGrcmsmp": false,
+      "sourcedMsmpOrBrfArtifacts": false
+    },
+    {
+      "question": "How do I configure approver determination?",
+      "domain": "General SAP",
+      "intent": "configure",
+      "answerPath": "retrieved-procedure",
+      "rankedSources": [
+        {
+          "file": "msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "score": 0.6514433715031956
+        },
+        {
+          "file": "rise-security.md",
+          "heading": "Implementation Activities",
+          "score": 0.6436813624132597
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "Configure a BRFplus agent rule for MSMP",
+          "score": 0.6305076896996495
+        },
+        {
+          "file": "msmp.md",
+          "heading": "Runtime Flow",
+          "score": 0.627782977751056
+        },
+        {
+          "file": "sox.md",
+          "heading": "Runtime Flow",
+          "score": 0.6248871706635386
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "Runtime Flow",
+          "score": 0.6230391598862675
+        },
+        {
+          "file": "arm.md",
+          "heading": "Runtime Flow",
+          "score": 0.6223379393922046
+        },
+        {
+          "file": "audit-support.md",
+          "heading": "Runtime Flow",
+          "score": 0.6141554070143049
+        }
+      ],
+      "procedureStepCount": 5,
+      "answer": "I would first confirm whether the change is an initiator rule or an agent rule before changing anything. The initiator rule selects the MSMP path from request attributes. For an agent rule I would generate the BRF+ flat rule shell in Define Workflow-Related MSMP Rules for process SAP_GRAC_ACCESS_REQUEST with rule kind Agent Rule, then open BRF+ and maintain the decision table so each realistic attribute combination returns the intended agent result. I would activate the application, function, and decision table, declare that rule in Maintain MSMP Workflows Maintain Rules, attach it to the stage that needs agent determination, and regenerate the MSMP version. I would test with a request that matches the decision-table row and confirm the Approvers of Selected Path in Request Status Instance Status.",
+      "inventedGrcmsmp": false,
+      "sourcedMsmpOrBrfArtifacts": true
+    },
+    {
+      "question": "Why does the MSMP request have no approver?",
+      "domain": "SAP GRC",
+      "intent": "",
+      "answerPath": "generation-required",
+      "rankedSources": [
+        {
+          "file": "msmp.md",
+          "heading": "Troubleshoot an MSMP access request with no approver",
+          "score": 0.8265682768195513
+        },
+        {
+          "file": "grc-overview.md",
+          "heading": "Troubleshooting",
+          "score": 0.7479057660722017
+        },
+        {
+          "file": "msmp.md",
+          "heading": "Troubleshooting",
+          "score": 0.7462588991795954
+        },
+        {
+          "file": "arm.md",
+          "heading": "Troubleshooting",
+          "score": 0.7244440097060403
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "Troubleshooting",
+          "score": 0.6598252844718591
+        },
+        {
+          "file": "ara.md",
+          "heading": "Troubleshooting",
+          "score": 0.5657952472041142
+        },
+        {
+          "file": "authorization-sync.md",
+          "heading": "Troubleshooting",
+          "score": 0.5562751171429139
+        },
+        {
+          "file": "connectors.md",
+          "heading": "Troubleshooting",
+          "score": 0.5558992903538714
+        }
+      ],
+      "procedureStepCount": 0,
+      "answer": "",
+      "inventedGrcmsmp": false,
+      "sourcedMsmpOrBrfArtifacts": false
+    },
+    {
+      "question": "How do I configure a new access-request approval path?",
+      "domain": "General SAP",
+      "intent": "configure",
+      "answerPath": "retrieved-procedure",
+      "rankedSources": [
+        {
+          "file": "msmp.md",
+          "heading": "Technical Configuration Sequence",
+          "score": 0.7065012091792219
+        },
+        {
+          "file": "msmp.md",
+          "heading": "Implementation Activities",
+          "score": 0.6431896854392478
+        },
+        {
+          "file": "grc-overview.md",
+          "heading": "Runtime Flow",
+          "score": 0.6296831747370433
+        },
+        {
+          "file": "arm.md",
+          "heading": "Implementation Activities",
+          "score": 0.6227187266970035
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "Configure a BRFplus agent rule for MSMP",
+          "score": 0.6141249827253497
+        },
+        {
+          "file": "arm.md",
+          "heading": "Runtime Flow",
+          "score": 0.609774351373329
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "Implementation Activities",
+          "score": 0.5863063759302537
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "Configure a BRFplus initiator rule for MSMP",
+          "score": 0.575435022359892
+        }
+      ],
+      "procedureStepCount": 5,
+      "answer": "I would first confirm whether the change is an initiator rule or an agent rule before changing anything. The initiator rule selects the MSMP path from request attributes. For an agent rule I would generate the BRF+ flat rule shell in Define Workflow-Related MSMP Rules for process SAP_GRAC_ACCESS_REQUEST with rule kind Agent Rule, then open BRF+ and maintain the decision table so each realistic attribute combination returns the intended agent result. I would activate the application, function, and decision table, declare that rule in Maintain MSMP Workflows Maintain Rules, attach it to the stage that needs agent determination, and regenerate the MSMP version. I would test with a request that matches the decision-table row and confirm the Approvers of Selected Path in Request Status Instance Status.",
+      "inventedGrcmsmp": false,
+      "sourcedMsmpOrBrfArtifacts": true
+    },
+    {
+      "question": "How do I troubleshoot the rule-result mapping?",
+      "domain": "General SAP",
+      "intent": "troubleshoot",
+      "answerPath": "retrieved-procedure",
+      "rankedSources": [
+        {
+          "file": "bw-security.md",
+          "heading": "Troubleshooting: query runs but returns no data for one user",
+          "score": 0.7209780961747693
+        },
+        {
+          "file": "brf-plus.md",
+          "heading": "Troubleshooting",
+          "score": 0.6528649763659506
+        },
+        {
+          "file": "s4hana-security.md",
+          "heading": "Troubleshooting: Fiori app opens but a request fails",
+          "score": 0.652484816531745
+        },
+        {
+          "file": "arm.md",
+          "heading": "Troubleshooting",
+          "score": 0.6080002543056358
+        },
+        {
+          "file": "rulesets.md",
+          "heading": "Troubleshooting",
+          "score": 0.5973185867164781
+        },
+        {
+          "file": "msmp.md",
+          "heading": "Troubleshooting",
+          "score": 0.5849106591080331
+        },
+        {
+          "file": "ara.md",
+          "heading": "Troubleshooting",
+          "score": 0.5684059664655229
+        },
+        {
+          "file": "grc-overview.md",
+          "heading": "Troubleshooting",
+          "score": 0.568402066358612
+        }
+      ],
+      "procedureStepCount": 6,
+      "answer": "Compare the same query, filters, variables, and time range for the affected and a working user; an empty result alone does not prove an authorization denial. For ABAP BW, reproduce the query once as the affected user in RSRT or RSRT2. In RSECADMIN, enable that user's analysis-authorization log, rerun once, then inspect the final check result and rejected characteristic-value combination; an intermediate partial check may be superseded by final success. If it confirms a denial, compare the user's effective S_RS_AUTH assignments and analysis authorizations with the query provider's authorization-relevant values, correct only the proven gap, and retest. If it shows no denial, check query variables and filters, provider joins, and data-load results instead of widening access. This BW OLAP log is distinct from SU53 or the standard authorization trace; those tools do not replace it.",
+      "inventedGrcmsmp": false,
+      "sourcedMsmpOrBrfArtifacts": false
+    }
+  ]
+}

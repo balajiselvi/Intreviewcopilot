@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "parserVersion": "v22-bank-sanitize-20261102",
+  "chunkVersion": "v22-bank-sanitize-20261102",
+  "embeddingVersion": "Xenova/all-MiniLM-L6-v2",
+  "buildTimestamp": "2026-11-02T15:05:43.140Z",
+  "totalDocuments": 166,
+  "totalChunks": 3442,
+  "indexVersion": 2
+}

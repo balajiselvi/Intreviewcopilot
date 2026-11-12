@@ -1,0 +1,714 @@
+{
+  "generatedAt": "2026-10-29T16:34:54.663Z",
+  "mode": "deterministic-offline-path",
+  "cases": [
+    {
+      "id": "Q1",
+      "q": "How would you configure an MSMP access-request approval workflow using BRFplus in SAP GRC Access Control?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc",
+        "s4hana"
+      ],
+      "answerScope": "IMPLEMENTATION_WALKTHROUGH",
+      "questionTopic": "GRC",
+      "turnRoute": "GENERATION",
+      "turnReason": "well-formed-question-or-technical-issue",
+      "verifiedId": "grc-msmp-access-request-config",
+      "verifiedPresent": true,
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-pool",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 5,
+      "sourceTag": "procedure-pool",
+      "enrichment": {
+        "enriched": true,
+        "chunkIds": [
+          "chunk_d5e6973a5d4392424481caee69aeb75ee67414e7e96c527055662aff8843dd70",
+          "chunk_be2887194b256e08dd90bb8b71a738d54e3373cfbccb0ce161a0cbeb4ca528db",
+          "chunk_6c872e86422035032f10ea25ce89d74bb3284316bc6288a6b8e1040ff9ff06bb"
+        ],
+        "reason": "merged-same-heading-siblings"
+      },
+      "topEvidence": [
+        {
+          "id": "chunk_d5e6973a5d4392424481caee69aeb75ee67414e7e96c527055662aff8843dd70",
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "Configure an MSMP workflow for an access request",
+          "thin": true
+        },
+        {
+          "id": "chunk_be2887194b256e08dd90bb8b71a738d54e3373cfbccb0ce161a0cbeb4ca528db",
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "Configure an MSMP workflow for an access request",
+          "thin": false
+        },
+        {
+          "id": "chunk_6c872e86422035032f10ea25ce89d74bb3284316bc6288a6b8e1040ff9ff06bb",
+          "file": "msmp.md",
+          "folder": "grc",
+          "heading": "Configure an MSMP workflow for an access request",
+          "thin": false
+        },
+        {
+          "id": "chunk_80e67dbf647384cf99ee9e84da058370010e089259b6584fbfdef1495d3b9a4b",
+          "file": "deloitte-usi-specific-gap-fillers.md",
+          "folder": "grc",
+          "heading": "Q105: How do you troubleshoot ARM workflow requests in GRC Access Control that become stuck in 'In Process' status?",
+          "thin": false
+        }
+      ]
+    },
+    {
+      "id": "Q2",
+      "q": "How do you configure a BRFplus function and decision table for a business rule?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc",
+        "s4hana"
+      ],
+      "answerScope": "IMPLEMENTATION_WALKTHROUGH",
+      "questionTopic": "GRC",
+      "turnRoute": "GENERATION",
+      "turnReason": "well-formed-question-or-technical-issue",
+      "verifiedId": null,
+      "verifiedPresent": false,
+      "prefer": false,
+      "preferReason": "task-fit-msmp-scoped-brf",
+      "preferRoute": "GENERATION",
+      "stepCount": 0,
+      "sourceTag": "primary",
+      "enrichment": {
+        "enriched": false,
+        "chunkIds": [
+          "chunk_2d2d272bae8e5d754abee169d4da339da897f332698252cc13ffe578884deb78",
+          "chunk_c06bb7006f0118654844d379a6c0596f26d8bccbb8c63fcd46a7a88be6fc5de9",
+          "chunk_05062f25aec1b0c58780677c56a0ce8a7d5689b4412daf7e5866dbbb70a33f0f"
+        ],
+        "reason": "primary-unchanged"
+      },
+      "topEvidence": [
+        {
+          "id": "chunk_2d2d272bae8e5d754abee169d4da339da897f332698252cc13ffe578884deb78",
+          "file": "brf-plus.md",
+          "folder": "grc",
+          "heading": "Configure a BRFplus agent rule for MSMP",
+          "thin": true
+        },
+        {
+          "id": "chunk_c06bb7006f0118654844d379a6c0596f26d8bccbb8c63fcd46a7a88be6fc5de9",
+          "file": "brf-plus.md",
+          "folder": "grc",
+          "heading": "Configure a BRFplus agent rule for MSMP",
+          "thin": false
+        },
+        {
+          "id": "chunk_05062f25aec1b0c58780677c56a0ce8a7d5689b4412daf7e5866dbbb70a33f0f",
+          "file": "brf-plus.md",
+          "folder": "grc",
+          "heading": "Configure a BRFplus agent rule for MSMP",
+          "thin": false
+        },
+        {
+          "id": "chunk_4fab21013fc8adb5d48292753e752dfef2b8718f0ea51bec1078ce56029fb0b5",
+          "file": "brf-plus.md",
+          "folder": "grc",
+          "heading": "Configure a BRFplus initiator rule for MSMP",
+          "thin": false
+        }
+      ]
+    },
+    {
+      "id": "Q3",
+      "q": "A Fiori tile is visible, but the application fails for one business user. How would you diagnose the issue end to end?",
+      "topics": [
+        "Fiori"
+      ],
+      "folders": [
+        "fiori",
+        "s4hana",
+        "rise"
+      ],
+      "answerScope": "STAGE_INVESTIGATION",
+      "questionTopic": "Fiori",
+      "turnRoute": "GENERATION",
+      "turnReason": "well-formed-question-or-technical-issue",
+      "verifiedId": null,
+      "verifiedPresent": false,
+      "prefer": true,
+      "preferReason": "coherent-source-procedure",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 5,
+      "sourceTag": "primary",
+      "enrichment": {
+        "enriched": false,
+        "chunkIds": [
+          "chunk_97184ee3bcade88ddc6a390a487d536a027c901e67896e339b6d50d7b1db694b"
+        ],
+        "reason": "seed-body-sufficient"
+      },
+      "topEvidence": [
+        {
+          "id": "chunk_97184ee3bcade88ddc6a390a487d536a027c901e67896e339b6d50d7b1db694b",
+          "file": "fiori-frontend-security-architect-bank.md",
+          "folder": "fiori",
+          "heading": "Q1: How do you design front-end versus backend roles so tiles appear only when the user can execute?",
+          "thin": false
+        },
+        {
+          "id": "chunk_67e52cdc6892182360e2324f009a246d4b599de69ac6b1af428fff18e784e93e",
+          "file": "fiori-frontend-security-architect-bank.md",
+          "folder": "fiori",
+          "heading": "Q3: How do you troubleshoot missing tile versus application launch failure?",
+          "thin": false
+        },
+        {
+          "id": "chunk_5d97c68f89236c5a0afc127ba546a90302eaecdfa60ed0d9964f00e1dcd3daa9",
+          "file": "fiori-frontend-security-architect-bank.md",
+          "folder": "fiori",
+          "heading": "Q8: How do you handle key-user extensibility and custom tiles safely?",
+          "thin": false
+        },
+        {
+          "id": "chunk_7d94bc73c6562b3c93228e77f6b205d92e78cfdc626760c4cc5799a2e30a5291",
+          "file": "fiori-security.md",
+          "folder": "fiori",
+          "heading": "Troubleshoot a user who cannot access a Fiori app",
+          "thin": true
+        }
+      ]
+    },
+    {
+      "id": "Q4",
+      "q": "Explain the distinct responsibilities of IAS, IPS and SAP Cloud IAG, including how you would troubleshoot an identity-provisioning failure.",
+      "topics": [
+        "IAS",
+        "IPS",
+        "IAG"
+      ],
+      "folders": [
+        "btp",
+        "cloud",
+        "iag"
+      ],
+      "answerScope": "DEFAULT",
+      "questionTopic": "IAS",
+      "turnRoute": "GENERATION",
+      "turnReason": "well-formed-question-or-technical-issue",
+      "verifiedId": "iag-analysis-sync-troubleshooting",
+      "verifiedPresent": true,
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-pool",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 6,
+      "sourceTag": "procedure-pool",
+      "enrichment": {
+        "enriched": false,
+        "chunkIds": [
+          "chunk_70d4b3cb97edd198da90bba9f036b0c0bda2e86e9d87359f861988a7a52d9d8d"
+        ],
+        "reason": "seed-body-sufficient"
+      },
+      "topEvidence": [
+        {
+          "id": "chunk_83b7cfc9e9b4a0c52bc1643bddb6f99aef44cfc278d3ec7be44b6d3a15b81b38",
+          "file": "cloud-identity.md",
+          "folder": "btp",
+          "heading": "SAP Cloud Identity",
+          "thin": true
+        },
+        {
+          "id": "chunk_70d4b3cb97edd198da90bba9f036b0c0bda2e86e9d87359f861988a7a52d9d8d",
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "folder": "btp",
+          "heading": "SAP Cloud Identity Services — IAS & IPS Architecture",
+          "thin": false
+        },
+        {
+          "id": "chunk_5b417abe50155368e397518b2de1f294b3d5ef99364da4f73c1057f48f165528",
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "folder": "btp",
+          "heading": "Q8: How do you orchestrate identity lifecycle across SAP cloud and on-premises with Cloud Connector?",
+          "thin": false
+        },
+        {
+          "id": "chunk_834ca497eb4299cf926c93846d28b9b4453d1d5bf55dfdfc4e78b51059b6933d",
+          "file": "iag-cloud-identity-access-governance-architect-bank.md",
+          "folder": "iag",
+          "heading": "SAP IAG — Cloud Identity Access Governance Architecture",
+          "thin": false
+        }
+      ]
+    },
+    {
+      "id": "Q5",
+      "q": "How would you design least-privilege access for an SAP BTP application integrated with an enterprise identity provider?",
+      "topics": [
+        "BTP"
+      ],
+      "folders": [
+        "btp",
+        "cloud"
+      ],
+      "answerScope": "DEFAULT",
+      "questionTopic": "BTP",
+      "turnRoute": "GENERATION",
+      "turnReason": "well-formed-question-or-technical-issue",
+      "verifiedId": null,
+      "verifiedPresent": false,
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-pool",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 4,
+      "sourceTag": "procedure-pool",
+      "enrichment": {
+        "enriched": false,
+        "chunkIds": [
+          "chunk_c131d05928963ab310a3873ea90944a5eba2c27fd5d17bb304b9bffe765915da"
+        ],
+        "reason": "seed-body-sufficient"
+      },
+      "topEvidence": [
+        {
+          "id": "chunk_c131d05928963ab310a3873ea90944a5eba2c27fd5d17bb304b9bffe765915da",
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "folder": "btp",
+          "heading": "Q2: How do you design MFA and risk-based authentication in IAS for privileged SAP admins?",
+          "thin": false
+        },
+        {
+          "id": "chunk_7b026daee1d392d21afb03da2254e120044f008a71586121aa411c72f591221e",
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "folder": "btp",
+          "heading": "Q4: How do you write IPS transformations that implement joiner–mover–leaver without silent wrong-access?",
+          "thin": false
+        },
+        {
+          "id": "chunk_5b417abe50155368e397518b2de1f294b3d5ef99364da4f73c1057f48f165528",
+          "file": "ias-ips-cloud-identity-services-architect-bank.md",
+          "folder": "btp",
+          "heading": "Q8: How do you orchestrate identity lifecycle across SAP cloud and on-premises with Cloud Connector?",
+          "thin": false
+        },
+        {
+          "id": "chunk_1fec4c31b64afbf8e607b057b12502d38c34d7be2bdd373fe83bf966d2b9e092",
+          "file": "btp-security-architect-bank.md",
+          "folder": "btp",
+          "heading": "Q3: How do you design `xs-security.json` for a CAP or Node.js application on Cloud Foundry?",
+          "thin": false
+        }
+      ]
+    },
+    {
+      "id": "Q6",
+      "q": "How would you investigate and remediate an employee-data access issue caused by SuccessFactors role-based permissions?",
+      "topics": [
+        "SuccessFactors"
+      ],
+      "folders": [
+        "successfactors"
+      ],
+      "answerScope": "STAGE_INVESTIGATION",
+      "questionTopic": "SuccessFactors",
+      "turnRoute": "GENERATION",
+      "turnReason": "well-formed-question-or-technical-issue",
+      "verifiedId": "sf-rbp",
+      "verifiedPresent": true,
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-siblings",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 4,
+      "sourceTag": "sibling-merge",
+      "enrichment": {
+        "enriched": true,
+        "chunkIds": [
+          "chunk_9175d1ce1d78c3248440c8b2da6d659a723e2e4074c4ae96867e871ab59b5d26",
+          "chunk_449c8297e5263cf83cc9946459bf2c3f7714036fc11e101ab4f9bc359b3fa439",
+          "chunk_b33dc3f614fda9f558a74192b5b318431a195a72613a74a17ba7f42fd4f23079"
+        ],
+        "reason": "merged-same-heading-siblings"
+      },
+      "topEvidence": [
+        {
+          "id": "chunk_9175d1ce1d78c3248440c8b2da6d659a723e2e4074c4ae96867e871ab59b5d26",
+          "file": "successfactors-rbp-security-architect-bank.md",
+          "folder": "successfactors",
+          "heading": "Q1: How do you architect SuccessFactors RBP so permission roles, groups, and target populations stay correctly separated?",
+          "thin": false
+        },
+        {
+          "id": "chunk_449c8297e5263cf83cc9946459bf2c3f7714036fc11e101ab4f9bc359b3fa439",
+          "file": "successfactors-rbp-security-architect-bank.md",
+          "folder": "successfactors",
+          "heading": "Q1: How do you architect SuccessFactors RBP so permission roles, groups, and target populations stay correctly separated?",
+          "thin": false
+        },
+        {
+          "id": "chunk_b33dc3f614fda9f558a74192b5b318431a195a72613a74a17ba7f42fd4f23079",
+          "file": "successfactors-rbp-security-architect-bank.md",
+          "folder": "successfactors",
+          "heading": "Q1: How do you architect SuccessFactors RBP so permission roles, groups, and target populations stay correctly separated?",
+          "thin": false
+        },
+        {
+          "id": "chunk_0de0f0ed01edd8754b209af890c60f0b3f1d2be39653858bf2319001e1e48f6e",
+          "file": "successfactors-rbp-security-architect-bank.md",
+          "folder": "successfactors",
+          "heading": "Q2: How do you separate SuccessFactors administrators so suite admins cannot silently grant themselves Sensitive HR access?",
+          "thin": false
+        }
+      ]
+    },
+    {
+      "id": "Q7",
+      "q": "How would you design and troubleshoot joiner provisioning from SuccessFactors Employee Central into downstream SAP systems?",
+      "topics": [
+        "IPS",
+        "SuccessFactors"
+      ],
+      "folders": [
+        "btp",
+        "cloud",
+        "successfactors"
+      ],
+      "answerScope": "DEFAULT",
+      "questionTopic": "IPS",
+      "turnRoute": "GENERATION",
+      "turnReason": "well-formed-question-or-technical-issue",
+      "verifiedId": "sf-rbp-unavailable-troubleshooting",
+      "verifiedPresent": true,
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-siblings",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 4,
+      "sourceTag": "sibling-merge",
+      "enrichment": {
+        "enriched": true,
+        "chunkIds": [
+          "chunk_0124664327fc8d216e72d6def06d3de2b260a9a602d55cc8e5227b50531c56fd",
+          "chunk_29e7d075228fa31310709afdf9f29f5c7266cdbfbdff0e651ecfbda5f6942822",
+          "chunk_bb6c3bb57493fb9f133a22987cfb3c7d0752ea5766cecfa0871ba75b53b269ad"
+        ],
+        "reason": "merged-same-heading-siblings"
+      },
+      "topEvidence": [
+        {
+          "id": "chunk_0124664327fc8d216e72d6def06d3de2b260a9a602d55cc8e5227b50531c56fd",
+          "file": "successfactors-rbp-security-architect-bank.md",
+          "folder": "successfactors",
+          "heading": "Q4: How do you design joiner–mover–leaver so SF employment events revoke suite access and trigger downstream SAP deprovisioning?",
+          "thin": false
+        },
+        {
+          "id": "chunk_29e7d075228fa31310709afdf9f29f5c7266cdbfbdff0e651ecfbda5f6942822",
+          "file": "successfactors-rbp-security-architect-bank.md",
+          "folder": "successfactors",
+          "heading": "Q4: How do you design joiner–mover–leaver so SF employment events revoke suite access and trigger downstream SAP deprovisioning?",
+          "thin": false
+        },
+        {
+          "id": "chunk_bb6c3bb57493fb9f133a22987cfb3c7d0752ea5766cecfa0871ba75b53b269ad",
+          "file": "successfactors-rbp-security-architect-bank.md",
+          "folder": "successfactors",
+          "heading": "Q4: How do you design joiner–mover–leaver so SF employment events revoke suite access and trigger downstream SAP deprovisioning?",
+          "thin": false
+        },
+        {
+          "id": "chunk_27bbbbb707d637d44d53c736d86bfcb78f5ba484af3d54ca76b600d6036c9e0f",
+          "file": "successfactors-rbp-security-architect-bank.md",
+          "folder": "successfactors",
+          "heading": "Q3: How do you secure Employee Central field-level and effective-dated data for HRBP versus employee self-service?",
+          "thin": true
+        }
+      ]
+    },
+    {
+      "id": "Q8",
+      "q": "How would you assess and remediate segregation-of-duties risks across a large SAP landscape without disrupting critical business operations?",
+      "topics": [],
+      "folders": [],
+      "answerScope": "DEFAULT",
+      "questionTopic": "General",
+      "turnRoute": "GENERATION",
+      "turnReason": "well-formed-question-or-technical-issue",
+      "verifiedId": null,
+      "verifiedPresent": false,
+      "prefer": false,
+      "preferReason": "no-procedure-intent",
+      "preferRoute": "GENERATION",
+      "stepCount": 0,
+      "sourceTag": null,
+      "enrichment": null,
+      "topEvidence": [
+        {
+          "id": "chunk_0cbd3d5d91c685a8a85384df13162da355ffce7b7798fa81a12f149dc3bbcf1f",
+          "file": "grc-principal-architect-interview-bank.md",
+          "folder": "grc",
+          "heading": "Q37: How do you handle conflict between Business Process Owners who resist remediating critical SoD risks?",
+          "thin": false
+        },
+        {
+          "id": "chunk_b2a20c58c1d75e6a6f9003016c8150dea067c4d2c14b6d2593ca594540e184eb",
+          "file": "grc-scenarios-greenfield-brownfield.md",
+          "folder": "grc",
+          "heading": "Q61: During a Brownfield project, legacy user accounts have massive accumulated roles containing broad S_TABU_DIS values (&NC&). How do you remediate without breaking operations?",
+          "thin": false
+        },
+        {
+          "id": "chunk_2bc57d97d7cd779d1f336fe6c9e830fe7a4558edcad20456ee422d5447f66e00",
+          "file": "security-workstream-e2e-architect-bank.md",
+          "folder": "project-types",
+          "heading": "Q1: How do you assess the current security landscape and business requirements at program start?",
+          "thin": false
+        },
+        {
+          "id": "chunk_330547de10d4bbbff9fe7149c57d5050b91cd6285117960a230e8e70c6a2a8f1",
+          "file": "consulting-leadership-interview-architect-bank.md",
+          "folder": "behavioral",
+          "heading": "Q6: How do you escalate risks without losing delivery focus?",
+          "thin": false
+        }
+      ]
+    },
+    {
+      "id": "Q9",
+      "q": "How would you lead an SAP GRC Access Control implementation for a large enterprise from requirements workshops through production hypercare?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc",
+        "hypercare"
+      ],
+      "answerScope": "IMPLEMENTATION_WALKTHROUGH",
+      "questionTopic": "GRC",
+      "turnRoute": "GENERATION",
+      "turnReason": "well-formed-question-or-technical-issue",
+      "verifiedId": null,
+      "verifiedPresent": false,
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-siblings",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 4,
+      "sourceTag": "sibling-merge",
+      "enrichment": {
+        "enriched": true,
+        "chunkIds": [
+          "chunk_d2987d176cbd4d54ff0558b69108cb3ac6a00932de25435210cafa4b6a834c1a",
+          "chunk_086b1ef96158d9923a09df256bd43f7132a6dd9631a6dd638795fe86dd32e9f5"
+        ],
+        "reason": "merged-same-heading-siblings"
+      },
+      "topEvidence": [
+        {
+          "id": "chunk_d2987d176cbd4d54ff0558b69108cb3ac6a00932de25435210cafa4b6a834c1a",
+          "file": "process-control.md",
+          "folder": "grc",
+          "heading": "Move a Process Control change through development quality and production",
+          "thin": true
+        },
+        {
+          "id": "chunk_086b1ef96158d9923a09df256bd43f7132a6dd9631a6dd638795fe86dd32e9f5",
+          "file": "process-control.md",
+          "folder": "grc",
+          "heading": "Move a Process Control change through development quality and production",
+          "thin": false
+        },
+        {
+          "id": "chunk_6a1aaf2cb9e49908fc10864d4d0943ddef4ded647fe8d91ddf489ddd776a85dd",
+          "file": "arm.md",
+          "folder": "grc",
+          "heading": "Design access request from submission through target provisioning",
+          "thin": false
+        },
+        {
+          "id": "chunk_c37f9a01e35e713ce9a916bb4caab6eb2fd74c90cf2f84cbe77a71f9564d693e",
+          "file": "grc-principal-architect-interview-bank.md",
+          "folder": "grc",
+          "heading": "Q1: How do you align SAP Security and GRC Access Control strategy with enterprise-wide Zero Trust Architecture (ZTA)?",
+          "thin": false
+        }
+      ]
+    },
+    {
+      "id": "Q10",
+      "q": "How would you plan an SAP GRC Access Control upgrade, including release-specific impacts, remediation, regression testing and rollback or recovery?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "answerScope": "DEFAULT",
+      "questionTopic": "GRC",
+      "turnRoute": "GENERATION",
+      "turnReason": "well-formed-question-or-technical-issue",
+      "verifiedId": null,
+      "verifiedPresent": false,
+      "prefer": false,
+      "preferReason": "insufficient-steps",
+      "preferRoute": "GENERATION",
+      "stepCount": 0,
+      "sourceTag": "primary",
+      "enrichment": null,
+      "topEvidence": [
+        {
+          "id": "chunk_80e67dbf647384cf99ee9e84da058370010e089259b6584fbfdef1495d3b9a4b",
+          "file": "deloitte-usi-specific-gap-fillers.md",
+          "folder": "grc",
+          "heading": "Q105: How do you troubleshoot ARM workflow requests in GRC Access Control that become stuck in 'In Process' status?",
+          "thin": false
+        },
+        {
+          "id": "chunk_f82f8b6b308a5c57f0a64a2d18c8f0f7c46f833ee8f002b7c99e98af82ed08b1",
+          "file": "process-control.md",
+          "folder": "grc",
+          "heading": "Access Control and Process Control",
+          "thin": true
+        },
+        {
+          "id": "chunk_c1312a81b5564cdddc32c6433088c59085116a84ddba43726ea039bb4c133095",
+          "file": "process-control.md",
+          "folder": "grc",
+          "heading": "Access Control and Process Control",
+          "thin": false
+        },
+        {
+          "id": "chunk_0055a7efab4b2d3086864c8119b498b0a6dc3d7cbafaf899d0d07b50df3046c5",
+          "file": "process-control.md",
+          "folder": "grc",
+          "heading": "Access Control and Process Control",
+          "thin": true
+        }
+      ]
+    },
+    {
+      "id": "Q11",
+      "q": "How would you lead the SAP Security and GRC workstream for an S/4HANA transformation on RISE with SAP, including SAP Activate alignment, cutover, go/no-go and hypercare?",
+      "topics": [
+        "GRC",
+        "S/4",
+        "RISE",
+        "Activate"
+      ],
+      "folders": [
+        "grc",
+        "s4hana",
+        "fiori",
+        "security",
+        "rise",
+        "project-management",
+        "cutover",
+        "hypercare"
+      ],
+      "answerScope": "IMPLEMENTATION_WALKTHROUGH",
+      "questionTopic": "GRC",
+      "turnRoute": "GENERATION",
+      "turnReason": "well-formed-question-or-technical-issue",
+      "verifiedId": null,
+      "verifiedPresent": false,
+      "prefer": true,
+      "preferReason": "coherent-source-procedure-from-pool",
+      "preferRoute": "RETRIEVED_PROCEDURE",
+      "stepCount": 5,
+      "sourceTag": "procedure-pool",
+      "enrichment": {
+        "enriched": false,
+        "chunkIds": [
+          "chunk_3dfc7cea52cfafaefb8ca6c52f7e08d9a1f7c6e14c3608b9ca088f654dab7f1c"
+        ],
+        "reason": "seed-body-sufficient"
+      },
+      "topEvidence": [
+        {
+          "id": "chunk_3dfc7cea52cfafaefb8ca6c52f7e08d9a1f7c6e14c3608b9ca088f654dab7f1c",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "folder": "rise",
+          "heading": "RISE with SAP & Cloud Transformation — Security Architecture",
+          "thin": false
+        },
+        {
+          "id": "chunk_0213c368f4cb46d64b614b8c46e8d51837e799bd2ba18f32861e5ae078234af9",
+          "file": "sap-activate-methodology-architect-bank.md",
+          "folder": "project-management",
+          "heading": "Q7: How do you distinguish SAP Activate quality gates from RISE transformation gates without mixing terms?",
+          "thin": false
+        },
+        {
+          "id": "chunk_052b07062604f699fad3951ddf97dcf0788dc231ce2a654a774d87f69a6c2d41",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "folder": "rise",
+          "heading": "Q1: How do you explain RISE versus Activate in a security-architect interview?",
+          "thin": false
+        },
+        {
+          "id": "chunk_f4aedb7e54a24f428869700c73eabe2860939bd392b062284e980a5a719d412a",
+          "file": "rise-with-sap-security-transformation-architect-bank.md",
+          "folder": "rise",
+          "heading": "Q7: How do you plan test, cutover, and operational readiness for security on RISE?",
+          "thin": false
+        }
+      ]
+    },
+    {
+      "id": "Q12",
+      "q": "How would you estimate, staff and govern a multi-location SAP Security and GRC engagement while managing scope, delivery risk, audit expectations and stakeholder commitments?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc",
+        "audit",
+        "compliance"
+      ],
+      "answerScope": "DEFAULT",
+      "questionTopic": "GRC",
+      "turnRoute": "GENERATION",
+      "turnReason": "well-formed-question-or-technical-issue",
+      "verifiedId": null,
+      "verifiedPresent": false,
+      "prefer": false,
+      "preferReason": "no-procedure-intent",
+      "preferRoute": "GENERATION",
+      "stepCount": 0,
+      "sourceTag": null,
+      "enrichment": null,
+      "topEvidence": [
+        {
+          "id": "chunk_29a70a346f319d93695907b1303f55debb1fa2c54876055ade631b4d39a0db18",
+          "file": "governance-risk-audit-sap-security-architect-bank.md",
+          "folder": "compliance",
+          "heading": "Governance, Risk, Compliance & Audit — SAP Security Architecture",
+          "thin": false
+        },
+        {
+          "id": "chunk_a6dac0ad7a366c19e3975f0178afff9fb2158e698a97d96107eb1a6d02e6bb03",
+          "file": "governance-risk-audit-sap-security-architect-bank.md",
+          "folder": "compliance",
+          "heading": "Q5: How do you govern emergency / privileged access for audit?",
+          "thin": false
+        },
+        {
+          "id": "chunk_144105bc6d50225d8843d814196627d7fa3fcd58005949559a0ba77d80737423",
+          "file": "governance-risk-audit-sap-security-architect-bank.md",
+          "folder": "compliance",
+          "heading": "Q1: How do you design SoD and critical-access risk management operating model?",
+          "thin": false
+        },
+        {
+          "id": "chunk_452667d37a45564abeade1c52abd91d453a388878f861d2ce1853488af6cc3b8",
+          "file": "governance-risk-audit-sap-security-architect-bank.md",
+          "folder": "compliance",
+          "heading": "Q2: How do SAP security controls map to SOX ITGCs without overclaiming?",
+          "thin": false
+        }
+      ]
+    }
+  ]
+}

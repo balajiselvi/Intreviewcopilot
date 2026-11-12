@@ -1,0 +1,626 @@
+{
+  "activeIndex": {
+    "chunks": 3428,
+    "mtime": "2026-10-26T16:00:51.885Z"
+  },
+  "questions": [
+    {
+      "question": "Difference between centralized and decentralized FF ID?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "intent": "DIRECT_QUESTION",
+      "topic": "GRC",
+      "answerScope": "DEFAULT",
+      "turnRoute": "GENERATION",
+      "turnScriptId": null,
+      "preparedId": null,
+      "verifiedId": null,
+      "retrievalCount": 6,
+      "q109Rank": 1,
+      "top8": [
+        {
+          "rank": 1,
+          "id": "chunk_8ee61d36b164e89fc810334a33abb8f2ccae37043700505b719ccdb7e5e69be3",
+          "sourceFile": "deloitte-usi-specific-gap-fillers.md",
+          "sourceFolder": "grc",
+          "heading": "Q109: How do you configure and secure central vs. decentralized Emergency Access Management (EAM / Firefighting)?",
+          "score": 0.4562,
+          "semantic": 0.3405,
+          "lexical": 9,
+          "isQ109": true
+        },
+        {
+          "rank": 2,
+          "id": "chunk_6ef944eb19a951947ee99e82458897e5b0ef28e04745a69d051a9e2710ba4347",
+          "sourceFile": "firefighter.md",
+          "sourceFolder": "grc",
+          "heading": "Red Flags",
+          "score": 0.4489,
+          "semantic": 0.3223,
+          "lexical": 9,
+          "isQ109": false
+        },
+        {
+          "rank": 3,
+          "id": "chunk_6161381b0b41202eb3c931d07797a2b4346f5b0c8b6533b729dc5474dc0e6a1f",
+          "sourceFile": "deloitte-usi-specific-gap-fillers.md",
+          "sourceFolder": "grc",
+          "heading": "Q119: What is the difference between direct user assignment and indirect user assignment via Organizational Management (OM / `PPOME`) in SAP?",
+          "score": 0.4398,
+          "semantic": 0.2995,
+          "lexical": 9,
+          "isQ109": false
+        },
+        {
+          "rank": 4,
+          "id": "chunk_9a444bc9f0d2ec9c47fa4793e54c4517eca8592b345e68f0ca2f8b4062d26b77",
+          "sourceFile": "deloitte-usi-specific-gap-fillers.md",
+          "sourceFolder": "grc",
+          "heading": "Q111: What is the difference between authorization check indicators in `SU24`: `Check`, `Do Not Check`, `Check/Maintain`, and `No`?",
+          "score": 0.4235,
+          "semantic": 0.2589,
+          "lexical": 9,
+          "isQ109": false
+        },
+        {
+          "rank": 5,
+          "id": "chunk_0da873e9d92ac2533ac786bd0b5d9d65369cc4f86bd4c79e66b8f55294e95fe2",
+          "sourceFile": "firefighter.md",
+          "sourceFolder": "grc",
+          "heading": "60 Second Interview Answer",
+          "score": 0.423,
+          "semantic": 0.3575,
+          "lexical": 6,
+          "isQ109": false
+        },
+        {
+          "rank": 6,
+          "id": "chunk_3a48c229a0e3e04f0b0a1d3ad37cea67e97143ccfe8b03a28d492e1e727fc7f8",
+          "sourceFile": "firefighter.md",
+          "sourceFolder": "grc",
+          "heading": "30 Second Interview Answer",
+          "score": 0.4228,
+          "semantic": 0.357,
+          "lexical": 6,
+          "isQ109": false
+        }
+      ],
+      "procedurePrefer": {
+        "prefer": false,
+        "reason": "no-procedure-intent"
+      },
+      "safeMode": {
+        "served": true,
+        "route": "CONCEPTUAL_KNOWLEDGE",
+        "reason": "conceptual-from-supporting-knowledge",
+        "scriptId": null,
+        "answerPreview": "Operationally, Firefighter starts at GRAC_SPM. A support engineer sees the Firefighter IDs they're assigned to, selects one relevant to the "
+      }
+    },
+    {
+      "question": "Difference between centralized and decentralized Firefighter ID?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "intent": "DIRECT_QUESTION",
+      "topic": "GRC",
+      "answerScope": "DEFAULT",
+      "turnRoute": "GENERATION",
+      "turnScriptId": null,
+      "preparedId": null,
+      "verifiedId": null,
+      "retrievalCount": 5,
+      "q109Rank": 5,
+      "top8": [
+        {
+          "rank": 1,
+          "id": "chunk_0da873e9d92ac2533ac786bd0b5d9d65369cc4f86bd4c79e66b8f55294e95fe2",
+          "sourceFile": "firefighter.md",
+          "sourceFolder": "grc",
+          "heading": "60 Second Interview Answer",
+          "score": 0.5443,
+          "semantic": 0.6108,
+          "lexical": 9,
+          "isQ109": false
+        },
+        {
+          "rank": 2,
+          "id": "chunk_6ef944eb19a951947ee99e82458897e5b0ef28e04745a69d051a9e2710ba4347",
+          "sourceFile": "firefighter.md",
+          "sourceFolder": "grc",
+          "heading": "Red Flags",
+          "score": 0.5412,
+          "semantic": 0.5197,
+          "lexical": 12,
+          "isQ109": false
+        },
+        {
+          "rank": 3,
+          "id": "chunk_3a48c229a0e3e04f0b0a1d3ad37cea67e97143ccfe8b03a28d492e1e727fc7f8",
+          "sourceFile": "firefighter.md",
+          "sourceFolder": "grc",
+          "heading": "30 Second Interview Answer",
+          "score": 0.5332,
+          "semantic": 0.5829,
+          "lexical": 9,
+          "isQ109": false
+        },
+        {
+          "rank": 4,
+          "id": "chunk_43eec4e407d6aaed1ef31b4f885ca4e7f2f120c7ff50102f283fcce9aba4f8bf",
+          "sourceFile": "firefighter.md",
+          "sourceFolder": "grc",
+          "heading": "90 Second Interview Answer",
+          "score": 0.5163,
+          "semantic": 0.5407,
+          "lexical": 9,
+          "isQ109": false
+        },
+        {
+          "rank": 5,
+          "id": "chunk_8ee61d36b164e89fc810334a33abb8f2ccae37043700505b719ccdb7e5e69be3",
+          "sourceFile": "deloitte-usi-specific-gap-fillers.md",
+          "sourceFolder": "grc",
+          "heading": "Q109: How do you configure and secure central vs. decentralized Emergency Access Management (EAM / Firefighting)?",
+          "score": 0.5128,
+          "semantic": 0.4486,
+          "lexical": 12,
+          "isQ109": true
+        }
+      ],
+      "procedurePrefer": {
+        "prefer": false,
+        "reason": "no-procedure-intent"
+      },
+      "safeMode": {
+        "served": true,
+        "route": "CONCEPTUAL_KNOWLEDGE",
+        "reason": "conceptual-from-supporting-knowledge",
+        "scriptId": null,
+        "answerPreview": "Operationally, Firefighter starts at GRAC_SPM. A support engineer sees the Firefighter IDs they're assigned to, selects one relevant to the "
+      }
+    },
+    {
+      "question": "Explain centralized Firefighter architecture in SAP GRC.",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "intent": "REQUEST_FOR_ARCHITECTURE",
+      "topic": "GRC",
+      "answerScope": "DEFAULT",
+      "turnRoute": "PREPARED_SCRIPT",
+      "turnScriptId": "eam",
+      "preparedId": "eam",
+      "verifiedId": null,
+      "retrievalCount": 7,
+      "q109Rank": null,
+      "top8": [
+        {
+          "rank": 1,
+          "id": "chunk_04bfa6f13d41ff0b1639f9efbfb6572fbe01389b95075bf3d080a2b508ec7e06",
+          "sourceFile": "grc-overview.md",
+          "sourceFolder": "grc",
+          "heading": "Red Flags",
+          "score": 0.5467,
+          "semantic": 0.6166,
+          "lexical": 9,
+          "isQ109": false
+        },
+        {
+          "rank": 2,
+          "id": "chunk_5f480eddcf423dec4a6bc688b2b8bf86fa22e11e3b599acffefc081760a035af",
+          "sourceFile": "firefighter.md",
+          "sourceFolder": "grc",
+          "heading": "Architecture",
+          "score": 0.5203,
+          "semantic": 0.634,
+          "lexical": 6,
+          "isQ109": false
+        },
+        {
+          "rank": 3,
+          "id": "chunk_de6f209f2a7842a5f2d2ca699f9829f188289f9b9af580aeb8f7a47c4d5612cf",
+          "sourceFile": "connectors.md",
+          "sourceFolder": "grc",
+          "heading": "60 Second Interview Answer",
+          "score": 0.5076,
+          "semantic": 0.6024,
+          "lexical": 6,
+          "isQ109": false
+        },
+        {
+          "rank": 4,
+          "id": "chunk_659f14f8f913fee3ebfb35fde4c76039c040cd0d5a2cde4ad752cfcdf86e0fed",
+          "sourceFile": "grc-overview.md",
+          "sourceFolder": "grc",
+          "heading": "30 Second Interview Answer",
+          "score": 0.5022,
+          "semantic": 0.5888,
+          "lexical": 6,
+          "isQ109": false
+        },
+        {
+          "rank": 5,
+          "id": "chunk_f95d040ba9a7e6e9e996fe9d251fddf4a250a0053b7a9098d032ba57b6499b1c",
+          "sourceFile": "grc-overview.md",
+          "sourceFolder": "grc",
+          "heading": "Configuration",
+          "score": 0.5019,
+          "semantic": 0.6713,
+          "lexical": 3,
+          "isQ109": false
+        },
+        {
+          "rank": 6,
+          "id": "chunk_5cfccd052393c9ecbd93f63ac2686fe9da5fd1cb3ceeb4e2f284723658abed4c",
+          "sourceFile": "firefighter.md",
+          "sourceFolder": "grc",
+          "heading": "Overview",
+          "score": 0.496,
+          "semantic": 0.6566,
+          "lexical": 3,
+          "isQ109": false
+        },
+        {
+          "rank": 7,
+          "id": "chunk_686f221b4c5c58d81fecfd2b3b5eb385dd0dbc9e072a5e19d38508da447c9f61",
+          "sourceFile": "grc-overview.md",
+          "sourceFolder": "grc",
+          "heading": "60 Second Interview Answer",
+          "score": 0.4869,
+          "semantic": 0.5506,
+          "lexical": 6,
+          "isQ109": false
+        }
+      ],
+      "procedurePrefer": {
+        "prefer": false,
+        "reason": "no-procedure-intent"
+      },
+      "safeMode": {
+        "served": true,
+        "route": "CONCEPTUAL_KNOWLEDGE",
+        "reason": "conceptual-from-supporting-knowledge",
+        "scriptId": null,
+        "answerPreview": "SAP GRC Access Control is the governance layer on top of standard SAP security. Instead of an administrator directly assigning roles in PFCG"
+      }
+    },
+    {
+      "question": "Explain decentralized Firefighter architecture.",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "intent": "REQUEST_FOR_ARCHITECTURE",
+      "topic": "GRC",
+      "answerScope": "DEFAULT",
+      "turnRoute": "PREPARED_SCRIPT",
+      "turnScriptId": "eam",
+      "preparedId": "eam",
+      "verifiedId": null,
+      "retrievalCount": 7,
+      "q109Rank": 3,
+      "top8": [
+        {
+          "rank": 1,
+          "id": "chunk_db9fed254a68b3a4f475432eee3c673a8856b53321bc4facbbd9dbef93b73c68",
+          "sourceFile": "eam.md",
+          "sourceFolder": "grc",
+          "heading": "What Makes This a 10/10 Answer",
+          "score": 0.4995,
+          "semantic": 0.4987,
+          "lexical": 6,
+          "isQ109": false
+        },
+        {
+          "rank": 2,
+          "id": "chunk_c75ea382aadaa235429045eeb6f3e32a2b50d61b26f2a2383b8699fd1e9d6c3b",
+          "sourceFile": "eam.md",
+          "sourceFolder": "grc",
+          "heading": "Implementation Activities",
+          "score": 0.4765,
+          "semantic": 0.5662,
+          "lexical": 3,
+          "isQ109": false
+        },
+        {
+          "rank": 3,
+          "id": "chunk_8ee61d36b164e89fc810334a33abb8f2ccae37043700505b719ccdb7e5e69be3",
+          "sourceFile": "deloitte-usi-specific-gap-fillers.md",
+          "sourceFolder": "grc",
+          "heading": "Q109: How do you configure and secure central vs. decentralized Emergency Access Management (EAM / Firefighting)?",
+          "score": 0.4704,
+          "semantic": 0.4259,
+          "lexical": 6,
+          "isQ109": true
+        },
+        {
+          "rank": 4,
+          "id": "chunk_4abe85fc639f1c524637d73917a25eb11c29a019280b028752d1e6c9bcb7205d",
+          "sourceFile": "grc-overview.md",
+          "sourceFolder": "grc",
+          "heading": "Implementation Activities",
+          "score": 0.4613,
+          "semantic": 0.5282,
+          "lexical": 3,
+          "isQ109": false
+        },
+        {
+          "rank": 5,
+          "id": "chunk_5f480eddcf423dec4a6bc688b2b8bf86fa22e11e3b599acffefc081760a035af",
+          "sourceFile": "firefighter.md",
+          "sourceFolder": "grc",
+          "heading": "Architecture",
+          "score": 0.4612,
+          "semantic": 0.5279,
+          "lexical": 3,
+          "isQ109": false
+        },
+        {
+          "rank": 6,
+          "id": "chunk_5cfccd052393c9ecbd93f63ac2686fe9da5fd1cb3ceeb4e2f284723658abed4c",
+          "sourceFile": "firefighter.md",
+          "sourceFolder": "grc",
+          "heading": "Overview",
+          "score": 0.4606,
+          "semantic": 0.5265,
+          "lexical": 3,
+          "isQ109": false
+        },
+        {
+          "rank": 7,
+          "id": "chunk_ce4076cb3333452130b5dac45fa8409869e893d4d33e4dd020ec5c50050eaf2c",
+          "sourceFile": "eam.md",
+          "sourceFolder": "grc",
+          "heading": "Architecture",
+          "score": 0.4549,
+          "semantic": 0.5121,
+          "lexical": 3,
+          "isQ109": false
+        }
+      ],
+      "procedurePrefer": {
+        "prefer": false,
+        "reason": "no-procedure-intent"
+      },
+      "safeMode": {
+        "served": true,
+        "route": "CONCEPTUAL_KNOWLEDGE",
+        "reason": "conceptual-from-supporting-knowledge",
+        "scriptId": null,
+        "answerPreview": "This covers how Firefighter actually gets used day to day — the GRAC_SPM login flow, ID versus role-based Firefighter, and the practical rea"
+      }
+    },
+    {
+      "question": "What happens when the central GRC system is unavailable?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "intent": "DIRECT_QUESTION",
+      "topic": "GRC",
+      "answerScope": "DEFAULT",
+      "turnRoute": "GENERATION",
+      "turnScriptId": null,
+      "preparedId": null,
+      "verifiedId": null,
+      "retrievalCount": 5,
+      "q109Rank": 3,
+      "top8": [
+        {
+          "rank": 1,
+          "id": "chunk_e504c2a25113f2fa5ba3db49f5fc8646124bbd1bd545d0b6adb9cc1715c34e47",
+          "sourceFile": "grc-principal-architect-interview-bank.md",
+          "sourceFolder": "grc",
+          "heading": "Q24: What is the function of GRC Connector Groups and how do they impact risk analysis performance?",
+          "score": 0.5147,
+          "semantic": 0.4744,
+          "lexical": 15,
+          "isQ109": false
+        },
+        {
+          "rank": 2,
+          "id": "chunk_8bf41a521dca0e14a9e4044625714d02205d8e2196fdd01576bd45207cd0b72e",
+          "sourceFile": "repository-sync.md",
+          "sourceFolder": "grc",
+          "heading": "30 Second Interview Answer",
+          "score": 0.5109,
+          "semantic": 0.4648,
+          "lexical": 15,
+          "isQ109": false
+        },
+        {
+          "rank": 3,
+          "id": "chunk_8ee61d36b164e89fc810334a33abb8f2ccae37043700505b719ccdb7e5e69be3",
+          "sourceFile": "deloitte-usi-specific-gap-fillers.md",
+          "sourceFolder": "grc",
+          "heading": "Q109: How do you configure and secure central vs. decentralized Emergency Access Management (EAM / Firefighting)?",
+          "score": 0.5102,
+          "semantic": 0.5255,
+          "lexical": 12,
+          "isQ109": true
+        },
+        {
+          "rank": 4,
+          "id": "chunk_99d79bbea0cd58fc56dec16dd72779e201068000b1e732cfe00e5f7054620251",
+          "sourceFile": "connectors.md",
+          "sourceFolder": "grc",
+          "heading": "Best Practices",
+          "score": 0.4931,
+          "semantic": 0.4202,
+          "lexical": 15,
+          "isQ109": false
+        },
+        {
+          "rank": 5,
+          "id": "chunk_80aea69fcb74ab5187254127516061a198f8626cb383581f5bb4dc710dd536e5",
+          "sourceFile": "grc-overview.md",
+          "sourceFolder": "grc",
+          "heading": "60 Second Interview Answer",
+          "score": 0.4883,
+          "semantic": 0.4708,
+          "lexical": 12,
+          "isQ109": false
+        }
+      ],
+      "procedurePrefer": {
+        "prefer": false,
+        "reason": "no-procedure-intent"
+      },
+      "safeMode": {
+        "served": true,
+        "route": "CONCEPTUAL_KNOWLEDGE",
+        "reason": "conceptual-from-supporting-knowledge",
+        "scriptId": null,
+        "answerPreview": "Repository Sync pulls role information from a target system into GRC's own repository — role names, descriptions, what authorization content"
+      }
+    },
+    {
+      "question": "What is the difference between centralized and decentralized EAM?",
+      "topics": [
+        "GRC"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "intent": "DIRECT_QUESTION",
+      "topic": "GRC",
+      "answerScope": "DEFAULT",
+      "turnRoute": "GENERATION",
+      "turnScriptId": null,
+      "preparedId": null,
+      "verifiedId": null,
+      "retrievalCount": 4,
+      "q109Rank": 1,
+      "top8": [
+        {
+          "rank": 1,
+          "id": "chunk_8ee61d36b164e89fc810334a33abb8f2ccae37043700505b719ccdb7e5e69be3",
+          "sourceFile": "deloitte-usi-specific-gap-fillers.md",
+          "sourceFolder": "grc",
+          "heading": "Q109: How do you configure and secure central vs. decentralized Emergency Access Management (EAM / Firefighting)?",
+          "score": 0.4843,
+          "semantic": 0.3984,
+          "lexical": 15,
+          "isQ109": true
+        },
+        {
+          "rank": 2,
+          "id": "chunk_6ef944eb19a951947ee99e82458897e5b0ef28e04745a69d051a9e2710ba4347",
+          "sourceFile": "firefighter.md",
+          "sourceFolder": "grc",
+          "heading": "Red Flags",
+          "score": 0.4444,
+          "semantic": 0.2985,
+          "lexical": 15,
+          "isQ109": false
+        },
+        {
+          "rank": 3,
+          "id": "chunk_9a444bc9f0d2ec9c47fa4793e54c4517eca8592b345e68f0ca2f8b4062d26b77",
+          "sourceFile": "deloitte-usi-specific-gap-fillers.md",
+          "sourceFolder": "grc",
+          "heading": "Q111: What is the difference between authorization check indicators in `SU24`: `Check`, `Do Not Check`, `Check/Maintain`, and `No`?",
+          "score": 0.4247,
+          "semantic": 0.2492,
+          "lexical": 15,
+          "isQ109": false
+        },
+        {
+          "rank": 4,
+          "id": "chunk_77a7f02788837a0b1bcc9720beb1f1762531cf76ab2f4f1491bee8f49e91f889",
+          "sourceFile": "deloitte-usi-specific-gap-fillers.md",
+          "sourceFolder": "grc",
+          "heading": "Q108: What is the technical difference between standard user types in SAP (`Dialog`, `System`, `Communication`, `Service`, `Reference`) and how do you secure them?",
+          "score": 0.4242,
+          "semantic": 0.2481,
+          "lexical": 15,
+          "isQ109": false
+        }
+      ],
+      "procedurePrefer": {
+        "prefer": false,
+        "reason": "no-procedure-intent"
+      },
+      "safeMode": {
+        "served": true,
+        "route": "CONCEPTUAL_KNOWLEDGE",
+        "reason": "conceptual-from-supporting-knowledge",
+        "scriptId": null,
+        "answerPreview": "Decision: Deploy Centralized EAM for unified administration and log consolidation, with Decentralized EAM as a failover backup for emergency"
+      }
+    }
+  ],
+  "boundaries": [
+    {
+      "question": "How do you debug an ABAP dump in ST22?",
+      "topics": [],
+      "folders": [],
+      "topic": "General",
+      "verifiedId": null,
+      "namesFirefighterLane": false
+    },
+    {
+      "question": "What does FF mean in a football formation?",
+      "topics": [],
+      "folders": [],
+      "topic": "General",
+      "verifiedId": null,
+      "namesFirefighterLane": false
+    },
+    {
+      "question": "How do you design BW/4HANA Analysis Authorizations in RSECADMIN?",
+      "topics": [
+        "BW"
+      ],
+      "folders": [
+        "bw"
+      ],
+      "topic": "BW",
+      "verifiedId": "bw4-analysis-authorizations",
+      "namesFirefighterLane": false
+    },
+    {
+      "question": "What is the difference between S/4HANA and BW/4HANA role design?",
+      "topics": [
+        "S/4",
+        "BW"
+      ],
+      "folders": [
+        "s4hana",
+        "fiori",
+        "security",
+        "bw"
+      ],
+      "topic": "S/4",
+      "verifiedId": "s4-vs-bw-role-design",
+      "namesFirefighterLane": false
+    },
+    {
+      "question": "How do you configure SAP GRC Process Control continuous control monitoring?",
+      "topics": [
+        "Process Control"
+      ],
+      "folders": [
+        "grc"
+      ],
+      "topic": "Process Control",
+      "verifiedId": null,
+      "namesFirefighterLane": false
+    }
+  ]
+}

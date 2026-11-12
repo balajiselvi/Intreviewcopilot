@@ -1,0 +1,99 @@
+{
+  "at": "2026-11-03T06:17:30.194Z",
+  "cases": {
+    "mock": {
+      "ok": true,
+      "liveTransportInvocations": 0,
+      "mockInvocations": 1,
+      "mockOpenaiCalls": 0,
+      "generation": {
+        "finish_reason": null,
+        "maxTokens": 2048,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "contentQualityFlags": [
+          "answer_kind:validated"
+        ],
+        "strippedEntityCount": 0,
+        "firstTokenMs": 1053,
+        "streamEndMs": 1056,
+        "procedurePrefer": {
+          "prefer": false,
+          "reason": "no-procedure-intent",
+          "wrapMode": null,
+          "stepCount": 0,
+          "sourceTag": null,
+          "workflowBackboneAsk": false,
+          "retrievalGap": null,
+          "enrichmentReason": null,
+          "taskFit": null,
+          "alignment": null,
+          "enrichment": null
+        },
+        "providerMode": "mock",
+        "providerImplementation": "deterministic-mock",
+        "mockInvocations": 1,
+        "liveTransportInvocations": 0,
+        "route": "GENERATION"
+      },
+      "route": "GENERATION",
+      "preview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive executable — typically a transaction, Web Dynpro, Fiori app, or service — as high",
+      "events": [
+        "admission",
+        "answer_final",
+        "data",
+        "generation",
+        "analysis",
+        "done"
+      ]
+    },
+    "disabled": {
+      "ok": true,
+      "liveTransportInvocations": 0,
+      "disabledBlocked": 1,
+      "mockOpenaiCalls": 0,
+      "generation": {
+        "finish_reason": null,
+        "maxTokens": 2048,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "contentQualityFlags": [
+          "answer_kind:validated"
+        ],
+        "strippedEntityCount": 0,
+        "firstTokenMs": null,
+        "streamEndMs": 190,
+        "procedurePrefer": {
+          "prefer": false,
+          "reason": "no-procedure-intent",
+          "wrapMode": null,
+          "stepCount": 0,
+          "sourceTag": null,
+          "workflowBackboneAsk": false,
+          "retrievalGap": null,
+          "enrichmentReason": null,
+          "taskFit": null,
+          "alignment": null,
+          "enrichment": null
+        },
+        "providerMode": "disabled",
+        "providerImplementation": "disabled",
+        "mockInvocations": 0,
+        "liveTransportInvocations": 0,
+        "route": "LOCAL_KNOWLEDGE_FALLBACK"
+      },
+      "route": "GENERATION",
+      "preview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive executable — typically a transaction, Web Dynpro, Fiori app, or service — as high",
+      "events": [
+        "admission",
+        "admission",
+        "answer_final",
+        "data",
+        "generation",
+        "done"
+      ]
+    }
+  }
+}

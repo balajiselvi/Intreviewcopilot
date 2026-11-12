@@ -1,0 +1,143 @@
+{
+  "at": "2026-11-03T12:12:56.660Z",
+  "mode": "genuine-live-openai",
+  "totals": {
+    "n": 141,
+    "liveFailed": 0,
+    "mockSub": 0,
+    "shortCircuit": 0,
+    "principleLike": 2,
+    "malformed": 0,
+    "avgLatencyMs": 4044,
+    "avgChars": 1023
+  },
+  "defect": {
+    "defect_pfcg_use": {
+      "route": "GENERATION",
+      "latencyMs": 3102,
+      "chars": 912,
+      "malformed": false,
+      "agrAsExec": false,
+      "preview": "I use transaction PFCG to create and manage roles in SAP. First, I define a single role by adding the necessary transactions on the Menu tab and maintaining organizational levels on the Authorizations tab. After completing the authorization data, I generate the authorization profile, which is crucial because this profi",
+      "issues": []
+    },
+    "defect_pfcg_configure": {
+      "route": "GENERATION",
+      "latencyMs": 3412,
+      "chars": 947,
+      "malformed": false,
+      "agrAsExec": false,
+      "preview": "To configure PFCG, I start by maintaining the menu tab with the correct transaction codes that align with the business processes. This ensures that users have access to the necessary functionalities. Next, I review and adjust the SU24-proposed authorization values on the authorization tab. This step is crucial as it al",
+      "issues": [
+        "missing-assign"
+      ]
+    },
+    "defect_st03n_export": {
+      "route": "GENERATION",
+      "latencyMs": 3503,
+      "chars": 844,
+      "malformed": false,
+      "agrAsExec": true,
+      "preview": "To export all the T-codes by a user, I would typically start by utilizing transaction, which provides workload analysis and usage statistics. From there, I can navigate to the \"Expert Mode\" and select the specific user whose T-code I want to analyze. Next, I would extract the relevant data by accessing the \"Transaction",
+      "issues": [
+        "missing-st03n-stad",
+        "stripped-tcode-placeholder",
+        "agr-as-execution"
+      ]
+    }
+  },
+  "benchmark": {
+    "bench_brm": {
+      "route": "GENERATION",
+      "latencyMs": 3724,
+      "chars": 987,
+      "malformed": false,
+      "agrAsExec": false,
+      "preview": "Organizations implement Business Role Management (BRM) to streamline access governance and enhance security by aligning business roles with actual job functions. This approach allows requesters to select roles based on business language, simplifying the access request process while ensuring that the underlying technica",
+      "issues": []
+    },
+    "bench_pfcg": {
+      "route": "GENERATION",
+      "latencyMs": 3311,
+      "chars": 899,
+      "malformed": false,
+      "agrAsExec": false,
+      "preview": "I use transaction PFCG to create and manage roles in SAP. First, I define a single role by adding the necessary transactions on the Menu tab and maintaining organizational levels on the Authorizations tab. After completing the authorization data, I generate the authorization profile, which is essential because the gene",
+      "issues": []
+    },
+    "bench_su24_su25": {
+      "route": "GENERATION",
+      "latencyMs": 3653,
+      "chars": 927,
+      "malformed": false,
+      "agrAsExec": false,
+      "preview": "SU24 and SU25 are both critical transactions in SAP authorization management, but they serve different purposes. SU24 is used to maintain transaction-to-authorization-object mappings, providing default field values for standard and custom transactions. It helps define how authorization checks are proposed in the role m",
+      "issues": []
+    },
+    "bench_msmp": {
+      "route": "GENERATION",
+      "latencyMs": 4329,
+      "chars": 1222,
+      "malformed": false,
+      "agrAsExec": false,
+      "preview": "MSMP, or Multi-Step Multi-Process, architecture is designed to manage complex approval workflows within SAP GRC Access Control. It serves to streamline access requests by defining a structured sequence of approval stages, ensuring that each request is evaluated appropriately based on predefined rules. The architecture ",
+      "issues": [
+        "wrong-msmp-expansion"
+      ]
+    },
+    "bench_critical_actions": {
+      "route": "GENERATION",
+      "latencyMs": 4095,
+      "chars": 1158,
+      "malformed": false,
+      "agrAsExec": false,
+      "preview": "Critical actions in SAP GRC Access Control involve the identification and management of risks associated with user access and permissions. These actions are significant because they help ensure compliance with regulatory requirements and internal policies, thereby reducing the risk of unauthorized access and potential ",
+      "issues": []
+    },
+    "bench_bw": {
+      "route": "GENERATION",
+      "latencyMs": 3671,
+      "chars": 902,
+      "malformed": false,
+      "agrAsExec": false,
+      "preview": "Analysis authorizations in BW/4HANA restrict query data by characteristic values, ensuring that users only see data relevant to their roles. This mechanism is crucial for maintaining data security and compliance, as it prevents unauthorized access to sensitive information. To implement analysis authorizations, I use RS",
+      "issues": []
+    },
+    "bench_idm": {
+      "route": "GENERATION",
+      "latencyMs": 3601,
+      "chars": 1017,
+      "malformed": false,
+      "agrAsExec": false,
+      "preview": "The identity provisioning lifecycle encompasses the processes involved in creating, managing, and deactivating user identities across systems. It begins with defining the source system connection, where details such as URL, credentials, and the scope of attributes to be retrieved are established. Next, the target syste",
+      "issues": []
+    },
+    "bench_btp": {
+      "route": "GENERATION",
+      "latencyMs": 2969,
+      "chars": 836,
+      "malformed": false,
+      "agrAsExec": false,
+      "preview": "Authentication answers who you are, while authorization determines what you can do. In an SAP environment, Identity Authentication Service (IAS) or an external identity provider like Entra ID can handle authentication, verifying user identities through methods such as Single Sign-On (SSO). Once authenticated, the autho",
+      "issues": []
+    },
+    "bench_s4_experience": {
+      "route": "GENERATION",
+      "latencyMs": 3275,
+      "chars": 1009,
+      "malformed": false,
+      "agrAsExec": false,
+      "preview": "In an S/4HANA security transformation, my role involved leading the design and implementation of the authorization framework to ensure compliance and operational efficiency. I started by assessing the existing role landscape, which included analyzing over 1,650 PFCG roles and 350 business roles, as well as identifying ",
+      "issues": []
+    },
+    "bench_oauth": {
+      "route": "GENERATION",
+      "latencyMs": 3803,
+      "chars": 1224,
+      "malformed": false,
+      "agrAsExec": false,
+      "preview": "OAuth 2.0 authorization code flow is a widely used mechanism for securing access to resources in cloud integrations. It begins with the client application redirecting the user to the authorization server, where the user is prompted to log in and grant permission for the application to access their resources. Upon succe",
+      "issues": []
+    }
+  }
+}

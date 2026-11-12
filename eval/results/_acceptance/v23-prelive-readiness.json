@@ -1,0 +1,895 @@
+{
+  "at": "2026-11-03T06:49:28.623Z",
+  "phase1": {
+    "branch": "feature/interview-engine-v2",
+    "head": "9a3b2da75fa9e2c7e3e528d446e2eb966ba404d2",
+    "statusPorcelainCount": 407,
+    "section913Exists": true,
+    "brmPfcgArtifact": true,
+    "section910Artifact": true,
+    "reverifiedBrmPfcg": {
+      "ok": true,
+      "brmRoute": "VERIFIED_WORKFLOW",
+      "pfcgRoute": "RETRIEVED_PROCEDURE",
+      "brmPreview": "In BRM I govern business-role definitions and their technical-role mappings so ARM requesters pick job-function names while provisioning still assigns the underlying PFCG roles. Define business roles in business language",
+      "pfcgPreview": "Use transaction PFCG to create the single role, add the required transactions on the Menu tab, and maintain organizational levels on the Authorizations tab. Generate the authorization profile in PFCG after that authoriza"
+    }
+  },
+  "phase2": {
+    "indexChunkCount": 3443,
+    "bankChunksStillIndexed": 413,
+    "bankFilesIndexed": [
+      "consulting-leadership-interview-architect-bank.md",
+      "btp-security-architect-bank.md",
+      "ias-ips-cloud-identity-services-architect-bank.md",
+      "bw4hana-analysis-authorizations-architect-bank.md",
+      "governance-risk-audit-sap-security-architect-bank.md",
+      "cyberark-pam-architect-bank.md",
+      "fiori-frontend-security-architect-bank.md",
+      "deloitte-usi-specific-gap-fillers.md",
+      "grc-principal-architect-interview-bank.md",
+      "hana-database-security-architect-bank.md",
+      "testing-service-ops-security-architect-bank.md",
+      "iag-cloud-identity-access-governance-architect-bank.md",
+      "sap-idm-identity-management-architect-bank.md",
+      "sap-integration-cross-app-security-architect-bank.md",
+      "ariba-security-architect-bank.md",
+      "crm-cx-sales-service-security-architect-bank.md",
+      "scm-srp-ibp-supply-chain-security-architect-bank.md",
+      "mdg-master-data-governance-security-architect-bank.md",
+      "sap-activate-methodology-architect-bank.md",
+      "sap-security-delivery-governance-architect-bank.md"
+    ],
+    "provenanceCoverage": 1,
+    "criticalActions": {
+      "bankHitsInScoped": 0,
+      "topFiles": [
+        "ara.md",
+        "risk-analysis.md"
+      ],
+      "coverage": "RELEVANT_SUFFICIENT"
+    },
+    "brm": {
+      "bankHitsInScoped": 0,
+      "topFiles": [
+        "brm.md",
+        "brm.md",
+        "brm.md",
+        "brm.md",
+        "brm.md",
+        "brm.md"
+      ],
+      "coverage": "RELEVANT_SUFFICIENT"
+    },
+    "pfcg": {
+      "bankHitsInScoped": 0,
+      "topFiles": [
+        "pfcg.md",
+        "pfcg.md",
+        "pfcg.md",
+        "pfcg.md",
+        "pfcg.md",
+        "role-design.md"
+      ],
+      "coverage": "RELEVANT_SUFFICIENT"
+    },
+    "preparedScriptPathExists": true,
+    "rehearsalNote": "Prepared/verified routes remain available via admission; technical retrieval prefers non-bank sources.",
+    "findingA": "Banks remain indexed but selectProductScopedChunks demotes/excludes them from ordinary technical primary set",
+    "findingB": true,
+    "findingC": "Prepared scripts / verified workflows are admission routes, not retrieval overrides of arbitrary questions"
+  },
+  "phase3": {
+    "grc-brm": {
+      "folders": [
+        "grc"
+      ],
+      "coverage": "RELEVANT_SUFFICIENT",
+      "bankHitsInScoped": 0,
+      "top": [
+        {
+          "heading": "Architecture",
+          "sourceFile": "brm.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Configuration",
+          "sourceFile": "brm.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Implementation Activities",
+          "sourceFile": "brm.md",
+          "score": 0.6392222558444073,
+          "interviewBank": false
+        },
+        {
+          "heading": "Runtime Flow",
+          "sourceFile": "brm.md",
+          "score": 0.6386512246622542,
+          "interviewBank": false
+        },
+        {
+          "heading": "Overview",
+          "sourceFile": "brm.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Migration Activities",
+          "sourceFile": "brm.md",
+          "score": 0.55,
+          "interviewBank": false
+        }
+      ]
+    },
+    "sec-pfcg": {
+      "folders": [
+        "security",
+        "s4hana",
+        "fiori"
+      ],
+      "coverage": "RELEVANT_SUFFICIENT",
+      "bankHitsInScoped": 0,
+      "top": [
+        {
+          "heading": "Generate and assign a single role",
+          "sourceFile": "pfcg.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Architecture",
+          "sourceFile": "pfcg.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Runtime Flow",
+          "sourceFile": "pfcg.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Configuration",
+          "sourceFile": "pfcg.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Implementation Activities",
+          "sourceFile": "pfcg.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Architecture",
+          "sourceFile": "role-design.md",
+          "score": 0.55,
+          "interviewBank": false
+        }
+      ]
+    },
+    "sec-su24-su25": {
+      "folders": [
+        "security",
+        "s4hana",
+        "fiori"
+      ],
+      "coverage": "RELEVANT_SUFFICIENT",
+      "bankHitsInScoped": 0,
+      "top": [
+        {
+          "heading": "Architecture",
+          "sourceFile": "su24.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Runtime Flow",
+          "sourceFile": "su24.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Configuration",
+          "sourceFile": "su24.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Implementation Activities",
+          "sourceFile": "su24.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Runtime Flow",
+          "sourceFile": "su25.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Configuration",
+          "sourceFile": "su25.md",
+          "score": 0.55,
+          "interviewBank": false
+        }
+      ]
+    },
+    "grc-msmp": {
+      "folders": [
+        "grc"
+      ],
+      "coverage": "RELEVANT_SUFFICIENT",
+      "bankHitsInScoped": 0,
+      "top": [
+        {
+          "heading": "Configure an MSMP workflow for an access request",
+          "sourceFile": "msmp.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Configure an MSMP workflow for an access request",
+          "sourceFile": "msmp.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Configure an MSMP workflow for an access request",
+          "sourceFile": "msmp.md",
+          "score": 0.6016913640984968,
+          "interviewBank": false
+        },
+        {
+          "heading": "Architecture",
+          "sourceFile": "msmp.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Configuration",
+          "sourceFile": "msmp.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Implementation Activities",
+          "sourceFile": "msmp.md",
+          "score": 0.55,
+          "interviewBank": false
+        }
+      ]
+    },
+    "grc-critical-actions": {
+      "folders": [
+        "grc"
+      ],
+      "coverage": "RELEVANT_SUFFICIENT",
+      "bankHitsInScoped": 0,
+      "top": [
+        {
+          "heading": "Runtime Flow",
+          "sourceFile": "firefighter.md",
+          "score": 0.3158145788650173,
+          "interviewBank": false
+        },
+        {
+          "heading": "Critical Actions, Critical Permissions, and SoD Risks",
+          "sourceFile": "ara.md",
+          "score": 0.2650618702624654,
+          "interviewBank": false
+        },
+        {
+          "heading": "Q100: How do you demonstrate overall SAP Security and GRC compliance readiness t",
+          "sourceFile": "grc-scenarios-greenfield-brownfield.md",
+          "score": 0.2700423238743334,
+          "interviewBank": false
+        },
+        {
+          "heading": "Red Flags",
+          "sourceFile": "firefighter.md",
+          "score": 0.2776553738537014,
+          "interviewBank": false
+        },
+        {
+          "heading": "Interviewer's Hidden Expectations",
+          "sourceFile": "grc-overview.md",
+          "score": 0.21870436961220485,
+          "interviewBank": false
+        }
+      ]
+    },
+    "bw-analysis-auth": {
+      "folders": [
+        "bw",
+        "security",
+        "s4hana",
+        "fiori"
+      ],
+      "coverage": "RELEVANT_SUFFICIENT",
+      "bankHitsInScoped": 0,
+      "top": [
+        {
+          "heading": "Architecture",
+          "sourceFile": "authorization-objects.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Runtime Flow",
+          "sourceFile": "authorization-objects.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Configuration",
+          "sourceFile": "authorization-objects.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Implementation Activities",
+          "sourceFile": "authorization-objects.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Overview",
+          "sourceFile": "analysis-authorizations.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Controls",
+          "sourceFile": "analysis-authorizations.md",
+          "score": 0.55,
+          "interviewBank": false
+        }
+      ]
+    },
+    "idm-ips-lifecycle": {
+      "folders": [
+        "btp",
+        "cloud"
+      ],
+      "coverage": "RELEVANT_SUFFICIENT",
+      "bankHitsInScoped": 0,
+      "top": [
+        {
+          "heading": "Architecture",
+          "sourceFile": "cloud-identity.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Runtime Flow",
+          "sourceFile": "cloud-identity.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Runtime Flow",
+          "sourceFile": "cloud-identity.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Configuration",
+          "sourceFile": "cloud-identity.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Implementation Activities",
+          "sourceFile": "cloud-identity.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "SAP Cloud Identity",
+          "sourceFile": "cloud-identity.md",
+          "score": 0.55,
+          "interviewBank": false
+        }
+      ]
+    },
+    "btp-authz": {
+      "folders": [],
+      "coverage": "RELEVANT_SUFFICIENT",
+      "bankHitsInScoped": 0,
+      "top": [
+        {
+          "heading": "Authorization Sync",
+          "sourceFile": "authorization-sync.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Overview",
+          "sourceFile": "authorization-sync.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Interview Summary",
+          "sourceFile": "authorization-sync.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Architecture",
+          "sourceFile": "authorization-sync.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Runtime Flow",
+          "sourceFile": "authorization-sync.md",
+          "score": 0.55,
+          "interviewBank": false
+        },
+        {
+          "heading": "Configuration",
+          "sourceFile": "authorization-sync.md",
+          "score": 0.55,
+          "interviewBank": false
+        }
+      ]
+    },
+    "s4-experience": {
+      "folders": [
+        "s4hana",
+        "fiori",
+        "security"
+      ],
+      "coverage": "IRRELEVANT_RETRIEVAL",
+      "bankHitsInScoped": 0,
+      "top": [
+        {
+          "heading": "Implementation Activities",
+          "sourceFile": "s4hana-migration.md",
+          "score": 0.37977200333995126,
+          "interviewBank": false
+        },
+        {
+          "heading": "Common Mistakes",
+          "sourceFile": "s4hana-migration.md",
+          "score": 0.4407460216651179,
+          "interviewBank": false
+        },
+        {
+          "heading": "S/4HANA Migration (Security Perspective)",
+          "sourceFile": "s4hana-migration.md",
+          "score": 0.35298070508650287,
+          "interviewBank": false
+        },
+        {
+          "heading": "S/4HANA Business Roles",
+          "sourceFile": "s4hana-business-roles.md",
+          "score": 0.32165952006298004,
+          "interviewBank": false
+        },
+        {
+          "heading": "Troubleshooting",
+          "sourceFile": "s4hana-migration.md",
+          "score": 0.42111751671621733,
+          "interviewBank": false
+        },
+        {
+          "heading": "Interview Summary",
+          "sourceFile": "s4hana-business-roles.md",
+          "score": 0.3696153525148284,
+          "interviewBank": false
+        }
+      ]
+    },
+    "outside-inventory": {
+      "folders": [],
+      "coverage": "NO_RELEVANT_KNOWLEDGE",
+      "bankHitsInScoped": 0,
+      "top": []
+    }
+  },
+  "phase4": {
+    "cases": [
+      {
+        "id": "grc-brm",
+        "ok": true,
+        "domainOk": true,
+        "answerOk": true,
+        "route": "VERIFIED_WORKFLOW",
+        "folders": [
+          "grc"
+        ],
+        "coverage": "RELEVANT_SUFFICIENT",
+        "intent": "",
+        "bankHitsInScoped": 0,
+        "topFiles": [
+          "brm.md",
+          "brm.md",
+          "brm.md",
+          "brm.md",
+          "brm.md",
+          "brm.md"
+        ],
+        "preview": "In BRM I govern business-role definitions and their technical-role mappings so ARM requesters pick job-function names while provisioning still assigns the underlying PFCG roles. Define business roles in business language from agreed job fun",
+        "analysis": {
+          "category": "Implementation",
+          "domain": "SAP GRC",
+          "intent": "implementation"
+        }
+      },
+      {
+        "id": "sec-pfcg",
+        "ok": true,
+        "domainOk": true,
+        "answerOk": true,
+        "route": "RETRIEVED_PROCEDURE",
+        "folders": [
+          "security",
+          "s4hana",
+          "fiori"
+        ],
+        "coverage": "RELEVANT_SUFFICIENT",
+        "intent": "configure",
+        "bankHitsInScoped": 0,
+        "topFiles": [
+          "pfcg.md",
+          "pfcg.md",
+          "pfcg.md",
+          "pfcg.md",
+          "pfcg.md",
+          "role-design.md"
+        ],
+        "preview": "Use transaction PFCG to create the single role, add the required transactions on the Menu tab, and maintain organizational levels on the Authorizations tab. Generate the authorization profile in PFCG after that authorization data is complet",
+        "analysis": {
+          "category": "Role Design",
+          "domain": "SAP Security",
+          "intent": "role design"
+        }
+      },
+      {
+        "id": "sec-su24-su25",
+        "ok": true,
+        "domainOk": true,
+        "answerOk": true,
+        "route": "VERIFIED_WORKFLOW",
+        "folders": [
+          "security",
+          "s4hana",
+          "fiori"
+        ],
+        "coverage": "RELEVANT_SUFFICIENT",
+        "intent": "",
+        "bankHitsInScoped": 0,
+        "topFiles": [
+          "su24.md",
+          "su24.md",
+          "su24.md",
+          "su24.md",
+          "su25.md",
+          "su25.md"
+        ],
+        "preview": "When I lead an ECC-to-S/4 authorization migration, I frame the work through Activate — Discover and Prepare for SoD and custom-code risk boundaries, Explore for the SU25/SU24 baseline, Realize for build and transport, Deploy for cutover reh",
+        "analysis": {
+          "category": "Upgrade",
+          "domain": "SAP Security",
+          "intent": "upgrade"
+        }
+      },
+      {
+        "id": "grc-msmp",
+        "ok": true,
+        "domainOk": true,
+        "answerOk": true,
+        "route": "VERIFIED_WORKFLOW",
+        "folders": [
+          "grc"
+        ],
+        "coverage": "RELEVANT_SUFFICIENT",
+        "intent": "",
+        "bankHitsInScoped": 0,
+        "topFiles": [
+          "msmp.md",
+          "msmp.md",
+          "msmp.md",
+          "msmp.md",
+          "msmp.md",
+          "msmp.md"
+        ],
+        "preview": "To configure MSMP for Access Request on Access Control 12.0, I enter Maintain MSMP Workflows with GRFNMW_CONFIGURE or GRFNMW_CONFIGURE_WD and first confirm whether the delivered Access Request Approval process already covers the request typ",
+        "analysis": {
+          "category": "Architecture",
+          "domain": "SAP GRC",
+          "intent": "architecture"
+        }
+      },
+      {
+        "id": "grc-critical-actions",
+        "ok": true,
+        "domainOk": true,
+        "answerOk": true,
+        "route": "GENERATION",
+        "folders": [
+          "grc"
+        ],
+        "coverage": "RELEVANT_SUFFICIENT",
+        "intent": "",
+        "bankHitsInScoped": 0,
+        "topFiles": [
+          "firefighter.md",
+          "ara.md",
+          "grc-scenarios-greenfield-brownfield.md",
+          "firefighter.md",
+          "grc-overview.md"
+        ],
+        "preview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive executable — typically a transaction, Web Dynpro, Fiori app, or service — as high risk on its own. It is not an S/4HANA r",
+        "analysis": {
+          "category": "General",
+          "domain": "SAP GRC",
+          "intent": "general"
+        }
+      },
+      {
+        "id": "bw-analysis-auth",
+        "ok": true,
+        "domainOk": true,
+        "answerOk": true,
+        "route": "VERIFIED_WORKFLOW",
+        "folders": [
+          "bw",
+          "security",
+          "s4hana",
+          "fiori"
+        ],
+        "coverage": "RELEVANT_SUFFICIENT",
+        "intent": "",
+        "bankHitsInScoped": 0,
+        "topFiles": [
+          "authorization-objects.md",
+          "authorization-objects.md",
+          "authorization-objects.md",
+          "authorization-objects.md",
+          "analysis-authorizations.md",
+          "analysis-authorizations.md"
+        ],
+        "preview": "In my experience with BW/4HANA, standard ABAP PFCG authorizations only control transaction and object access — they never filter query result rows for regional data. When I set this up, I mark the InfoObjects as authorization-relevant and d",
+        "analysis": {
+          "category": "Authorization",
+          "domain": "General SAP",
+          "intent": "authorization"
+        }
+      },
+      {
+        "id": "idm-ips-lifecycle",
+        "ok": true,
+        "domainOk": true,
+        "answerOk": true,
+        "route": "RETRIEVED_PROCEDURE",
+        "folders": [
+          "btp",
+          "cloud"
+        ],
+        "coverage": "RELEVANT_SUFFICIENT",
+        "intent": "configure",
+        "bankHitsInScoped": 0,
+        "topFiles": [
+          "cloud-identity.md",
+          "cloud-identity.md",
+          "cloud-identity.md",
+          "cloud-identity.md",
+          "cloud-identity.md",
+          "cloud-identity.md"
+        ],
+        "preview": "First, source System Connection: Define connection details (URL, credentials, query scope), attribute retrieval (which attributes to read), entity type (users, groups, or both). Next, target System Connections: Define connection details, SC",
+        "analysis": {
+          "category": "Definition",
+          "domain": "SAP Cloud Identity / BTP",
+          "intent": "definition"
+        }
+      },
+      {
+        "id": "btp-authz",
+        "ok": true,
+        "domainOk": true,
+        "answerOk": true,
+        "route": "PREPARED_SCRIPT",
+        "folders": [],
+        "coverage": "RELEVANT_SUFFICIENT",
+        "intent": "configure",
+        "bankHitsInScoped": 0,
+        "topFiles": [
+          "authorization-sync.md",
+          "authorization-sync.md",
+          "authorization-sync.md",
+          "authorization-sync.md",
+          "authorization-sync.md",
+          "authorization-sync.md"
+        ],
+        "preview": "Authentication answers who you are. Authorization answers what you may do. IAS or Entra ID can authenticate. SAP roles, authorization objects, and BTP role collections decide what that user can execute. Successful SSO is not application acc",
+        "analysis": {
+          "category": "Architecture",
+          "domain": "SAP Security",
+          "intent": "architecture"
+        }
+      },
+      {
+        "id": "s4-experience",
+        "ok": true,
+        "domainOk": true,
+        "answerOk": true,
+        "route": "GENERATION",
+        "folders": [
+          "s4hana",
+          "fiori",
+          "security"
+        ],
+        "coverage": "IRRELEVANT_RETRIEVAL",
+        "intent": "",
+        "bankHitsInScoped": 0,
+        "topFiles": [
+          "s4hana-migration.md",
+          "s4hana-migration.md",
+          "s4hana-migration.md",
+          "s4hana-business-roles.md",
+          "s4hana-migration.md",
+          "s4hana-business-roles.md"
+        ],
+        "preview": "I would answer from verified CV engagements only: the transformation objective, the security and role decisions I owned, Fiori or platform authorization readiness where relevant, and the cutover evidence I would defend — without inventing e",
+        "analysis": {
+          "category": "General",
+          "domain": "SAP Platform",
+          "intent": "general"
+        }
+      },
+      {
+        "id": "outside-inventory",
+        "ok": true,
+        "domainOk": true,
+        "answerOk": true,
+        "route": "GENERATION",
+        "folders": [],
+        "coverage": "NO_RELEVANT_KNOWLEDGE",
+        "intent": "",
+        "bankHitsInScoped": 0,
+        "topFiles": [],
+        "preview": "I do not have verified product documentation for that module or transaction not confirmed in supporting knowledge in the knowledge base. I would not invent T-codes, tables, or configuration paths. If this maps to a standard SAP product, nam",
+        "analysis": {
+          "category": "Definition",
+          "domain": "General SAP",
+          "intent": "definition"
+        }
+      }
+    ]
+  },
+  "phase5": {
+    "cases": [
+      {
+        "id": "wrapMode-configure-direct",
+        "ok": true,
+        "detail": {
+          "howIntent": "configure",
+          "wrap": "direct",
+          "prefer": true,
+          "reason": "coherent-source-procedure",
+          "steps": 5
+        }
+      },
+      {
+        "id": "why-not-forced-configure",
+        "ok": true,
+        "detail": {
+          "whyIntent": "",
+          "prefer": false,
+          "reason": "no-procedure-intent"
+        }
+      },
+      {
+        "id": "usage-work-in-intent",
+        "ok": true,
+        "detail": {
+          "workIntent": "configure"
+        }
+      },
+      {
+        "id": "experience-not-activate-checklist",
+        "ok": true,
+        "detail": {
+          "preview": "I would answer from verified CV engagements only: the transformation objective, the security and role decisions I owned, Fiori or platform authorization readiness where relevant, a",
+          "route": "GENERATION"
+        }
+      },
+      {
+        "id": "inability-is-meta",
+        "ok": true,
+        "detail": {}
+      },
+      {
+        "id": "inability-not-accepted-as-technical",
+        "ok": true,
+        "detail": {
+          "answerKind": "recovered_direct_technical",
+          "preview": "Use PFCG to maintain the Menu tab, adjust Authorizations, generate the profile, assign the role, and validate with a bus"
+        }
+      },
+      {
+        "id": "answer-final-emitted",
+        "ok": true,
+        "detail": {
+          "events": [
+            "admission",
+            "answer_final",
+            "data",
+            "generation",
+            "analysis"
+          ],
+          "route": "GENERATION"
+        }
+      }
+    ]
+  },
+  "phase6": {
+    "cases": [],
+    "resolve": {
+      "mockMode": "mock",
+      "disabledMode": "disabled",
+      "liveMode": "live"
+    },
+    "disabledBlocksLiveTransport": true,
+    "mock": {
+      "ok": true,
+      "route": "GENERATION",
+      "stats": {
+        "mode": "mock",
+        "mockInvocations": 1,
+        "liveTransportInvocations": 0,
+        "disabledBlocked": 0,
+        "lastImplementation": "deterministic-mock"
+      },
+      "note": "MOCK exercises pipeline; not proof of live LLM accuracy"
+    },
+    "disabled": {
+      "ok": true,
+      "known": {
+        "ok": true,
+        "route": "GENERATION",
+        "preview": "In SAP GRC Access Control Access Risk Analysis, a Critical Action is a ruleset risk type that flags a single sensitive executable — typically a transaction, Web Dynpro, Fiori app, ",
+        "stats": {
+          "mode": "disabled",
+          "mockInvocations": 0,
+          "liveTransportInvocations": 0,
+          "disabledBlocked": 1,
+          "lastImplementation": "disabled"
+        }
+      },
+      "outsideInventory": {
+        "ok": true,
+        "route": "GENERATION",
+        "preview": "Provider generation is disabled on this server. That is an operational configuration, not a statement that SAP technical knowledge is missing. Prepared, verified, or retrieved local-knowledge routes may still answer when",
+        "stats": {
+          "mode": "disabled",
+          "mockInvocations": 0,
+          "liveTransportInvocations": 0,
+          "disabledBlocked": 1,
+          "lastImplementation": "disabled"
+        }
+      }
+    },
+    "live": {
+      "invoked": false,
+      "modeResolvesToLive": true,
+      "prerequisites": [
+        "Explicit user authorization for paid live calls",
+        "Valid provider API key configured",
+        "LLM_PROVIDER_MODE=live",
+        "Separate live evaluation harness (not this readiness suite)"
+      ]
+    }
+  },
+  "pass": true,
+  "defects": []
+}

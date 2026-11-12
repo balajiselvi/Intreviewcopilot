@@ -1,0 +1,90 @@
+[
+  {
+    "id": "grc-version",
+    "question": "What is the difference between SAP Access Control 10.1 and Access Control 12.0?",
+    "httpStatus": 200,
+    "route": "VERIFIED_WORKFLOW",
+    "workflowId": "ac-release-boundary",
+    "modelCalls": 0,
+    "chars": 1273,
+    "employers": false,
+    "answer": "GRC Access Control releases.\n\n1. The product name is SAP Access Control. The releases named in the SAP Help upgrade guide are 10.0, 10.1, and 12.0. Do not describe a separate product called GRC 12.x.\n2. Access Control 10.1 is add-on GRCFND_A V1100. Access Control 12.0 is add-on GRCFND_A V1200 on the GRC system, with NetWeaver plug-in GRCPINW V1200_750 on the plug-in system.\n3. The upgrade guide for 12.0.32 applies only to an upgrade from 10.0 or 10.1 to 12.0. A 10.1 system on SP24 must go to 12.0 SP05 or higher. Confirm the installed support package before describing an upgrade.\n4. After the upgrade, NWBC is still the Business Client. The guide assigns role SAP_GRC_NWBC in SU01 when users launch NWBC from SAP GUI. There is no portal plug-in for Access Control 12.0, so the 10.1 portal plug-in remains the documented choice.\n5. SAP Fiori apps are optional. The front-end add-on is UIGRAC01, SAP Fiori for SAP AC 1.0. It does not replace MSMP, BRFplus, or the target plug-in.\n6. ARA, ARM, BRM, and EAM stay the four components in 10.1 and 12.0. Do not invent a rename or a feature change the upgrade guide does not state.\n\nSimplified Access Request customizing is new in the 12.0 guide. Confirm the activity in the target system's IMG before describing its screens."
+  },
+  {
+    "id": "msmp-open",
+    "question": "How do you open MSMP workflow maintenance for SAP Access Control?",
+    "httpStatus": 200,
+    "route": "",
+    "workflowId": "",
+    "modelCalls": 1,
+    "chars": 509,
+    "employers": false,
+    "answer": "To open MSMP workflow maintenance for SAP Access Control, you would use the transaction code GRFNMW_CONFIGURE. This transaction allows you to configure the MSMP workflows. You can also access this through the SPRO path: Access Control > Workflow for Access Control > Maintain MSMP Workflows. Once in the configuration, you can manage workflow templates, paths, and stages. To validate the configuration, ensure that the workflows are correctly mapped to the business rules and activate them before deployment."
+  },
+  {
+    "id": "fiori-space",
+    "question": "How is a Fiori space assigned on S/4HANA Cloud Public Edition, and how is that different from Private Edition?",
+    "httpStatus": 200,
+    "route": "",
+    "workflowId": "",
+    "modelCalls": 1,
+    "chars": 1029,
+    "employers": false,
+    "answer": "In S/4HANA Cloud Public Edition, Fiori spaces are assigned through the Maintain Business Roles transaction, where you define business catalogs that contain the relevant Fiori apps. You then manage spaces and pages using the Manage Launchpad Spaces and Manage Launchpad Pages tools. This setup allows you to organize the apps into logical groups for user access.\n\nIn contrast, for S/4HANA Private Edition, the assignment process involves using PFCG roles. You start by assigning Fiori catalogs to PFCG roles, which then link to spaces and pages. The backend objects are still managed through SU24 and role generation, maintaining a more traditional ABAP role management approach.\n\nThe key difference lies in the absence of PFCG in the Public Edition, where the configuration is more streamlined and focused on business roles and catalogs, while the Private Edition retains the PFCG structure for role management. This distinction affects how you manage user access and visibility to Fiori applications across the two environments."
+  },
+  {
+    "id": "fiori-trace",
+    "question": "The user can see a Fiori tile but the app fails an authorization check. What do you trace?",
+    "httpStatus": 200,
+    "route": "",
+    "workflowId": "",
+    "modelCalls": 1,
+    "chars": 901,
+    "employers": false,
+    "answer": "When a user can see a Fiori tile but the app fails an authorization check, it indicates an issue with the backend authorization rather than the launchpad visibility. The first step is to trace the authorization failure using STAUTHTRACE or ST01 to capture the authorization checks being performed when the app is accessed. This will help identify which specific authorization objects are being checked and which ones are failing.\n\nNext, I would verify the Fiori catalog and group assignments to ensure that the user has the correct roles assigned that include the necessary backend authorizations. Additionally, checking the OData service authorization using the relevant authorization objects will help confirm if the user has the required permissions to execute the app's functionality. This evidence will clarify whether the issue lies in the role assignments or the backend authorization settings."
+  },
+  {
+    "id": "bw-compare",
+    "question": "How does BW/4HANA analysis authorization differ from an S/4 PFCG role?",
+    "httpStatus": 200,
+    "route": "",
+    "workflowId": "",
+    "modelCalls": 1,
+    "chars": 818,
+    "employers": false,
+    "answer": "BW/4HANA analysis authorization operates on a distinct layer compared to S/4 PFCG roles. While S/4 PFCG roles utilize standard authorization objects like S_RS_COMP to control execution-level access to queries and InfoProviders, BW analysis authorization, maintained in RSECADMIN, focuses on row-level data restrictions based on characteristic values. For instance, a user may have access to execute a query but still see no data if their analysis authorization does not permit it for specific values, such as company codes. This separation ensures that data visibility is tightly controlled, allowing for more granular security measures beyond what PFCG roles provide. The connection between these two layers is facilitated through the authorization object S_RS_AUTH, which links analysis authorizations to PFCG roles."
+  },
+  {
+    "id": "bw-only",
+    "question": "A BW query runs but returns no rows for one user. How do you isolate analysis authorization?",
+    "httpStatus": 200,
+    "route": "",
+    "workflowId": "",
+    "modelCalls": 1,
+    "chars": 918,
+    "employers": false,
+    "answer": "When a BW query runs but returns no rows for a specific user, the first step is to determine if the issue lies with analysis authorization. This symptom typically indicates that while the user has execution access to the query, they may lack the necessary analysis authorizations to view specific data rows.\n\nTo isolate this, I would check the user's assigned roles in PFCG to ensure they include the relevant authorization object S_RS_AUTH, which links to the analysis authorizations. Next, I would inspect the analysis authorizations themselves in transaction RSECADMIN to confirm they are correctly defined and that the InfoProvider has the required technical characteristics (0TCAIPROV, 0TCAVALID, and 0TCAACTVT) marked as authorization-relevant.\n\nThis evidence will help establish whether the lack of data visibility is due to missing or misconfigured analysis authorizations, rather than a role assignment issue."
+  },
+  {
+    "id": "iag-policy",
+    "question": "What does authorization policy mean in IAG Access Request?",
+    "httpStatus": 200,
+    "route": "VERIFIED_WORKFLOW",
+    "workflowId": "iag-request-policy",
+    "modelCalls": 0,
+    "chars": 691,
+    "employers": false,
+    "answer": "IAG Access Request.\n\n1. An authorization policy in IAG Access Request limits which systems, roles, users, or other entities a requestor can search and request.\n2. Open the Authorization Policy app. Create a policy set for Access, Business Role, or Application/System. Add a policy with the Request Access action and restrict the objects by attribute.\n3. Assign the policy set from user attributes and activate the policy. Access Request search then returns only those objects.\n4. It is not a PFCG authorization object and it is not the approval path. Verify by signing in as the requestor.\n\nThe table that maps a request type to an approval path is a different object and is not this policy."
+  },
+  {
+    "id": "definition",
+    "question": "What exactly is SU53?",
+    "httpStatus": 200,
+    "route": "",
+    "workflowId": "",
+    "modelCalls": 1,
+    "chars": 511,
+    "employers": false,
+    "answer": "SU53 is an SAP transaction used to diagnose authorization failures. It provides a detailed report of the last authorization check that failed, showing which authorization objects were checked and which ones were missing. This is crucial for troubleshooting access issues, as it helps identify the specific authorizations that need to be granted to resolve the problem. The mechanism works by capturing the authorization check context, allowing administrators to quickly pinpoint and address access control gaps."
+  }
+]

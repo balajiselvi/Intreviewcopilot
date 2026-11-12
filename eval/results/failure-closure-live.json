@@ -1,0 +1,90 @@
+[
+  {
+    "id": "fiori-missing",
+    "question": "A Public Edition user cannot see a Fiori app.",
+    "httpStatus": 200,
+    "route": "NONE",
+    "calls": 0,
+    "answer": ""
+  },
+  {
+    "id": "fiori-para",
+    "question": "On S/4HANA Cloud Public Edition the tile is missing. Where do you look first?",
+    "httpStatus": 200,
+    "route": "GENERATION",
+    "calls": 1,
+    "answer": "First, I would check the layout assignment for the deployment, specifically looking at the space and page assignments in the business role. In S/4HANA Cloud Public Edition, spaces and pages are managed through the Maintain Business Roles app. If the tile is still missing after confirming that the catalog is assigned correctly, I would then investigate the IAM Apps tab to determine if the application is categorized as a direct application or merely a navigation target. Additionally, I would reference SAP Note 3401525 to verify the spaces migration settings and ensure the parameters for SPACES and SPACES_ENABLE_USER are correctly configured for the tenant."
+  },
+  {
+    "id": "connector",
+    "question": "Connect ECC for Access Control risk analysis.",
+    "httpStatus": 200,
+    "route": "NONE",
+    "calls": 0,
+    "answer": ""
+  },
+  {
+    "id": "connector-empty",
+    "question": "SM59 succeeds but Access Control risk analysis returns nothing.",
+    "httpStatus": 200,
+    "route": "NONE",
+    "calls": 0,
+    "answer": ""
+  },
+  {
+    "id": "connector-para",
+    "question": "The RFC test in SM59 is green, yet risk analysis shows no authorization data from ECC. What is the next check?",
+    "httpStatus": 200,
+    "route": "GENERATION",
+    "calls": 1,
+    "answer": "The symptom indicates that while the RFC connection is successful, the risk analysis is unable to retrieve authorization data from the ECC system. This typically suggests that the ECC system is not registered as an active connector for the authorization scenario in the GRC Access Control framework. \n\nThe next step is to check the Integration Framework to ensure that the ECC system is properly registered as a connector. Specifically, I would verify the entries in the GRFNCCICONNECTOR table to confirm that the ECC system is listed and active. If it is not present, that would explain why the risk analysis is returning no data. This check will help establish whether the connector configuration is the root cause of the issue."
+  },
+  {
+    "id": "rise",
+    "question": "Who operates the infrastructure of SAP S/4HANA Cloud Private Edition compared with Public Edition?",
+    "httpStatus": 200,
+    "route": "NONE",
+    "calls": 0,
+    "answer": ""
+  },
+  {
+    "id": "rise-para",
+    "question": "Does the customer manage the servers in RISE Private Edition?",
+    "httpStatus": 200,
+    "route": "rise-hybrid-identity",
+    "calls": 0,
+    "answer": "RISE Hybrid identity.\n\n1. Keep the planes separate. Identity Authentication signs the user in. A corporate identity provider is proxied through it only when that landscape uses one.\n2. Identity Provisioning synchronizes users and groups. It does not decide the target's authorization.\n3. On S/4HANA Cloud Private Edition, PFCG maintains the role and its authorization objects. SU01 assigns that role to the ABAP user. SUIM reports those ABAP users and roles. SUIM does not validate Identity Authentication, Identity Provisioning, or BTP.\n4. On S/4HANA Cloud Public Edition, maintain business roles and restrictions in Maintain Business Roles, and assign business users in Maintain Business Users. Inspect a missing authorization with Display Authorization Trace. Do not design that model in PFCG.\n5. On BTP, the subaccount trusts the identity provider and the user receives a role collection.\n6. Validate each plane in its own tool: the identity-provider sign-in, the provisioning job, the edition's authorization tool, and the BTP role-collection assignment.\n\nWhether the corporate identity provider is proxied, which provisioning targets exist, and whether GRC or IAG governs requests are properties of the tenant. Do not invent them."
+  },
+  {
+    "id": "neg-msmp",
+    "question": "How do you maintain an MSMP workflow in Access Control?",
+    "httpStatus": 200,
+    "route": "GENERATION",
+    "calls": 1,
+    "answer": "To maintain an MSMP workflow in Access Control, start by configuring the process ID and defining the stages of the workflow, including the initiator and the approval paths. Each stage can be set as mandatory or conditional based on specific criteria. \n\nYou would validate the configuration by running user comparisons after role assignments and ensuring that the approval process aligns with the defined rules in BRF+. Additionally, monitor for any requests that get stuck at a stage and troubleshoot using logs to identify issues. Regularly review and update the workflow to ensure it meets compliance requirements and reflects any changes in business processes."
+  },
+  {
+    "id": "neg-pfcg",
+    "question": "How do you add a Fiori catalog to a PFCG role on an on-premise system?",
+    "httpStatus": 200,
+    "route": "GENERATION",
+    "calls": 1,
+    "answer": "First, you need to open the PFCG transaction to manage roles. Then, select the role you want to modify or create a new role. In the role maintenance screen, navigate to the \"Menu\" tab. Here, you can add a Fiori catalog by clicking on the \"Insert\" button and selecting \"Fiori Catalog.\" You will need to enter the catalog ID of the Fiori catalog you want to add. \n\nAfter that, switch to the \"Authorizations\" tab to generate the authorization profile. This step ensures that the necessary backend authorizations are included. You can use the \"Profile\" button to generate the profile based on the assigned Fiori catalog and any other authorization objects required by the applications in that catalog.\n\nNext, save your changes and transport the role if necessary. To verify that the role works as intended, you can use the \"User Comparison\" function to assign the role to users and check their access. Finally, test the assigned user’s access in the Fiori Launchpad to ensure they can see and use the applications associated with the catalog. If there are issues, you can use transaction SU53 to analyze authorization failures."
+  },
+  {
+    "id": "neg-iag",
+    "question": "What does authorization policy mean in IAG Access Request?",
+    "httpStatus": 200,
+    "route": "iag-request-policy",
+    "calls": 0,
+    "answer": "IAG Access Request.\n\n1. An authorization policy in IAG Access Request limits which systems, roles, users, or other entities a requestor can search and request.\n2. Open the Authorization Policy app. Create a policy set for Access, Business Role, or Application/System. Add a policy with the Request Access action and restrict the objects by attribute.\n3. Assign the policy set from user attributes and activate the policy. Access Request search then returns only those objects.\n4. It is not a PFCG authorization object and it is not the approval path. Verify by signing in as the requestor.\n\nThe table that maps a request type to an approval path is a different object and is not this policy."
+  },
+  {
+    "id": "neg-rfc",
+    "question": "How do you create a type 3 RFC destination in SM59 between two ABAP systems?",
+    "httpStatus": 200,
+    "route": "GENERATION",
+    "calls": 1,
+    "answer": "To create a type 3 RFC destination in SM59 between two ABAP systems, first, access transaction SM59. Then, select the option to create a new RFC destination. Specify the destination name and choose \"ABAP Connections\" as the connection type. In the next step, set the connection type to \"Type 3\" and fill in the required fields, including the target host and system number of the remote ABAP system. \n\nNext, configure the logon details, which typically include the user credentials for the technical communication user. Ensure that the \"Use SNC\" checkbox is selected if you are implementing Secure Network Communications. After entering all necessary information, save the configuration. \n\nTo verify the connection, use the \"Connection Test\" feature in SM59. A successful test indicates that the RFC destination is correctly set up and can communicate with the target ABAP system. Finally, ensure that the appropriate authorizations are in place for the user defined in the RFC destination to allow for successful communication."
+  }
+]

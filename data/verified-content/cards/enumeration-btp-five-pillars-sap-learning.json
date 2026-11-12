@@ -1,0 +1,42 @@
+{
+  "id": "enumeration-btp-five-pillars-sap-learning",
+  "domain": "btp",
+  "product": "SAP Business Technology Platform",
+  "version_scope": "SAP Learning five-pillar framing from Becoming an SAP BTP Solution Architect → Exploring SAP BTP: An Overview (retrieved 2026-10-29). Not a claim that every SAP publication uses this inventory.",
+  "claims": [
+    {
+      "id": "five-pillars-sap-learning",
+      "text": "In Exploring SAP BTP: An Overview (course: Becoming an SAP BTP Solution Architect), SAP identifies five capability pillars of SAP BTP: (1) Application Development & Automation, (2) Data and Analytics, (3) Integration, (4) Artificial Intelligence, and (5) Platform Foundation.",
+      "kind": "definition"
+    },
+    {
+      "id": "four-vs-five-framing-scope",
+      "text": "Other SAP Learning material describes four core solution pillars and treats Platform Foundation as the supporting layer rather than a fifth peer pillar. Do not silently merge the two framings or present the five-pillar list as the only framework used in all SAP materials; name the framing and dated source when answering.",
+      "kind": "definition"
+    },
+    {
+      "id": "excluded-stale-iam-fifth",
+      "text": "Excluded look-alike error: reciting an undated inventory that places IAM (or similar) as a timeless fifth pillar while omitting Artificial Intelligence / Platform Foundation from the SAP Learning overview framing cited here.",
+      "kind": "definition"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://learning.sap.com/courses/becoming-an-sap-btp-solution-architect/exploring-sap-btp-an-overview",
+      "section": "Exploring SAP BTP: An Overview — five capability pillars of SAP Business Technology Platform",
+      "retrieved_on": "2026-10-29",
+      "title": "Exploring SAP BTP: An Overview (Becoming an SAP BTP Solution Architect)"
+    }
+  ],
+  "verification_status": "NEEDS_REVIEW",
+  "reviewer": null,
+  "verified_on": null,
+  "expiry": null,
+  "recheck_date": "2026-11-30",
+  "spoken_answer": "In the SAP Learning overview Exploring SAP BTP: An Overview from Becoming an SAP BTP Solution Architect, SAP frames five capability pillars: Application Development and Automation, Data and Analytics, Integration, Artificial Intelligence, and Platform Foundation. In that five-pillar framing, Platform Foundation is the foundation layer under the other solution areas. Other SAP Learning material uses four core solution pillars and treats Platform Foundation as the supporting layer rather than a fifth peer pillar, so I name the framing and source instead of claiming one inventory is universal across all SAP materials.",
+  "conflicts": [
+    "enumeration-btp-capability-framing (generic undated five-pillar caution; this card attaches a dated SAP Learning source for one specific framing)",
+    "btp-security-depth legacy-pillars claim (security-depth checklist is not a pillar inventory)"
+  ],
+  "notes": "Draft only. Human must set VERIFIED. Do not promote to APPROVED pack solely for tests. Offline tests may inject spoken_answer / claims as supporting knowledge evidence without changing verification_status."
+}

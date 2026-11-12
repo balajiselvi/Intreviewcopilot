@@ -1,0 +1,111 @@
+[
+  {
+    "id": "auth-ecc-s4-btp",
+    "priorAppWords": 248,
+    "goldWords": 148,
+    "newWords": 166,
+    "vsApp": "67% of prior app",
+    "vsGold": "112% of gold",
+    "latencyMs": 8654,
+    "hits": [
+      {
+        "name": "PFCG",
+        "ok": true
+      },
+      {
+        "name": "SU01",
+        "ok": true
+      },
+      {
+        "name": "Fiori catalog",
+        "ok": true
+      },
+      {
+        "name": "S_SERVICE or S_START",
+        "ok": true
+      },
+      {
+        "name": "role collection",
+        "ok": true
+      },
+      {
+        "name": "OAuth/SAML/JWT",
+        "ok": true
+      }
+    ],
+    "leaks": [
+      {
+        "name": "evolution opener",
+        "leaked": false
+      }
+    ],
+    "answer": "The authorization architecture across SAP ECC, S/4HANA, and SAP BTP is designed to ensure that users have the appropriate access while maintaining security and compliance.\n\nIn SAP ECC, authorization is managed through PFCG, where authorization objects are assigned to user profiles in SU01. This allows for role-based access control, ensuring users can only perform actions relevant to their roles.\n\nIn S/4HANA, the architecture evolves to include Fiori apps, where PFCG roles are still used, but they are complemented by Fiori catalogs and target mappings. The S_SERVICE and S_START authorization objects are critical for OData services, ensuring that users can access the necessary Fiori applications.\n\nFor SAP BTP, authorization is handled through role collections and scopes, enforced using OAuth 2.0 or SAML 2.0. This allows for fine-grained access control at the application level, ensuring that users have the right permissions based on their roles.\n\nThis layered approach ensures that identity management, authorization, and application enforcement are distinct yet integrated, providing a robust security framework across all platforms."
+  },
+  {
+    "id": "ias-ips-hybrid",
+    "priorAppWords": 218,
+    "goldWords": 132,
+    "newWords": 142,
+    "vsApp": "65% of prior app",
+    "vsGold": "108% of gold",
+    "latencyMs": 3449,
+    "hits": [
+      {
+        "name": "IdP or proxy",
+        "ok": true
+      },
+      {
+        "name": "SCIM",
+        "ok": true
+      },
+      {
+        "name": "source/target",
+        "ok": true
+      },
+      {
+        "name": "Cloud Connector",
+        "ok": true
+      }
+    ],
+    "leaks": [],
+    "answer": "In a hybrid landscape, the architecture of SAP Cloud Identity Services involves a clear separation of responsibilities among identity management components. IAS acts as the identity provider, handling authentication through protocols like SAML 2.0 and OIDC. It verifies user identities for cloud applications, ensuring secure access.\n\nIPS, on the other hand, serves as the provisioning engine. It reads identity data from sources such as SuccessFactors or corporate directories and executes provisioning writes to target systems, synchronizing user identities and role assignments. This is done through SCIM, which facilitates the mapping of attributes from source to target.\n\nThe Cloud Connector plays a crucial role by establishing an outbound tunnel to on-premise systems, allowing secure communication without exposing internal networks. This architecture effectively closes the gap between cloud and on-premise identity management, ensuring a unified identity lifecycle while maintaining distinct governance and authorization layers."
+  },
+  {
+    "id": "siem-etd",
+    "priorAppWords": 247,
+    "goldWords": 108,
+    "newWords": 147,
+    "vsApp": "60% of prior app",
+    "vsGold": "136% of gold",
+    "latencyMs": 3376,
+    "hits": [
+      {
+        "name": "app-layer gap or SE16/RFC",
+        "ok": true
+      },
+      {
+        "name": "SM19 or SM20 or SAL",
+        "ok": true
+      },
+      {
+        "name": "ETD or SAP-aware engine",
+        "ok": true
+      },
+      {
+        "name": "CEF or Syslog",
+        "ok": true
+      }
+    ],
+    "leaks": [
+      {
+        "name": "IAS bolted on",
+        "leaked": false
+      },
+      {
+        "name": "SOC process opener",
+        "leaked": false
+      }
+    ],
+    "answer": "To effectively position and architect SAP Threat Detection and SIEM integration for a customer's Security Operations Center, we need to address the gap where traditional network SIEM solutions cannot detect SAP-specific threats, such as unauthorized SE16N downloads or changes to table parameters. \n\nI would implement an SAP-aware Threat Detection solution, such as Enterprise Threat Detection or a third-party tool like SecurityBridge or Onapsis. This would leverage the Security Audit Log (SM19/SM20), Read Access Logging, and Gateway/RFC logs to capture relevant events. These logs would then be normalized into a Common Event Format (CEF) or Syslog for integration with the enterprise SIEM.\n\nThe architecture would ensure that the detection layer is closely aligned with SAP's native mechanisms, providing visibility into application-layer activities while maintaining distinct separation between identity, authorization, and detection planes. This approach not only enhances security monitoring but also facilitates timely incident response and compliance reporting."
+  }
+]

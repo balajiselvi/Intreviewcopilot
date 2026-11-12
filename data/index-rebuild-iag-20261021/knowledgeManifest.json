@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "parserVersion": "a5fdef3073fe",
+  "chunkVersion": "59c1e5914015",
+  "embeddingVersion": "Xenova/all-MiniLM-L6-v2",
+  "buildTimestamp": "2026-10-21T12:35:02.500Z",
+  "totalDocuments": 134,
+  "totalChunks": 2907,
+  "indexVersion": 1
+}

@@ -1,0 +1,98 @@
+{
+  "rows": [
+    {
+      "file": "bw/infoproviders.md",
+      "bytes": 0
+    },
+    {
+      "file": "cloud/cloud-security.md",
+      "bytes": 0
+    },
+    {
+      "file": "cloud/identity-federation.md",
+      "bytes": 0
+    },
+    {
+      "file": "cloud/oauth.md",
+      "bytes": 0
+    },
+    {
+      "file": "cloud/saml.md",
+      "bytes": 0
+    },
+    {
+      "file": "compliance/compliance.md",
+      "bytes": 0
+    },
+    {
+      "file": "compliance/risk-mitigation.md",
+      "bytes": 0
+    },
+    {
+      "file": "cutover/rollback-plan.md",
+      "bytes": 0
+    },
+    {
+      "file": "fiori/catalogs.md",
+      "bytes": 0
+    },
+    {
+      "file": "fiori/launchpad.md",
+      "bytes": 0
+    },
+    {
+      "file": "fiori/spaces-pages.md",
+      "bytes": 0
+    },
+    {
+      "file": "hypercare/knowledge-transfer.md",
+      "bytes": 0
+    },
+    {
+      "file": "hypercare/post-go-live.md",
+      "bytes": 0
+    },
+    {
+      "file": "leadership/client-management.md",
+      "bytes": 0
+    },
+    {
+      "file": "leadership/delivery-management.md",
+      "bytes": 0
+    },
+    {
+      "file": "leadership/team-management.md",
+      "bytes": 0
+    },
+    {
+      "file": "leadership/vendor-management.md",
+      "bytes": 0
+    },
+    {
+      "file": "transports/chaRM.md",
+      "bytes": 0
+    },
+    {
+      "file": "transports/release-process.md",
+      "bytes": 0
+    },
+    {
+      "file": "transports/transport-management.md",
+      "bytes": 0
+    },
+    {
+      "file": "troubleshooting/debugging.md",
+      "bytes": 0
+    },
+    {
+      "file": "troubleshooting/job-failures.md",
+      "bytes": 0
+    },
+    {
+      "file": "troubleshooting/performance.md",
+      "bytes": 0
+    }
+  ],
+  "missing": [],
+  "nonempty": []
+}

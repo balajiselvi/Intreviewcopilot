@@ -1,0 +1,14 @@
+[
+  {
+    "id": "task-interview-engine-v2-live-context",
+    "key": "interview-engine-v2-live-context",
+    "content": "Task completed: interview-engine-v2-live-context",
+    "namespace": "tasks",
+    "type": "task-outcome",
+    "metadata": {
+      "success": true,
+      "quality": 0.85
+    },
+    "createdAt": 1788951813056
+  }
+]

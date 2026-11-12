@@ -1,0 +1,35 @@
+{
+  "id": "acronym-msmp",
+  "domain": "grc-ac",
+  "product": "SAP Access Control",
+  "version_scope": "GRC AC 10.x–12.0 — confirm per release",
+  "claims": [
+    {
+      "id": "msmp-expansion-conflict",
+      "text": "SAP documentation uses more than one English expansion for MSMP; candidates historically cite Multi-Stage Multi-Path and Multi-Stage Multi-Process. Do not assert a single expansion until verified against current SAP Help for the target release.",
+      "kind": "definition"
+    },
+    {
+      "id": "msmp-role",
+      "text": "MSMP is the Access Control workflow engine that stages access-request approvals; agent determination is commonly delegated to BRFplus rules.",
+      "kind": "definition"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://help.sap.com/",
+      "section": "SAP Access Control — Workflow for Access Control / MSMP (verify exact path for release)",
+      "retrieved_on": "2026-10-29"
+    }
+  ],
+  "verification_status": "NEEDS_REVIEW",
+  "reviewer": null,
+  "verified_on": null,
+  "expiry": null,
+  "recheck_date": "2026-11-30",
+  "spoken_answer": null,
+  "conflicts": [
+    "Multi-Stage Multi-Path vs Multi-Stage Multi-Process — resolve from SAP's own docs for the release in scope"
+  ],
+  "notes": "Draft only. Do not serve expansion as fact until VERIFIED."
+}

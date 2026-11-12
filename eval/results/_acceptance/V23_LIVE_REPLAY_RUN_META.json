@@ -1,0 +1,22 @@
+{
+  "startedAt": "2026-11-03T11:52:52.742Z",
+  "envLoad": {
+    "loaded": true,
+    "count": 4
+  },
+  "providerMode": "live",
+  "model": "gpt-4o-mini",
+  "plannedCount": 141,
+  "fullWorklistCount": 141,
+  "limit": null,
+  "completed": 141,
+  "liveFailed": 0,
+  "shortCircuits": 7,
+  "mockViolations": 0,
+  "last": {
+    "runId": "bench_oauth",
+    "at": "2026-11-03T11:53:56.914Z",
+    "liveFailed": false
+  },
+  "endedAt": "2026-11-03T11:53:56.915Z"
+}

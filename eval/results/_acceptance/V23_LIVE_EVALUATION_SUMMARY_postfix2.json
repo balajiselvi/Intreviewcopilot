@@ -1,0 +1,41 @@
+{
+  "at": "2026-11-03T12:36:00.000Z",
+  "mode": "genuine-live-openai-postfix2",
+  "harness": "registerNextResolveLive.mjs",
+  "artifact": "V23_LIVE_REPLAY_RESULTS_postfix2.jsonl",
+  "fixesInForce": [
+    "WELL_KNOWN_SAP_KEEP",
+    "quiet-strip-no-hedge",
+    "msmp-kb-Multi-Stage-Multi-Path",
+    "prompt-assignment-vs-execution",
+    "technicalReasoner-usage-vs-assignment",
+    "bank-script-demote-for-live"
+  ],
+  "totals": {
+    "n": 13,
+    "liveFailed": 0,
+    "mockSub": 0,
+    "shortCircuit": 0
+  },
+  "classifications": {
+    "defect_pfcg_use": "CORRECT_AND_COMPLETE",
+    "defect_pfcg_configure": "CORRECT_BUT_INCOMPLETE",
+    "defect_st03n_export": "PARTIALLY_INCORRECT",
+    "bench_brm": "CORRECT_AND_COMPLETE",
+    "bench_pfcg": "CORRECT_AND_COMPLETE",
+    "bench_su24_su25": "IRRELEVANT",
+    "bench_msmp": "PARTIALLY_INCORRECT",
+    "bench_critical_actions": "PARTIALLY_INCORRECT",
+    "bench_bw": "CORRECT_AND_COMPLETE",
+    "bench_idm": "CORRECT_BUT_INCOMPLETE",
+    "bench_btp": "CORRECT_BUT_INCOMPLETE",
+    "bench_s4_experience": "CORRECT_BUT_INCOMPLETE",
+    "bench_oauth": "CORRECT_AND_COMPLETE"
+  },
+  "releaseBlocking": [
+    "defect_st03n_export: AGR still mixed into usage-export answer",
+    "bench_msmp: expansion Multi-Step Multi-Path (need Multi-Stage Multi-Path)",
+    "bench_su24_su25: recovered migration procedure instead of difference"
+  ],
+  "readiness": "NOT_READY"
+}

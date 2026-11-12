@@ -1,0 +1,40 @@
+{
+  "id": "enumeration-btp-capability-framing",
+  "domain": "btp",
+  "product": "SAP Business Technology Platform",
+  "version_scope": "Marketing/capability framing changes over time — attach dated SAP sources before VERIFIED",
+  "claims": [
+    {
+      "id": "no-stale-pillar-list",
+      "text": "Do not treat a fixed five-pillar inventory (for example Database, Application Development, Integration, Analytics, IAM) as current authoritative BTP architecture unless a dated SAP source for the interview context is verified.",
+      "kind": "definition"
+    },
+    {
+      "id": "security-interview-framing",
+      "text": "For security-focused BTP questions prefer: global account/directory/subaccount structure, IAS trust, role templates, role collections, XSUAA (Authorization and Trust Management), destinations/connectivity including Cloud Connector, audit logging. Do not omit AI or other current platform themes solely because an older pillar list omitted them — and do not invent members.",
+      "kind": "definition"
+    },
+    {
+      "id": "excluded-lookalikes",
+      "text": "Excluded look-alike error: answering BTP pillars as if IAM were a timeless fifth pillar while omitting current topics the question expects, or delivering a numbered markdown list that truncates mid-sentence.",
+      "kind": "definition"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://help.sap.com/",
+      "section": "SAP BTP product overview / security — verify dated framing",
+      "retrieved_on": "2026-10-29"
+    }
+  ],
+  "verification_status": "NEEDS_REVIEW",
+  "reviewer": null,
+  "verified_on": null,
+  "expiry": null,
+  "recheck_date": "2026-11-30",
+  "spoken_answer": null,
+  "conflicts": [
+    "enumeration-btp-five-pillars-sap-learning (dated SAP Learning five-pillar framing — prefer that card when the interview asks specifically for the five pillars and that source is in scope)"
+  ],
+  "notes": "Supports I-2 regression class: enumeration/definition/comparison. Keep this as the undated/stale-inventory caution; the dated five-pillar SAP Learning list lives in enumeration-btp-five-pillars-sap-learning (still NEEDS_REVIEW)."
+}

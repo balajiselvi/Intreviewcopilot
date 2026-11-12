@@ -1,0 +1,41 @@
+{
+  "stagedChunks": 2786,
+  "backupChunks": 2772,
+  "stagedDocuments": 127,
+  "manifestChunks": 2786,
+  "manifestDocuments": 127,
+  "embeddingVersion": "text-embedding-3-small",
+  "indexEmbeddingModel": "text-embedding-3-small",
+  "dims": [
+    384
+  ],
+  "report": {
+    "documentsProcessed": 127,
+    "documentsSkipped": 93,
+    "documentsUpdated": 34,
+    "chunksCreated": 341,
+    "errors": []
+  },
+  "required": {
+    "activate-phases": true,
+    "joule-trust": true,
+    "joule-groups": true,
+    "car-admin": true,
+    "sac-team": true,
+    "public-trace": true
+  },
+  "forbidden": {
+    "false-weeks": false,
+    "false-percent": false,
+    "false-duration": false
+  },
+  "activateFiles": [
+    "project-lifecycle.md",
+    "sap-activate.md",
+    "rise-project.md"
+  ],
+  "backupOnly": [],
+  "stagedOnly": [
+    "sap-activate.md"
+  ]
+}

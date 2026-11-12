@@ -1,0 +1,711 @@
+{
+  "index": {
+    "activeChunks": 3443,
+    "generatedAt": "2026-11-02T15:15:49.717Z",
+    "parserVersion": "v22-bank-sanitize-20261102",
+    "chunkVersion": "v22-bank-sanitize-20261102",
+    "indexVersion": 2,
+    "backupChunks": 3428,
+    "backupGeneratedAt": "2026-10-26T16:00:51.492Z",
+    "backupPath": "data/index-backup-20261102-203015-pre-v22/",
+    "method": "searchKnowledge + selectProductScopedChunks (mirrors chat.js)"
+  },
+  "families": [
+    {
+      "question": "What are Critical Actions?",
+      "detectedFamily": "critical-actions",
+      "topic": "GRC",
+      "folders": [
+        "grc"
+      ],
+      "returnedCandidates": 16,
+      "scopedCount": 8,
+      "topScore": 0.4677340658215888,
+      "belowLiveRelevanceThreshold": false,
+      "coverageStatus": "RELEVANT_SUFFICIENT",
+      "useRetrievedAsGrounding": true,
+      "top8": [
+        {
+          "rank": 1,
+          "id": "chunk_fe0d3891a99ed2d689ade60ca708a198d3c98dad73a5e3cb3e5cb5c7127812d4",
+          "sourceFile": "grc/ara.md",
+          "heading": "Critical Actions, Critical Permissions, and SoD Risks",
+          "score": 0.42521278711053523,
+          "preview": "- A segregation-of-duties Risk requires conflicting Functions held together (for example create vendor plus post payment). - A Critical Action Risk flags a sing"
+        },
+        {
+          "rank": 2,
+          "id": "chunk_451fe781a9920097c52bbee36aa8a94d45b6da99896ccd8e7e0f7804429fd5b4",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "What Makes This a 10/10 Answer",
+          "score": 0.31111134596150447,
+          "preview": "An average answer says you review flagged conflicts and decide what to do. A 10/10 answer explains the specific decision framework — remediate, mitigate, or acc"
+        },
+        {
+          "rank": 3,
+          "id": "chunk_acaa9af5503f94c0edf062d92cab2e931d3393e6024e5d10772effd4350e7fbe",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "Interview Summary",
+          "score": 0.2913131709189048,
+          "preview": "Once ARA produces a list of conflicts, someone has to decide what to do about each one — remediate by changing the role or access, mitigate with a compensating "
+        },
+        {
+          "rank": 4,
+          "id": "chunk_94f3f074b50a299c986ed513805d19d1914534ea8d6b1747eaeacbcc04f65bb6",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.27403401397470983,
+          "preview": "When remediation isn't feasible in the short term, mitigation applies a compensating control instead — most commonly an independent review process where someone"
+        },
+        {
+          "rank": 5,
+          "id": "chunk_b63161a1dfac7379392d0e894d27c4e22741c8ea4c65ab71173445752b0bad33",
+          "sourceFile": "grc/firefighter.md",
+          "heading": "Runtime Flow",
+          "score": 0.2670610852986073,
+          "preview": "## Runtime Flow An engineer opens GRAC_SPM and selects a Firefighter ID from those they're assigned to. They choose a reason code and enter justification text, "
+        },
+        {
+          "rank": 6,
+          "id": "chunk_055bfbc2712ae0fad534648546e23b4c6448a91758165ca709288287ffa59e16",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.2650724767340602,
+          "preview": "Prioritization across a large list of conflicts usually follows risk level first, then how business-critical the functions involved are, then how many users are"
+        },
+        {
+          "rank": 7,
+          "id": "chunk_698a4a337cfdd6c7e81c70416184bcb74cd1b5fbca297dc02aa16d6aeb0258b5",
+          "sourceFile": "grc/deloitte-usi-specific-gap-fillers.md",
+          "heading": "Q103: What are the most critical backend SAP PFCG, User, and GRC tables that an architect must know for audit queries and custom reporting?",
+          "score": 0.2548469951245795,
+          "preview": "## Q103: What are the most critical backend SAP PFCG, User, and GRC tables that an architect must know for audit queries and custom reporting?"
+        },
+        {
+          "rank": 8,
+          "id": "chunk_4e201f163ba2dede0756152117e4713c112e8cd48b15b686105286a8f740b4c3",
+          "sourceFile": "grc/rulesets.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.2959558163235848,
+          "preview": "The quality of a ruleset directly determines whether ARA is a meaningful control or theater. A ruleset with gaps — missing functions for custom transactions, mi"
+        }
+      ],
+      "bankOrGapFillerInTop8": [
+        "7:grc/deloitte-usi-specific-gap-fillers.md"
+      ],
+      "technicalPreferredInTop8": true,
+      "technicalReference": {
+        "id": "chunk_fe0d3891a99ed2d689ade60ca708a198d3c98dad73a5e3cb3e5cb5c7127812d4",
+        "sourceFile": "grc/ara.md",
+        "heading": "Critical Actions, Critical Permissions, and SoD Risks",
+        "rankAmongScoped": 1
+      },
+      "knowledgeHasTopical": true,
+      "q22HeadingInKnowledge": false,
+      "validateInstructionInKnowledge": false,
+      "coverageEnum": {
+        "RELEVANT_SUFFICIENT": "RELEVANT_SUFFICIENT",
+        "RELEVANT_PARTIAL": "RELEVANT_PARTIAL",
+        "NO_RELEVANT_KNOWLEDGE": "NO_RELEVANT_KNOWLEDGE",
+        "IRRELEVANT_RETRIEVAL": "IRRELEVANT_RETRIEVAL",
+        "CONFLICTING_KNOWLEDGE": "CONFLICTING_KNOWLEDGE"
+      }
+    },
+    {
+      "question": "What are Critical Permissions?",
+      "detectedFamily": "critical-permissions",
+      "topic": "GRC",
+      "folders": [
+        "grc"
+      ],
+      "returnedCandidates": 16,
+      "scopedCount": 10,
+      "topScore": 0.5535569395429865,
+      "belowLiveRelevanceThreshold": false,
+      "coverageStatus": "RELEVANT_SUFFICIENT",
+      "useRetrievedAsGrounding": true,
+      "top8": [
+        {
+          "rank": 1,
+          "id": "chunk_fe0d3891a99ed2d689ade60ca708a198d3c98dad73a5e3cb3e5cb5c7127812d4",
+          "sourceFile": "grc/ara.md",
+          "heading": "Critical Actions, Critical Permissions, and SoD Risks",
+          "score": 0.5032335814027149,
+          "preview": "- A segregation-of-duties Risk requires conflicting Functions held together (for example create vendor plus post payment). - A Critical Action Risk flags a sing"
+        },
+        {
+          "rank": 2,
+          "id": "chunk_87de925b216d2e0d9fa29f520cf4f8ea4f890cb1f19ddce3275c4956f31adaad",
+          "sourceFile": "grc/ara.md",
+          "heading": "Critical Actions, Critical Permissions, and SoD Risks",
+          "score": 0.30564740136527474,
+          "preview": "ARA rulesets distinguish segregation-of-duties Risks from Critical Access Risks."
+        },
+        {
+          "rank": 3,
+          "id": "chunk_acaa9af5503f94c0edf062d92cab2e931d3393e6024e5d10772effd4350e7fbe",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "Interview Summary",
+          "score": 0.36944072793714994,
+          "preview": "Once ARA produces a list of conflicts, someone has to decide what to do about each one — remediate by changing the role or access, mitigate with a compensating "
+        },
+        {
+          "rank": 4,
+          "id": "chunk_560a0e8c0b750bf0a8a6bc9ec824363594699cc74be36eb3bb1241a70224df09",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "30 Second Interview Answer",
+          "score": 0.29391122682583626,
+          "preview": "Running the analysis is the easy part — deciding what to do with the results is where the judgment is. For every flagged conflict you're choosing between three "
+        },
+        {
+          "rank": 5,
+          "id": "chunk_94f3f074b50a299c986ed513805d19d1914534ea8d6b1747eaeacbcc04f65bb6",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.28582256720624377,
+          "preview": "When remediation isn't feasible in the short term, mitigation applies a compensating control instead — most commonly an independent review process where someone"
+        },
+        {
+          "rank": 6,
+          "id": "chunk_056245f8c77bf7de8cb0788974d7b9ebd16669e65f8fdc212c3164257adc8954",
+          "sourceFile": "grc/mitigation.md",
+          "heading": "30 Second Interview Answer",
+          "score": 0.2739156647250829,
+          "preview": "A mitigating control is what you apply when you can't remove a segregation of duties conflict by changing access. It's a compensating process, usually an indepe"
+        },
+        {
+          "rank": 7,
+          "id": "chunk_698a4a337cfdd6c7e81c70416184bcb74cd1b5fbca297dc02aa16d6aeb0258b5",
+          "sourceFile": "grc/deloitte-usi-specific-gap-fillers.md",
+          "heading": "Q103: What are the most critical backend SAP PFCG, User, and GRC tables that an architect must know for audit queries and custom reporting?",
+          "score": 0.2745803310580736,
+          "preview": "## Q103: What are the most critical backend SAP PFCG, User, and GRC tables that an architect must know for audit queries and custom reporting?"
+        },
+        {
+          "rank": 8,
+          "id": "chunk_4e201f163ba2dede0756152117e4713c112e8cd48b15b686105286a8f740b4c3",
+          "sourceFile": "grc/rulesets.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.2933808905073244,
+          "preview": "The quality of a ruleset directly determines whether ARA is a meaningful control or theater. A ruleset with gaps — missing functions for custom transactions, mi"
+        }
+      ],
+      "bankOrGapFillerInTop8": [
+        "7:grc/deloitte-usi-specific-gap-fillers.md"
+      ],
+      "technicalPreferredInTop8": true,
+      "technicalReference": {
+        "id": "chunk_fe0d3891a99ed2d689ade60ca708a198d3c98dad73a5e3cb3e5cb5c7127812d4",
+        "sourceFile": "grc/ara.md",
+        "heading": "Critical Actions, Critical Permissions, and SoD Risks",
+        "rankAmongScoped": 1
+      },
+      "knowledgeHasTopical": true,
+      "q22HeadingInKnowledge": false,
+      "validateInstructionInKnowledge": false,
+      "coverageEnum": {
+        "RELEVANT_SUFFICIENT": "RELEVANT_SUFFICIENT",
+        "RELEVANT_PARTIAL": "RELEVANT_PARTIAL",
+        "NO_RELEVANT_KNOWLEDGE": "NO_RELEVANT_KNOWLEDGE",
+        "IRRELEVANT_RETRIEVAL": "IRRELEVANT_RETRIEVAL",
+        "CONFLICTING_KNOWLEDGE": "CONFLICTING_KNOWLEDGE"
+      }
+    },
+    {
+      "question": "What are Critical Access Risks?",
+      "detectedFamily": "critical-access-risks",
+      "topic": "GRC",
+      "folders": [
+        "grc"
+      ],
+      "returnedCandidates": 16,
+      "scopedCount": 9,
+      "topScore": 0.611241547332292,
+      "belowLiveRelevanceThreshold": false,
+      "coverageStatus": "RELEVANT_SUFFICIENT",
+      "useRetrievedAsGrounding": true,
+      "top8": [
+        {
+          "rank": 1,
+          "id": "chunk_87de925b216d2e0d9fa29f520cf4f8ea4f890cb1f19ddce3275c4956f31adaad",
+          "sourceFile": "grc/ara.md",
+          "heading": "Critical Actions, Critical Permissions, and SoD Risks",
+          "score": 0.4861828510327606,
+          "preview": "ARA rulesets distinguish segregation-of-duties Risks from Critical Access Risks."
+        },
+        {
+          "rank": 2,
+          "id": "chunk_fe0d3891a99ed2d689ade60ca708a198d3c98dad73a5e3cb3e5cb5c7127812d4",
+          "sourceFile": "grc/ara.md",
+          "heading": "Critical Actions, Critical Permissions, and SoD Risks",
+          "score": 0.4800079158956633,
+          "preview": "- A segregation-of-duties Risk requires conflicting Functions held together (for example create vendor plus post payment). - A Critical Action Risk flags a sing"
+        },
+        {
+          "rank": 3,
+          "id": "chunk_e6d92dd1ac1e9915b3025890e26a74c0e3107872045253f5eede97cff9d1eb4f",
+          "sourceFile": "grc/ara.md",
+          "heading": "Access Risk Analysis (ARA)",
+          "score": 0.3435241939359358,
+          "preview": "# Access Risk Analysis (ARA)"
+        },
+        {
+          "rank": 4,
+          "id": "chunk_9556f00ea2ed3bdf8481551bca41c55810c36495b6bce37069e5f3d810367105",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "Best Practices",
+          "score": 0.33074063689055777,
+          "preview": "- Default to remediation whenever it's genuinely feasible, reserving mitigation for real constraints - Track and enforce mitigating control execution, not just "
+        },
+        {
+          "rank": 5,
+          "id": "chunk_5248e8475bfd89305756b57cd2db4914e4d97eaccf05f83f9a549a776555aeed",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "Common Mistakes",
+          "score": 0.32510212976185426,
+          "preview": "- Defaulting to mitigation because it's politically easier than remediation - Documenting mitigating controls that are never actually executed - Treating every "
+        },
+        {
+          "rank": 6,
+          "id": "chunk_acaa9af5503f94c0edf062d92cab2e931d3393e6024e5d10772effd4350e7fbe",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "Interview Summary",
+          "score": 0.38686451591585536,
+          "preview": "Once ARA produces a list of conflicts, someone has to decide what to do about each one — remediate by changing the role or access, mitigate with a compensating "
+        },
+        {
+          "rank": 7,
+          "id": "chunk_6465aba7f9a704559caa1aa1e3dc41aced82f90d3f5bf72395f2f845d9685366",
+          "sourceFile": "grc/ara.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.38467435227911884,
+          "preview": "Access Risk Analysis is the segregation of duties engine underneath GRC Access Control. Its core job is comparing a user's access — either what they already hav"
+        },
+        {
+          "rank": 8,
+          "id": "chunk_560a0e8c0b750bf0a8a6bc9ec824363594699cc74be36eb3bb1241a70224df09",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "30 Second Interview Answer",
+          "score": 0.3664712681521285,
+          "preview": "Running the analysis is the easy part — deciding what to do with the results is where the judgment is. For every flagged conflict you're choosing between three "
+        }
+      ],
+      "bankOrGapFillerInTop8": [],
+      "technicalPreferredInTop8": true,
+      "technicalReference": {
+        "id": "chunk_87de925b216d2e0d9fa29f520cf4f8ea4f890cb1f19ddce3275c4956f31adaad",
+        "sourceFile": "grc/ara.md",
+        "heading": "Critical Actions, Critical Permissions, and SoD Risks",
+        "rankAmongScoped": 1
+      },
+      "knowledgeHasTopical": true,
+      "q22HeadingInKnowledge": false,
+      "validateInstructionInKnowledge": false,
+      "coverageEnum": {
+        "RELEVANT_SUFFICIENT": "RELEVANT_SUFFICIENT",
+        "RELEVANT_PARTIAL": "RELEVANT_PARTIAL",
+        "NO_RELEVANT_KNOWLEDGE": "NO_RELEVANT_KNOWLEDGE",
+        "IRRELEVANT_RETRIEVAL": "IRRELEVANT_RETRIEVAL",
+        "CONFLICTING_KNOWLEDGE": "CONFLICTING_KNOWLEDGE"
+      }
+    },
+    {
+      "question": "What is the difference between Risk, Function, Action and Permission?",
+      "detectedFamily": "ara-hierarchy",
+      "topic": "GRC",
+      "folders": [
+        "grc"
+      ],
+      "returnedCandidates": 16,
+      "scopedCount": 13,
+      "topScore": 0.5946698140046927,
+      "belowLiveRelevanceThreshold": false,
+      "coverageStatus": "RELEVANT_SUFFICIENT",
+      "useRetrievedAsGrounding": true,
+      "top8": [
+        {
+          "rank": 1,
+          "id": "chunk_fe0d3891a99ed2d689ade60ca708a198d3c98dad73a5e3cb3e5cb5c7127812d4",
+          "sourceFile": "grc/ara.md",
+          "heading": "Critical Actions, Critical Permissions, and SoD Risks",
+          "score": 0.5048461754803588,
+          "preview": "- A segregation-of-duties Risk requires conflicting Functions held together (for example create vendor plus post payment). - A Critical Action Risk flags a sing"
+        },
+        {
+          "rank": 2,
+          "id": "chunk_6465aba7f9a704559caa1aa1e3dc41aced82f90d3f5bf72395f2f845d9685366",
+          "sourceFile": "grc/ara.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.3958855643034988,
+          "preview": "Access Risk Analysis is the segregation of duties engine underneath GRC Access Control. Its core job is comparing a user's access — either what they already hav"
+        },
+        {
+          "rank": 3,
+          "id": "chunk_127e5e73d5ddc711d0dc3cc2d272cce9eda7e33dce19151c75e37aa8c075363e",
+          "sourceFile": "grc/ara.md",
+          "heading": "Architecture",
+          "score": 0.3552474735883326,
+          "preview": "## Architecture - Ruleset: the maintained definition of risky function combinations - Function: a business activity, like \"create vendor\" or \"post payment,\" tha"
+        },
+        {
+          "rank": 4,
+          "id": "chunk_6d7b23429c5d4d48b3076e06751788893ce27e53b7049ed6c606440471d311b4",
+          "sourceFile": "grc/ara.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.32328987872019044,
+          "preview": "ARA operates in two distinct modes that matter for different purposes. User-level analysis evaluates existing access across the user population, which is the mo"
+        },
+        {
+          "rank": 5,
+          "id": "chunk_43a7e29be94ecb5676095edf7f226832beaabe3baf06a990a48ed38575a6c528",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.321658699958697,
+          "preview": "A risk analysis result is just a starting point. For every flagged segregation of duties conflict, there's a decision to make: remediate, mitigate, or in limite"
+        },
+        {
+          "rank": 6,
+          "id": "chunk_56697caa97eb558e8f08089c62a76328335ff8cb8f482df76969222b217e92fa",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.319677506207158,
+          "preview": "Producing a risk analysis result is the mechanical part. The actual work is deciding what to do with every flagged conflict, and that decision generally falls i"
+        },
+        {
+          "rank": 7,
+          "id": "chunk_77a7f02788837a0b1bcc9720beb1f1762531cf76ab2f4f1491bee8f49e91f889",
+          "sourceFile": "grc/deloitte-usi-specific-gap-fillers.md",
+          "heading": "Q108: What is the technical difference between standard user types in SAP (`Dialog`, `System`, `Communication`, `Service`, `Reference`) and how do you secure them?",
+          "score": 0.3171571056474652,
+          "preview": "## Q108: What is the technical difference between standard user types in SAP (`Dialog`, `System`, `Communication`, `Service`, `Reference`) and how do you secure"
+        },
+        {
+          "rank": 8,
+          "id": "chunk_b087cdffc6cfae1e933fa093020c966182410b5124ba728e2e0687274853c700",
+          "sourceFile": "grc/rulesets.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.42042195424923146,
+          "preview": "A ruleset is structured in two layers, and understanding both is what separates a superficial answer from a real one. Functions are the foundational layer — eac"
+        }
+      ],
+      "bankOrGapFillerInTop8": [
+        "7:grc/deloitte-usi-specific-gap-fillers.md"
+      ],
+      "technicalPreferredInTop8": true,
+      "technicalReference": {
+        "id": "chunk_fe0d3891a99ed2d689ade60ca708a198d3c98dad73a5e3cb3e5cb5c7127812d4",
+        "sourceFile": "grc/ara.md",
+        "heading": "Critical Actions, Critical Permissions, and SoD Risks",
+        "rankAmongScoped": 1
+      },
+      "knowledgeHasTopical": true,
+      "q22HeadingInKnowledge": false,
+      "validateInstructionInKnowledge": false,
+      "coverageEnum": {
+        "RELEVANT_SUFFICIENT": "RELEVANT_SUFFICIENT",
+        "RELEVANT_PARTIAL": "RELEVANT_PARTIAL",
+        "NO_RELEVANT_KNOWLEDGE": "NO_RELEVANT_KNOWLEDGE",
+        "IRRELEVANT_RETRIEVAL": "IRRELEVANT_RETRIEVAL",
+        "CONFLICTING_KNOWLEDGE": "CONFLICTING_KNOWLEDGE"
+      }
+    },
+    {
+      "question": "What are the GRC Rule Set Components?",
+      "detectedFamily": "grc-ruleset",
+      "topic": "GRC",
+      "folders": [
+        "grc"
+      ],
+      "returnedCandidates": 16,
+      "scopedCount": 12,
+      "topScore": 0.5610195044740383,
+      "belowLiveRelevanceThreshold": false,
+      "coverageStatus": "RELEVANT_SUFFICIENT",
+      "useRetrievedAsGrounding": true,
+      "top8": [
+        {
+          "rank": 1,
+          "id": "chunk_61d52f8a5a92b6566110481c49ecd67797dedc6c304c46f2a35607d972c3cfa8",
+          "sourceFile": "grc/ara.md",
+          "heading": "Overview",
+          "score": 0.4528464417464353,
+          "preview": "## Overview Access Risk Analysis is the GRC component that evaluates segregation of duties conflicts. It runs against a maintained ruleset, checking both existi"
+        },
+        {
+          "rank": 2,
+          "id": "chunk_b1ac9c9693c503b880be291ead299c01c439c93f221222d759f4ad6c97403256",
+          "sourceFile": "grc/grc-overview.md",
+          "heading": "Configuration",
+          "score": 0.4932542416837273,
+          "preview": "- Configure connectors linking GRC to every target system requiring governed access - Maintain the ARA ruleset to reflect current business processes and complia"
+        },
+        {
+          "rank": 3,
+          "id": "chunk_58016a526e1426234dc01b83e2124c600442d54264c898e392e78e5bc0d623e1",
+          "sourceFile": "grc/grc-scenarios-greenfield-brownfield.md",
+          "heading": "Q57: In a hybrid Brownfield landscape, GRC ARA performance degrades significantly during full risk analysis sync jobs. How do you optimize execution?",
+          "score": 0.4871614780747792,
+          "preview": "I would optimize Access Control repository and analysis scope before blaming the ruleset design. Decision: Prefer incremental sync and scoped connector groups o"
+        },
+        {
+          "rank": 4,
+          "id": "chunk_21cd7b9466abbbecdde18037b642b96715cd3bce074eafa03376fd691c1a1ced",
+          "sourceFile": "grc/grc-overview.md",
+          "heading": "What Makes This a 10/10 Answer",
+          "score": 0.45763698443081946,
+          "preview": "An average answer lists the four GRC components. A 10/10 answer explains how they work together as one governed process — request, risk analysis, approval, prov"
+        },
+        {
+          "rank": 5,
+          "id": "chunk_80aea69fcb74ab5187254127516061a198f8626cb383581f5bb4dc710dd536e5",
+          "sourceFile": "grc/grc-overview.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.5238394732912165,
+          "preview": "Risk analysis can read a target system only after that system is a connector. The SAP Help integration guide for Access Control 12.0.31 registers it under Gover"
+        },
+        {
+          "rank": 6,
+          "id": "chunk_54471fd8c2939cd38884f32667103e7c5e9835bf3f5af767c04d05a68dcd694c",
+          "sourceFile": "grc/grc-overview.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.5082218294079364,
+          "preview": "SAP GRC Access Control governs how access actually gets granted, not just how it's technically structured. Standard SAP security — PFCG roles, authorization obj"
+        },
+        {
+          "rank": 7,
+          "id": "chunk_94d8c979a53c228a1337e2b9ce1c100c1127808a6c3d4bc94f0a6a98e5c9324c",
+          "sourceFile": "grc/connectors.md",
+          "heading": "90 Second Interview Answer",
+          "score": 0.49102077098256297,
+          "preview": "A connector is the technical integration between GRC and any system it needs to govern, and it's foundational infrastructure that almost every other GRC capabil"
+        },
+        {
+          "rank": 8,
+          "id": "chunk_e57603404954b11c239a3809a6d1a8480ab5108d3161f2f00ee382699360a0eb",
+          "sourceFile": "grc/arm.md",
+          "heading": "60 Second Interview Answer",
+          "score": 0.47321908358269976,
+          "preview": "ARM is the provisioning workflow at the center of GRC Access Control. It starts when a request is submitted — new access, a change, or a termination — and the f"
+        }
+      ],
+      "bankOrGapFillerInTop8": [],
+      "technicalPreferredInTop8": true,
+      "technicalReference": {
+        "id": "chunk_61d52f8a5a92b6566110481c49ecd67797dedc6c304c46f2a35607d972c3cfa8",
+        "sourceFile": "grc/ara.md",
+        "heading": "Overview",
+        "rankAmongScoped": 1
+      },
+      "knowledgeHasTopical": true,
+      "q22HeadingInKnowledge": false,
+      "validateInstructionInKnowledge": false,
+      "coverageEnum": {
+        "RELEVANT_SUFFICIENT": "RELEVANT_SUFFICIENT",
+        "RELEVANT_PARTIAL": "RELEVANT_PARTIAL",
+        "NO_RELEVANT_KNOWLEDGE": "NO_RELEVANT_KNOWLEDGE",
+        "IRRELEVANT_RETRIEVAL": "IRRELEVANT_RETRIEVAL",
+        "CONFLICTING_KNOWLEDGE": "CONFLICTING_KNOWLEDGE"
+      }
+    },
+    {
+      "question": "Explain the Mitigation Lifecycle.",
+      "detectedFamily": "mitigation-lifecycle",
+      "topic": "GRC",
+      "folders": [
+        "grc"
+      ],
+      "returnedCandidates": 16,
+      "scopedCount": 14,
+      "topScore": 0.3355169880813597,
+      "belowLiveRelevanceThreshold": true,
+      "coverageStatus": "RELEVANT_SUFFICIENT",
+      "useRetrievedAsGrounding": true,
+      "top8": [
+        {
+          "rank": 1,
+          "id": "chunk_c48e3e037e2f43c75418507da1c43fed3905be9b3ffaccdce93f769aac62fee5",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "Implementation Activities",
+          "score": 0.2845343434447479,
+          "preview": "- Run baseline risk analysis and triage results into remediation, mitigation, or acceptance - Design mitigating control templates for common conflict scenarios "
+        },
+        {
+          "rank": 2,
+          "id": "chunk_d4a26c8f5206fc62204dcb1ddce6472994eb81be3ef5658e30619d50a3025f37",
+          "sourceFile": "grc/mitigation.md",
+          "heading": "Operational Mitigation Control Lifecycle",
+          "score": 0.3939975317513931,
+          "preview": "SAP Access Control does not publish a single product feature named \"Mitigation Lifecycle.\" In practice, organizations operate mitigating controls through a gove"
+        },
+        {
+          "rank": 3,
+          "id": "chunk_9556f00ea2ed3bdf8481551bca41c55810c36495b6bce37069e5f3d810367105",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "Best Practices",
+          "score": 0.3233371604648523,
+          "preview": "- Default to remediation whenever it's genuinely feasible, reserving mitigation for real constraints - Track and enforce mitigating control execution, not just "
+        },
+        {
+          "rank": 4,
+          "id": "chunk_ea6cc58150845099f89c710e5d7789c73110889af8337e816a5c97531718aa37",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "Red Flags",
+          "score": 0.32024926713766944,
+          "preview": "## Red Flags - Treating mitigation as equivalent to remediation rather than a fallback - No mention of tracking whether mitigating controls are actually perform"
+        },
+        {
+          "rank": 5,
+          "id": "chunk_a947bfb80787701f22707ee0d0d6554ec0d371a96855fd7a25d4fb77ab658cee",
+          "sourceFile": "grc/mitigation.md",
+          "heading": "What Makes This a 10/10 Answer",
+          "score": 0.3196834770806426,
+          "preview": "An average answer describes a mitigating control as a compensating review process. A 10/10 answer explains the formal components GRC requires, why monitor indep"
+        },
+        {
+          "rank": 6,
+          "id": "chunk_23bda595524da98c4b54457451d74714a6140c054328f0db1a6747d28e89b51f",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "Interviewer's Hidden Expectations",
+          "score": 0.3098150333947107,
+          "preview": "Interviewers want to hear that you understand risk analysis results as the start of a decision process, not the end of one. They're listening for whether you ca"
+        },
+        {
+          "rank": 7,
+          "id": "chunk_5248e8475bfd89305756b57cd2db4914e4d97eaccf05f83f9a549a776555aeed",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "Common Mistakes",
+          "score": 0.30597917706052824,
+          "preview": "- Defaulting to mitigation because it's politically easier than remediation - Documenting mitigating controls that are never actually executed - Treating every "
+        },
+        {
+          "rank": 8,
+          "id": "chunk_5fe1e8435e83d6a7b1ad68da4b8c78490e2aa0dcca9b04eac8d72dd5ffc6b981",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "Keywords",
+          "score": 0.2955069998160855,
+          "preview": "## Keywords risk analysis, remediation, mitigation, acceptance, risk level, prioritization, mitigating control, systemic conflict"
+        }
+      ],
+      "bankOrGapFillerInTop8": [],
+      "technicalPreferredInTop8": true,
+      "technicalReference": {
+        "id": "chunk_d4a26c8f5206fc62204dcb1ddce6472994eb81be3ef5658e30619d50a3025f37",
+        "sourceFile": "grc/mitigation.md",
+        "heading": "Operational Mitigation Control Lifecycle",
+        "rankAmongScoped": 2
+      },
+      "knowledgeHasTopical": true,
+      "q22HeadingInKnowledge": false,
+      "validateInstructionInKnowledge": false,
+      "coverageEnum": {
+        "RELEVANT_SUFFICIENT": "RELEVANT_SUFFICIENT",
+        "RELEVANT_PARTIAL": "RELEVANT_PARTIAL",
+        "NO_RELEVANT_KNOWLEDGE": "NO_RELEVANT_KNOWLEDGE",
+        "IRRELEVANT_RETRIEVAL": "IRRELEVANT_RETRIEVAL",
+        "CONFLICTING_KNOWLEDGE": "CONFLICTING_KNOWLEDGE"
+      }
+    },
+    {
+      "question": "What if Firefighter Logs are Not Generated?",
+      "detectedFamily": "eam-ff-logs",
+      "topic": "GRC",
+      "folders": [
+        "grc"
+      ],
+      "returnedCandidates": 16,
+      "scopedCount": 15,
+      "topScore": 0.7473141556183853,
+      "belowLiveRelevanceThreshold": false,
+      "coverageStatus": "RELEVANT_SUFFICIENT",
+      "useRetrievedAsGrounding": true,
+      "top8": [
+        {
+          "rank": 1,
+          "id": "chunk_cf97128311049edf126244fbafa578cd5325d97a358ff81147520d04a165d985",
+          "sourceFile": "grc/firefighter.md",
+          "heading": "Troubleshooting",
+          "score": 0.6793765051076229,
+          "preview": "Common issue: an engineer can't see the Firefighter ID they expect to use. Root cause: they haven't been assigned to that Firefighter ID in the owner configurat"
+        },
+        {
+          "rank": 2,
+          "id": "chunk_7d8be02f5cfea79dafc7c70df85b69d3f9e20ca266cc9569c5c00bb83aa8dd5c",
+          "sourceFile": "grc/eam.md",
+          "heading": "Troubleshooting",
+          "score": 0.6342462053573054,
+          "preview": "Common issue: a controller review is significantly delayed or never happens. Root cause: no enforcement mechanism ensures timely review after a session closes. "
+        },
+        {
+          "rank": 3,
+          "id": "chunk_5969ef4f574a3b85647dcde65795fb1a4274b3c914c8238fde002e1eeac51d7c",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "Troubleshooting",
+          "score": 0.4195156763948532,
+          "preview": "Common issue: the same conflicts keep reappearing analysis cycle after cycle. Root cause: conflicts are being mitigated instead of remediated when remediation w"
+        },
+        {
+          "rank": 4,
+          "id": "chunk_24dc6dedbd4ebcfa6d11ffbfb30c29b808451f42b9cb4eb82bdf7aed52312fc4",
+          "sourceFile": "grc/risk-analysis.md",
+          "heading": "Troubleshooting",
+          "score": 0.3710469469421308,
+          "preview": "Common issue: risk owners are overwhelmed by the volume of flagged conflicts and start approving without real review. Root cause: prioritization criteria aren't"
+        },
+        {
+          "rank": 5,
+          "id": "chunk_1a24348f58ae63223b403e7d5c37af5964de9530a1ee5772fbba3e1b78e6ccfa",
+          "sourceFile": "grc/firefighter.md",
+          "heading": "Firefighter (Operational Usage)",
+          "score": 0.5644254071052226,
+          "preview": "# Firefighter (Operational Usage)"
+        },
+        {
+          "rank": 6,
+          "id": "chunk_0ea8560cfda9f047a39b32041a2fb6b4b5526a75f0305fd2b477691483f0ff63",
+          "sourceFile": "grc/grc-principal-architect-interview-bank.md",
+          "heading": "Q18: What is the technical mechanism behind Emergency Access Management (EAM) ID-Based vs. Role-Based Firefighting?",
+          "score": 0.5705986210147632,
+          "preview": "I would choose the firefighter model from the UI and audit requirements. ID-based firefighting runs a session under a dedicated firefighter ID with logs tied to"
+        },
+        {
+          "rank": 7,
+          "id": "chunk_85c7febfcb430ff4b5e314f5c21d85b063e37d77fa8040aa279df5de47ee2160",
+          "sourceFile": "grc/deloitte-usi-specific-gap-fillers.md",
+          "heading": "Q109: How do you configure and secure central vs. decentralized Emergency Access Management (EAM / Firefighting)?",
+          "score": 0.537492771825809,
+          "preview": "- **Decision:** Deploy Centralized EAM for unified administration and log consolidation, with Decentralized EAM as a failover backup for emergency network outag"
+        },
+        {
+          "rank": 8,
+          "id": "chunk_5ec9f604217f66fda3d560023f237410f33475d6b6c40086bebf223b5e0ae979",
+          "sourceFile": "grc/grc-principal-architect-interview-bank.md",
+          "heading": "Q13: How do you troubleshoot a missing authorization issue in a Fiori application when SU53 shows no failures?",
+          "score": 0.4754125885930109,
+          "preview": "I would not stop at SU53 for Fiori. Check browser network and console for 403/500, Gateway error log /IWFND/ERROR_LOG, then STAUTHTRACE or ST01 on the backend w"
+        }
+      ],
+      "bankOrGapFillerInTop8": [
+        "6:grc/grc-principal-architect-interview-bank.md",
+        "7:grc/deloitte-usi-specific-gap-fillers.md",
+        "8:grc/grc-principal-architect-interview-bank.md"
+      ],
+      "technicalPreferredInTop8": true,
+      "technicalReference": {
+        "id": "chunk_cf97128311049edf126244fbafa578cd5325d97a358ff81147520d04a165d985",
+        "sourceFile": "grc/firefighter.md",
+        "heading": "Troubleshooting",
+        "rankAmongScoped": 1
+      },
+      "knowledgeHasTopical": true,
+      "q22HeadingInKnowledge": false,
+      "validateInstructionInKnowledge": false,
+      "coverageEnum": {
+        "RELEVANT_SUFFICIENT": "RELEVANT_SUFFICIENT",
+        "RELEVANT_PARTIAL": "RELEVANT_PARTIAL",
+        "NO_RELEVANT_KNOWLEDGE": "NO_RELEVANT_KNOWLEDGE",
+        "IRRELEVANT_RETRIEVAL": "IRRELEVANT_RETRIEVAL",
+        "CONFLICTING_KNOWLEDGE": "CONFLICTING_KNOWLEDGE"
+      }
+    }
+  ]
+}

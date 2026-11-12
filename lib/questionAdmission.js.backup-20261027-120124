@@ -1,0 +1,111 @@
+/**
+ * Question admission with explicit noise, ambiguity, and context handling.
+ * Well-formed questions and technical issue statements are admitted; pure chatter
+ * is ignored; context-dependent fragments are deferred rather than generated alone.
+ */
+const { isNoiseOnly } = require("./transcriptGuardrails.js");
+
+const DECISIONS = {
+  ANSWER: "ANSWER",
+  IGNORE: "IGNORE",
+  DEFER: "DEFER"
+};
+
+const deferredOnIncomplete = true;
+
+const TECHNICAL_SIGNAL = /\b(?:SAP|S\/4(?:HANA)?|S4(?:HANA)?|ECC|GRC|IAG|IAS|IPS|BTP|Fiori|SoD|SU24|SU25|SU53|PFCG|MSMP|BRF\+|XSUAA|CERTRULE|STAUTHTRACE|Firefighter|authori[sz]ation|derived role|roles?|ruleset|workflow|Access Control|access request|access risk|risk analysis|provisioning|JML|ITGC|OData|mitigating control|mitigation|on[- ]?prem(?:ise|ises)?|Public Edition|Private Edition|SuccessFactors|identity|catalog|UAT|SM59|SAP_ALL|controller review|presales)\b/i;
+
+const OPEN_TAIL = new Set(
+  "a an the and or but so to of in on for with at from by as about into over your you we they would could should can will do does did how what when where which who if that this".split(/\s+/)
+);
+
+function normalize(raw) {
+  return String(raw || "").replace(/[â€™â€˜]/g, "'").replace(/\s+/g, " ").trim();
+}
+
+function decision(code, reason, features = {}) {
+  return { decision: code, reason, features: { ...features, deferredOnIncomplete } };
+}
+
+function isAlwaysUnderspecified(text) {
+  return /^(?:how|what)\s+to\s+(?:iag|grc)\s*[?.!]*$/i.test(text)
+    || /^have you statistical\b/i.test(text)
+    || /^(?:how\s+){2,}/i.test(text);
+}
+
+function isContextlessFragment(text) {
+  const tokens = text.toLowerCase().replace(/[^a-z0-9+/? ]/g, " ").split(/\s+/).filter(Boolean);
+  if (tokens.length <= 2) return true;
+  if (/^(?:and|or|so|but|then|what about|or maybe|something about|just|based in|implementation bit|post selling|identify customer then partner|you you you|the role or)\b/i.test(text)) return true;
+  if (/^what\s+if\b/i.test(text)) return true;
+  if (OPEN_TAIL.has(tokens[tokens.length - 1])) return true;
+  if (/^(?:how|what|where|which|who)\s+to\b/i.test(text) && tokens.length < 5) return true;
+  if (/^(?:how\s+){2,}/i.test(text)) return true;
+  return false;
+}
+
+function isWellFormedAsk(text, count) {
+  if (count < 4) return false;
+  if (/^(?:and|or|so|but|then|or maybe|something about|just|based in)\b/i.test(text)) return false;
+  if (/^have you statistical\b/i.test(text) || /^(?:how\s+){2,}/i.test(text)) return false;
+
+  const questionOrPrompt = /^(?:what|how|why|when|where|which|who|can|could|would|should|do|does|did|is|are|have|has|tell|walk|compare|explain|describe|outline|give|connect|identify|trace|configure|design|troubleshoot|implement|remediate|validate|propose|modify|integrate|provision|approve|assign)\b/i.test(text);
+  const explicitlyAsked = /\?\s*$/.test(text) && count >= 4;
+  return questionOrPrompt || explicitlyAsked;
+}
+
+function admitQuestion(raw, context = {}) {
+  const text = normalize(raw);
+  const priorQuestion = normalize(context.priorQuestion || "");
+  const count = text ? text.split(/\s+/).filter(Boolean).length : 0;
+  const features = {
+    tokens: count,
+    hasPrior: Boolean(priorQuestion),
+    deferredOnIncomplete
+  };
+
+  if (!text) return decision(DECISIONS.IGNORE, "empty", features);
+  if (isNoiseOnly(text)) return decision(DECISIONS.IGNORE, "noise-only", features);
+  if (isAlwaysUnderspecified(text)) return decision(DECISIONS.DEFER, "underspecified-fragment", features);
+
+  // A real prior question gives short but meaningful follow-ups their context.
+  // Noise and structurally under-specified phrases were filtered above.
+  if (priorQuestion) {
+    return decision(DECISIONS.ANSWER, "contextual-follow-up", features);
+  }
+
+  if (isContextlessFragment(text)) {
+    return decision(DECISIONS.DEFER, "ambiguous-fragment", features);
+  }
+
+  // Permit concise but explicit technical questions such as "What is SoD?".
+  // Contextless fragments ("What about the workflow?") were deferred above.
+  const conciseTechnicalAsk = count >= 3 && /\?\s*$/.test(text) && TECHNICAL_SIGNAL.test(text);
+  if (isWellFormedAsk(text, count) || conciseTechnicalAsk || (count >= 4 && TECHNICAL_SIGNAL.test(text))) {
+    return decision(DECISIONS.ANSWER, "well-formed-question-or-technical-issue", features);
+  }
+
+  return decision(DECISIONS.DEFER, "insufficient-question-context", features);
+}
+
+function priorAnchor(history = []) {
+  const items = Array.isArray(history) ? history : [];
+  for (let index = items.length - 1; index >= 0; index -= 1) {
+    const item = items[index];
+    if (!item || item.disposition === DECISIONS.IGNORE || item.disposition === DECISIONS.DEFER) continue;
+    const role = item.role || item.type;
+    if (role === "assistant" || role === "response" || role === "answer") continue;
+    const content = item.content || item.text || item.question || "";
+    if (!String(content).trim()) continue;
+    const admitted = admitQuestion(content, { priorQuestion: "" });
+    if (admitted.decision === DECISIONS.ANSWER) return String(content);
+  }
+  return "";
+}
+
+module.exports = {
+  DECISIONS,
+  admitQuestion,
+  priorAnchor,
+  deferredOnIncomplete
+};
